@@ -35,6 +35,8 @@ The VIM section requires some cleanup.
 - `Ctrl+B`				            Show/hide sidebar
 - `Ctrl+J`				            Show/hide console
 - ``Ctrl+` ``                 Show/hide terminal
+- `Ctrl+Shift+V`              Open file preview in tab
+- `Ctrl+K, V`                 Show file preview (side-by-side)
 
 - `Ctrl+K, M`                 Select language
 
@@ -46,8 +48,8 @@ The VIM section requires some cleanup.
 
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)
 
-- `Ctrl+Alt+C`                Copy file path
-- `Ctrl+Alt+Shift+C`          Copy file relative path
+- `Ctrl+Alt+C`                Copy file path (from explorer panel)
+- `Ctrl+Alt+Shift+C`          Copy file relative path (from explorer panel)
 
 #### custom
 

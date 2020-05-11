@@ -252,26 +252,60 @@ $XDG_RUNTIME_DIR
 
 ### Setting system/shell variables in scripts
 
-On non interactive shells, `/etc/profile` and `/etc/bash.bashrc` (and the corresponding per-user files) are executed, so vars can be set there.
+It's a bloody mess.
 
-On non-interactive shells, bash rc files are the only executed ones.
+First, there are two types of logins: interactive and not.
 
-`/etc/profile` supports `*.sh` scripts under `/etc/profile.d`, while `/etc/bash.bashrc` doesn't. A nice addition to the latter is:
+Then, there are per-O/S specific compiled configurations. On Debian-based systems, also `/etc/bash.bashrc` is executed, although, it does not run in any (expected) case (!!).
+
+Cases:
 
 ```sh
-if [ -z "$PS1" ]; then
-  if [[ -d /etc/bash.bashrc.d ]]; then
-    for f in /etc/bash.bashrc.d/*.sh; do
-      source "$f"
-    done
-    unset f
-  fi
+# Note that the tracker has been set before the interactive test in every file.
 
-  return
-fi
+# Interactive SSH session:
+#
+#   /etc/profile /etc/bash.bashrc /etc/profile.d/track.sh /home/user1/.bashrc
+#
+ssh myserver.ts.int
+echo $ENV_TRACKER
+
+# Non-interactive SSH session:
+#
+#   /etc/bash.bashrc /home/user1/.bashrc
+#
+ssh myserver.ts.int 'echo $ENV_TRACKER'
+
+# `sudo -u`:
+#
+#   (none)
+#
+# [Explanation](https://unix.stackexchange.com/a/472226): $HOME is not changed!
+#
+ssh -t myserver.ts.int 'sudo -u user2 bash -c '\''echo $ENV_TRACKER'\'''
+
+# `sudo -iu`:
+#
+#   /etc/profile /etc/profile.d/track.sh /home/user2/.bashrc
+#
+# Note how `$HOME/.bashrc` execution doesn't imply `/etc/bash.bashrc` execution!
+#
+ssh -t myserver.ts.int 'sudo -iu user2 bash -c '\''echo $ENV_TRACKER'\'''
+
+# `sudo -Eu`:
+#
+#   /etc/bash.bashrc /home/user1/.bashrc
+#
+# Like `-u`, however, inherits the non-interactive vars of the $SUDO_USER (user1).
+#
+ssh -t myserver.ts.int 'sudo -Eu user2 bash -c '\''echo $ENV_TRACKER'\'''
 ```
 
-System services don't run either of the two. In the case of Systemd, use `Environment=...` for this purpose.
+Summary: if one wants to cover every case (except the bare `sudo -u`), it's best to set variables at the top of `/etc/profile` and `/etc/bash.bashrc`.
+
+On a server system, all the config files may be changed, and apply on subsequent logins; no need to reboot the servers.
+
+Don't forget that system services don't run any. In the case of Systemd, use `Environment=...` for this purpose.
 
 ## Systemctl
 

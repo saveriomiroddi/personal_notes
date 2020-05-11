@@ -6,6 +6,7 @@
   - [Format](#format)
   - [Bisect](#bisect)
   - [Export (`archive`)](#export-archive)
+  - [Informations gathering](#informations-gathering)
 
 ## Log
 
@@ -59,4 +60,18 @@ Export in tar format:
 ```sh
 # Example export->import into another directory.
 archive master Gemfile Gemfile.lock gems_dir | tar x -f - -C /export
+```
+
+## Informations gathering
+
+Low(er) level branch information; can be used to find the remote branch
+
+```sh
+# The output listed is exact.
+
+$ git status -b --porcelain
+## test...origin/test [gone]
+
+$ git status -b --porcelain
+## master...origin/master
 ```

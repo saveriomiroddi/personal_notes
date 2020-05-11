@@ -76,15 +76,15 @@ use std::io::Write; // bring flush() into scope
 #[allow(dead_code)]
 fn testing(n: u32) -> String {
   if n > 10 {
-    panic("Error message!");
+    panic!("Error message!");
   }
   // In order to return a value without using `return`, omit the semicolon.
   //
-  "abc"
+  String::from("abc")
 }
 
 fn main() {
-  println!("Enter guess:");
+  print!("Enter guess: ");
   io::stdout().flush().unwrap(); // makes sure that the output is flushed, since O/S generally do it per-line.
 
   // `mut`: mutable.
@@ -101,7 +101,7 @@ fn main() {
 
   // Placeholder: `{}`
   //
-  print!("Guess: {}", guess);
+  println!("Guess: {}", guess);
 }
 ```
 
@@ -175,8 +175,8 @@ Arrays (immutable, so they're allocated on the stack):
 
 ```rust
 let my_list = [1, 2, 3];
-let my_list = [true; 4]                 // 4 elements initialized as true; won't work with variable size (use a Vec)
-let my_list[u32; 3] = [1, 2, 3]         // with data type annotation; ugly!
+let my_list = [true; 4];                // 4 elements initialized as true; won't work with variable size (use a Vec)
+let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
 ```
 
 Vectors (mutable):
@@ -194,7 +194,7 @@ vec[0] = 2;
 
 vec.extend([1, 2, 3].iter().copied());  // append a list
 vec.extend(&[1, 2, 3]);                 // borrowing version
-vec.iter()                              // iterator
+vec.iter();                             // iterator
 
 vec.first();
 vec.last();

@@ -9,7 +9,9 @@
   - [Debian alternatives](#debian-alternatives)
   - [Environment](#environment)
     - [Available variables](#available-variables)
-    - [Setting system/shell variables in scripts](#setting-systemshell-variables-in-scripts)
+    - [Shell (initscripts)](#shell-initscripts)
+      - [Example cases](#example-cases)
+      - [sudo -i, login shell test, and bash](#sudo--i-login-shell-test-and-bash)
   - [Systemctl](#systemctl)
   - [Terminal](#terminal)
   - [Desktop Environment: windows](#desktop-environment-windows)
@@ -250,62 +252,88 @@ Current user run dir:
 $XDG_RUNTIME_DIR
 ```
 
-### Setting system/shell variables in scripts
+### Shell (initscripts)
 
-It's a bloody mess.
+There are two aspects of a shell:
 
-First, there are two types of logins: interactive and not.
+- interactive <> non interactive
+- login <> non login
 
-Then, there are per-O/S specific compiled configurations. On Debian-based systems, also `/etc/bash.bashrc` is executed, although, it does not run in any (expected) case (!!).
+Best explanation: https://askubuntu.com/a/376386/46091.
 
-Cases:
+Additionally, there are per-O/S specific compiled configurations. On Debian-based systems, there is `/etc/bash.bashrc` which is run on *non login* shells.
+
+Files involved:
+
+- `/etc/profile`: for login shells; optionally sources `/etc/bash.bashrc`; always sources `/etc/profile.d/*.sh`
+- `/etc/bash.bashrc`: for interactive non-login shells (see [here](https://askubuntu.com/a/815083)), however, it's not always loaded when `$HOME/.bashrc` is (!!)
+- `$HOME/.bashrc`: not always sourced; part of the body is optionally executed.
+
+All in all, it'a bloody mess; see the next subsection after the examples.
+
+#### Example cases
+
+Example cases (the tracker has been set before the interactive test in every file):
 
 ```sh
-# Note that the tracker has been set before the interactive test in every file.
-
-# Interactive SSH session:
-#
-#   /etc/profile /etc/bash.bashrc /etc/profile.d/track.sh /home/user1/.bashrc
-#
+# Interactive SSH session: /etc/profile /etc/bash.bashrc /etc/profile.d/track.sh /home/user1/.bashrc
 ssh myserver.ts.int
-echo $ENV_TRACKER
+env | grep ^ENV_TRACKER
 
-# Non-interactive SSH session:
-#
-#   /etc/bash.bashrc /home/user1/.bashrc
-#
-ssh myserver.ts.int 'echo $ENV_TRACKER'
+# Non-interactive SSH session: /etc/bash.bashrc /home/user1/.bashrc
+ssh myserver.ts.int 'env | grep ^ENV_TRACKER'
 
-# `sudo -u`:
-#
-#   (none)
-#
-# [Explanation](https://unix.stackexchange.com/a/472226): $HOME is not changed!
-#
-ssh -t myserver.ts.int 'sudo -u user2 bash -c '\''echo $ENV_TRACKER'\'''
+# `sudo -u`: none, [explanation](https://unix.stackexchange.com/a/472226): $HOME is not changed!
+ssh -t myserver.ts.int 'sudo -u user2 bash -c "env | grep ^ENV_TRACKER"'
 
-# `sudo -iu`:
-#
-#   /etc/profile /etc/profile.d/track.sh /home/user2/.bashrc
-#
-# Note how `$HOME/.bashrc` execution doesn't imply `/etc/bash.bashrc` execution!
-#
-ssh -t myserver.ts.int 'sudo -iu user2 bash -c '\''echo $ENV_TRACKER'\'''
+# `sudo -iu` + non interactive shell (`bash -c`): /etc/profile /etc/profile.d/track.sh /home/user2/.bashrc
+ssh -t myserver.ts.int 'sudo -iu user2 bash -c "env | grep ^ENV_TRACKER"'
 
-# `sudo -Eu`:
-#
-#   /etc/bash.bashrc /home/user1/.bashrc
-#
-# Like `-u`, however, inherits the non-interactive vars of the $SUDO_USER (user1).
-#
-ssh -t myserver.ts.int 'sudo -Eu user2 bash -c '\''echo $ENV_TRACKER'\'''
+# `sudo -iu` -> interactive shell: /etc/profile /etc/bash.bashrc /etc/profile.d/ticketsolve.sh /home/app/.bashrc
+ssh -t myserver.ts.int sudo -iu user2
+env | grep ^ENV_TRACKER
+
+# `sudo -Eu` + non interactive shell (`bash -c`): /etc/bash.bashrc /home/user1/.bashrc
+ssh -t myserver.ts.int 'sudo -Eu user2 bash -c "env | grep ^ENV_TRACKER"'
 ```
 
-Summary: if one wants to cover every case (except the bare `sudo -u`), it's best to set variables at the top of `/etc/profile` and `/etc/bash.bashrc`.
+The above are **not** all the possible cases (!!); in a tested Capistrano workflow, `$HOME/.bashrc` was not sourced (wondering if it was using another shell).
 
-On a server system, all the config files may be changed, and apply on subsequent logins; no need to reboot the servers.
+If one wants to cover every case (except the bare `sudo -u`), the best is to use `$HOME/.bashrc` (modified at the top) **and** `/etc/profile.d/` scripts.
 
-Don't forget that system services don't run any. In the case of Systemd, use `Environment=...` for this purpose.
+On a configuration managements system, a clean solution is likely to create a `$HOME/.bashrc.d`-style solution, for drop-in scripts.
+
+On a server system, each login loads the new init scripts, so there's no need to reboot in order to test.
+
+Don't forget that system services don't run any script. In the case of Systemd, use `Environment=...` for this purpose.
+
+#### sudo -i, login shell test, and bash
+
+The `-i` does **not** stand for `i`nteractive; it stands for `i`nitial login` (=login shell).
+
+Joint usage of sudo and bash is confusing, because bash has its own login/interactive options.
+
+Behavior:
+
+```sh
+sudo -iu app bash -c 'shopt -q login_shell && echo login shell'
+# none
+
+sudo -iu app bash
+shopt -q login_shell && echo login shell
+# none
+
+sudo -iu app
+shopt -q login_shell && echo login shell
+# login shell
+```
+
+Bash options:
+
+```
+-i          : If the -i option is present, the shell is interactive.
+-l, --login : Make bash act as if it had been invoked as a login shell (see INVOCATION below).
+```
 
 ## Systemctl
 

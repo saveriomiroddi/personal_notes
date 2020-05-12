@@ -30,9 +30,13 @@
 set -o errtrace           # `-E`: trap errors also inside functions
 set -o xtrace             # `-x`: debugging mode; prints all the statements
 shopt -s nocasematch      # case insensitive matches
+shopt -s inherit_errexit  # subshells inherit errexit (Bash 4.4+)
 ```
 
-**important!** don't forget to set `errtrace` when trapping errors!
+**important!**:
+
+- set `shopt -s inherit_errexit` when performing command substitution!!
+- set `errtrace` when trapping errors!
 
 ## Switch/case
 

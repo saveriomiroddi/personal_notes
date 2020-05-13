@@ -161,12 +161,23 @@ Ranges are:
 `std::iter::Iterator` methods, implemented by Range:
 
 ```rust
+map(|x| x * 2)               // Ruby map!!! 😍😍😍
 rev()                        // reverse. WATCH OUT, UNINTUITIVE: since it's not inclusive, it goes from 99 to 0.
 any(|x| x == 33)             // terminates on the first occurrence.
 filter(|x| x == 33)          // iterator of the items verifying the condition; LAZY!
 nth(n)                       // nth element (0-based)
 take(n)                      // iterator for the first n elements
 enumerate()                  // iterator (index, &value)
+join("str")                  // join using str
+
+chunks(n)                    // iterate in chunks of n elements; includes last chunk, if smaller
+chunks_exact(n)              // iterate in chunks of n elements; does not include the last chunk, if smaller
+windows(n)                   // like chunks, but with overlapping slices
+
+// transform an iterator into a collection
+collect()
+collect::<Vec<i32>>()
+collect::<Vec<_>>()
 ```
 
 ### Arrays/Vectors
@@ -192,9 +203,9 @@ vec.pop();
 vec.len();
 vec[0] = 2;
 
+vec.iter();                             // iterator
 vec.extend([1, 2, 3].iter().copied());  // append a list
 vec.extend(&[1, 2, 3]);                 // borrowing version
-vec.iter();                             // iterator
 
 vec.first();
 vec.last();
@@ -209,6 +220,7 @@ Don't forget the `&` operator!!!
 
 ```rust
 let string = String::from("pizza!");
+let string = "pizza!".to_string();
 
 // The type is `&str`
 //
@@ -496,6 +508,7 @@ String APIs:
 string.clear();                           // blank a string
 string.len();
 string.as_bytes();                        // byte slice of the string contents
+string.push_str(&str);                    // concatenate (append) strings
 ```
 
 Formatting:

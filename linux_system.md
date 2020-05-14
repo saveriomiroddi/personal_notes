@@ -265,7 +265,8 @@ Additionally, there are per-O/S specific compiled configurations. On Debian-base
 
 Files involved:
 
-- `/etc/profile`: for login shells; optionally sources `/etc/bash.bashrc`; always sources `/etc/profile.d/*.sh`
+- `/etc/profile`: for login shells; conditionally sources `/etc/bash.bashrc`; always sources `/etc/profile.d/*.sh`
+- `$HOME/.profile`: for login shells; sources `$HOME/.bashrc` (!)
 - `/etc/bash.bashrc`: for interactive non-login shells (see [here](https://askubuntu.com/a/815083)), however, it's not always loaded when `$HOME/.bashrc` is (!!)
 - `$HOME/.bashrc`: not always sourced; part of the body is optionally executed.
 

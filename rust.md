@@ -20,7 +20,7 @@
     - [Dangling pointers](#dangling-pointers)
     - [Slices](#slices)
   - [APIs/Crates](#apiscrates)
-    - [String-related](#string-related)
+    - [String/char-related](#stringchar-related)
     - [Random (`rand`)](#random-rand)
     - [Date/times (`chrono`)](#datetimes-chrono)
 
@@ -136,7 +136,8 @@ Chars: `'🤯'` (4 bytes, require single quotes).
 Tuples:
 
 ```rust
-let (a, b, c) = (0, 1, 2);        // with multiple assignment
+let foo = ("bar", "baz");
+let (bar, baz) = foo;             // with multiple assignment (unpacking); foo can also be a tuple literal
 let first_element = tuple.0;      // tuple indexing
 ```
 
@@ -503,7 +504,7 @@ Slices are immutable references, so the ownership needs to be considered:
 
 ## APIs/Crates
 
-### String-related
+### String/char-related
 
 Conversions:
 
@@ -525,6 +526,13 @@ string.push_str(&str);                    // concatenate (append) strings
 // Must use a crate to handle this exactly.
 //
 string.chars();
+```
+
+Char APIs:
+
+```rust
+c.is_alphabetic();
+c.is_numeric();
 ```
 
 Formatting:

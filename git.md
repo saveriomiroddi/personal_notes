@@ -4,6 +4,7 @@
   - [Log](#log)
     - [More complex examples](#more-complex-examples)
   - [Format](#format)
+  - [Merging](#merging)
   - [Bisect](#bisect)
   - [Export (`archive`)](#export-archive)
   - [Informations gathering](#informations-gathering)
@@ -41,6 +42,12 @@ log --merges v0.1.8...v0.1.9	      # search merges between two tags
 
 ```sh
 --format="%h %b"        # $commit $body; if a body has more body lines, they will be shown, so some trickery is required
+```
+
+## Merging
+
+```sh
+checkout (--ours|--theirs) $files   # resolve conflict using ours/theirs version
 ```
 
 ## Bisect

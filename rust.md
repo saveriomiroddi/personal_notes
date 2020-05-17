@@ -489,7 +489,7 @@ fn not_dangling -> String {
 
 ### Slices
 
-Slices are immutable references, so the ownership needs to be considered:
+Slices can refer to arrays and strings. They are immutable references, so the ownership needs to be considered:
 
 ```rust
 {
@@ -501,6 +501,10 @@ Slices are immutable references, so the ownership needs to be considered:
   println!("{}", slice);
 }
 ```
+
+String slices are at *byte* points!
+
+Using string slices as arguments is preferrable to string references, as they're more generic (they can also take strings).
 
 ## APIs/Crates
 

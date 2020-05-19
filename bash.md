@@ -177,6 +177,7 @@ ${str:+<expr>}                    # if the var is set, replace with <expr> (whic
 
 ${str//search/replace}            # substitution (!! NOT REGEX !!) ->
 ${str//[a-e]/ }                   # -> but supports at least character classes!
+                                  # WATCH OUT! In <search>, `~` must be escaped (not not in <replace>).
 
 ${str:[<start>][:<end_expr>]}     # substring (0-based)
                                   # `start`: inclusive; blank: first char
@@ -335,7 +336,7 @@ else
     cat
   } | {
     # stuff to do if the input is not empty
-  }      
+  }
 fi
 ```
 

@@ -48,6 +48,7 @@ The VIM section requires some cleanup.
 
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)
 
+- `Ctrl+K, P`                 Copy file path
 - `Ctrl+Alt+C`                Copy file path (from explorer panel)
 - `Ctrl+Alt+Shift+C`          Copy file relative path (from explorer panel)
 

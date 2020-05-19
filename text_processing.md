@@ -43,6 +43,20 @@ Strip trailing file spaces: `chomp if eof`
 
 ## Sed
 
+Must use `-E` to support extended regular expressions!
+
+Basic support:
+
+- `[...]` (character sets)
+- `*`
+
+Some supported by `-E`:
+
+- `\w`
+- `+`
+
+Capturing groups are not supported.
+
 ### Useful examples
 
 Operations on numbered lines (1-based):
@@ -50,6 +64,8 @@ Operations on numbered lines (1-based):
 - insert : `<n>i<content>`
 - delete : `<n>d`.
 - replace : `<n>c<content>`.
+
+- search/replace on a given line: `<n>s/<search>/<replace>/[g]`
 
 ### Special characters
 

@@ -17,6 +17,7 @@
     - [Formatting](#formatting)
     - [Operations](#operations)
   - [Imagemagick](#imagemagick)
+  - [PGP](#pgp)
   - [Formatting tools](#formatting-tools)
   - [htop](#htop)
 
@@ -296,6 +297,42 @@ Other operations:
 convert "$input" -flip -flop "$output"            # Rotate 180°
 convert "$input" -resize 50% "$output"            # Resize 50%
 convert -size 1920x1080 xc:white "$output.pdf"    # Create blank pdf page, with given resolution (size)
+```
+
+## PGP
+
+Main commands (`gpg...`); `$key_id` can be email or key id.
+
+```sh
+--gen-key                                            # generate a gpg keypair (store in the database)
+
+--armor --export[-secret-key] $key_id                # export a key
+--import $pubkey [--allow-secret-key-import]         # import a key
+
+--edit-key $key_id => fpr => sign                    # mark an imported key as signed (signing with own key)
+--edit-key $key_id => trust => 5                     # [required by some programs] other way to trust a key
+
+--delete[-secret]-key $key_id
+
+--list[-secret]-keys
+--fingerprint $key_id
+
+--recipient $key_id --encrypt [--output $destfile]   # encrypt from stdin
+--decrypt [file] [--output $destfile]
+
+--detach-sign $doc                                   # don't include the original
+--clearsign $doc                                     # don't compress the original, useful for ascii files
+--verify $doc
+
+--keyserver $keyserver_address --search-key $key_id  # search key, by email, on a keyserver
+```
+
+Snippets:
+
+```sh
+# Encode a group of files; gpg can also input from stdin.
+#
+find . -name *.log.gz | xargs -I {} gpg -r phony@recipient.com [--output {}.xxx] --encrypt {}
 ```
 
 ## Formatting tools

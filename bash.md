@@ -13,8 +13,10 @@
   - [Date operations](#date-operations)
   - [Redirections](#redirections)
   - [Process substitution](#process-substitution)
-  - [Ask for input (keypress)](#ask-for-input-keypress)
+  - [Arrays](#arrays)
+    - [Snippets](#snippets)
   - [Script operational concepts](#script-operational-concepts)
+    - [Ask for input (keypress)](#ask-for-input-keypress)
     - [Trapping errors](#trapping-errors)
     - [Log a script output/Enable debugging [log]](#log-a-script-outputenable-debugging-log)
     - [Switching to root user inside a script](#switching-to-root-user-inside-a-script)
@@ -106,6 +108,7 @@ myTest "foo" && echo "bar"      # prints `bar`!
 Metacharacters:
 
 - `\w`: not supported; use `[:alnum:]`, but *doesn't match underscore*
+- `\d`: not supported; use `[0-9]` or `[:digit:]`
 - `\b`: supported
 - `\s`: `[:space:]`
 - `[:xdigit:]`: hexadecimal!
@@ -190,9 +193,9 @@ ${str,,}                          # down case (single `^` applies only once)
 (g)sub (applied to filenames):
 
 ```sh
-${filename%<.ext>}                # strip specific <ext>ension; `*` can be used
+${filename%<.ext>}                # strip specific <ext>ension; `*` can be used [replace suffix]
 ${filename%%.*}                   # strip any extension (anything after the first dot)
-${filename##*.}                   # extract (last) extension
+${filename##*.}                   # extract (last) extension [replace prefix]
 ${filename##*/}                   # extract basename, eg. `"${PWD##*/}"`
 
 ${filename%/*/*}                  # parent dir of a file (watch out - requires at least two slashes!)
@@ -265,15 +268,88 @@ Extension to input: if the command is just a filename, the command is repliced w
 echo $(< "$filename")
 ```
 
-## Ask for input (keypress)
+## Arrays
+
+Note that arrays in zsh work in slightly different ways, so scripts involving them should be shell-specific.
+
+Creation:
+
+```sh
+declare -a $array_name              # create an empty array; local by default
+myarray=("entry 1" entry2)          # create a filled array; space/newline is separator
+
+coordinates=(${1//./ })             # split by `.` (bash) !!! use only for unspaced stuff !!!
+
+# More solid way of creating an array from a string.
+# `mapfile` is synonym of `readarray`.
+#
+# `-t`: remove trailing delimiter
+#
+# in order to make the variable local, declare it as local before executing `mapfile`
+# When using this pattern, don't forget `-n` on the echo!!
+# here-string appends a newline, so it can be used only when mapfile has a newline delimiter.
+#
+mapfile -td. coordinates < <(echo -n "$1")
+mapfile -t coordinates < <(printf "a a\nb b")
+mapfile -t coordinates <<< "$myvar"
+
+IFS=, read -ra coordinates <<< $1    # create via `read`; note how `echo -n` is not required
+
+files=(scripts/*.cnf)                # create from list of files; **must use nullglob shopt!**
+```
+
+Operations; indexes are 0-based:
+
+```sh
+coordinates+=("abc")                 # append an entry
+echo ${coordinates[0]}               # access an array; last entry: -1
+unset 'coordinates[1]'               # delete an entry
+coordinates[1]=b                     # set an indexed value
+echo "${coordinates[@]:2}"           # array slicing! ([2..-1]) (see https://stackoverflow.com/a/1336245)
+echo "${@:2}"                        # slice the `$@` variable
+echo ${#coordinates[@]}              # size (length)
+printf '%s\n' "${pizza[@]}"          # print the entries (one per line); echo print all in one line
+echo $(IFS=,; echo "${pizza[*]}")    # join the entries. !!! don't forget the `;` !!!
+
+# Iteration (regular vars/$@)
+#
+for entry in "${coordinates[@]}"; do echo $entry; done
+for param in "$@"; do echo $param; done
+```
+
+### Snippets
+
+Sort an array (/keys of an associative array):
+
+```sh
+# For entries with newlinews, `sort -z` and mapfile `-d ''` should be used.
+#
+mapfile -t sorted_keys < <(printf '%s\n' "${!my_ass[@]}" | sort)
+```
+
+Iterate a multiple lines output, assigning it to an array:
+
+```sh
+# `IFS=` prevents leading/trailing line whitespace to be trimmed
+# `-r` prevents interpreting the escape character (`\`)
+# `-a` splits the tokens (by space) into an array; not supported by Zsh.
+#
+binlogs=$(mysql -u"$my_user" -p"$my_pwd" -h"$my_host" -BNe 'SHOW BINARY LOGS')
+
+while IFS= read -r -a binlog; do
+  echo Filename: "${binlog[0]}", Position: "${binlog[1]}"
+done <<< "$binlogs"
+```
+
+## Script operational concepts
+
+### Ask for input (keypress)
 
 Input one char; if `variable_name` is specified, the input is stored in the variable:
 
 ```sh
 read -rsn1 [<variable_name>]
 ```
-
-## Script operational concepts
 
 ### Trapping errors
 

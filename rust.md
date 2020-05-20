@@ -1,10 +1,11 @@
 # Rust
-
 - [Rust](#rust)
   - [Cargo](#cargo)
   - [Syntax/basics](#syntaxbasics)
     - [Basic structure/Printing/Input](#basic-structureprintinginput)
+      - [Printing](#printing)
     - [Variables/Data types](#variablesdata-types)
+    - [Basic operators/operations](#basic-operatorsoperations)
     - [Closures](#closures)
     - [Ranges and `std::iter::Iterator` methods](#ranges-and-stditeriterator-methods)
     - [Arrays/Vectors](#arraysvectors)
@@ -13,7 +14,8 @@
     - [If/then/else](#ifthenelse)
     - [Pattern matching](#pattern-matching)
       - [Error handling](#error-handling)
-    - [Basic operators/operations](#basic-operatorsoperations)
+    - [Structs](#structs)
+    - [[Static] Methods](#static-methods)
   - [Ownership](#ownership)
     - [Move](#move)
     - [Borrowing](#borrowing)
@@ -106,6 +108,13 @@ fn main() {
 }
 ```
 
+#### Printing
+
+```rust
+println!("{:#?}", vec);                 // generic pretty printing
+println!("{:?}", vec);                  // `Debug` format (requires the `Debug` trait)
+```
+
 ### Variables/Data types
 
 ```rust
@@ -139,12 +148,24 @@ Tuples:
 let foo = ("bar", "baz");
 let (bar, baz) = foo;             // with multiple assignment (unpacking); foo can also be a tuple literal
 let first_element = tuple.0;      // tuple indexing
+
+// Use a tuple as function argument
+fn are(dimensions: (u32, u32)) -> u32 {
+  dimensions.0 * dimensions.1
+}
 ```
 
 There are two types of strings:
 
 - literals (`&'static str`); hardcoded in the executable.
 - `std::string::String`s; allocated on the heap: `String::from("text")`.
+
+### Basic operators/operations
+
+```rust
+val += 1; val -= 1;             // increment/decrement value (no postfix)
+let val = 10_u64.pow(2);        // exponentiation (power)
+```
 
 ### Closures
 
@@ -220,10 +241,9 @@ vec.extend(&[1, 2, 3]);                 // borrowing version
 
 vec.first();
 vec.last();
-
-println!("{:?}", vec);                  // must use this for printing
-println!("{:#?}", vec);                 // pretty printing
 ```
+
+Arrays implement the `Debug` trait.
 
 ### (String) Slices
 
@@ -348,11 +368,79 @@ let num: u32 = match num_string.parse() {
 };
 ```
 
-### Basic operators/operations
+### Structs
 
 ```rust
-val += 1; val -= 1;             // increment/decrement value (no postfix)
-let val = 10_u64.pow(2);        // exponentiation (power)
+// Define a struct
+struct User {
+  username: String,
+  active: bool,
+}
+
+// Instantiate it
+let mut user = User {
+  username: String::from("sav"),
+}
+
+// Update it. Requires the whole struct to be mutable!
+user.active = true
+```
+
+Printing requires `Debug` trait!
+
+Empty ("unit-like") struts can also be created, although they have a particular role.
+
+Tuple structs:
+
+```rust
+struct Color(i32, i32, i32);
+let black = Color(0, 0, 0);
+```
+
+tuple structs with same definition cannot share instances.
+
+Odd functionality:
+
+```rust
+// "Field init shorthand" syntax for reducing struct definitions in functions.
+fn create_user(email: String) -> User {
+  User {
+    email,
+    active: true,
+  }
+}
+
+// "Struct update" syntax to copy part of another instance.
+let mut user2 = User {
+  active: false,
+  ..user
+}
+```
+
+### [Static] Methods
+
+Methods definition (essentially, struct functions)
+
+```rust
+struct Rectangle {
+  width: u32,
+  height: u32,
+}
+
+// Multiple methods can be defined in the same `impl` block (and multiple blocks can be defined).
+impl Rectangle {
+  // Methods can also borrow `self` mutably.
+  // Methods taking ownership of `self` are rare and specific.
+  fn area(&self) -> u32 {
+    self.width * self.height
+  }
+}
+
+impl Rectangle {
+  fn square(size: u32) -> Rectangle {
+    Rectangle { width: size, height: size }
+  }
+}
 ```
 
 ## Ownership

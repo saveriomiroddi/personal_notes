@@ -12,6 +12,8 @@
     - [(String) Slices](#string-slices)
     - [For/while (/loop) loops](#forwhile-loop-loops)
     - [If/then/else](#ifthenelse)
+    - [Enums](#enums)
+    - [Option<T>](#optiont)
     - [Pattern matching](#pattern-matching)
       - [Error handling](#error-handling)
     - [Structs](#structs)
@@ -225,7 +227,7 @@ let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
 Vectors (mutable):
 
 ```rust
-let mut vec = Vec::new();               // Basic instantiation
+let mut vec = Vec::new();               // Basic (untyped) instantiation (if the type can be inferred)
 let mut vec = vec![1, 2, 3];            // Macro to initialize a vector from a literal list
 let mut vec = vec![true; n];            // Same, with variable-specified length and initialization
 
@@ -233,7 +235,14 @@ vec.push(1);
 vec.pop();
 
 vec.len();
+let val = &vec[0];
 vec[0] = 2;
+
+// Pattern matching!
+match v.get(2) {
+  Some(entry) => println!("The third element is {}", entry),
+  None => println!("There is no third element."),
+}
 
 vec.iter();                             // iterator
 vec.extend([1, 2, 3].iter().copied());  // append a list
@@ -294,7 +303,7 @@ See the ownership chapter, for the related properties.
 For loops iterate over ranges:
 
 ```rust
-// For the reverse iteration, see the Ranges section, with warning(s).
+// For the reverse iteration, see rev() in the Ranges section, with warning(s).
 //
 for x in 0..10 { }
 
@@ -305,6 +314,11 @@ for x in (0..100).step_by(2).rev() {}
 // Iterate an array.
 //
 for i in array.iter() { }
+
+// Iterate a vector
+//
+for i in &vec { println!("{}", i) }
+for i in &mut vec { *i *= 2 }
 ```
 
 While:
@@ -344,17 +358,102 @@ let (a, b) =
   } else {
     (3, 4)
   };
+
+// If let (see enum+pattern matching sections)
+//
+if let Coin::Quarter(state) = coin {
+  println!("State quarter from {:?}!", state);
+} else {
+  count += 1;
+}
+```
+
+### Enums
+
+Definition:
+
+```rust
+// Each entry is called "variant".
+// The Debug trait is needed for printing.
+//
+#[derive(Debug)]
+enum IpAddrKind {
+  V4,
+  V6,
+}
+
+// Enum with associated data; it can be of any kind, e.g. anonymous structs.
+//
+enum IpAddr {
+  V4(u8, u8, u8, u8),
+  V6(String),
+}
+
+// Methods can even be defined on enums!
+//
+impl IpAddr {
+  fn is_local(&self) -> bool { true }
+}
+```
+
+Assignment and invocation:
+
+```rust
+let four = IpAddrKind::V4;
+let home = IpAddr::V4(127, 0, 0, 1);
+
+fn route(ip_kind: IpAddrKind) { }
+```
+
+### Option<T>
+
+Foundation of Rust. In order to use the contained value, we must extract (and test) it.
+
+```rust
+enum Option<T> {
+  Some(T),
+  None,
+}
+
+// For None, the type must be specified, otherwise it can't be inferred.
+//
+let some_number = Some(5);
+let absent_number: Option<i32> = None;
 ```
 
 ### Pattern matching
 
 ```rust
+// Generic match
+//
 let xxx = match val {
   1 | 2 => "1 or 2",
   _     => {
     "other"
   },
 };
+
+// Match enum; all the entries must be exhausted (or the `_` placeholder must be used).
+// The second case is a variant with an associated value!
+//
+// See `if let` for an alternative structure.
+//
+match message {
+  Message::Move{x, y} => { self.position = Point { x: x, y: y } },
+  Message::Echo(s) => { self.echo(s) },
+  Message::ChangeColor(c1, c2, c3) => { self.color = (c1, c2, c3) },
+}
+
+// Match Option<T>, and example usage.
+//
+fn plus_one(x: Option<i32>) -> Option<i32> {
+  match x {
+    None => None,
+    Some(i) => Some(i + 1),
+  }
+}
+let six = plus_one(Some(5));
+let none = plus_one(None);
 ```
 
 #### Error handling

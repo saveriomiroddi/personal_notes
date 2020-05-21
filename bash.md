@@ -309,7 +309,7 @@ echo "${coordinates[@]:2}"           # array slicing! ([2..-1]) (see https://sta
 echo "${@:2}"                        # slice the `$@` variable
 echo ${#coordinates[@]}              # size (length)
 printf '%s\n' "${pizza[@]}"          # print the entries (one per line); echo print all in one line
-echo $(IFS=,; echo "${pizza[*]}")    # join the entries. !!! don't forget the `;` !!!
+echo $(IFS=,; echo "${pizza[*]}")    # join the entries. !!! don't forget the `;` and the quotes !!!
 
 # Iteration (regular vars/$@)
 #

@@ -29,6 +29,14 @@ printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line
 
 ### Regex extra backslash sequences
 
+Don't substitute part of the match!!:
+
+```sh
+# Don't replace before `\K`.
+#
+echo abc | perl -pe 's/^a\K.*/xx/' # => axx
+```
+
 Apply operations inside regexes (see https://perldoc.perl.org/perlrebackslash.html)!!:
 
 ```sh

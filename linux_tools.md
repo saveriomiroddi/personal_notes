@@ -251,8 +251,8 @@ Interpret a date: `date -d <input>`
 
 Sequences:
 
-- `%A`: full day of the week
-- `%B`: full month
+- `%a/%A`: short/full day of the week
+- `%b/%B`: short/full month
 - `%H:%M:%s`
 - `%Y-%m-%d`
 - `%F %R` == `%Y-%m-%d %H:%M`
@@ -309,8 +309,8 @@ Main commands (`gpg...`); `$key_id` can be email or key id.
 --armor --export[-secret-key] $key_id                # export a key
 --import $pubkey [--allow-secret-key-import]         # import a key
 
---edit-key $key_id => fpr => sign                    # mark an imported key as signed (signing with own key)
---edit-key $key_id => trust => 5                     # [required by some programs] other way to trust a key
+printf $'fpr\nsign\n'   | gpg --command-fd 0 --edit-key $key_id  # self-sign a key
+printf $'trust\n5\ny\n' | gpg --command-fd 0 --edit-key $key_id  # ultimately trust a key [required by some programs]
 
 --delete[-secret]-key $key_id
 

@@ -312,10 +312,12 @@ Main commands (`gpg...`); `$key_id` can be email or key id.
 printf $'fpr\nsign\n'   | gpg --command-fd 0 --edit-key $key_id  # self-sign a key
 printf $'trust\n5\ny\n' | gpg --command-fd 0 --edit-key $key_id  # ultimately trust a key [required by some programs]
 
+printf $'passwd' | gpg --command-fd 0 --edit-key $key_id   # remove passphrase -> INTERACTIVE!
+
 --delete[-secret]-key $key_id
 
 --list[-secret]-keys
---fingerprint $key_id
+--fingerprint [$key_id]
 
 --recipient $key_id --encrypt [--output $destfile]   # encrypt from stdin
 --decrypt [file] [--output $destfile]

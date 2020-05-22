@@ -113,15 +113,21 @@ Base tools:
 
 ### Cowbuilder (pbuilder)
 
-Cowbuilder is a wrapper around pbuilder+cowdancer, which makes building faster:
+[Cowbuilder](https://wiki.debian.org/cowbuilder) is a wrapper around pbuilder+cowdancer, which makes building faster.
 
 ```sh
-sudo cowbuilder --create                  # stored as `/var/cache/pbuilder/base.cow/`
-sudo cowbuilder --update
-sudo cowbuilder --build $package_name.dsc # creates `/var/cache/pbuilder/result/$package_name.deb`
+distros_path="/var/cache/pbuilder/distros"
+mkdir "$distros_path"
 
-debsign /var/cache/pbuilder/result/$package_name.changes # signs both the `dsc` and the `changes` files
+cowbuilder --create --basepath "$distros_path/$distribution" --distribution "$distribution"
+
+cowbuilder --update --basepath "$distros_path/$distribution" --distribution "$distribution"
+
+# creates `$distros_path/result/$package_name.deb`
+cowbuilder --build --basepath "$distros_path/$distribution" --distribution "$distribution" $package_name.dsc
 ```
+
+The basepath can be simplified away by using `~/.pbuilderrc` (see [Ubuntu wiki](https://wiki.ubuntu.com/PbuilderHowto#Multiple_pbuilders)).
 
 In order to make cowbuilder closer to Launchpad, run:
 

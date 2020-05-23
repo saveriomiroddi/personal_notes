@@ -32,22 +32,30 @@
       - [Formatting](#formatting)
       - [Parsing/Numerical/Character conversion](#parsingnumericalcharacter-conversion)
       - [Utils](#utils)
+    - [Reflection](#reflection)
+      - [DeepEqual](#deepequal)
     - [Regular expressions](#regular-expressions)
     - [Time](#time)
     - [Math](#math)
     - [Random](#random)
     - [Streams read/write](#streams-readwrite)
     - [Files/descriptors](#filesdescriptors)
-    - [O/S, Environment variables, Command line arguments](#os-environment-variables-command-line-arguments)
+    - [O/S, Environment variables](#os-environment-variables)
+    - [Command line arguments/Options parsing](#command-line-argumentsoptions-parsing)
     - [Logging](#logging)
     - [Atomic](#atomic)
     - [Sleep](#sleep)
     - [Memory allocation](#memory-allocation)
+    - [Unsafe](#unsafe)
+    - [CGo](#cgo)
+    - [Testing](#testing)
   - [Management](#management)
     - [Packages/naming](#packagesnaming)
       - [init() function](#init-function)
     - [Tools](#tools)
     - [Modules](#modules)
+    - [Build tags](#build-tags)
+    - [Go environment variables, anc cross compiling](#go-environment-variables-anc-cross-compiling)
     - [Shared libraries (invoke from other languages)](#shared-libraries-invoke-from-other-languages)
 
 ## General program structure
@@ -786,6 +794,44 @@ unicode.IsPunct(char)
 unicode.IsSymbol(char)
 ```
 
+### Reflection
+
+```golang
+type Table struct {
+	Name string
+}
+
+func main() {
+	table := Table{
+		Name: "MyTable",
+	}
+
+	fmt.Println("name: ", reflect.TypeOf(table).Name())                      // Table
+	fmt.Println("field value: ", reflect.ValueOf(table).FieldByName("Type")) // MyTable
+}
+```
+
+#### DeepEqual
+
+Deep equality for complex objects. Conditions:
+
+- arrays must have the same elements, in the same order;
+- maps don't have an order concept, so there's no condition.
+
+```golang
+// true
+reflect.DeepEqual(
+  make([]int, 10),
+  make([]int, 10),
+)
+
+// true
+reflect.DeepEqual(
+  map[int]string{1: "one", 2: "two"},
+  map[int]string{2: "two", 1: "one"},
+)
+```
+
 ### Regular expressions
 
 ```golang
@@ -877,6 +923,11 @@ Reading line by line:
 ```golang
 scanner := bufio.NewScanner(f)
 
+// Optionally set the `SplitFunc` (defaults to ScanLines otherwise)
+// The bufio available are: ScanLines, ScanWords, ScanBytes, ScanRunes
+//
+scanner.Split(scanner.ScanWords)
+
 for scanner.Scan() {
   fmt.Println(">", scanner.Text())
 }
@@ -922,14 +973,30 @@ filepath.Abs(string)                // absolute representation of the path (File
 _, err := os.Stat(gobyRoot)         // check if a file exists
 ```
 
-### O/S, Environment variables, Command line arguments
+### O/S, Environment variables
 
 ```golang
 os.Exit(<exit_status>)              // exit to the O/S
 
-os.Args                             // commandline arguments
-
 os.Getenv("GOBY_ROOT")              // environment variables
+```
+
+### Command line arguments/Options parsing
+
+```golang
+// commandline arguments
+os.Args
+
+// parsing options
+// format (option with minus (= -l), default, comment); returns a reference
+// generates help:
+//
+//     Usage of ./playground_golang:
+//       -l	Count lines
+//
+lines := flag.Bool("l", true, "Count lines")
+flag.Parse()
+
 ```
 
 ### Logging
@@ -996,6 +1063,68 @@ runtime.ReadMemStats(&m)
 fmt.Printf("TotalAlloc (Heap) = %v MiB\n", m.TotalAlloc/1048576)
 ```
 
+### Unsafe
+
+WATCH OUT! The unsafe package does not come with Go 1 compatibility guidelines - it could stop working in future versions.
+
+```golang
+func Float32bits(f float32) uint32
+{
+  return *(*uint32)(unsafe.Pointer(&f))
+}
+```
+
+### CGo
+
+The commented lines are the actual C code.
+
+WATCH OUT!:
+
+- There must be no empty lines between the C code and the import;
+- The import must be on its own line
+
+otherwise, the error `could not determine kind of name for C.<function_name>` will be raised.
+
+```golang
+package main
+
+// #include <stdio.h>
+// #include <stdlib.h>
+//
+// static void myprint(char* s) {
+//   printf("%s\n", s);
+// }
+import "C"
+import "unsafe"
+
+func main() {
+	cs := C.CString("Hello World!")
+	C.myprint(cs)
+	C.free(unsafe.Pointer(cs))
+}
+```
+
+Example APIs:
+
+```golang
+// Converts Go string to C string
+func C.CString(string) *C.char
+// C data with explicit length to Go []byte
+func C.GoBytes(unsafe.Pointer, C.int) []byte
+```
+
+### Testing
+
+Compacted test case (`main_test.go`, for testing `main.go`):
+
+```golang
+func TestCountWords(t *testing.T) {
+	if res := count(b); res != 4 {
+		t.Errorf("Expected %d, got %d\n", 4, res)
+	}
+}
+```
+
 ## Management
 
 ### Packages/naming
@@ -1050,6 +1179,14 @@ go run --race "$sourcefile"           # run with race detector
 go get github.com/sav/project         # download a library
 ```
 
+Test, and wildcard (`./...`; excludes `./vendor`):
+
+```sh
+# `v`erbose: prints also successful unit tests.
+#
+go test -v ./...
+```
+
 ### Modules
 
 [Modules](https://github.com/golang/go/wiki/Modules) basic usage:
@@ -1064,6 +1201,39 @@ There are many other aspects, including:
 - dependencies are automatically handled
 
 Configuration is stored in a `go.mod` file.
+
+### Build tags
+
+Sample (complex) tagging; equals `(amd64 AND darwin) OR (i386 AND NOT gccgo)`
+
+```golang
+//+build amd64,darwin i386,!gccgo
+
+package abc
+```
+
+Must leave one space after the `//+build` directive!
+
+Filename suffixes can also be used as build tags; the formats is `filename[_GOOS][_GOARCH]`, e.g. `main_darwin.go`.
+
+### Go environment variables, anc cross compiling
+
+GO env variables, with the two most common:
+
+```sh
+$ go env
+GOARCH="amd64"
+GOOS="linux" # windows, darwin
+...
+```
+
+There are many archs/OSs supported; see [source code](https://github.com/golang/go/blob/master/src/go/build/syslist.go).
+
+Cross-compiling:
+
+```sh
+GOOS=darwin go build
+```
 
 ### Shared libraries (invoke from other languages)
 

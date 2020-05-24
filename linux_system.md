@@ -19,6 +19,7 @@
   - [MIME (extensions) (file associations) handling](#mime-extensions-file-associations-handling)
     - [Adding and associating a new application](#adding-and-associating-a-new-application)
     - [Split MAFF association](#split-maff-association)
+  - [Hardware](#hardware)
 
 ## Filesystems/partitions
 
@@ -468,4 +469,17 @@ cat > /usr/share/mime/packages/maff.xml << 'XML'
 XML
 
 update-mime-database /usr/share/mime
+```
+
+## Hardware
+
+Get hardware information:
+
+```sh
+# Without options, all the system information is reported.
+#
+dmidecode -s \
+  system-product-name   # (laptop) model
+  bios-version
+  chassis-serial-number # (dell) service tag
 ```

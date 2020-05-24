@@ -2,6 +2,7 @@
 
 - [Golang](#golang)
   - [General program structure](#general-program-structure)
+    - [Sample program layout for a cmdline program](#sample-program-layout-for-a-cmdline-program)
   - [Syntax](#syntax)
     - [Variables/Constants/Literals](#variablesconstantsliterals)
     - [Functions](#functions)
@@ -38,10 +39,12 @@
     - [Time](#time)
     - [Math](#math)
     - [Random](#random)
-    - [Streams read/write](#streams-readwrite)
+    - [Streams read/write, Buffer](#streams-readwrite-buffer)
     - [Files/descriptors](#filesdescriptors)
+    - [JSON](#json)
     - [O/S, Environment variables](#os-environment-variables)
     - [Command line arguments/Options parsing](#command-line-argumentsoptions-parsing)
+    - [Executing shell commands, runtime reflection](#executing-shell-commands-runtime-reflection)
     - [Logging](#logging)
     - [Atomic](#atomic)
     - [Sleep](#sleep)
@@ -74,6 +77,19 @@ func main() {
 ```
 
 then execute `go run main.go` (compile and run).
+
+### Sample program layout for a cmdline program
+
+```
+todo
+├── cmd
+│   └── todo
+│       ├── main.go       # cmdline (makes binary name `todo`)
+│       └── main_test.go
+├── go.mod
+├── todo.go               # library
+└── todo_test.go
+```
 
 ## Syntax
 
@@ -769,6 +785,7 @@ u, err := strconv.ParseUint(str, base, bitsize)
 
 str := strconv.Itoa(97)                              // integer to string
 string(intVar); string(byteVar)                      // alternative
+string([]byte)                                       // array of bytes to string
 // also see fmt.Sprintf
 ```
 
@@ -868,9 +885,11 @@ Modifiers:
 Instantiation:
 
 ```golang
-now = time.now()
+now = time.Now()
 t = time.Date(2009, 11, 17, 20, 34, 58, 651387237, time.UTC))
 monday = time.Monday
+
+time.Time{}       // "zero" time
 ```
 
 Operations/Comparisons:
@@ -916,7 +935,7 @@ rand.Seed(time.Now().UnixNano())
 index := rand.Intn(int)
 ```
 
-### Streams read/write
+### Streams read/write, Buffer
 
 Reading line by line:
 
@@ -933,25 +952,52 @@ for scanner.Scan() {
 }
 ```
 
+Alternative, via NewReader():
+
+```golang
+reader := bufio.NewReader(stdout)
+
+for {
+  line, err := reader.ReadString('\n')
+  if err != nil {
+    break
+  }
+  fmt.Print(line)
+}
+```
+
 Writing to a stream:
 
 ```golang
 io.WriteString(os.Stdout, s)     // allows to write to any IO stream (`w Writer`, ...)
 ```
 
-Bytes buffer:
+Bytes buffer ([Buffer](https://golang.org/pkg/bytes/#Buffer)); implements Reader and Writer:
 
 ```golang
-var s bytes.Buffer
-log.SetOutput(&s)
+var buffer bytes.Buffer
+log.SetOutput(&buffer)
+
+buffer := bytes.NewBufferString("str")  // *Buffer from a string
 ```
 
 ### Files/descriptors
 
-Create a file:
+Create/delete a file:
 
 ```golang
 f, err := os.OpenFile(LOGFILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+os.IsNotExist(err error) bool         // check if error on open is caused by file not existing
+
+err := os.Remove(filename)
+```
+
+R/W operations:
+
+```golang
+ioutil.ReadFile(filename string) ([]byte, error)
+ioutil.WriteFile(filename string, data []byte, perm os.FileMode) error
 ```
 
 Standard FDs:
@@ -973,12 +1019,20 @@ filepath.Abs(string)                // absolute representation of the path (File
 _, err := os.Stat(gobyRoot)         // check if a file exists
 ```
 
+### JSON
+
+```golang
+json.Marshal(interface{}) []byte, error   // Encode object into JSON
+```
+
 ### O/S, Environment variables
 
 ```golang
-os.Exit(<exit_status>)              // exit to the O/S
+os.Exit(<exit_status>)                 // exit to the O/S
 
-os.Getenv("GOBY_ROOT")              // environment variables
+path, err := os.Getwd                  // current path ($PWD)
+val := os.Getenv("ENV_VAR")            // get environment variable; empty if not found
+val, found := os.LookupEnv("ENV_VAR")  // same, but false if not found
 ```
 
 ### Command line arguments/Options parsing
@@ -994,10 +1048,52 @@ os.Args
 //     Usage of ./playground_golang:
 //       -l	Count lines
 //
-lines := flag.Bool("l", true, "Count lines")
-flag.Parse()
+lines    := flag.Bool("l", true, "Count lines")
+task     := flag.String("task", "", "Task to be included in the ToDo list")
+complete := flag.Int("complete", 0, "Item to be completed")
 
+flag.Parse()
 ```
+
+### Executing shell commands, runtime reflection
+
+```golang
+runtime.GOOS
+
+command := exec.Command("ls", "-l")
+
+err := command.Run() // synchronous execution
+
+err := command.Start() // asynchronous execution
+err := command.Wait()  // wait
+
+[]byte, err := command.Output()         // stdout
+[]byte, err := command.CombinedOutput() // stdout + stderr
+
+// Pipes - require Wait()
+//
+StdinPipe() (io.WriteCloser, error)
+StdoutPipe() (io.ReadCloser, error)
+StderrPipe() (io.ReadCloser, error)
+```
+
+Example of reading stdout (without error checking):
+
+```golang
+command := exec.Command("ls", "-l")
+stdout, _ := command.StdoutPipe()
+reader := bufio.NewScanner(stdout)
+
+command.Start()
+
+for reader.Scan() {
+  fmt.Println(reader.Text())
+}
+
+command.Wait()
+```
+
+No using bufio requires convoluted byte slices management (see https://is.gd/HDblbp).
 
 ### Logging
 
@@ -1118,6 +1214,10 @@ func C.GoBytes(unsafe.Pointer, C.int) []byte
 Compacted test case (`main_test.go`, for testing `main.go`):
 
 ```golang
+// A `_test` suffix makes only exported types accessible.
+//
+package counter_test
+
 func TestCountWords(t *testing.T) {
 	if res := count(b); res != 4 {
 		t.Errorf("Expected %d, got %d\n", 4, res)

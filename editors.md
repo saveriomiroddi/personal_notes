@@ -45,6 +45,7 @@ The VIM section requires some cleanup.
 - `Ctrl+↓`/`Ctrl+↑`           Scroll the viewport without moving the cursor
 
 - `Ctrl+K, Ctrl+L/U`		      Change case to Upper/Lower
+- `Ctrl+K, Ctrl+X`		        Trim trailing whitespace (extension)
 
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)
 

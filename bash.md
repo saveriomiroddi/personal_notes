@@ -15,6 +15,7 @@
   - [Process substitution](#process-substitution)
   - [Arrays](#arrays)
     - [Snippets](#snippets)
+  - [Associative arrays](#associative-arrays)
   - [Script operational concepts](#script-operational-concepts)
     - [Ask for input (keypress)](#ask-for-input-keypress)
     - [Trapping errors](#trapping-errors)
@@ -163,7 +164,7 @@ unset IFS
 While the `while` loop has scoping:
 
 ```sh
-while IFS= read -r token ... done <<< "$input"
+while IFS= read -r token; do : done <<< $input
 ```
 
 it doesn't work as intended for this purpose.
@@ -277,6 +278,7 @@ Creation:
 ```sh
 declare -a $array_name              # create an empty array; local by default
 myarray=("entry 1" entry2)          # create a filled array; space/newline is separator
+myarray2=("$myarray")               # copy an array
 
 coordinates=(${1//./ })             # split by `.` (bash) !!! use only for unspaced stuff !!!
 
@@ -339,6 +341,36 @@ binlogs=$(mysql -u"$my_user" -p"$my_pwd" -h"$my_host" -BNe 'SHOW BINARY LOGS')
 while IFS= read -r -a binlog; do
   echo Filename: "${binlog[0]}", Position: "${binlog[1]}"
 done <<< "$binlogs"
+```
+
+## Associative arrays
+
+See https://www.artificialworlds.net/blog/2012/10/17/bash-associative-array-examples.
+
+```sh
+declare -A MYHASH                    # explicit creation
+declare -A MYHASH=([foo]=1 [bar]=2)  # explicit creation with multiple values (it's possible to quote both keys and values)
+MYHASH[foo]=bar                      # implicit creation
+unset MYHASH                         # destruction
+
+echo ${MYHASH[foo]}                  # access an entry
+unset MYHASH[foo]                    # remove an entry
+[[ -v MYHASH[foo] ]]                 # test if a key exists
+
+echo ${MYHASH[@]}                    # values (!!!)
+echo ${!MYHASH[@]}                   # keys
+echo ${#MYHASH[@]}                   # size
+
+# Iterate.
+# in order to iterate the sorted keys, use `mapfile` as in the Arrays section
+#
+for key in ${!MYHASH[@]}; do echo "$key => ${MYHASH[$key]}"; done
+
+# Test if a variable is an associate array (!!)
+# `declare -p` prints the declaration; writes to stderr if the variable doesn't exist
+# watch out! if a variable was defined via `declare -p`, it will be printed.
+#
+[[ "$(declare -p MYHASH 2> /dev/null)" == "declare -A"* ]] && echo "is associative array"
 ```
 
 ## Script operational concepts

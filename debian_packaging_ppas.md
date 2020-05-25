@@ -132,7 +132,7 @@ The basepath can be simplified away by using `~/.pbuilderrc` (see [Ubuntu wiki](
 In order to make cowbuilder closer to Launchpad, run:
 
 ```sh
-printf $'\nEXTRAPACKAGES="dwz pkgbinarymangler"\n' | sudo tee -a /etc/pbuilderrc
+printf $'\nEXTRAPACKAGES="dwz pkgbinarymangler"\n' >> /etc/pbuilderrc
 ```
 
 ### Packaging with a Version Control System

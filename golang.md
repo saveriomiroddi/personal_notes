@@ -41,6 +41,7 @@
     - [Random](#random)
     - [Streams read/write, Buffer](#streams-readwrite-buffer)
     - [Files/descriptors](#filesdescriptors)
+      - [Reading from stdin](#reading-from-stdin)
     - [JSON](#json)
     - [O/S, Environment variables](#os-environment-variables)
     - [Command line arguments/Options parsing](#command-line-argumentsoptions-parsing)
@@ -1019,6 +1020,17 @@ filepath.Abs(string)                // absolute representation of the path (File
 _, err := os.Stat(gobyRoot)         // check if a file exists
 ```
 
+#### Reading from stdin
+
+```golang
+reader := bufio.NewScanner(os.Stdin)
+buffer := ""
+
+for reader.Scan() {
+  buffer += reader.Text() + "\n"
+}
+```
+
 ### JSON
 
 ```golang
@@ -1054,6 +1066,37 @@ complete := flag.Int("complete", 0, "Item to be completed")
 
 flag.Parse()
 ```
+
+The `-h` flag is implemented automatically; it invokes `flag.Usage()`, which can be overwritten:
+
+```golang
+flag.Usage = func() {
+  fmt.Fprintf("Custom help")
+  flag.PrintDefaults()
+}
+```
+
+Multiple commands can be defined via `FlagSet`:
+
+```golang
+countCommand := flag.NewFlagSet("count", flag.ExitOnError)
+countTextPtr := countCommand.String("text", "", "Text to parse. (Required)")
+// other commands/flags
+
+if len(os.Args) < 2 { os.Exit(1) }
+
+switch os.Args[1] {
+case "count":
+    countCommand.Parse(os.Args[2:])
+// other commands
+}
+
+if countCommand.Parsed() {
+  // handle flags
+}
+```
+
+See [Building a Simple CLI Tool with Golang](https://blog.rapid7.com/2016/08/04/build-a-simple-cli-tool-with-golang) for the FlagSet example; it also includes custom Flag Types.
 
 ### Executing shell commands, runtime reflection
 
@@ -1093,7 +1136,9 @@ for reader.Scan() {
 command.Wait()
 ```
 
-No using bufio requires convoluted byte slices management (see https://is.gd/HDblbp).
+If one needs to send data to the process, use `StdinPipe` the same way, but *don't forget to close after writing*, otherwise the process will hang waiting.
+
+Not using bufio requires convoluted byte slices management (see https://is.gd/HDblbp).
 
 ### Logging
 

@@ -43,9 +43,9 @@
     - [Files/descriptors](#filesdescriptors)
       - [Reading from stdin](#reading-from-stdin)
     - [JSON](#json)
-    - [O/S, Environment variables](#os-environment-variables)
+    - [O/S, Environment variables, Runtime reflection](#os-environment-variables-runtime-reflection)
     - [Command line arguments/Options parsing](#command-line-argumentsoptions-parsing)
-    - [Executing shell commands, runtime reflection](#executing-shell-commands-runtime-reflection)
+    - [Executing shell commands](#executing-shell-commands)
     - [Logging](#logging)
     - [Atomic](#atomic)
     - [Sleep](#sleep)
@@ -130,7 +130,7 @@ func myFunc(myVar, myVar2 int) (bool, int) {
   return true, 1
 }
 
-// Variadic arguments.
+// Variadic arguments (varargs)
 // The `...` operator is called "Pack operator".
 //
 // In order to pass a slice, unpack it:
@@ -295,6 +295,7 @@ Slices:
 ```golang
 var sl []int                               // instantiate without size
 sl := make([]string, <size>[, <capacity>]) // with a size
+bdsl := make([][]int, 10)                  // bidimensional slice; must initialize each entry separately
 sl := []string{"a", "b"}                   // literal form
 sl := array[[<start>]:[<end>]]             // make from an array; **end element is not included**
                                            // omitting start/end indexes indicate first/last indexes
@@ -304,6 +305,8 @@ sl2 := append(sl, sl...)                   // append a slice to another slice (v
 
 copy(dest[z:a], source[x:y])               // copy slices (indexing is optional); !! the destination capacity is equal to the source length !!
 cap(sl)                                    // capacity of a slice
+
+bytes.Equal(a, b []byte)                   // compares two byte arrays
 ```
 
 Accessing:
@@ -587,7 +590,7 @@ func main() {
 }
 ```
 
-See the [Atomic](#atomic) section for the atomic operations support package.
+See the [Atomic](#atomic) section for the atomic operations support package, which are much faster than sync.Mutex!
 
 ### Channels
 
@@ -994,14 +997,26 @@ os.IsNotExist(err error) bool         // check if error on open is caused by fil
 err := os.Remove(filename)
 ```
 
-R/W operations:
+Read/write from/to files:
 
 ```golang
 ioutil.ReadFile(filename string) ([]byte, error)
 ioutil.WriteFile(filename string, data []byte, perm os.FileMode) error
 ```
 
-Standard FDs:
+Temporary files:
+
+```golang
+// Create a temporary file, close it, then get the name.
+//
+// A random string is appended to `prefix`, in order to generate the filename
+//
+func TempFile(dir, prefix string) (f *os.File, err error)
+err := temp.Close()
+temp.Name()
+```
+
+Standard file descriptors:
 
 - `os.Stdin`
 - `os.stdOut`
@@ -1037,7 +1052,7 @@ for reader.Scan() {
 json.Marshal(interface{}) []byte, error   // Encode object into JSON
 ```
 
-### O/S, Environment variables
+### O/S, Environment variables, Runtime reflection
 
 ```golang
 os.Exit(<exit_status>)                 // exit to the O/S
@@ -1045,6 +1060,8 @@ os.Exit(<exit_status>)                 // exit to the O/S
 path, err := os.Getwd                  // current path ($PWD)
 val := os.Getenv("ENV_VAR")            // get environment variable; empty if not found
 val, found := os.LookupEnv("ENV_VAR")  // same, but false if not found
+
+runtime.GOOS                           // e.g. "windows"
 ```
 
 ### Command line arguments/Options parsing
@@ -1098,10 +1115,10 @@ if countCommand.Parsed() {
 
 See [Building a Simple CLI Tool with Golang](https://blog.rapid7.com/2016/08/04/build-a-simple-cli-tool-with-golang) for the FlagSet example; it also includes custom Flag Types.
 
-### Executing shell commands, runtime reflection
+### Executing shell commands
 
 ```golang
-runtime.GOOS
+command, err := exec.LookPath("binary")   // use if one needs to look for an executable in $PATH
 
 command := exec.Command("ls", "-l")
 
@@ -1184,11 +1201,17 @@ myLog := log.New(f, ogLinePrefix, log.LstdFlags | log.Lshortfile)    // Custom l
 
 ### Atomic
 
-Atomic operations package; supports operations on `[u]int(32|64)`:
+Atomic operations package; supports operations on `[u]int(32|64)`. Much faster than using a mutex!
 
 ```golang
-atomic.AddInt32(myvar, int32(myint))
+atomic.AddInt32(&myvar, myint32)
+atomic.CompareAndSwapXXX()
+atomic.LoadXXX()
+atomic.StoreXXX()
+atomic.SwapXXX()
 ```
+
+Variants: `Int32`, `Int64`, `Uint32`, `Uint64`, `Pointer`.
 
 ### Sleep
 
@@ -1265,6 +1288,7 @@ package counter_test
 
 func TestCountWords(t *testing.T) {
 	if res := count(b); res != 4 {
+    t.Logf("Debug message\n")
 		t.Errorf("Expected %d, got %d\n", 4, res)
 	}
 }

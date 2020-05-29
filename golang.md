@@ -970,10 +970,12 @@ for {
 }
 ```
 
-Writing to a stream:
+I/O operations:
 
 ```golang
-io.WriteString(os.Stdout, s)     // allows to write to any IO stream (`w Writer`, ...)
+io.WriteString(w Writer, s string) (n int, err error)                // write a string to any writer
+io.Copy(dst Writer, src Reader) (written int64, err error)           // copy from reader to writer
+io.CopyN(dst Writer, src Reader, n int64) (written int64, err error) // like Copy, but for the given number of bytes
 ```
 
 Bytes buffer ([Buffer](https://golang.org/pkg/bytes/#Buffer)); implements Reader and Writer:
@@ -1287,10 +1289,10 @@ Compacted test case (`main_test.go`, for testing `main.go`):
 package counter_test
 
 func TestCountWords(t *testing.T) {
-	if res := count(b); res != 4 {
+  if res := count(b); res != 4 {
     t.Logf("Debug message\n")
-		t.Errorf("Expected %d, got %d\n", 4, res)
-	}
+    t.Errorf("Expected %d, got %d\n", 4, res)
+  }
 }
 ```
 

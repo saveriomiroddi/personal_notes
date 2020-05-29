@@ -13,6 +13,7 @@
   - [Date operations](#date-operations)
   - [Redirections](#redirections)
   - [Process substitution](#process-substitution)
+  - [Brace expansion](#brace-expansion)
   - [Arrays](#arrays)
     - [Snippets](#snippets)
   - [Associative arrays](#associative-arrays)
@@ -267,6 +268,12 @@ Extension to input: if the command is just a filename, the command is repliced w
 
 ```sh
 echo $(< "$filename")
+```
+
+## Brace expansion
+
+```sh
+{$start..$end [..$incr]}            # generate a sequence via brace expansion (!!)
 ```
 
 ## Arrays

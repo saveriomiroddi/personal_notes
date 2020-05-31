@@ -11,9 +11,10 @@
     - [Split by duration, starting on a keyframe](#split-by-duration-starting-on-a-keyframe)
     - [Concatenate videos](#concatenate-videos)
   - [Scaling](#scaling)
-    - [Downscale audio file](#downscale-audio-file)
+    - [Downscale/downmix audio file](#downscaledownmix-audio-file)
     - [Video scaling](#video-scaling)
   - [Other operations](#other-operations)
+    - [Check file encoding formats](#check-file-encoding-formats)
     - [Record desktop](#record-desktop)
     - [Build FFmpeg with libfdk-aac support](#build-ffmpeg-with-libfdk-aac-support)
 
@@ -80,8 +81,12 @@ ffmpeg -i "$input" -plays 10 -r 1/2 "${input%.*}.apng"
 # `-acodec copy: same as above`
 # `vn`:          no video; required!
 #
-ffmpeg -i <input.mp4> -vn -acodec copy <output.aac>
-ffmpeg -i <input.webm> -vn -acodec copy <output.ogg>
+ffmpeg -i $input -vn -acodec copy $output
+
+# Demux a single stream.
+# See `Stream` from ffprobe (`Stream #0:1: Audio` -> `0:a:1`)
+#
+ffmpeg -i $input -vn -map 0:a:1 -c copy $audio_output
 ```
 
 ### Lossless split (trim) m4a
@@ -123,10 +128,11 @@ LIST
 
 ## Scaling
 
-### Downscale audio file
+### Downscale/downmix audio file
 
 ```sh
-ffmpeg -i <input.ext> -sample_fmt s16 -ar 44100 <output.ext>
+ffmpeg -i $input -sample_fmt s16 -ar 44100 $output    # downscale to 16 bit/44 KHz
+ffmpeg -i $input -ac 2 $output                        # downmix to stereo
 ```
 
 ### Video scaling
@@ -144,6 +150,13 @@ ffmpeg -i input.mp4 -vf scale=800:600 -aspect 4:3 output.avi
 ```
 
 ## Other operations
+
+### Check file encoding formats
+
+```sh
+ffmpeg -i $filename
+ffprobe $filename
+```
 
 ### Record desktop
 

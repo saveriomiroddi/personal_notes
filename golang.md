@@ -24,9 +24,11 @@
       - [For](#for)
     - [Builtin functions](#builtin-functions)
     - [Errors](#errors)
+  - [Concurrency](#concurrency)
     - [Goroutines](#goroutines)
     - [Channels](#channels)
-      - [Non-blocking reads (select) + Interruptible threads (Context)](#non-blocking-reads-select--interruptible-threads-context)
+    - [Non-blocking reads (select) + Interruptible threads (Context)](#non-blocking-reads-select--interruptible-threads-context)
+    - [Base template of producers/consumers with queue processing](#base-template-of-producersconsumers-with-queue-processing)
   - [APIs](#apis)
     - [Strings](#strings)
       - [General concepts](#general-concepts)
@@ -555,6 +557,8 @@ err.Error()                        // get the message
 panic(err)                         // panic throwing the given error
 ```
 
+## Concurrency
+
 ### Goroutines
 
 Goroutines don't share memory (differently from threads).
@@ -669,7 +673,7 @@ Typical concurrency patterns:
 - pipeline: serial process, from one "_source_" to a "_sink_" (final stage)
 - fan out/fan in: parallel processing, via workers workers reading from the same channel
 
-#### Non-blocking reads (select) + Interruptible threads (Context)
+### Non-blocking reads (select) + Interruptible threads (Context)
 
 This shows also `select`, which doesn't block:
 
@@ -707,6 +711,57 @@ func main() {
 
 	// Without this, the goroutine cleanup may not execute
 	fmt.Println(<-r)
+}
+```
+
+### Base template of producers/consumers with queue processing
+
+Synchronization is performed via `dataChan`, rather than via mutex. The mutex-based approach is not idiomatic, although actually simpler for this case (consumer adds directly to the result; wait in the middle, then print); on large scale, this approach is likely more error-prone, though.
+
+```golang
+func producer(val int) []int {
+	return []int{val, val, val}
+}
+
+func concurrentProduceAndConsume() {
+  // Add another channel, for error handling
+	dataChan := make(chan []int)
+	completionChan := make(chan interface{})
+
+	waitGroup := &sync.WaitGroup{}
+
+	var result []int
+
+	// Production ////////////////////////////////////////////////////////////////
+
+	for i := 0; i < runtime.NumCPU(); i++ {
+		waitGroup.Add(1)
+
+		go func(i int, dataChan chan []int, waitGroup *sync.WaitGroup) {
+			defer waitGroup.Done()
+			dataChan <- producer(i)
+		}(i, dataChan, waitGroup)
+	}
+
+	// Waiting ///////////////////////////////////////////////////////////////////
+
+	go func(waitGroup *sync.WaitGroup) {
+		waitGroup.Wait()
+		completionChan <- struct{}{}
+	}(waitGroup)
+
+	// Consumption ///////////////////////////////////////////////////////////////
+
+	for {
+    // Add another case, for error handling
+		select {
+		case <-completionChan:
+			fmt.Println(result)
+			return
+		case data := <-dataChan:
+			result = append(result, data...)
+		}
+	}
 }
 ```
 
@@ -936,7 +991,9 @@ Note that infinity _is_ a number.
 import "math/rand"
 
 rand.Seed(time.Now().UnixNano())
-index := rand.Intn(int)
+
+func (r *Rand) Intn(n int) int          // random non-negative int, in interval [0, n)
+func Read(p []byte) (n int, err error)  // fill a slice with random numbers; returns bytes written and never fails
 ```
 
 ### Streams read/write, Buffer

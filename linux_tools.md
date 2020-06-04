@@ -17,7 +17,7 @@
     - [Formatting](#formatting)
     - [Operations](#operations)
   - [Imagemagick](#imagemagick)
-  - [PGP](#pgp)
+  - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
   - [Formatting tools](#formatting-tools)
   - [htop](#htop)
 
@@ -300,7 +300,7 @@ convert -size 1920x1080 xc:white "$output.pdf"    # Create blank pdf page, with 
 convert -coalesce animation.gif target.png        # Split an animated gif into its frames; `-coalesce` is required for more complex sources.
 ```
 
-## PGP
+## PGP (GnuPG/gpg)
 
 Main commands (`gpg...`); `$key_id` can be email or key id.
 
@@ -308,7 +308,7 @@ Main commands (`gpg...`); `$key_id` can be email or key id.
 --gen-key                                            # generate a gpg keypair (store in the database)
 
 --armor --export[-secret-key] $key_id                # export a key
---import $pubkey [--allow-secret-key-import]         # import a key
+--import $pubkey                                     # import a key (also secret)
 
 printf $'fpr\nsign\n'   | gpg --command-fd 0 --edit-key $key_id  # self-sign a key
 printf $'trust\n5\ny\n' | gpg --command-fd 0 --edit-key $key_id  # ultimately trust a key [required by some programs]

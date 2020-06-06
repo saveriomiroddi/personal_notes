@@ -5,7 +5,10 @@
     - [String functions](#string-functions)
       - [Character conversions](#character-conversions)
     - [Regular expressions (regexes)](#regular-expressions-regexes)
+      - [Strategies](#strategies)
+    - [XPath](#xpath)
   - [Window functions](#window-functions)
+    - [Window function aggregates](#window-function-aggregates)
 
 ## Built-in functions
 
@@ -42,7 +45,7 @@ SELECT HEX(ORD('👸'));
 
 Metacharacters/functionalities supported:
 
-- `^ $ . * + {} []`;
+- `^ $ . * + ? | {} []`;
 - `()` but not with groups capturing;
 - `[:digit:]` and so on;
 - backreferences is not supported;
@@ -97,13 +100,71 @@ Search/replace:
 
 ```sql
 -- Supports the same options as `REGEXP_SUBSTR`.
+-- !!! Don't forget to set <occurrence> to 0 for gsub !!!
 --
-SELECT REGEXP_REPLACE('a b c', 'b', 'X') `replace`;
+SELECT REGEXP_REPLACE('a b b c', 'b', 'X', 1, 0) `replace`;
 -- +---------+
 -- | replace |
 -- +---------+
--- | a X c   |
+-- | a X X c |
 -- +---------+
+```
+
+#### Strategies
+
+Since capturing groups are not supported, using `REGEXP_REPLACE` can be the simplest option in some cases.  
+Note that MySQL supports XPath, so input data like this is best handle throught that.
+
+```sql
+SET @input := '
+<id>my_id</id>
+<op>my_op</op>
+';
+
+SELECT
+  REGEXP_REPLACE(
+    REGEXP_SUBSTR(@input, 'my_id</id>.*?</', 1, 1, 'mn'),
+    '^.*>|</$', '', 1, 0, 'mn'
+  ) `operator`
+;
+-- +----------+
+-- | operator |
+-- +----------+
+-- | my_op    |
+-- +----------+
+```
+
+### XPath
+
+Examples:
+
+```sql
+SET @input := '
+<bookstore>
+  <book>
+    <title lang="en">Harry Potter</title>
+    <price>29.99</price>
+  </book>
+  <book>
+    <title lang="en">Learning XML</title>
+    <price>39.95</price>
+  </book>
+</bookstore>
+';
+
+SELECT ExtractValue(@input, "//title[@lang='en']") `match`;
+-- +---------------------------+
+-- | match                     |
+-- +---------------------------+
+-- | Harry Potter Learning XML |
+-- +---------------------------+
+
+SELECT ExtractValue(@input, "/bookstore/book[price>35.00]/title") `match`;
+-- +--------------+
+-- | match        |
+-- +--------------+
+-- | Learning XML |
+-- +--------------+
 ```
 
 ## Window functions
@@ -145,4 +206,11 @@ SELECT
 FROM sales
 WHERE special_customer
 WINDOW w AS (ORDER BY id DESC)
+```
+
+### Window function aggregates
+
+```
+ROW_NUMBER()                         # 1-based
+LAG(@expr[, @position[, @default]])  # @position defaults to 1; @default defaults to NULL, and can be an expression (great to avoid the first NULL)
 ```

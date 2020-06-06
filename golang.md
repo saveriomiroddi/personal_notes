@@ -42,19 +42,27 @@
     - [Math](#math)
     - [Random](#random)
     - [Streams read/write, Buffer](#streams-readwrite-buffer)
-    - [Files/descriptors](#filesdescriptors)
+    - [Files/Dirs/descriptors](#filesdirsdescriptors)
+      - [File informations](#file-informations)
       - [Reading from stdin](#reading-from-stdin)
     - [JSON](#json)
+    - [CSV](#csv)
+    - [Gzip](#gzip)
     - [O/S, Environment variables, Runtime reflection](#os-environment-variables-runtime-reflection)
     - [Command line arguments/Options parsing](#command-line-argumentsoptions-parsing)
     - [Executing shell commands](#executing-shell-commands)
+      - [Context](#context)
+    - [Processes; Signals sending/handling](#processes-signals-sendinghandling)
     - [Logging](#logging)
     - [Atomic](#atomic)
     - [Sleep](#sleep)
     - [Memory allocation](#memory-allocation)
     - [Unsafe](#unsafe)
     - [CGo](#cgo)
-    - [Testing](#testing)
+  - [Testing](#testing)
+    - [Strategies/tools](#strategiestools)
+    - [Benchmarking](#benchmarking)
+      - [Useful tools](#useful-tools)
   - [Management](#management)
     - [Packages/naming](#packagesnaming)
       - [init() function](#init-function)
@@ -716,16 +724,17 @@ func main() {
 
 ### Base template of producers/consumers with queue processing
 
-Synchronization is performed via `dataChan`, rather than via mutex. The mutex-based approach is not idiomatic, although actually simpler for this case (consumer adds directly to the result; wait in the middle, then print); on large scale, this approach is likely more error-prone, though.
+Synchronization is performed via `dataChan`, rather than via mutex, which is not considered idiomatic.
 
 ```golang
-func producer(val int) []int {
-	return []int{val, val, val}
+func producer(val int) ([]int, err error) {
+	return []int{val, val, val}, nil
 }
 
 func concurrentProduceAndConsume() {
   // Add another channel, for error handling
 	dataChan := make(chan []int)
+  errorChan := make(chan error)
 	completionChan := make(chan interface{})
 
 	waitGroup := &sync.WaitGroup{}
@@ -738,8 +747,13 @@ func concurrentProduceAndConsume() {
 		waitGroup.Add(1)
 
 		go func(i int, dataChan chan []int, waitGroup *sync.WaitGroup) {
-			defer waitGroup.Done()
-			dataChan <- producer(i)
+      defer waitGroup.Done()
+
+      if result, err := producer(i); err != nil {
+        errChan <- err
+      } else {
+  			dataChan <- result
+      }
 		}(i, dataChan, waitGroup)
 	}
 
@@ -753,8 +767,9 @@ func concurrentProduceAndConsume() {
 	// Consumption ///////////////////////////////////////////////////////////////
 
 	for {
-    // Add another case, for error handling
 		select {
+    case err := <-errorChan:
+      return err
 		case <-completionChan:
 			fmt.Println(result)
 			return
@@ -857,9 +872,9 @@ strings.HasSuffix(str, suffix)
 strings.ToUpper(str)
 strings.Join(str, separator)
 strings.ReplaceAll(str, search, replace)
-strings.Split(str, separator)
 strings.TrimSpace(str)
 strings.Repeat("*", n)o
+strings.Contains(str, str)
 
 // `unicode` package
 
@@ -868,6 +883,11 @@ unicode.IsLower(char)
 unicode.IsNumber(char)
 unicode.IsPunct(char)
 unicode.IsSymbol(char)
+
+// splitting
+
+strings.Split(str, separator)                        // if separator is empty, split after every UTF-8 sequence
+bytes.Split(str, separator []byte)                   // byte-based split; if separator is empty, split after every UTF-8 sequence
 ```
 
 ### Reflection
@@ -1035,25 +1055,44 @@ io.Copy(dst Writer, src Reader) (written int64, err error)           // copy fro
 io.CopyN(dst Writer, src Reader, n int64) (written int64, err error) // like Copy, but for the given number of bytes
 ```
 
-Bytes buffer ([Buffer](https://golang.org/pkg/bytes/#Buffer)); implements Reader and Writer:
+Byte-based stream readers/writers:
 
 ```golang
+// Bytes [Buffer](https://golang.org/pkg/bytes/#Buffer); implements Reader and Writer:
+//
 var buffer bytes.Buffer
 log.SetOutput(&buffer)
+fmt.Println(buffer.String())
 
-buffer := bytes.NewBufferString("str")  // *Buffer from a string
+// *Buffer from a string
+buffer := bytes.NewBufferString("str")
+
+// Reader for stream of bytes
+reader := bytes.NewReader(slice)
+
+// /dev/null writer!!!
+ioutil.Discard
 ```
 
-### Files/descriptors
+### Files/Dirs/descriptors
 
 Create/delete a file:
 
 ```golang
 f, err := os.OpenFile(LOGFILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+f, err := os.Open(filename)                                               // open for reading only
 
 os.IsNotExist(err error) bool         // check if error on open is caused by file not existing
 
 err := os.Remove(filename)
+
+```
+
+Directory operations:
+
+```golang
+os.MkdirAll(path string, perm FileMode) error   // mkdir -p; `perm` is used for the created dirs
+err := os.RemoveAll(path)                       // recursive deletion
 ```
 
 Read/write from/to files:
@@ -1063,7 +1102,23 @@ ioutil.ReadFile(filename string) ([]byte, error)
 ioutil.WriteFile(filename string, data []byte, perm os.FileMode) error
 ```
 
-Temporary files:
+Read file trees (directories):
+
+```golang
+// Return a list
+func ioutil.ReadDir(dirname string) ([]os.FileInfo, error)
+
+// Ignores errors; only possible is ErrBadPattern
+func filepath.Glob(pattern string) (matches []string, err error)
+
+// Walk a tree. Doesn't follow symlinks.
+//
+err = filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+  // operations with `info`
+})
+```
+
+Temporary files/dirs:
 
 ```golang
 // Create a temporary file, close it, then get the name.
@@ -1073,6 +1128,10 @@ Temporary files:
 func TempFile(dir, prefix string) (f *os.File, err error)
 err := temp.Close()
 temp.Name()
+
+// Set `parentDir` to "" to use the default temporary dir.
+//
+tempDir, err := ioutil.TempDir(parentDir, namePrefix string)
 ```
 
 Standard file descriptors:
@@ -1090,8 +1149,19 @@ filepath.Base(string)               // file basename
 filepath.Join(elem ...string)       // Filename.join()
 
 filepath.Abs(string)                // absolute representation of the path (File.expand_path)
+filepath.Ext(string)                // extension
 
-_, err := os.Stat(gobyRoot)         // check if a file exists
+_, err := os.Stat(filename)         // check if a file exists; watch out - not necessarily needed (see https://stackoverflow.com/q/12518876)
+```
+
+#### File informations
+
+```golang
+info, err := os.Stat(filename)
+
+info.IsDir()
+info.Name()
+info.Size()
 ```
 
 #### Reading from stdin
@@ -1109,6 +1179,50 @@ for reader.Scan() {
 
 ```golang
 json.Marshal(interface{}) []byte, error   // Encode object into JSON
+```
+
+### CSV
+
+```golang
+csv.NewReader(r reader)
+
+// Read at once
+
+rows, err := csv.ReadAll()
+
+for i, row := range rows {
+  if i == 0 {
+    continue // headers
+  }
+  strconv.ParseFloat(row[0], 64)  // Example; columns must be parsed
+}
+
+// Read line by line
+
+csv.ReuseRecord = true            // Avoid reallocating new arrays
+
+for i := 0; ; i++ {
+  row, err := cr.Read()
+
+  if err == io.EOF {
+    break
+  } else if i == 0 {
+    continue
+  }
+
+  // ...
+}
+```
+
+### Gzip
+
+Compress via gzip. It's somewhat tricky to handle all the errors of writer and source. The book advises not to defer `Close()`, so that the errors can be handled depending on the error context.
+
+```golang
+gzWriter := gzip.NewWriter(w io.Writer) *Writer
+gzWriter.Name = filename
+io.Copy(gzWriter, inputReader)
+if err := gzWriter.Close(); err != nil { return err }
 ```
 
 ### O/S, Environment variables, Runtime reflection
@@ -1180,18 +1294,27 @@ See [Building a Simple CLI Tool with Golang](https://blog.rapid7.com/2016/08/04/
 command, err := exec.LookPath("binary")   // use if one needs to look for an executable in $PATH
 
 command := exec.Command("ls", "-l")
+command.Dir = "/new_path"
 
-err := command.Run() // synchronous execution
+// Synchronous execution
 
-err := command.Start() // asynchronous execution
-err := command.Wait()  // wait
+var out, err bytes.Buffer
+command.Stdout = &out                   // redirect
+command.Stderr = &err
 
-[]byte, err := command.Output()         // stdout
+err := command.Run()                    // must set Stdout; `Output()` funcs can't be used
+
+// Synchronous alternative
+
+[]byte, err := command.Output()         // Runs, and stdout
 []byte, err := command.CombinedOutput() // stdout + stderr
 
-// Pipes - require Wait()
-//
-StdinPipe() (io.WriteCloser, error)
+// Asynchronous
+
+err := command.Start()
+err := command.Wait()
+
+StdinPipe() (io.WriteCloser, error)     // `Pipe()` funcs require Wait()
 StdoutPipe() (io.ReadCloser, error)
 StderrPipe() (io.ReadCloser, error)
 ```
@@ -1215,6 +1338,52 @@ command.Wait()
 If one needs to send data to the process, use `StdinPipe` the same way, but *don't forget to close after writing*, otherwise the process will hang waiting.
 
 Not using bufio requires convoluted byte slices management (see https://is.gd/HDblbp).
+
+#### Context
+
+Context allows setting a timeout:
+
+```golang
+ctx, cancel := context.WithTimeout(context.Background(), 10*time.Nanosecond)
+defer cancel()
+
+command := exec.CommandContext(ctx, "ls", "-l", "/tmp")
+
+if result, err := command.Output(); err != nil {
+  if ctx.Err() == context.DeadlineExceeded {
+    os.Exit(1)
+  }
+} else {
+  fmt.Println(string(result))
+}
+```
+
+### Processes; Signals sending/handling
+
+Get PID of current process, and send signal:
+
+```golang
+processPid := syscall.Getpid()
+syscall.Kill(processPid, syscall.SIGINT)
+```
+
+Catching. It's not clear why this works when sending Ctrl+C, but not when signals are sent from another process, eg. via `pkill`.
+
+```golang
+// Set size of 1, so that at least one signal is handled, if many are sent
+sig := make(chan os.Signal, 1)
+
+// Specify signals to catch
+signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+
+// On more complex programs, integrate in the main events cycle
+rec := <-sig
+
+// Stop relaying signals to the channel
+signal.Stop(sig)
+
+fmt.Printf("Received signal: %s. Exiting\n", rec)
+```
 
 ### Logging
 
@@ -1336,7 +1505,7 @@ func C.CString(string) *C.char
 func C.GoBytes(unsafe.Pointer, C.int) []byte
 ```
 
-### Testing
+## Testing
 
 Compacted test case (`main_test.go`, for testing `main.go`):
 
@@ -1345,12 +1514,121 @@ Compacted test case (`main_test.go`, for testing `main.go`):
 //
 package counter_test
 
+// Helper functions should invoke t.Helper(), so that the error location is displayed in the callee.
+//
+func testHelper(t *testing.T, value interface{}) {
+  t.Helper()
+}
+
 func TestCountWords(t *testing.T) {
   if res := count(b); res != 4 {
     t.Logf("Debug message\n")
     t.Errorf("Expected %d, got %d\n", 4, res)
   }
 }
+```
+
+Table-based testing:
+
+```golang
+func TestRun(t *testing.T) {
+  testCases := []struct {
+    name     string
+    // data ...
+    expected string
+  }{
+    // ...
+  }
+  for _, tc := range testCases {
+    t.Run(tc.name, func(t *testing.T) {
+      res := // run test (data) ...
+      if tc.expected != res {
+        t.Errorf("Expected %q, got %q instead\n", tc.expected, res)
+      }
+    }
+  }
+```
+
+### Strategies/tools
+
+In order to use mocks, in the program code, instead of invoking a function directly, set it as unexported package variable; the testing code will be able to replace it!
+
+Tools:
+
+```golang
+iotest.TimeoutReader(bytes.NewReader([]byte{0}))             // mock reader, that times out!
+```
+
+### Benchmarking
+
+Code:
+
+```golang
+func BenchmarkRun(b *testing.B) {
+
+  // `b.N` is automatically adjusted to make the benchmark run for 1 second.
+  //
+  for i := 0; i < b.N; i++ {
+    // code to benchmark here
+  }
+}
+
+// Extra functions:
+
+b.ResetTimer()
+```
+
+Run:
+
+```sh
+# The run parameter avoids running anything except the benchmark function.
+#
+# - `benchtime` : use multiplier if the default (1 second) is too low.
+# - `cpuprofile`: profile the cpu (slices of 10ms)
+# - `memprofile`: profile the memory
+# - `benchmem`  : display the total memory allocation
+# - `trace`:    : tracing tool, for analyzing waits
+#
+go test -bench . -run ^$ -benchtime=10x \
+  -cpuprofile cpu.pprof \
+  -memprofile mem.pprof \
+  -benchmem \
+  -trace trace.out \
+  | tee benchresults00.txt
+
+# CPU profiler
+#
+go tool pprof cpu.pprof
+(pprof) top -cum         # sort by `cum`ulative time
+(pprof) list funcName    # accepts regex
+(pprof) web              # display diagram
+
+# Memory profiler
+#
+go tool pprof -alloc_space mem.pprof
+(pprof) top -cum         # sort by `cum`ulative memory
+
+# Tracing tool: automatically opens a browser
+#
+go tool trace trace.out
+```
+
+#### Useful tools
+
+Useful tool to compare benchmark runs output:
+
+```sh
+go get -u -v golang.org/x/tools/cmd/benchcmp
+
+benchcmp benchresults00.txt benchresults01.txt
+# benchmark           old ns/op     new ns/op     delta
+# BenchmarkConcat     523           68.6          -86.88%
+#
+# benchmark           old allocs    new allocs    delta
+# BenchmarkConcat     3             1             -66.67%
+#
+# benchmark           old bytes     new bytes     delta
+# BenchmarkConcat     80            48            -40.00%
 ```
 
 ## Management

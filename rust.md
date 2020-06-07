@@ -8,8 +8,10 @@
     - [Basic operators/operations](#basic-operatorsoperations)
     - [Closures](#closures)
     - [Ranges and `std::iter::Iterator` methods](#ranges-and-stditeriterator-methods)
-    - [Arrays/Vectors](#arraysvectors)
-    - [(String) Slices](#string-slices)
+    - [Arrays/Vectors/Slices](#arraysvectorsslices)
+    - [Hash maps](#hash-maps)
+    - [Strings](#strings)
+      - [Internal representation (bytes/chars/graphemes)](#internal-representation-bytescharsgraphemes)
     - [For/while (/loop) loops](#forwhile-loop-loops)
     - [If/then/else](#ifthenelse)
     - [Enums](#enums)
@@ -131,18 +133,38 @@ Integer types: `[iu](8|16|32|64|128|size)`. The `size` ones depend on the archit
 
 Max value function (example): `u64::max_value()`
 
-All number literals support the type as suffix (e.g. `32u8`), and the (cosmetic) underscore.
+Floats types: `f(32|64)`.
 
 Integer literals:
 
-- hex: `0xff`,
-- octal: `0o77`,
-- binary: `0b1111_0000`,
-- byte: `b'A'` (only `u8`; require single quotes).
+```rust
+0xff      // hex
+0o77      // octal
+0b1100    // binary
+b'A'      // byte; only `u8`; require single quotes
+```
 
-Floats: `f(32|64)`.
+All number literals support the type as suffix (e.g. `32u8`), and the (cosmetic) underscore.
 
-Chars: `'🤯'` (4 bytes, require single quotes).
+Extra string literals:
+
+```rust
+b"hello"                // byte (ASCII) string
+r"hello"; r#"hello"#    // raw string (doesn't process escapes)
+br"hello"; br#"hello"#  // byte raw string
+```
+
+Char literals:
+
+```rust
+'🤯'          // 4 bytes, require single quotes
+```
+
+Escapes ([Tokens](https://doc.rust-lang.org/reference/tokens.html) subset):
+
+```rust
+"\u{0304}"    // 24-bit Unicode character code (up to 6 digits); valid also as char
+```
 
 Tuples:
 
@@ -157,10 +179,7 @@ fn are(dimensions: (u32, u32)) -> u32 {
 }
 ```
 
-There are two types of strings:
-
-- literals (`&'static str`); hardcoded in the executable.
-- `std::string::String`s; allocated on the heap: `String::from("text")`.
+For strings, see the [Strings chapter](#strings).
 
 ### Basic operators/operations
 
@@ -214,7 +233,7 @@ collect::<Vec<i32>>()
 collect::<Vec<_>>()
 ```
 
-### Arrays/Vectors
+### Arrays/Vectors/Slices
 
 Arrays (immutable, so they're allocated on the stack):
 
@@ -228,15 +247,18 @@ Vectors (mutable):
 
 ```rust
 let mut vec = Vec::new();               // Basic (untyped) instantiation (if the type can be inferred)
+let mut vec: Vec<i32> = Vec::new();     // Basic, if type can't be inferred
 let mut vec = vec![1, 2, 3];            // Macro to initialize a vector from a literal list
 let mut vec = vec![true; n];            // Same, with variable-specified length and initialization
 
-vec.push(1);
-vec.pop();
+vec[0] = 2;
+vec.get(2);                             // Option version
+vec.push(1);                            // Push at the end
+
+let val = &vec[0];
+vec.pop();                              // Pop from the end
 
 vec.len();
-let val = &vec[0];
-vec[0] = 2;
 
 // Pattern matching!
 match v.get(2) {
@@ -254,26 +276,83 @@ vec.last();
 
 Arrays implement the `Debug` trait.
 
-### (String) Slices
-
-Don't forget the `&` operator!!!
+Using an Enum to store different data types in an array!!:
 
 ```rust
-let string = String::from("pizza!");
-let string = "pizza!".to_string();
+enum CsvRow {
+  Int(i32),
+  Float(f64),
+};
 
-// The type is `&str`
-//
-let s1 = &string[0..3];
-let s1 = &string[..];                   // omitted start/end are syntax for start/end
+let mut vec = vec![];
+
+vec.push(CsvRow::Int(1));
+vec.push(CsvRow::Float(2.0));
 ```
 
-String literals are String slices!
+Slices apply to arrays as well:
 
 ```rust
-let string = String::new("My pizza");
-let literal = "Your pizza";             // type is `&str` (string slice)
+let array = [8u32; 5];
+let slice = &array[..];         // type is `&[u32]`
+```
 
+See the [ownership chapter](#ownership), for the related properties.
+
+### Hash maps
+
+The default hashing function is cryptographically secure!!. For faster versions, must use a crate.
+
+```rust
+use std::collections::HashMap;
+
+let mut map = HashMap::new();
+
+map.insert("b", 10);
+map.insert("b", 10);            // Overwrites the existing value
+
+// `entry()` gets the value for in-place modification.
+// `or_insert()` sets the given value if the key doesn't exist; its return value can be used to
+// modify the value in-place.
+//
+let entry = map.entry("b").or_insert(50);
+*entry = 100;
+
+// Getters use references.
+//
+map["b"];
+map.get("a");                   // Option
+
+// Invalid! Once a key is inserted, it's owned by the hash map!
+//
+let key = String::from("abc");
+map.insert(key, 20);
+println!("{}", key)
+```
+
+### Strings
+
+There are two types of strings:
+
+- literals (`&'static str`); hardcoded in the executable.
+- `std::string::String`s; allocated on the heap: `String::from("text")`.
+
+Then, there are the slices (don't forget the `&` operator!!!).
+
+```rust
+// The `String` data type is mutable.
+//
+let string: String = String::from("pizza!");
+let string: String = "pizza!".to_string();
+let mut string = String::new();
+
+let slice: &str = &string[0..3];
+let literal: &str = "Your pizza";             // string literals are slices!
+```
+
+Using strings with functions:
+
+```rust
 // Valid, but forces to pass a string
 //
 fn str_method(s: &String) -> &str { s }
@@ -289,14 +368,34 @@ str_method(&literal[..]);
 str_method(literal);
 ```
 
-Slices apply to arrays as well:
+#### Internal representation (bytes/chars/graphemes)
+
+A `String` is a wrapper over a `Vec<u8>`.
+
+Rust has three notions of string composition. Example `नस्` (the second character is accented):
+
+- bytes: `[224, 164, 168,   224, 164, 184,   224, 165, 141]`
+- Unicode scalars (codepoints): `['न', 'स', ' ्']`
+- grapheme clusters: `"न", "स्"`
+
+Rust doesn't handle graphemes natively (requires a crate).
+
+Accessing:
 
 ```rust
-let array = [8u32; 5];
-let slice = &array[..];         // type is `&[u32]`
-```
+// Not valid: direct array indexing
+//
+"ननन"[0]
 
-See the ownership chapter, for the related properties.
+// Range access, but panics if the sequence returned is not at char boundary.
+&"ननन"[0..3]
+
+// Extract chars. WATCH OUT! Does not split into graphemes, e.g. "ü" will be 2 chars (!).
+string.chars();
+
+// Extract bytes.
+string.bytes();
+```
 
 ### For/while (/loop) loops
 
@@ -311,14 +410,11 @@ for x in 0..10 { }
 //
 for x in (0..100).step_by(2).rev() {}
 
-// Iterate an array.
+// Iterate an array/vector
 //
-for i in array.iter() { }
-
-// Iterate a vector
-//
-for i in &vec { println!("{}", i) }
-for i in &mut vec { *i *= 2 }
+for i in collection.iter() { }
+for i in &collection { }
+for i in &mut collection { *i *= 2 }
 ```
 
 While:
@@ -711,12 +807,11 @@ string.clear();                           // blank a string
 string.len();
 string.as_bytes();                        // byte slice of the string contents
 string.push_str(&str);                    // concatenate (append) strings
+string.push('c');
+string.split_whitespace();
 
-
-// WATCH OUT! Does not split into graphemes, e.g. "ü" will be 2 chars (!); must 
-// Must use a crate to handle this exactly.
-//
-string.chars();
+string += &string2;                       // concatenate via overloaded operator; can take &str or &String
+format!("{}/{}/{}"), s1, s2, s3);         // preferred format for more complex concatenations
 ```
 
 Char APIs:
@@ -724,6 +819,10 @@ Char APIs:
 ```rust
 c.is_alphabetic();
 c.is_numeric();
+
+use std::char;
+
+let c = char::from_digit(4, 10);          // (number, radix)
 ```
 
 Formatting:

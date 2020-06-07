@@ -8,6 +8,7 @@
   - [Bisect](#bisect)
   - [Export (`archive`)](#export-archive)
   - [Informations gathering](#informations-gathering)
+  - [Ignoring](#ignoring)
 
 ## Log
 
@@ -81,4 +82,12 @@ $ git status -b --porcelain
 
 $ git status -b --porcelain
 ## master...origin/master
+```
+
+## Ignoring
+
+```sh
+update-index --[no-]assume-unchanged $file                  # ignore changes to a file in the index
+echo '/.ruby-version' >> .git/info/exclude                  # ignore an untracked file only in the local repository
+git config --global core.excludesfile ~/.gitignore_global   # create a global gitignore
 ```

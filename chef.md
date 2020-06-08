@@ -64,7 +64,9 @@ file '/etc/nginx/ssl/example.crt' do
   owner 'root'
 end
 
+# Don't forget that the :subscribes action is the action of the enclosing resource!
 service 'nginx' do
+  action :nothing
   subscribes :reload, 'file[/etc/nginx/ssl/example.crt]', :immediately
 end
 ```
@@ -72,7 +74,7 @@ end
 ### Available variables
 
 ```ruby
-Chef::Config[:cookbook_path]      # Cookbook path, usable in recipes 
+Chef::Config[:cookbook_path]      # Cookbook path, usable in recipes
 ```
 
 ## Resources

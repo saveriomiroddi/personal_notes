@@ -45,13 +45,13 @@ SELECT HEX(ORD('👸'));
 
 Metacharacters/functionalities supported:
 
-- `^ $ . * + ? | {} []`;
+- `^ $ . * + ? | {} [] \b`;
 - `()` but not with groups capturing;
 - `[:digit:]` and so on;
 - backreferences is not supported;
 - lookahead is not supported.
 
-!! The backslash needs to be doubled where it's literal, e.g. `\\.` !!
+!! The backslash needs to be doubled where it's literal, e.g. `\\.`/`\\b` !!
 
 `LIKE`-style operator:
 

@@ -37,6 +37,7 @@ The VIM section requires some cleanup.
 - ``Ctrl+` ``                 Show/hide terminal
 - `Ctrl+Shift+V`              Open file preview in tab
 - `Ctrl+K, V`                 Show file preview (side-by-side)
+- `Ctrl+\`                    Open split screen tab
 
 - `Ctrl+K, M`                 Select language
 
@@ -65,6 +66,7 @@ The VIM section requires some cleanup.
 `Ctrl[+K]+D`                when a word is selected, goes to the next instance and selects the current; if [+K], skips the current
 `Ctrl+Alt+(select)`         start rectangular selection
 `Ctrl+Shift+(Up/Down)`   		move a line
+`Alt+Shift+2`               two columns (split screen)
 
 #### search/replace
 

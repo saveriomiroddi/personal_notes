@@ -3,6 +3,7 @@
 - [Ruby](#ruby)
   - [General syntax](#general-syntax)
     - [Array literals](#array-literals)
+    - [Runtime code evaluation](#runtime-code-evaluation)
     - [Block-oriented processing methods](#block-oriented-processing-methods)
     - [Ampersand prefix operator `&<object>`](#ampersand-prefix-operator-object)
     - [Heredoc](#heredoc)
@@ -25,6 +26,20 @@
 
 ```ruby
 %i(foo bar)           # array of symbols
+```
+
+### Runtime code evaluation
+
+Create a (namespaced) class runtime, inside a method:
+
+```ruby
+# Version using :class_eval and a heredoc string; the parameters passed enable source debugging.
+#
+ActiveTrigger.class_eval <<-'RUBY', __FILE__, __LINE__ + 1
+  class Application < Rails::Application; end
+'RUBY'
+
+ActiveTrigger.const_set :Application, Class.new(Rails::Application) do; end
 ```
 
 ### Block-oriented processing methods

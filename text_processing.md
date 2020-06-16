@@ -75,6 +75,10 @@ Operations on numbered lines (1-based):
 
 - search/replace on a given line: `<n>s/<search>/<replace>/[g]`
 
+With regexes, put the operation after the pattern:
+
+- delete: `/<pattern>/d`
+
 ### Special characters
 
 In order to handle tabs (`\t`), either use `$` quoting or parameter substitution:

@@ -19,7 +19,7 @@ log --merges --first-parent		      # search only [merges] commits, only in the [
 
 # commits reachable by $r2 but not by $r1
 # alias: `^$r1 $r2`
-log $r1..$r2 
+log $r1..$r2
 
 # commits reachable by either $r1 or $r2, but not both
 # alias: `$r1 $r2 --not $(git merge-base --all $r1 $r2)`

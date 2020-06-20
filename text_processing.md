@@ -69,15 +69,17 @@ Capturing groups are not supported.
 
 Operations on numbered lines (1-based):
 
-- insert : `<n>i<content>`
+- insert : `<n>i<content>` (includes newline)
 - delete : `<n>d`.
 - replace : `<n>c<content>`.
 
 - search/replace on a given line: `<n>s/<search>/<replace>/[g]`
 
-With regexes, put the operation after the pattern:
+Operations with matches:
 
 - delete: `/<pattern>/d`
+- insert (add before) `/<pattern>/i newstring` # in order to add leading spaces, must escape them
+- add (add after) `/<pattern>/a newstring`
 
 ### Special characters
 

@@ -29,6 +29,7 @@
     - [String/char-related](#stringchar-related)
     - [Random (`rand`)](#random-rand)
     - [Date/times (`chrono`)](#datetimes-chrono)
+    - [Commandline parsing (`clap`)](#commandline-parsing-clap)
 
 ## Cargo
 
@@ -853,4 +854,120 @@ use chrono::{DateTime, Duration, Utc};
 let start:DateTime<Utc> = Utc::now();                   // Current time
 start + Duration::days(3);                              // Arithmentic
 start.checked_add(Duration::days(3));                   // Safe arithmetic
+```
+
+### Commandline parsing (`clap`)
+
+Show varargs, and how to encapsulate in a function; must copy the strings, because it's not possible for them to be used outside the function.
+
+```rust
+// Alternative: receive `std::env::args().collect()`, and use `get_matches()`.
+//
+fn parse_commandline_arguments() -> Vec<String> {
+  let matches = App::new("test")
+      .setting(AppSettings::TrailingVarArg)
+      .arg(
+          Arg::with_name("INTERVALS")
+              .required(true)
+              .index(1)
+              .multiple(true),
+      )
+      .get_matches();
+
+  matches
+      .values_of("INTERVALS")
+      .unwrap()
+      .map(|str|String::from(str))
+      .collect::<Vec<String>>()
+}
+```
+
+Examples of extended form:
+
+```rust
+let matches = App::new("My Super Program")
+    .version("1.0")
+    .author("Kevin K. <kbknapp@gmail.com>")
+    .about("Does awesome things")
+    .arg(
+        Arg::with_name("config")
+            .short("c")
+            .long("config")
+            .value_name("FILE")
+            .help("Sets a custom config file")
+            .takes_value(true),
+    )
+    .arg(
+        Arg::with_name("INPUT")
+            .help("Sets the input file to use")
+            .required(true)
+            .index(1),
+    )
+    .arg(
+        Arg::with_name("v")
+            .short("v")
+            .multiple(true)
+            .help("Sets the level of verbosity"),
+    )
+    .subcommand(
+        SubCommand::with_name("test")
+            .about("controls testing features")
+            .version("1.3")
+            .author("Someone E. <someone_else@other.com>")
+            .arg(
+                Arg::with_name("debug")
+                    .short("d")
+                    .help("print debug information verbosely"),
+            ),
+    )
+    .get_matches();
+
+// Gets a value for config if supplied by user, or defaults to "default.conf"
+let config = matches.value_of("config").unwrap_or("default.conf");
+println!("Value for config: {}", config);
+
+// Calling .unwrap() is safe here because "INPUT" is required (if "INPUT" wasn't
+// required we could have used an 'if let' to conditionally get the value)
+println!("Using input file: {}", matches.value_of("INPUT").unwrap());
+
+// Vary the output based on how many times the user used the "verbose" flag
+// (i.e. 'myprog -v -v -v' or 'myprog -vvv' vs 'myprog -v'
+match matches.occurrences_of("v") {
+    0 => println!("No verbose info"),
+    1 => println!("Some verbose info"),
+    2 => println!("Tons of verbose info"),
+    3 | _ => println!("Don't be crazy"),
+}
+
+// You can handle information about subcommands by requesting their matches by name
+// (as below), requesting just the name used, or both at the same time
+if let Some(matches) = matches.subcommand_matches("test") {
+    if matches.is_present("debug") {
+        println!("Printing debug info...");
+    } else {
+        println!("Printing normally...");
+    }
+}
+```
+
+Examples of compact form:
+
+```rust
+let matches = App::new("myapp")
+    .version("1.0")
+    .author("Kevin K. <kbknapp@gmail.com>")
+    .about("Does awesome things")
+    .args_from_usage(
+        "-c, --config=[FILE] 'Sets a custom config file'
+  <INPUT>              'Sets the input file to use'
+  -v...                'Sets the level of verbosity'",
+    )
+    .subcommand(
+        SubCommand::with_name("test")
+            .about("controls testing features")
+            .version("1.3")
+            .author("Someone E. <someone_else@other.com>")
+            .arg_from_usage("-d, --debug 'Print debug information'"),
+    )
+    .get_matches();
 ```

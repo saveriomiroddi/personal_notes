@@ -24,10 +24,13 @@
     - [Move](#move)
     - [Borrowing](#borrowing)
     - [Dangling pointers](#dangling-pointers)
+    - [Lifetimes](#lifetimes)
     - [Slices](#slices)
   - [APIs/Crates](#apiscrates)
     - [String/char-related](#stringchar-related)
     - [Random (`rand`)](#random-rand)
+    - [Regular expressions (`regex`)](#regular-expressions-regex)
+    - [Date/times (standard)](#datetimes-standard)
     - [Date/times (`chrono`)](#datetimes-chrono)
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
 
@@ -63,6 +66,11 @@ path = "src/play.rs"
 
 [dependencies]
 rand = "0.7.3"
+
+# Workspace: manage multiple projects.
+# Using cargo from root requires the member name; otherwise, each member can be treated as an individual project.
+[workspace]
+members = ["playground", "rust_programming_by_example"]
 ```
 
 Versioning is pessimistic by default.
@@ -118,6 +126,10 @@ fn main() {
 ```rust
 println!("{:#?}", vec);                 // generic pretty printing
 println!("{:?}", vec);                  // `Debug` format (requires the `Debug` trait)
+
+eprintln!("Error!");                    // print on stderr!
+
+println!("{:.2}", f);                   // formatted printing (rounds float)
 ```
 
 ### Variables/Data types
@@ -171,7 +183,7 @@ Tuples:
 
 ```rust
 let foo = ("bar", "baz");
-let (bar, baz) = foo;             // with multiple assignment (unpacking); foo can also be a tuple literal
+let (mut bar, mut baz) = foo;     // multiple assignment (unpacking); foo can also be a tuple literal
 let first_element = tuple.0;      // tuple indexing
 
 // Use a tuple as function argument
@@ -186,7 +198,10 @@ For strings, see the [Strings chapter](#strings).
 
 ```rust
 val += 1; val -= 1;             // increment/decrement value (no postfix)
+std::mem::swap(&mut a, &mut b); // !! swap two variables !!
+
 let val = 10_u64.pow(2);        // exponentiation (power)
+(f * 100.0).round() / 100.0;    // ugly: round to specific number of decimals (also see #printing)
 ```
 
 ### Closures
@@ -222,6 +237,7 @@ nth(n)                       // nth element (0-based)
 take(n)                      // iterator for the first n elements
 enumerate()                  // iterator (index, &value)
 join("str")                  // join using str
+zip(iter)                    // zip two arrays (iterators)!!!
 sum::<T>()
 
 chunks(n)                    // iterate in chunks of n elements; includes last chunk, if smaller
@@ -329,6 +345,17 @@ map.get("a");                   // Option
 let key = String::from("abc");
 map.insert(key, 20);
 println!("{}", key)
+```
+
+Conveniences:
+
+```rust
+// Create a hashmap from multiple arrays.
+//
+let scores: HashMap<_, _> = teams
+    .iter()
+    .zip(initial_scores.iter())
+    .collect();
 ```
 
 ### Strings
@@ -771,6 +798,21 @@ fn not_dangling -> String {
 }
 ```
 
+### Lifetimes
+
+Functions may need to know the lifetime of an object, in order to make sure that the resource is not freed prematurely.
+
+For example, here, the returned vector is bound to the matches; if `matches` is freed, the content of the vector may be dangling!
+
+```rust
+fn extract_interval_arguments<'a>(matches: &'a clap::ArgMatches) -> Vec<&'a str> {
+    matches
+        .values_of("INTERVALS")
+        .unwrap()
+        .collect::<Vec<&str>>()
+}
+```
+
 ### Slices
 
 Slices can refer to arrays and strings. They are immutable references, so the ownership needs to be considered:
@@ -809,6 +851,12 @@ string.len();
 string.as_bytes();                        // byte slice of the string contents
 string.push_str(&str);                    // concatenate (append) strings
 string.push('c');
+string.replace("a", "b");
+
+string.split("sep")
+string.split(char::is_numeric);
+string.split(|c: char| c.is_numeric()).collect();
+string.lines();                           // the newline char is not included in the output!
 string.split_whitespace();
 
 string += &string2;                       // concatenate via overloaded operator; can take &str or &String
@@ -844,41 +892,81 @@ use rand::Rng;
 let secret_number = rand::thread_rng().gen_range(0, 2);
 ```
 
-### Date/times (`chrono`)
+### Regular expressions (`regex`)
 
 ```rust
-// Don't use `time::Duration`, since it doesn't implement the operation traits.
-//
-use chrono::{DateTime, Duration, Utc};
+let re = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
+re.is_match("2014-01-01");
+```
 
+### Date/times (standard)
+
+```rust
+// Compute time elapsed
+//
+let current_time = SystemTime::now();
+current_time.elapsed();
+
+// Get current time in seconds
+//
+let current_time_secs = SystemTime::now()
+    .duration_since(UNIX_EPOCH)
+    .unwrap()
+    .as_secs();
+```
+
+### Date/times (`chrono`)
+
+Don't use `time::Duration`, since it doesn't implement the operation traits.
+
+```rust
 let start:DateTime<Utc> = Utc::now();                   // Current time
-start + Duration::days(3);                              // Arithmentic
+
+DateTime::parse_from_str(string, "%d.%m.%Y %H:%M %P %z")?;   // Parse a datetime, with timezone
+NaiveTime::parse_from_str(string, "%H:%M:%S")?;              // Parse a time
+NaiveDateTime::parse_from_str(string, "%Y-%m-%d %H:%M:%S")?; // Parse a datetime, without timezone
+
+start + Duration::days(3);                              // Arithmetic
 start.checked_add(Duration::days(3));                   // Safe arithmetic
+naive_time_1 + naive_time_2                             // Returns duration
+nt1 + nt2 + Duration::seconds(nt3.second() as i64);     // Sample arithmetic with 3+ (odd) NaiveTime
+
+// Conversions/tests
+
+naive_time.second();                                    // requires `Timelike`
+duration.num_seconds();
+
+duration < Duration::zero();
 ```
 
 ### Commandline parsing (`clap`)
 
-Show varargs, and how to encapsulate in a function; must copy the strings, because it's not possible for them to be used outside the function.
+Example of varargs, and how to encapsulate the parsing logic:
 
 ```rust
-// Alternative: receive `std::env::args().collect()`, and use `get_matches()`.
-//
-fn parse_commandline_arguments() -> Vec<String> {
-  let matches = App::new("test")
-      .setting(AppSettings::TrailingVarArg)
-      .arg(
-          Arg::with_name("INTERVALS")
-              .required(true)
-              .index(1)
-              .multiple(true),
-      )
-      .get_matches();
+fn parse_commandline_arguments<'a>(args: &'a Vec<String>) -> clap::ArgMatches {
+    App::new("test")
+        .setting(AppSettings::TrailingVarArg)
+        .arg(
+            Arg::with_name("INTERVALS")
+                .required(true)
+                .index(1)
+                .multiple(true),
+        )
+        .get_matches_from(args)
+}
 
-  matches
-      .values_of("INTERVALS")
-      .unwrap()
-      .map(|str|String::from(str))
-      .collect::<Vec<String>>()
+fn extract_interval_arguments<'a>(matches: &'a clap::ArgMatches) -> Vec<&'a str> {
+    matches
+        .values_of("INTERVALS")
+        .unwrap()
+        .collect::<Vec<&str>>()
+}
+
+fn main() {
+    let commandline_args = std::env::args().collect::<Vec<String>>();
+    let matches = parse_commandline_arguments(&commandline_args);
+    let intervals = extract_interval_arguments(&matches);
 }
 ```
 

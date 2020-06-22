@@ -9,6 +9,7 @@
   - [Cycle a string tokens based on separator (IFS)](#cycle-a-string-tokens-based-on-separator-ifs)
   - [String operations](#string-operations)
     - [Examples](#examples)
+  - [printf/escaping](#printfescaping)
   - [Arithmetic operations](#arithmetic-operations)
   - [Date operations](#date-operations)
   - [Redirections](#redirections)
@@ -208,6 +209,12 @@ ${filename%/*/*}                  # parent dir of a file (watch out - requires a
 ```sh
 ${str:1}                          # substring: remove the first charater
 ${str::-1}                        # substring: remove the last character
+```
+
+## printf/escaping
+
+```sh
+printf "%q" "$str"                # escape a string
 ```
 
 ## Arithmetic operations

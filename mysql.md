@@ -1,6 +1,7 @@
 # MySQL
 
 - [MySQL](#mysql)
+  - [Privileges](#privileges)
   - [Built-in functions](#built-in-functions)
     - [String functions](#string-functions)
       - [Character conversions](#character-conversions)
@@ -9,6 +10,18 @@
     - [XPath](#xpath)
   - [Window functions](#window-functions)
     - [Window function aggregates](#window-function-aggregates)
+
+## Privileges
+
+```sql
+SHOW GRANTS for <user>[@'<host>']\G
+
+-- *************************** 1. row ***************************
+-- Grants for user@%: GRANT SELECT, .. ON *.* TO `user`@`1.2.3.4` WITH GRANT -- OPTION
+-- *************************** 2. row ***************************
+-- Grants for user@%: GRANT APPLICATION_PASSWORD_ADMIN, ... ON *.* TO `user`@`1.2.3.4` WITH GRANT OPTION
+
+```
 
 ## Built-in functions
 

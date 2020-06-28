@@ -895,8 +895,14 @@ let secret_number = rand::thread_rng().gen_range(0, 2);
 ### Regular expressions (`regex`)
 
 ```rust
-let re = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
-re.is_match("2014-01-01");
+let re = Regex::new(r"(\d{4})(\d{2})").unwrap();
+let text = "201203, 201301, 201407";
+
+re.is_match(text); // true
+
+for cap in re.captures_iter(text) {
+    println!("Whole: '{}', $1: '{}', $2: '{}'", &cap[0], &cap[1], &cap[2]);
+}
 ```
 
 ### Date/times (standard)

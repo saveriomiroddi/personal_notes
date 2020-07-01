@@ -88,6 +88,7 @@ use std::io;
 use std::io::Write; // bring flush() into scope
 
 // "attributes": metadata with different purposes.
+// #![...] is at crate level.
 //
 #[allow(dead_code)]
 fn testing(n: u32) -> String {

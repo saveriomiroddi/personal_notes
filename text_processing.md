@@ -47,7 +47,20 @@ perl -i -pe 's/- (\w)/- \u$1/'
 
 ### Useful examples
 
-Strip trailing file spaces: `chomp if eof`
+Strip trailing file spaces: `chomp if eof`.
+
+Print part of line if there is a match:
+
+```perl
+# Conventional way.
+#
+print $1 if /^Host: (.*)/
+
+# Clever way! If there isn't a capturing group, all the match is printed, otherwise, only the
+# capturing group. Since this is a print, without newline, lines not matching don't print anything!
+#
+print /^Host: (.*)/
+```
 
 ## Sed
 

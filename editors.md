@@ -37,13 +37,16 @@ The VIM section requires some cleanup.
 - ``Ctrl+` ``                 Show/hide terminal
 - `Ctrl+Shift+V`              Open file preview in tab
 - `Ctrl+K, V`                 Show file preview (side-by-side)
-- `Ctrl+\`                    Open split screen tab
+- `Ctrl+\`                    Split editor vertically
+- `Ctrl+K, Ctrl+\`            Split editor horizontally
 
 - `Ctrl+K, M`                 Select language
 
 - `Ctrl+Shift+O`              Go to symbol in current file (includes Markdown headers)
 - `Alt+←`/`Alt+→`             Navigate through history
 - `Ctrl+↓`/`Ctrl+↑`           Scroll the viewport without moving the cursor
+
+- `Alt+L`                     Switch to replace inside selection (after `Ctrl+H`)
 
 - `Ctrl+K, Ctrl+L/U`		      Change case to Upper/Lower
 - `Ctrl+K, Ctrl+X`		        Trim trailing whitespace (extension)

@@ -2,9 +2,12 @@
 
 - [Text processing](#text-processing)
   - [Perl](#perl)
+    - [Syntax](#syntax)
     - [General concepts](#general-concepts)
+      - [Line numbers/Position-based operations](#line-numbersposition-based-operations)
       - [Priority](#priority)
-    - [Regex extra backslash sequences](#regex-extra-backslash-sequences)
+    - [Search/replace](#searchreplace)
+      - [Regex extra backslash sequences](#regex-extra-backslash-sequences)
     - [Useful examples](#useful-examples)
   - [Sed](#sed)
     - [Useful examples](#useful-examples-1)
@@ -12,7 +15,45 @@
 
 ## Perl
 
+### Syntax
+
+```perl
+# True/false: !! there are no `true`/`false` keywords !!
+# False values (everything else is true)
+0
+'0'
+''
+"()" # empty list
+"undef"
+
+# If (and blocks)
+if (CONDITION) { TRUE_BRANCH } else { ELSE_BRANCH }
+
+# Ternary operator
+CONDITION ? TRUE_BRANCH : FALSE_BRANCH
+```
+
 ### General concepts
+
+#### Line numbers/Position-based operations
+
+```sh
+# Insert at specific positions (line number):
+#
+# - `$.` is 1-based!; it's also valid in the END block
+# - `S_` → current line (can be modified)
+# - `.=` → append
+# - `.`  → concatenation
+#
+printf "0\n1\n2" | perl -lpe 'BEGIN { print "abc" }'			# !! doesn't work inplace !!
+printf "0\n1\n2" | perl -lpe 'END { print "abc" }'        # !! doesn't work inplace !!
+printf "0\n1\n2" | perl -ne 'eof && print'                # match and print last line
+
+printf "0\n1\n2" | perl -lpe '$. == 2 && print "abc"'		  # print before a numbered line => `0 abc 1 2`
+printf "0\n1\n2" | perl -pe '$_ .= "abc\n" if /1/'        # print after a match; !! `/regex/ && ...` doesn't work! !!
+
+printf "0\n0\n0" | perl -pe '$_ .= "abc\n" if /0/ && ++$cnt == 2'	# 2nd occurrence of the pattern (!!) => 0 0 abc 0
+```
 
 #### Priority
 
@@ -27,7 +68,15 @@ printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline and print $line'
 printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line'
 ```
 
-### Regex extra backslash sequences
+### Search/replace
+
+```sh
+# Replace with code evaluation. 
+#
+perl -pe 's/(@\S+)/" " x length($1)/e'
+```
+
+#### Regex extra backslash sequences
 
 Don't substitute part of the match!!:
 

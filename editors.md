@@ -49,6 +49,7 @@ The VIM section requires some cleanup.
 - `Alt+L`                     Switch to replace inside selection (after `Ctrl+H`)
 
 - `Ctrl+K, Ctrl+L/U`		      Change case to Upper/Lower
+- `Ctrl+Alt+I`                Increment selection, inside column selection (extension)
 - `Ctrl+K, Ctrl+X`		        Trim trailing whitespace (extension)
 
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)

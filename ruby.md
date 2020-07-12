@@ -7,10 +7,12 @@
     - [Block-oriented processing methods](#block-oriented-processing-methods)
     - [Ampersand prefix operator `&<object>`](#ampersand-prefix-operator-object)
     - [Heredoc](#heredoc)
+    - [Numerical base conversion](#numerical-base-conversion)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
   - [APIs/Stdlib](#apisstdlib)
     - [Array](#array)
     - [CGI/URI (encoding)](#cgiuri-encoding)
+    - [Strings/encoding](#stringsencoding)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
     - [Using `IO.popen3`](#using-iopopen3)
@@ -112,6 +114,47 @@ With tilde, also allows delimiter to be anywhere:
   EOF
 ```
 
+### Numerical base conversion
+
+Common conversions. Everything is a string; "int" represents a decimal.
+
+Generic methods:
+
+```ruby
+# int -> a numerical string in the given base
+# IMPORTANT! There's no left padding.
+#
+int.to_s(base)
+
+# numerical string in the given base -> int
+#
+numerical_str.to_i(base)
+
+# Numerical string to bytes; the directive is the base of the string; some directives:
+# - `B*`: binary
+# - `H*`: hex
+#
+[numerical_str].pack(directive)
+```
+
+Specific conversions:
+
+```ruby
+bytes.each_byte.map { |b| "%02X" % b }.join   # bytes → hex string (see printf link below)
+bytes.each_byte.each_slice(2) { |i, j| puts "%016b" % (256 * i + j) } # bytes → binary, padded 16 bits big endian
+bytes.each_byte.map(&:to_i)                   # bytes → array of ints
+arr.map(&:chr).join                           # array of ints → bytes
+
+"c".ord                                       # char  → int
+int.chr                                       # int   → byte/char (ASCII-8)
+
+hex.hex                                       # hex   → int (same as `to_i(16)`)
+```
+
+See https://idiosyncratic-ruby.com/49-what-the-format.html for `printf`-style formatting.
+
+There is a gem, `bitarray`, however, it's not so much better than just using a string (bits = `"0" * 8`) for generic work, as it doesn't even support bit operations like `OR`.
+
 ## Special variables/Built-in constants
 
 Updated up to: https://ruby-doc.org/stdlib-2.3.0/libdoc/English/rdoc/English.html
@@ -119,40 +162,40 @@ Updated up to: https://ruby-doc.org/stdlib-2.3.0/libdoc/English/rdoc/English.htm
 Entries marked with `ENG` need to `require 'English'` in order for the english version to be usable.
 
 ```ruby
-$:   $LOAD_PATH				              # load path
-$0   $PROGRAM_NAME			            # the name of the ruby script file
-$*   $ARGV					                # [ENG] the command line arguments
-$?   $CHILD_STATUS			            # [ENG] exit status of last executed child process
-$$   $PID, $PROCESS_ID			        # [ENG] interpreter's process ID
+$:   $LOAD_PATH                      # load path
+$0   $PROGRAM_NAME                  # the name of the ruby script file
+$*   $ARGV                          # [ENG] the command line arguments
+$?   $CHILD_STATUS                  # [ENG] exit status of last executed child process
+$$   $PID, $PROCESS_ID              # [ENG] interpreter's process ID
 
-$~   $LAST_MATCH_INFO			          # [ENG] MatchData instance for the last regexp match
-$<n>						                    # nth subexpression in the last match (same as $~[n])
-$&   $MATCH					                # [ENG] string last matched by regexp
-$+   $LAST_PAREN_MATCH			        # [ENG] last match from the previous successful pattern match
-$`   $PREMATCH				              # [ENG] string before the actual matched string of the previous successful pattern match.
-$'   $POSTMATCH				              # [ENG] string after the actual matched string of the previous successful pattern match.
+$~   $LAST_MATCH_INFO               # [ENG] MatchData instance for the last regexp match
+$<n>                                # nth subexpression in the last match (same as $~[n])
+$&   $MATCH                         # [ENG] string last matched by regexp
+$+   $LAST_PAREN_MATCH              # [ENG] last match from the previous successful pattern match
+$`   $PREMATCH                      # [ENG] string before the actual matched string of the previous successful pattern match.
+$'   $POSTMATCH                      # [ENG] string after the actual matched string of the previous successful pattern match.
 
-$!   $ERROR_INFO				            # [ENG] last error message
-$@   $ERROR_POSITION			          # [ENG] last error backtrace
+$!   $ERROR_INFO                    # [ENG] last error message
+$@   $ERROR_POSITION                # [ENG] last error backtrace
 
-$_   $LAST_READ_LINE			          # [ENG] string last read by gets
+$_   $LAST_READ_LINE                # [ENG] string last read by gets
 $.   $NR, $INPUT_LINE_NUMBER        # [ENG] line number last read by interpreter
 
-$,  $OFS, $OUTPUT_FIELD_SEPARATOR	  # [ENG]
-$;  $FS, $FIELD_SEPARATOR		        # [ENG]
-$/  $RS, $INPUT_RECORD_SEPARATOR	  # [ENG] input record separator
-$\  $ORS, $OUTPUT_RECORD_SEPARATOR	# [ENG] output record separator
+$,  $OFS, $OUTPUT_FIELD_SEPARATOR    # [ENG]
+$;  $FS, $FIELD_SEPARATOR            # [ENG]
+$/  $RS, $INPUT_RECORD_SEPARATOR    # [ENG] input record separator
+$\  $ORS, $OUTPUT_RECORD_SEPARATOR  # [ENG] output record separator
 
-$>  $DEFAULT_OUTPUT			            # [ENG]
-$<  $DEFAULT_INPUT			            # [ENG]
+$>  $DEFAULT_OUTPUT                  # [ENG]
+$<  $DEFAULT_INPUT                  # [ENG]
 
-$=  $IGNORECASE				              # [ENG] obsolete: case-insensitivity flag
+$=  $IGNORECASE                      # [ENG] obsolete: case-insensitivity flag
 ```
 
 ```ruby
-RUBY_PATCHLEVEL             				# patch level (Integer)
+RUBY_PATCHLEVEL                     # patch level (Integer)
 RUBY_VERSION                        # e.g. "2.7.0"
-__dir__						                  # directory of current file
+__dir__                              # directory of current file
 ```
 
 ## APIs/Stdlib
@@ -176,8 +219,14 @@ URI.encode_www_form(p1: "&&&", "p2" => "!!!") # URL-encode params: "p1=%26%26%26
 
 CGI::escapeHTML('"html"')       # escape HTML
 
-CGI.unescapeHTML("html")	      # decode HTML entities; use only for basic cases, as it' not 100% complete (gem: https://github.com/threedaymonk/htmlentities)
-HTMLEntities.new.decode("html")	# htmlentities gem
+CGI.unescapeHTML("html")        # decode HTML entities; use only for basic cases, as it' not 100% complete (gem: https://github.com/threedaymonk/htmlentities)
+HTMLEntities.new.decode("html")  # htmlentities gem
+```
+
+### Strings/encoding
+
+```ruby
+String.new(str, encoding: enc)         # !! Defaults to ASCII-8 encoding !!
 ```
 
 ## Handling processes

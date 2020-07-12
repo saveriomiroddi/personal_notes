@@ -155,6 +155,8 @@ See https://idiosyncratic-ruby.com/49-what-the-format.html for `printf`-style fo
 
 There is a gem, `bitarray`, however, it's not so much better than just using a string (bits = `"0" * 8`) for generic work, as it doesn't even support bit operations like `OR`.
 
+Another gem, `bitset`, is very functional, but it's old, and needs to be checked.
+
 ## Special variables/Built-in constants
 
 Updated up to: https://ruby-doc.org/stdlib-2.3.0/libdoc/English/rdoc/English.html

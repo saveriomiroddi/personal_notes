@@ -259,6 +259,7 @@ Arrays (immutable, so they're allocated on the stack):
 let my_list = [1, 2, 3];
 let my_list = [true; 4];                // 4 elements initialized as true; won't work with variable size (use a Vec)
 let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
+let mut my_list: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
 ```
 
 Vectors (mutable):
@@ -490,6 +491,12 @@ if let Coin::Quarter(state) = coin {
   println!("State quarter from {:?}!", state);
 } else {
   count += 1;
+}
+
+// While let: same. In this case, with stacked Option<T>.
+//
+while let Some(Some(value)) = optional_values_vec.pop() {
+  println!("current value: {}", value);
 }
 ```
 
@@ -847,6 +854,8 @@ let guess: u32 = string.parse().unwrap(); // string to numeric type
 String APIs:
 
 ```rust
+string.eq(&str)                           // test equality (compare)
+
 string.clear();                           // blank a string
 string.len();
 string.as_bytes();                        // byte slice of the string contents

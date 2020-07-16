@@ -143,7 +143,11 @@ const MAX_PRIMES: u32 = 100000;     // constants; the data type is required
 ((1u128 << CONST_U64) - 1) as u64    // WATCH OUT the priorities! In this example, the brackets are all required!
 ```
 
-Integer types: `[iu](8|16|32|64|128|size)`. The `size` ones depend on the architecture.
+Integer types:
+
+- `[iu](8|16|32|64|128|size)`
+  - the `size` ones depend on the architecture
+  - the default, if not specified and can't be inferred, is `i32`
 
 Max value function (example): `u64::max_value()`
 

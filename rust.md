@@ -27,6 +27,7 @@
     - [Lifetimes](#lifetimes)
     - [Slices](#slices)
   - [APIs/Crates](#apiscrates)
+    - [Testing](#testing)
     - [String/char-related](#stringchar-related)
     - [Random (`rand`)](#random-rand)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
@@ -53,6 +54,9 @@ cargo doc [--open]                   # builds and optionally opens docs for the 
 Configuration file example:
 
 ```toml
+# Enable nightly features; `strip` is on 1.46
+cargo-features = ["strip"]
+
 [package]
 name = "rust"
 version = "0.1.0"
@@ -67,8 +71,16 @@ path = "src/play.rs"
 [dependencies]
 rand = "0.7.3"
 
-# Workspace: manage multiple projects.
-# Using cargo from root requires the member name; otherwise, each member can be treated as an individual project.
+[profile.release]
+strip = "symbols"
+```
+
+Workspace: manage multiple projects.
+Using cargo from root requires the member name; otherwise, each member can be treated as an individual project.
+
+```toml
+# Some settings must be in the workspace configuration when using a workspace, eg. nightly features.
+
 [workspace]
 members = ["playground", "rust_programming_by_example"]
 ```
@@ -845,6 +857,19 @@ String slices are at *byte* points!
 Using string slices as arguments is preferrable to string references, as they're more generic (they can also take strings).
 
 ## APIs/Crates
+
+### Testing
+
+Simple test function, with assertions:
+
+```rust
+#[test]
+fn my_test() {
+  assert!(true);
+  assert_eq!(1, 1);
+  assert_ne!(1, 2);
+}
+```
 
 ### String/char-related
 

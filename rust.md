@@ -15,7 +15,7 @@
     - [For/while (/loop) loops](#forwhile-loop-loops)
     - [If/then/else](#ifthenelse)
     - [Enums](#enums)
-    - [Option<T>](#optiont)
+    - [Option<T>/Result<T, Error>](#optiontresultt-error)
     - [Pattern matching](#pattern-matching)
       - [Error handling](#error-handling)
     - [Structs](#structs)
@@ -27,6 +27,7 @@
     - [Lifetimes](#lifetimes)
     - [Slices](#slices)
   - [APIs/Crates](#apiscrates)
+    - [Files/streams handling](#filesstreams-handling)
     - [Testing](#testing)
     - [String/char-related](#stringchar-related)
     - [Random (`rand`)](#random-rand)
@@ -553,7 +554,7 @@ let home = IpAddr::V4(127, 0, 0, 1);
 fn route(ip_kind: IpAddrKind) { }
 ```
 
-### Option<T>
+### Option<T>/Result<T, Error>
 
 Foundation of Rust. In order to use the contained value, we must extract (and test) it.
 
@@ -567,7 +568,20 @@ enum Option<T> {
 //
 let some_number = Some(5);
 let absent_number: Option<i32> = None;
+
+// Convenient syntax for decoding a Result and returning the Err, if any.
+//
+let value = method()?;
+
+// Convenient pattern
+//
+method.unwrap_or_else( |err | {
+  println!("Problem parsing arguments: {}", err);
+  std::process::exit(1);
+});
 ```
+
+See next section for pattern matching.
 
 ### Pattern matching
 
@@ -602,6 +616,13 @@ fn plus_one(x: Option<i32>) -> Option<i32> {
 }
 let six = plus_one(Some(5));
 let none = plus_one(None);
+
+// Match Result<T, Err>
+//
+match Url::parse(&line) {
+  Ok(url) => println!("ok"),
+  _ => println!("ko"),
+};
 ```
 
 #### Error handling
@@ -858,6 +879,27 @@ Using string slices as arguments is preferrable to string references, as they're
 
 ## APIs/Crates
 
+### Files/streams handling
+
+```rust
+std::fs::read_to_string(filename) -> Result<String, Error>; // content must be valid UTF-8; filename can be relative.
+
+// Buffered read; requires the import below
+//
+use std::io::prelude::*;
+//
+// Read line by line
+//
+let f = File::open("log.txt")?;
+let mut reader = BufReader::new(f);
+let mut line = String::new();
+let len = reader.read_line(&mut line)?;
+
+// Read whole lines (two ways: iteration, vector)
+for line in reader.lines() { println!("{}", line?); }
+let lines = reader.lines().collect::<Result<Vec<_>, _>>().unwrap();
+```
+
 ### Testing
 
 Simple test function, with assertions:
@@ -888,6 +930,7 @@ string.eq(&str)                           // test equality (compare)
 string.clear();                           // blank a string
 string.len();
 string.as_bytes();                        // byte slice of the string contents
+string.is_empty();                        // must be 0 chars long
 string.push_str(&str);                    // concatenate (append) strings
 string.push('c');
 string.replace("a", "b");

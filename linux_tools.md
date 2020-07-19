@@ -30,15 +30,15 @@
 \( -name xx -or -name yy \)       # OR condition with brackets
 
 -[i]name <pattern>                # use quotes when using wildcards in pattern; case [i]nsensitive
--wholename <value>						    # include the directory name (eg. `.git/config`)
--regextype awk -[i]regex <regex>	# same as name, but with regex; must match the whole name; !! specify the regextype (the default is minimal) !!
-						                      # !! uses crap metachars (eg. [[:digit:]]) !!
+-wholename <value>                # include the directory name (eg. `.git/config`)
+-regextype awk -[i]regex <regex>  # same as name, but with regex; must match the whole name; !! specify the regextype (the default is minimal) !!
+                                  # !! uses crap metachars (eg. [[:digit:]]) !!
 
 -type (f|d)                       # [f]iles, [d]irectories
--L <path> -xtype l						    # find symlinks
--L <path> -type l				          # find broken symlinks
--maxdepth <value>							    # max number of levels to descend; `1` causes not to descend into directories
--mindepth <value>							    # opposite of `maxdepth`; useful when the root path (eg. `.`) must not be displayed (use `1`)
+-L <path> -xtype l                # find symlinks
+-L <path> -type l                 # find broken symlinks
+-maxdepth <value>                 # max number of levels to descend; `1` causes not to descend into directories
+-mindepth <value>                 # opposite of `maxdepth`; useful when the root path (eg. `.`) must not be displayed (use `1`)
 -follow                           # [follow] symlinks
 
 -perm                                    # parameters can be either in number or literal ("u+w,g+w","o=w") format
@@ -50,17 +50,17 @@
 -(a|c|m)[-|+](time|min)           # Accessed|Changed|Modified; time = n*hours, min = n*mins; +/- = more/less than
 --mtime +7                        # mtime = file data last modified N*24 hours ago; +7 = modified more than 7 days ago
 --mtime 0                         # 0 = created today
---mmin -<minutes>					        # mmin = modified in the last <minutes> minutes (don't forget the minus)
+--mmin -<minutes>                 # mmin = modified in the last <minutes> minutes (don't forget the minus)
 
 -size [+|-]<value>[c|k|M]         # bigger or greater than <value>; c/k/M = bytes/kilo/mega
--empty								            # empty files/directories
+-empty                            # empty files/directories
 
 -print                            # when passing the content to the pipe, adds the filename to the start of every line
 -print0 | xargs -0                # use null-char to separate filenames (useful for filenames with spaces) 
--print -quit							        # print one entry and quit; useful to check if there is one or more files in a directory (or matching)
+-print -quit                      # print one entry and quit; useful to check if there is one or more files in a directory (or matching)
 
--exec <command> {} \;		          # execute command for every file found, passing the name as {}; multiple -exec can be passed
--exec <command> {} +		          # execute command with as many files as possible (see https://unix.stackexchange.com/a/389706)
+-exec <command> {} \;             # execute command for every file found, passing the name as {}; multiple -exec can be passed
+-exec <command> {} +              # execute command with as many files as possible (see https://unix.stackexchange.com/a/389706)
 ```
 
 ### Examples
@@ -123,15 +123,22 @@ find . -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep -i --with-filename --l
 
 ## xargs
 
+For the parallel concepts, see the specific section.
+
 ```sh
--0                                    # specify null-char separator
--L $lines                             # max $lines for each invocation
--r || --no-run-if-empty               # don't run if there is no input
+-0                                    # specify null-char separator; useful ie. with `-print0`
+-r --no-run-if-empty                  # :-)
+-L $lines --max-lines=$lines          # maximum input lines per command
+[-I pattern]                          # cmd split input on new lines and executes cmd; use of -I is the simplest
+                                      # if no args, appends the line at the end
+-d '<delimiter>'                      # set delimiter, e.g. "\n" with `ls`
+
 ```
 
 Examples:
 
 ```sh
+ls -1rt | xargs -d "\n" $cmd                  # executes the command, with files sorted by reverse modification time
 cat /proc/self/environ | xargs -0 -L 1        # print the env vars (null-terminated), one per line
 ```
 
@@ -168,8 +175,8 @@ The number of jobs is automatically limited to the number of cores.
 Quoting is not required.
 
 ```sh
-ls -1 *.tar.* | parallel tar xvf		  # if unspecified, the argument is automatically appended
-ls -1 | parallel zip -m {1}.zip {1}		# parameterized; can also use `{}`
+ls -1 *.tar.* | parallel tar xvf      # if unspecified, the argument is automatically appended
+ls -1 | parallel zip -m {1}.zip {1}   # parameterized; can also use `{}`
 ```
 
 Using the `:::` commands separator:

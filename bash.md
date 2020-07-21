@@ -31,11 +31,21 @@
 
 ## Shellopts
 
+Basic:
+
 ```sh
+set -o pipefail
+set -o errexit
+set -o nounset
 set -o errtrace           # `-E`: trap errors also inside functions
+shopt -s inherit_errexit  # subshells inherit errexit (Bash 4.4+)
+```
+
+Extra:
+
+```sh
 set -o xtrace             # `-x`: debugging mode; prints all the statements
 shopt -s nocasematch      # case insensitive matches
-shopt -s inherit_errexit  # subshells inherit errexit (Bash 4.4+)
 shopt -s nullglob         # when globs don't match anything, expand to null string, rather than to themselves
 ```
 
@@ -408,7 +418,7 @@ LOCKFILE=/var/lock/makewhatis.lock
 
 # Explicit command form:
 #
-trap "{ rm -f $LOCKFILE; }" EXIT
+trap "{ rm -f $LOCKFILE; }" ERR INT EXIT
 
 # Function form:
 #
@@ -416,7 +426,7 @@ function remove_lockfile {
   rm -f "$LOCKFILE"
 }
 
-trap remove_lockfile EXIT
+trap remove_lockfile ERR INT EXIT
 ```
 
 ### Log a script output/Enable debugging [log]

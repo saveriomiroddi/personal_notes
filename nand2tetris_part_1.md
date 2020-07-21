@@ -25,6 +25,7 @@
     - [4.7 Programming (III)](#47-programming-iii)
       - [Pointers](#pointers)
       - [I/O](#io)
+  - [Week 5](#week-5)
 
 ## Week 1
 
@@ -109,6 +110,7 @@ Program counter: has load/inc/reset
     - [4.7 Programming (III)](#47-programming-iii)
       - [Pointers](#pointers)
       - [I/O](#io)
+  - [Week 5](#week-5)
 
 ### 4.4 Hack language
 
@@ -477,3 +479,8 @@ RAM layout:
 - (16k)    Data memory
 - (8k)     Screen memory map
 - (1 byte) Keyboard memory map
+
+## Week 5
+
+- forward reference
+- symbol

@@ -250,7 +250,6 @@ find(|x| x % 2 == 0)         // find first element matching the condition
 rev()                        // reverse. WATCH OUT, UNINTUITIVE: since it's not inclusive, it goes from 99 to 0.
 any(|x| x == 33)             // terminates on the first true
 all(|x| x % 2 == 0)          // terminates on the first false
-filter(|x| x == 33)          // iterator of the items verifying the condition; LAZY!
 nth(n)                       // nth element (0-based)
 take(n)                      // iterator for the first n elements
 enumerate()                  // iterator (index, &value)
@@ -928,6 +927,7 @@ String APIs:
 string.eq(&str)                           // test equality (compare)
 
 string.clear();                           // blank a string
+string.trim();                            // trim/strip
 string.len();
 string.as_bytes();                        // byte slice of the string contents
 string.is_empty();                        // must be 0 chars long
@@ -950,6 +950,8 @@ Char APIs:
 ```rust
 c.is_alphabetic();
 c.is_numeric();
+
+c.to_uppercase();                         // returns an iterator (AAARGH!!!)
 
 use std::char;
 

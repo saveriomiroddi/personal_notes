@@ -43,12 +43,13 @@ The VIM section requires some cleanup.
 - `Ctrl+K, M`                 Select language
 
 - `Ctrl+Shift+O`              Go to symbol in current file (includes Markdown headers)
-- `Alt+←`/`Alt+→`             Navigate through history
-- `Ctrl+↓`/`Ctrl+↑`           Scroll the viewport without moving the cursor
+- `Alt+(←/→)`               Navigate through history
+- `Ctrl+(↓/↑)`                  Scroll the viewport without moving the cursor
 
-- `Alt+L`                     Switch to replace inside selection (after `Ctrl+H`)
+- `Alt+Shift+(↓/↑)`           Column (box) selection
+- `Alt+L`                     Switch to replace inside selection (after `Ctrl+H`); it seems it doesn't currently support block selection
 
-- `Ctrl+K, Ctrl+L/U`		      Change case to Upper/Lower
+- `Ctrl+K, Ctrl+(L/U)`	      Change case to Upper/Lower
 - `Ctrl+Alt+I`                Increment selection, inside column selection (extension)
 - `Ctrl+K, Ctrl+X`		        Trim trailing whitespace (extension)
 

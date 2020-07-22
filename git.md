@@ -9,6 +9,7 @@
   - [Export (`archive`)](#export-archive)
   - [Informations gathering](#informations-gathering)
   - [Ignoring](#ignoring)
+  - [Batch operations  (message/tree filtering)](#batch-operations-messagetree-filtering)
 
 ## Log
 
@@ -90,4 +91,23 @@ $ git status -b --porcelain
 update-index --[no-]assume-unchanged $file                  # ignore changes to a file in the index
 echo '/.ruby-version' >> .git/info/exclude                  # ignore an untracked file only in the local repository
 git config --global core.excludesfile ~/.gitignore_global   # create a global gitignore
+```
+
+## Batch operations  (message/tree filtering)
+
+Mass-change all the messages in the current branch.
+
+`--msg-filter` receives the commit message from stdin, and set as new message the output of the user-specified command.
+
+Note that the [git filter-repo](https://github.com/newren/git-filter-repo) tool should be used instead. In order to take this approach, `export FILTER_BRANCH_SQUELCH_WARNING=1`.
+
+```sh
+# Rename commit titles.
+git filter-branch --force --msg-filter 'perl -pe "s/^(\[Chef\] )?/[Chef] /i"' -- $(git merge-base master HEAD)..HEAD
+
+# Delete a file
+git filter-branch --force --tree-filter 'rm -f terraform/terraform.tfstate' master..HEAD
+
+# Delete a Ruby method.
+git filter-branch --force --tree-filter 'ag "def mymethod" -l | xargs -r perl -0777 -i -pe "s/^(\s+)def mymethod.*?^\g1end\n\n//sm"' master..HEAD
 ```

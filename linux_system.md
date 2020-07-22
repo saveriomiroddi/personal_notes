@@ -65,6 +65,7 @@ apt show $package
 # Check if a package is installed (**with pipefail**), in the most standard way possible
 #
 if grep -qP "^trash-cli\s+install$" <<< $(dpkg --get-selections); then echo installed; fi
+dpkg --get-selections | grep '^trash-cli ' # interactive
 
 # Advanced filtering with aptitude.
 #

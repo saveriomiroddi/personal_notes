@@ -3,8 +3,8 @@
 - [Editors](#editors)
   - [Notes](#notes)
   - [Visual Studio Code](#visual-studio-code)
-    - [bindings](#bindings)
-      - [custom](#custom)
+    - [Bindings](#bindings)
+      - [Extensions](#extensions)
   - [Sublime Text](#sublime-text)
     - [bindings](#bindings-1)
       - [search/replace](#searchreplace)
@@ -30,7 +30,7 @@ The VIM section requires some cleanup.
 
 ## Visual Studio Code
 
-### bindings
+### Bindings
 
 - `Ctrl+B`				            Show/hide sidebar
 - `Ctrl+J`				            Show/hide console
@@ -49,19 +49,22 @@ The VIM section requires some cleanup.
 - `Alt+Shift+(↓/↑)`           Column (box) selection
 - `Alt+L`                     Switch to replace inside selection (after `Ctrl+H`); it seems it doesn't currently support block selection
 
-- `Ctrl+K, Ctrl+(L/U)`	      Change case to Upper/Lower
-- `Ctrl+Alt+I`                Increment selection, inside column selection (extension)
-- `Ctrl+K, Ctrl+X`		        Trim trailing whitespace (extension)
-
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)
 
 - `Ctrl+K, P`                 Copy file path
 - `Ctrl+Alt+C`                Copy file path (from explorer panel)
 - `Ctrl+Alt+Shift+C`          Copy file relative path (from explorer panel)
 
-#### custom
+`Ctrl + @`:                   Open link in browser (custom)
 
-`Ctrl + @`:                 Open link in browser (custom)
+#### Extensions
+
+- `Ctrl+K, Ctrl+(L/U)`	      Change case to Upper/Lower
+- `Ctrl+K, Ctrl+S`	          Change case to Snake
+
+- `Ctrl+Alt+I`                Increment selection, inside column selection
+
+- `Ctrl+K, Ctrl+X`		        Trim trailing whitespace
 
 ## Sublime Text
 

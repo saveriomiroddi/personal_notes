@@ -10,6 +10,7 @@
   - [State operations](#state-operations)
     - [Move resources from one statefile to another](#move-resources-from-one-statefile-to-another)
   - [Resources](#resources)
+    - [Key pair](#key-pair)
     - [IAM](#iam)
       - [`aws_iam_group`/`aws_iam_group_policy_attachment`](#aws_iam_groupaws_iam_group_policy_attachment)
       - [`aws_iam_user`/`aws_iam_user_group_membership`](#aws_iam_useraws_iam_user_group_membership)
@@ -26,6 +27,8 @@
     - [Scaling](#scaling)
       - [`aws_lb`/`aws_lb_target_group`/`aws_lb_target_group_attachment`](#aws_lbaws_lb_target_groupaws_lb_target_group_attachment)
       - [`aws_launch_template`/`aws_autoscaling_group`](#aws_launch_templateaws_autoscaling_group)
+    - [Lambda](#lambda)
+    - [Lightsail](#lightsail)
 
 ## Base configuration
 
@@ -138,6 +141,15 @@ terraform state push remote.tfstate
 
 The import format is be `terraform $resource_type.$local_name $resource_reference`; the standard for the reference is the resource_id, where otherwise, it's specified.
 
+### Key pair
+
+```hcl
+resource "aws_key_pair" "deployer" {
+  key_name   = "deployer-key"
+  public_key = "ssh-rsa [...] email@example.com"
+}
+```
+
 ### IAM
 
 #### `aws_iam_group`/`aws_iam_group_policy_attachment`
@@ -164,14 +176,14 @@ The membership is non-exclusive - a user can have multiple resources.
 ```hcl
 # import ref.: name
 #
-resource "aws_iam_user" "lb" {
+resource "aws_iam_user" "myuser" {
   name = "loadbalancer"
 }
 
 # import ref.: "user.name/group.name{/groupN.name}"
 #
-resource "aws_iam_user_group_membership" "example1" {
-  user = aws_iam_user.user1.name
+resource "aws_iam_user_group_membership" "example" {
+  user = aws_iam_user.myuser.name
 
   groups = [
     aws_iam_group.group1.name,
@@ -204,6 +216,8 @@ The attachment is non-exclusive.
 #
 resource "aws_iam_role" "demo_role" {
   name = "DemoRoleForEC2"
+
+  force_detach_policies = true # convenient; default: false
 
   assume_role_policy = <<-EOF
     {
@@ -513,5 +527,80 @@ resource "aws_autoscaling_group" "asg" {
   #
   force_delete              = false
   wait_for_capacity_timeout = "10m"
+}
+```
+
+### Lambda
+
+```hcl
+# Required role.
+#
+resource "aws_iam_role" "lambda-example" {
+  name = "example-role-32t7sco4"
+  path = "/service-role/"
+
+  force_detach_policies = true
+
+  assume_role_policy = <<-JSON
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": "sts:AssumeRole",
+          "Principal": {
+            "Service": "lambda.amazonaws.com"
+          },
+          "Effect": "Allow"
+        }
+      ]
+    }
+  JSON
+}
+
+# import ref.: function_name
+#
+resource "aws_lambda_function" "example" {
+  function_name = "example"
+  role          = aws_iam_role.lambda-example.arn
+
+  runtime          = "python3.7"
+  filename         = "lambda/example.zip"
+  handler          = "lambda_function.lambda_handler" # <file-name>.<method>
+  source_code_hash = filebase64sha256("lambda/example.zip")
+
+  # Optional params
+  #
+  timeout     = 3   # seconds
+  memory_size = 128 # MB
+
+  # Forced by TF
+  #
+  publish = false # default
+}
+```
+
+The zip contains a `/lambda_function.py` file, which contains:
+
+```python
+def lambda_handler(event, context):
+    print("value1 = " + event['key1'])
+    return event['key1']  # Echo back the first key value
+```
+
+### Lightsail
+
+```hcl
+# import ref: name (watch out the case!)
+#
+resource "aws_lightsail_instance" "wordpress-test" {
+  name              = "WordPress"
+  availability_zone = "eu-central-1a"
+  blueprint_id      = "wordpress"
+  bundle_id         = "nano_2_0"
+
+  # Defaults given by Lightsail (for this blueprint)
+  #
+  key_pair_name = "LightsailDefaultKeyPair"
+  username      = "bitnami"
 }
 ```

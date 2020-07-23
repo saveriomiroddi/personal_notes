@@ -4,6 +4,7 @@
   - [Configuration](#configuration)
   - [User-related](#user-related)
   - [Account-related](#account-related)
+  - [Lightsail](#lightsail)
 
 ## Configuration
 
@@ -22,4 +23,10 @@ iam get-user --user-name=$username
 
 ```sh
 budgets describe-budgets --account-id=$account_id
+```
+
+## Lightsail
+
+```sh
+lightsail get-instances
 ```

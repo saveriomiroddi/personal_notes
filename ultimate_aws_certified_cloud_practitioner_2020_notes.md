@@ -15,13 +15,15 @@
   - [Section 15: VPC & Networking](#section-15-vpc--networking)
   - [Section 16: Security & Compliance](#section-16-security--compliance)
   - [Section 17: Machine learning](#section-17-machine-learning)
+  - [Section 18: Account Management, Billing & Support](#section-18-account-management-billing--support)
   - [Section 19: Advanced identity](#section-19-advanced-identity)
+  - [Section 20: Marketese super-trash](#section-20-marketese-super-trash)
 
 ## General notes
 
 - See `REVIEW` for points to review
 - Scrub `64kramsystems.com` and `saverio`s
-- Create account alias?
+- How to create account alias?
 
 ## Section 3
 
@@ -405,6 +407,69 @@ AWS
   - For example, use to mass-analyze/categorize articles, requests...
 - SageMaker: managed service for building Machine Learning models
 
+## Section 18: Account Management, Billing & Support
+
+- Organizations
+  - Two types: "full" and for consolidated billing only
+  - Advantages (full)
+    - Consolidated billing
+    - Volume savings
+    - Pooling of reserved instances
+    - API for creating accounts
+    - Have additional security layer (Service Control Policies)
+
+- Typical design important: central account for logging
+
+- Organizational Units (OUs)
+  - Can be multi-level nested
+  - 1 OU per account
+  - Inherit SCPs
+
+- Organizations: there is one master account; can be in any OU
+
+- Reservations
+  - commitment to payment per hour to instance family
+  - independent of AZ, size, OS or tenancy
+
+- Payment model
+  - EC2: Linux=per second, Windows=per hour
+  - Fargate: per vCPU+memory
+  - S3
+    - no payment for inbound traffic
+    - payment also for: lifecycle transition, acceleration
+  - CF: different per region
+  - EC2 networking (scale of expense)
+    - via public IP
+    - across regions
+    - across AZs
+    - no payment for inbound traffic
+
+- Billing tools
+  - `TCO`: Estimate: On-premises vs AWS
+  - `Pricing calculator`: Estimate: Cost of infrastructure (insert the components)
+  - `Billing (+Free tier) dashbord`: Very high-level overview
+  - `Cost and usage reports`: In-depth reports (csv-style)
+  - `Cost Explorer`: Review costs (over time)
+    - includes `Savings Plan`
+    - includes `Forecast`
+    - can send reports (at intervals)
+  - `CloudWatch`: Alarms-oriented, simple
+  - `Budgets`: Alarms-oriented, complex
+
+- Cost allocation tags
+  - added by AWS: `aws:`, added by user: `user:`
+  - can be added via Tag Editor
+  - aggregated into Resource Groups
+
+- Trusted advisor: performs lots of different high-level checks, and gives advice
+  - Free tier has limited checks
+
+- Support plans (additions)
+  - Basic: 24/7 support (what?), email (support associates), one contact
+  - Developer: Email (support engineers)
+  - Business: Phone, Full Trusted advisor+API, Production impaired SLA
+  - Enterprise: Account manager, Concierge, More production SLA
+
 ## Section 19: Advanced identity
 
 - Cognito: Large-scale authentication (including 3rd party like Google/Facebook), including mobile apps
@@ -412,3 +477,32 @@ AWS
 - SSO: Amazon's login service
   - exam keyword: business applications
   - exam: manage multiple accounts, but not business applications -> Organizations
+
+## Section 20: Marketese super-trash
+
+- Operational excellence
+  - Principles
+    - Infrastructure as code
+    - Documentation
+    - Small, frequent changes
+    - Improve operations
+    - Anticipate failures
+  - Services: CloudFormation, Config, CloudTrail/CloudWatch, X-Ray, Code*
+- Security
+- Reliability
+  - Principles
+    - Recovery
+    - Scale horizontally/Don't guess capacity
+    - Automate change
+  - Services: IAM, VPC, Service Limits, Trusted Advisor, Auto Scaling, CloudTrail/CloudWatch, Config, Backups, CloudFormation, S3, Route 53
+- Performance Efficiency
+  - Principles
+    - Democratize advanced techs
+    - Go global in minutes
+    - Serverless
+    - Experiment more often
+    - Mechanical sympathy WTF
+  - Selection: a lot
+- Cost Optimization
+
+- Note: Downtime can be a disadvantage of vertical scaling

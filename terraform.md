@@ -1,6 +1,7 @@
 # Terraform
 
 - [Terraform](#terraform)
+  - [TMP](#tmp)
   - [Base configuration](#base-configuration)
   - [HCL](#hcl)
     - [Variables](#variables)
@@ -16,6 +17,7 @@
       - [`aws_iam_user`/`aws_iam_user_group_membership`](#aws_iam_useraws_iam_user_group_membership)
       - [`aws_iam_account_password_policy`](#aws_iam_account_password_policy)
       - [`aws_iam_role`/`aws_iam_role_policy_attachment`](#aws_iam_roleaws_iam_role_policy_attachment)
+    - [KMS/Secrets Manager](#kmssecrets-manager)
     - [Account-related](#account-related)
       - [`aws_budgets_budget`](#aws_budgets_budget)
     - [Networking](#networking)
@@ -27,8 +29,25 @@
     - [Scaling](#scaling)
       - [`aws_lb`/`aws_lb_target_group`/`aws_lb_target_group_attachment`](#aws_lbaws_lb_target_groupaws_lb_target_group_attachment)
       - [`aws_launch_template`/`aws_autoscaling_group`](#aws_launch_templateaws_autoscaling_group)
+    - [S3](#s3)
+      - [Bucket/properties/policies (many)](#bucketpropertiespolicies-many)
+      - [Objects](#objects)
     - [Lambda](#lambda)
     - [Lightsail](#lightsail)
+    - [DNS: `aws_route53_zone`](#dns-aws_route53_zone)
+    - [Cloudfront: `aws_cloudfront_distribution`, `aws_cloudfront_origin_access_identity`](#cloudfront-aws_cloudfront_distribution-aws_cloudfront_origin_access_identity)
+
+## TMP
+
+```sh
+smterraform import aws_iam_group.admins admins
+smterraform import aws_iam_group_policy_attachment.admins-administrator admins/arn:aws:iam::aws:policy/AdministratorAccess
+smterraform import aws_iam_user.saverio saverio
+smterraform import aws_iam_user_group_membership.saverio saverio/admins
+smterraform import aws_iam_role.demo_role DemoRoleForEC2
+smterraform import aws_iam_role_policy_attachment.demo-attach DemoRoleForEC2/arn:aws:iam::aws:policy/IAMReadOnlyAccess
+smterraform import aws_iam_role.lambda-example example-role-32t7sco4
+```
 
 ## Base configuration
 
@@ -36,13 +55,32 @@ Provider configuration (e.g. `terraform.tf`):
 
 ```hcl
 terraform {
-  required_version = "0.12.24"
+  required_version = "0.12.28"
 }
 
 provider "aws" {
+  region     = var.aws_default_region
   access_key = var.aws_access_key_id
   secret_key = var.aws_secret_access_key
-  region     = var.aws_default_region
+}
+
+# Alternate provider, for other region. Don't forget to set the keys.
+#
+provider "aws" {
+  alias  = "eu-west-2"
+  region = "eu-west-2"
+  access_key = var.aws_access_key_id
+  secret_key = var.aws_secret_access_key
+}
+
+# Conveniences for referencing the region. Reference as: `data.aws_region.eu-west-2.name`
+#
+data "aws_region" "eu-central-1" {
+  provider = aws
+}
+
+data "aws_region" "eu-west-2" {
+  provider = aws.eu-west-2
 }
 ```
 
@@ -59,6 +97,14 @@ variable "aws_secret_access_key" {
 
 variable "aws_default_region" {
   type = string
+}
+
+Create a resource in the alternate region:
+
+```hcl
+resource "aws_instance" "instance_london" {
+  provider = aws.eu-west-2
+  // [...]
 }
 ```
 
@@ -97,9 +143,11 @@ path.module     # path of the current module
 ### Functions
 
 ```hcl
-# String
+# Encodings
 
 base64encode(string)
+jsonencode(object)   # can encode maps!
+jsondecode(string)
 
 # File
 
@@ -143,6 +191,8 @@ The import format is be `terraform $resource_type.$local_name $resource_referenc
 
 ### Key pair
 
+Key pairs are per-region!
+
 ```hcl
 resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
@@ -155,13 +205,13 @@ resource "aws_key_pair" "deployer" {
 #### `aws_iam_group`/`aws_iam_group_policy_attachment`
 
 ```hcl
-# import ref.: name
+# Import ref.: name
 #
 resource "aws_iam_group" "developers" {
   name = "developers"
 }
 
-# import ref.: "group.name/policy_arn"
+# Import ref.: "group.name/policy_arn"
 #
 resource "aws_iam_group_policy_attachment" "test-attach" {
   group      = aws_iam_group.group.name
@@ -174,13 +224,13 @@ resource "aws_iam_group_policy_attachment" "test-attach" {
 The membership is non-exclusive - a user can have multiple resources.
 
 ```hcl
-# import ref.: name
+# Import ref.: name
 #
 resource "aws_iam_user" "myuser" {
   name = "loadbalancer"
 }
 
-# import ref.: "user.name/group.name{/groupN.name}"
+# Import ref.: "user.name/group.name{/groupN.name}"
 #
 resource "aws_iam_user_group_membership" "example" {
   user = aws_iam_user.myuser.name
@@ -195,7 +245,7 @@ resource "aws_iam_user_group_membership" "example" {
 #### `aws_iam_account_password_policy`
 
 ```hcl
-# import ref.: `iam-account-password-policy`
+# Import ref.: `iam-account-password-policy`
 #
 resource "aws_iam_account_password_policy" "strict" {
   minimum_password_length        = 8
@@ -212,7 +262,7 @@ resource "aws_iam_account_password_policy" "strict" {
 The attachment is non-exclusive.
 
 ```hcl
-# import ref.: name
+# Import ref.: name
 #
 resource "aws_iam_role" "demo_role" {
   name = "DemoRoleForEC2"
@@ -235,11 +285,54 @@ resource "aws_iam_role" "demo_role" {
   EOF
 }
 
-# import ref.: "demo_role.name/policy_arn"
+# Import ref.: "demo_role.name/policy_arn"
 #
 resource "aws_iam_role_policy_attachment" "demo-attach" {
   role       = aws_iam_role.demo_role.name
   policy_arn = "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
+}
+```
+
+### KMS/Secrets Manager
+
+Customer managed key:
+
+```hcl
+# Import ref.: key_id
+#
+resource "aws_kms_key" "ebs-test" {}
+```
+
+Secrets manager secret:
+
+```
+locals {
+  # These can be, for example, passed from the environment.
+  #
+  my_secret_values = {
+    key1 = "value1",
+    key2 = "value2",
+  }
+}
+
+# Import ref.: arn (same as id)
+#
+resource "aws_secretsmanager_secret" "my_secret" {
+  name = "my_secret" # optional
+
+  recovery_window_in_days = 30 # Default
+
+  # Optional; if not specified, the account's default CMK is used.
+  #
+  # kms_key_id = "..."
+}
+
+# Import: <secret_id>|<secret_version>
+# Use CLI for finding the version.
+#
+resource "aws_secretsmanager_secret_version" "my_secret" {
+  secret_id     = aws_secretsmanager_secret.my_secret.id
+  secret_string = jsonencode(local.my_secret_values)
 }
 ```
 
@@ -248,7 +341,7 @@ resource "aws_iam_role_policy_attachment" "demo-attach" {
 #### `aws_budgets_budget`
 
 ```hcl
-# import ref.: "account_id:name"
+# Import ref.: "account_id:name"
 #
 resource "aws_budgets_budget" "ec2" {
   name              = "Monthly EC2 budget"
@@ -280,6 +373,8 @@ resource "aws_budgets_budget" "ec2" {
 
 ### Networking
 
+Networks are per-region!
+
 #### `aws_vpc`/`aws_subnet`
 
 ```hcl
@@ -303,17 +398,26 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-# There is an alternative route resource; the below is the inline version.
+# WATCH OUT! Since each VPC comes with a default routing table set as main, it's necessary to use
+# the main association resource (below).
 #
-resource "aws_route_table" "routes" {
+resource "aws_route_table" "internet" {
   vpc_id = aws_vpc.main.id
 
+  # Inline version of the routes (alternative: use `aws_route` resources).
   # Multiple routes can be defined; the local route is implicit, and can't be specified.
   #
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
   }
+}
+
+# Import not available.
+#
+resource "aws_main_route_table_association" "internet" {
+  vpc_id         = aws_vpc.main.id
+  route_table_id = aws_route_table.internet.id
 }
 ```
 
@@ -367,7 +471,7 @@ resource "aws_security_group_rule" "main-egress" {
 # smterraform import aws_instance.first_instance $instance_id
 #
 resource "aws_instance" "first_instance" {
-  ami           = "ami-079024c517d22af5b" # Current Ubuntu 20.04 x86-64
+  ami           = "ami-079024c517d22af5b" # Current Ubuntu 20.04 x86-64; per-region!
   instance_type = "t2.micro"
   # availability_zone = ...
 
@@ -411,6 +515,8 @@ resource "aws_instance" "first_instance" {
 resource "aws_ebs_volume" "first_instance_extra" {
   availability_zone = aws_instance.first_instance.availability_zone
   size              = 2
+  encrypted         = true # required, if the key (below) is set
+  kms_key_id        = aws_kms_key.ebs-test.arn
 }
 
 # There are important gotchas when working with volumes:
@@ -440,7 +546,7 @@ resource "aws_ebs_snapshot" "first_instance_extra" {
 #### `aws_lb`/`aws_lb_target_group`/`aws_lb_target_group_attachment`
 
 ```hcl
-# import ref.: arn
+# Import ref.: arn
 #
 resource "aws_lb" "lb" {
   name               = "lb"
@@ -453,7 +559,7 @@ resource "aws_lb" "lb" {
   ]
 }
 
-# import ref: arn
+# Import ref: arn
 #
 resource "aws_lb_target_group" "lb-tg" {
   name     = "lb-tg"
@@ -505,7 +611,7 @@ resource "aws_launch_template" "asg-template" {
   user_data = filebase64("${path.module}/ec2_instances_user_data.sh")
 }
 
-# import ref.: name
+# Import ref.: name
 #
 resource "aws_autoscaling_group" "asg" {
   name                      = "DemoASG"
@@ -527,6 +633,175 @@ resource "aws_autoscaling_group" "asg" {
   #
   force_delete              = false
   wait_for_capacity_timeout = "10m"
+}
+```
+
+### S3
+
+#### Bucket/properties/policies (many)
+
+See the notes - there's much going on.
+
+```hcl
+locals {
+  base_bucket_name = "sav986" # used to avoid cycles
+}
+
+data "aws_canonical_user_id" "current" {}
+
+# https://www.terraform.io/docs/providers/aws/r/s3_bucket.html
+#
+# Import ref.: bucket
+#
+resource "aws_s3_bucket" "sav-test" {
+  bucket = local.base_bucket_name
+
+  # TF forces these.
+  #
+  acl           = "private"
+  force_destroy = true # default: false
+
+  versioning {
+    enabled = true
+  }
+
+  # Endpoint: http://sav986.s3-website.eu-central-1.amazonaws.com.
+  # See note in the index object!
+  #
+  website {
+    index_document = "index.html"
+  }
+
+  logging {
+    bucket = "${aws_s3_bucket.sav-test.bucket}-logging"
+    target_prefix = "log/"
+  }
+
+  lifecycle_rule {
+    enabled = true # mandatory
+
+    transition {
+      # Classes: STANDARD, STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, GLACIER, DEEP_ARCHIVE
+      #
+      storage_class = "INTELLIGENT_TIERING"
+      # days          = 30
+    }
+  }
+}
+
+resource "aws_s3_bucket" "sav-test-logging" {
+  bucket = "${local.base_bucket_name}-logging"
+
+  versioning {
+    enabled = true
+  }
+
+  # Bucket ACLs required for setting a bucket for logging. Such grants are automatically set by AWS
+  # when setting up logging via console.
+  # Canonical id info: https://docs.aws.amazon.com/general/latest/gr/acct-identifiers.html.
+  #
+  grant {
+    permissions = [
+      "READ_ACP",
+      "WRITE",
+    ]
+    type = "Group"
+    uri  = "http://acs.amazonaws.com/groups/s3/LogDelivery"
+  }
+  grant {
+    id = data.aws_canonical_user_id.current.id
+    permissions = [
+      "FULL_CONTROL",
+    ]
+    type = "CanonicalUser"
+  }
+}
+
+# Import ref.: bucket
+#
+resource "aws_s3_bucket_public_access_block" "sav-test" {
+  bucket = aws_s3_bucket.sav-test.bucket
+
+  # AWS defaults all to true
+  #
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_policy" "sav-test-allow-get-objects" {
+  bucket = aws_s3_bucket.sav-test.bucket
+
+  # As of v0.12.28, TF doesn't correctly handle the resources:
+  #
+  #   aws_s3_bucket.sav-test: Creating...
+  #   aws_s3_bucket.sav-test: Creation complete after 2s [id=sav986]
+  #   aws_s3_bucket_policy.sav-test-allow-get-objects: Creating...
+  #   [...]
+  #   Error: Error putting S3 policy: OperationAborted: A conflicting conditional operation is currently in progress against this resource.
+  #
+  # see https://git.io/JJ8Tj.
+  #
+  depends_on = [aws_s3_bucket_public_access_block.sav-test]
+
+  policy = <<-POLICY
+    {
+      "Id": "Policy1595497452733",
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Sid": "Stmt1595497451256",
+          "Action": [
+            "s3:GetObject"
+          ],
+          "Effect": "Allow",
+          "Resource": "${aws_s3_bucket.sav-test.arn}/*",
+          "Principal": "*"
+        }
+      ]
+    }
+  POLICY
+}
+```
+
+#### Objects
+
+```hcl
+# Import currently not supported (see https://git.io/JJlhX)
+#
+resource "aws_s3_bucket_object" "coffee" {
+  bucket = aws_s3_bucket.sav-test.bucket
+  key    = "coffee.jpg"
+  source = "s3/coffee.jpg"
+
+  # This is the default.
+  #
+  # content_type = "binary/octet-stream"
+}
+
+# Important! Since this is the index, the `content_type` must be specified! Otherwise, the index
+# will be downloaded instead of opened.
+#
+resource "aws_s3_bucket_object" "index" {
+  bucket       = aws_s3_bucket.sav-test.bucket
+  key          = "index.html"
+  source       = "s3/index.html"
+  content_type = "text/html"
+}
+
+resource "aws_s3_bucket_object" "images-dir" {
+  bucket = aws_s3_bucket.sav-test.bucket
+  key    = "images/"
+  source = "/dev/null"
+}
+
+resource "aws_s3_bucket_object" "beach" {
+  bucket = aws_s3_bucket.sav-test.bucket
+  key    = "images/beach.jpg"
+  source = "s3/images/beach.jpg"
+
+  storage_class = "INTELLIGENT_TIERING"
 }
 ```
 
@@ -557,7 +832,7 @@ resource "aws_iam_role" "lambda-example" {
   JSON
 }
 
-# import ref.: function_name
+# Import ref.: function_name
 #
 resource "aws_lambda_function" "example" {
   function_name = "example"
@@ -590,7 +865,7 @@ def lambda_handler(event, context):
 ### Lightsail
 
 ```hcl
-# import ref: name (watch out the case!)
+# Import ref: name (watch out the case!)
 #
 resource "aws_lightsail_instance" "wordpress-test" {
   name              = "WordPress"
@@ -602,5 +877,130 @@ resource "aws_lightsail_instance" "wordpress-test" {
   #
   key_pair_name = "LightsailDefaultKeyPair"
   username      = "bitnami"
+}
+```
+
+### DNS: `aws_route53_zone`
+
+When the DNS is managed by a 3rd party, create the zone, then set the DNS nameservers associated to the zone.
+
+```hcl
+resource "aws_route53_zone" "demo" {
+  name = "64kram.systems"
+
+  # Forced by TF.
+  #
+  comment       = "Managed by Terraform"
+  force_destroy = false
+}
+
+# Import ref.: <zone_id>_<name>_<type>_<set_identifier>; example: `000000000000000000000_www.domain.com_A_eu-central-1`
+#
+resource "aws_route53_record" "www-eu-central-1" {
+  zone_id        = aws_route53_zone.demo.id
+  name           = "www.64kram.systems"
+  set_identifier = "eu-central-1"
+  type           = "A"
+  ttl            = "300" # default
+  latency_routing_policy {
+    region = "eu-central-1"
+  }
+  records = [
+    aws_instance.first_instance.public_ip
+  ]
+}
+```
+
+### Cloudfront: `aws_cloudfront_distribution`, `aws_cloudfront_origin_access_identity`
+
+Cloudfront distribution + OAI:
+
+```hcl
+# Workaround to avoid self-reference. See https://www.terraform.io/docs/providers/aws/r/cloudfront_origin_access_identity.html#using-with-cloudfront.
+#
+resource "aws_cloudfront_origin_access_identity" "sav-test" {}
+
+# In order to update/destroy the distribution, it needs to be disabled first, AND the operation
+# needs to complete on the AWS side.
+#
+resource "aws_cloudfront_distribution" "sav-test" {
+  # See the corresponding bucket policy.
+  #
+  origin {
+    # Append the region to `s3`, in order to send requests to the (selected) closer regional
+    # endpoint, in order to have a faster first propagation, e.g. `s3-eu-central-1`.
+    #
+    domain_name = "${aws_s3_bucket.sav-test-private.bucket}.s3.amazonaws.com"
+    origin_id   = "S3-${aws_s3_bucket.sav-test-private.bucket}"
+
+    s3_origin_config {
+      # See resource-based workaround above
+      #
+      origin_access_identity = aws_cloudfront_origin_access_identity.sav-test.cloudfront_access_identity_path
+    }
+  }
+
+  enabled         = true
+  is_ipv6_enabled = true
+
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "S3-${aws_s3_bucket.sav-test-private.bucket}"
+
+    forwarded_values {
+      query_string = false # default
+
+      cookies {
+        forward = "none" # default
+      }
+    }
+
+    viewer_protocol_policy = "allow-all"
+    default_ttl            = 0 # Default: 86400
+    max_ttl                = 0 # Default: 31536000
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+}
+```
+
+Bucket policy:
+
+```hcl
+# See https://www.terraform.io/docs/providers/aws/r/cloudfront_origin_access_identity.html#updating-your-bucket-policy.
+#
+# Import fe.: bucket
+#
+resource "aws_s3_bucket_policy" "sav-test-private-allow-cloudfront" {
+  bucket = aws_s3_bucket.sav-test-private.bucket
+
+  depends_on = [aws_s3_bucket_public_access_block.sav-test-private]
+
+  policy = <<-POLICY
+    {
+        "Version": "2008-10-17",
+        "Id": "PolicyForCloudFrontPrivateContent",
+        "Statement": [
+            {
+                "Sid": "1",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "${aws_cloudfront_origin_access_identity.sav-test.iam_arn}"
+                },
+                "Action": "s3:GetObject",
+                "Resource": "${aws_s3_bucket.sav-test-private.arn}/*"
+            }
+        ]
+    }
+  POLICY
 }
 ```

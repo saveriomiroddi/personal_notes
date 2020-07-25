@@ -10,12 +10,18 @@
   - [Section 9: Databases & Analytics](#section-9-databases--analytics)
   - [Section 10: Other Compute Services: ECS, Lambda, Batch, Lightsail](#section-10-other-compute-services-ecs-lambda-batch-lightsail)
   - [Section 11: Deployments & Managing Infrastructure at Scale](#section-11-deployments--managing-infrastructure-at-scale)
+  - [Section 12: Leveraging the AWS Global Infrastructure](#section-12-leveraging-the-aws-global-infrastructure)
+  - [Section 13: Cloud integrations](#section-13-cloud-integrations)
+  - [Section 15: VPC & Networking](#section-15-vpc--networking)
+  - [Section 16: Security & Compliance](#section-16-security--compliance)
   - [Section 17: Machine learning](#section-17-machine-learning)
   - [Section 19: Advanced identity](#section-19-advanced-identity)
 
 ## General notes
 
 - See `REVIEW` for points to review
+- Scrub `64kramsystems.com` and `saverio`s
+- Create account alias?
 
 ## Section 3
 
@@ -257,6 +263,135 @@ AWS
   - Requires the SSM agent
 - OpsWorks: Chef/Puppet
 
+## Section 12: Leveraging the AWS Global Infrastructure
+
+- Global: for latency
+
+- R53 Routing policies:
+  - simple
+  - weighted
+  - latency
+  - failover, with health check on the designated primary
+
+- Cloufront
+  - caches (on/from first access), for a TTL (maybe a day); origin: S3 or HTTP
+  - enhanced security: via CF Origin Access Identiy (OAI) (added to bucket policy), DDoS protection (AWS Shield), WAF
+  - CF can be used as ingress to upload files to S3
+
+- CF <> x-region replication
+  - CF has more edges (200+)
+  - XRR is updated almost-realtime
+  - XRR has lower latency
+  - CF is not read-only
+
+- CF creation procedure (1)
+  - this time, block the public access on the bucket
+  - create distro: web
+  - select the bucket
+    - even lbs can be chosen
+  - restrict bucket
+  - OAI: create new identity
+  - grant read (update bucket policy)
+
+- CF: the http address can be found in `Domain Name`
+
+- CF creation procedure (2) -> regional, for faster propagation
+  - in the origin, add the region
+    - e.g. `sav986-private.s3.amazonaws.com` -> `sav986-private.s3-eu-central-1.amazonaws.com`
+    - otherwise, access will get 307, during propagation
+      - see https://aws.amazon.com/premiumsupport/knowledge-center/s3-http-307-response
+    - also restrict access, use existing identity, update bucket policy
+  - access is now available (check the address)
+  - one can see the new policy in the bucket
+
+- S3 Transfer Acceleration
+  - Uses edge locations to upload files to S3, in order to speed up the upload
+
+- Global Accelerator
+  - Same as S3 TA, except for applications
+  - Connection through "Anycast IP"s
+
+## Section 13: Cloud integrations
+
+- Simple Queue System (SQS)
+  - Pull system: messages are put in a queue, and the consumers pull them (1 consumer per message)
+- Simple Notificaation System (SNS)
+  - Push: messages are sent, with a topic assigned, and subscribers to the topic are sent the message
+  - Subscribers can be many services, including Lambda, email etc.
+
+## Section 15: VPC & Networking
+
+- Subnets are inside AZ; can be private or public (with an IGW)
+  - private can access internet via NAT GW)
+
+- NACLs: operate at subnet (IPs) level; have allow/deny; there is a default one; stateless
+- Security groups: operate at EC2 instance level; have only allow; stateful (outgoing traffic is allowed if originates from incoming)
+
+- VPC peering: allow VPCs to communicate; CIDRs must not overlap; not transitive!
+- Transit gateway: peering on large scale, hub-and-spoke architecture
+
+- Flow logs: storage on CW or S3
+
+- Hybrid networking
+  - Site-to-site VPN: requires customer GW and Virtual Private GW
+  - Direct Connect: physical (expensive): fast and private
+
+- VPC endpoints: connect services to private subnet
+  - GW: S3/DynamoDB
+  - Interface: the rest
+
+## Section 16: Security & Compliance
+
+- Shared responsibility exam keywords: "Path Management", "Configuration Management", "Awareness & Training"
+
+- WAF
+  - Layer 7 (Application, highest)
+  - Deploy on Application LBs, API Gateway, Cloudfront
+  - Web ACL (rules), including packet origin and request rate
+
+- Shield: Layer 3/4; two levels
+  - Basic, free, enabled by default
+  - Advanced
+    - 3k/month/org
+    - DDoS and more sophisticated attacks
+    - Spike fees absorbed by AWS
+    - Special support
+
+- Safe design
+  - Route 53 (-> Shield)
+    - CF (-> WAF)
+      - VPC (-> subnets, NACL, SGs)
+
+- Penetration testing: all mass-operations (eg. scanning, flooding) are prohibited
+
+- KMS encrypted services by default
+  - Cloutrail logs
+  - Glacier
+  - Storage GW
+
+- KMS keys
+  - AWS-managed (used by services)
+  - Customer-managed
+  - HSM: expensive, HW solution, for clients deploying their own keys
+
+- Secrets Manager
+  - Uses KMS
+  - Mostly meant to be integrated with RDS
+
+- Artifact: Produce documentation useful for assessments/certifications/etc.
+
+- Inspector: Analyzes EC2 instances for vulnerabilities (requires agent)
+
+- Macie: Analyzes S3 data for fiding personal data
+
+- Config: Stores, reviews and notifies about configuration history of AWS resources
+  - Configured with rules (e.g. port 22 open)
+  - Per-region
+
+- Guardduty (per-region)
+  - Analyzes logs: VPC Flow, CloudTrail, DNS
+  - Generates CW Events
+
 ## Section 17: Machine learning
 
 - Rekognition: ML for finding/recognizing objects in images/videos
@@ -277,4 +412,3 @@ AWS
 - SSO: Amazon's login service
   - exam keyword: business applications
   - exam: manage multiple accounts, but not business applications -> Organizations
-

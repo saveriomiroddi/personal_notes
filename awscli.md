@@ -5,6 +5,7 @@
   - [User-related](#user-related)
   - [Account-related](#account-related)
   - [Lightsail](#lightsail)
+  - [Secrets Manager](#secrets-manager)
 
 ## Configuration
 
@@ -29,4 +30,10 @@ budgets describe-budgets --account-id=$account_id
 
 ```sh
 lightsail get-instances
+```
+
+## Secrets Manager
+
+```sh
+secretsmanager list-secret-version-ids --secret-id=$secret_arn
 ```

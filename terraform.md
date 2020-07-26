@@ -1,7 +1,6 @@
 # Terraform
 
 - [Terraform](#terraform)
-  - [TMP](#tmp)
   - [Base configuration](#base-configuration)
   - [HCL](#hcl)
     - [Variables](#variables)
@@ -16,7 +15,7 @@
       - [`aws_iam_group`/`aws_iam_group_policy_attachment`](#aws_iam_groupaws_iam_group_policy_attachment)
       - [`aws_iam_user`/`aws_iam_user_group_membership`](#aws_iam_useraws_iam_user_group_membership)
       - [`aws_iam_account_password_policy`](#aws_iam_account_password_policy)
-      - [`aws_iam_role`/`aws_iam_role_policy_attachment`](#aws_iam_roleaws_iam_role_policy_attachment)
+      - [`aws_iam_role`/`aws_iam_role_policy_attachment`/`aws_iam_policy`](#aws_iam_roleaws_iam_role_policy_attachmentaws_iam_policy)
     - [KMS/Secrets Manager](#kmssecrets-manager)
     - [Account-related](#account-related)
       - [`aws_budgets_budget`](#aws_budgets_budget)
@@ -36,18 +35,13 @@
     - [Lightsail](#lightsail)
     - [DNS: `aws_route53_zone`](#dns-aws_route53_zone)
     - [Cloudfront: `aws_cloudfront_distribution`, `aws_cloudfront_origin_access_identity`](#cloudfront-aws_cloudfront_distribution-aws_cloudfront_origin_access_identity)
-
-## TMP
-
-```sh
-smterraform import aws_iam_group.admins admins
-smterraform import aws_iam_group_policy_attachment.admins-administrator admins/arn:aws:iam::aws:policy/AdministratorAccess
-smterraform import aws_iam_user.saverio saverio
-smterraform import aws_iam_user_group_membership.saverio saverio/admins
-smterraform import aws_iam_role.demo_role DemoRoleForEC2
-smterraform import aws_iam_role_policy_attachment.demo-attach DemoRoleForEC2/arn:aws:iam::aws:policy/IAMReadOnlyAccess
-smterraform import aws_iam_role.lambda-example example-role-32t7sco4
-```
+    - [SNS](#sns)
+    - [Cloudwatch](#cloudwatch)
+      - [Alarms](#alarms)
+      - [Logs](#logs)
+      - [Events](#events)
+    - [CloudTrail](#cloudtrail)
+    - [RDS](#rds)
 
 ## Base configuration
 
@@ -257,9 +251,11 @@ resource "aws_iam_account_password_policy" "strict" {
 }
 ```
 
-#### `aws_iam_role`/`aws_iam_role_policy_attachment`
+#### `aws_iam_role`/`aws_iam_role_policy_attachment`/`aws_iam_policy`
 
 The attachment is non-exclusive.
+
+Example, using predefined policy:
 
 ```hcl
 # Import ref.: name
@@ -285,11 +281,50 @@ resource "aws_iam_role" "demo_role" {
   EOF
 }
 
-# Import ref.: "demo_role.name/policy_arn"
+# Import ref.: "role.name/policy_arn"
 #
 resource "aws_iam_role_policy_attachment" "demo-attach" {
   role       = aws_iam_role.demo_role.name
   policy_arn = "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
+}
+```
+
+Custom policy:
+
+```hcl
+# Import ref.: arn
+#
+resource "aws_iam_policy" "lambda_example_logging" {
+  name = "AWSLambdaBasicExecutionRole-6d128aa8-189b-42d2-aa07-9bb2e622c1cd"
+  path = "/service-role/"
+
+  # On automatic creation, AWS also adds this permission:
+  #
+  #   {
+  #       "Effect": "Allow",
+  #       "Action": "logs:CreateLogGroup",
+  #       "Resource": "arn:aws:logs:<region>:<account_number>:*"
+  #   },
+  #
+  # which in this case is not needed, since the log group is created by TF.
+  #
+  policy = <<-JSON
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                ],
+                "Resource": [
+                    "${aws_cloudwatch_log_group.lambda_example_log_group.arn}"
+                ]
+            }
+        ]
+    }
+  JSON
 }
 ```
 
@@ -647,6 +682,12 @@ locals {
   base_bucket_name = "sav986" # used to avoid cycles
 }
 
+# Current account id (`account_id`)
+#
+data "aws_caller_identity" "current" {}
+
+# Current user id.
+#
 data "aws_canonical_user_id" "current" {}
 
 # https://www.terraform.io/docs/providers/aws/r/s3_bucket.html
@@ -978,7 +1019,7 @@ Bucket policy:
 ```hcl
 # See https://www.terraform.io/docs/providers/aws/r/cloudfront_origin_access_identity.html#updating-your-bucket-policy.
 #
-# Import fe.: bucket
+# Import ref.: bucket
 #
 resource "aws_s3_bucket_policy" "sav-test-private-allow-cloudfront" {
   bucket = aws_s3_bucket.sav-test-private.bucket
@@ -1003,4 +1044,280 @@ resource "aws_s3_bucket_policy" "sav-test-private-allow-cloudfront" {
     }
   POLICY
 }
+```
+
+### SNS
+
+```hcl
+# Import ref.: arn
+#
+resource "aws_sns_topic" "system_alarms" {
+  name = "SystemAlarms"
+}
+
+# Email subscriptions (`protocol = "email"`) are not supported (see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_subscription#protocols-supported).
+#
+# Import ref.: arn
+#
+resource "aws_sns_topic_subscription" "system_alarms_email" {
+  topic_arn = aws_sns_topic.system_alarms.arn
+
+  protocol = "email"
+  endpoint = "test-aws-system-alarms@mailinator.com"
+}
+```
+
+### Cloudwatch
+
+#### Alarms
+
+```hcl
+# Import ref.: <alarm_name>
+#
+resource "aws_cloudwatch_metric_alarm" "ec2_first_instance_cpu_utilization_alarm" {
+  alarm_name = "EC2_First_Instance_CPUUtilizationAlarm"
+
+  metric_name = "CPUUtilization"
+
+  namespace = "AWS/EC2"
+
+  dimensions = {
+    "InstanceId" = aws_instance.first_instance.id
+  }
+
+  # `GreaterThanOrEqualToThreshold`, etc.
+  #
+  comparison_operator = "GreaterThanThreshold"
+
+  threshold = 80
+
+  alarm_actions = [
+    aws_sns_topic.system_alarms.arn,
+  ]
+
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  period              = 300
+  statistic           = "Average"
+}
+
+# Created via EC2 instances Monitoring tab.
+#
+resource "aws_cloudwatch_metric_alarm" "ec2_first_instance_system_status_check_failed" {
+  alarm_name = "EC2_First_Instance_System_Status_Check_Failed"
+
+  metric_name = "StatusCheckFailed_System"
+
+  namespace = "AWS/EC2"
+
+  dimensions = {
+    "InstanceId" = aws_instance.first_instance.id
+  }
+
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+
+  threshold = 1
+
+  alarm_actions = [
+    "arn:aws:automate:eu-central-1:ec2:recover", # Recover the instance
+    aws_sns_topic.system_alarms.arn,
+  ]
+
+  evaluation_periods = 2
+  period             = 60
+  statistic          = "Maximum"
+  treat_missing_data = "missing"
+
+  # Interestingly, 0 is the default when created via Monitoring tab, which is invalid for TF, which
+  # requires at least 1.
+  #
+  datapoints_to_alarm = 1
+
+  alarm_description = "Created from EC2 Console"
+}
+
+# Special billing alarms - needs to be in `us-east-1`.
+#
+resource "aws_cloudwatch_metric_alarm" "billing_alarm" {
+  alarm_name = "BillingAlarm"
+  provider   = aws.us-east-1
+
+  metric_name = "EstimatedCharges"
+
+  namespace = "AWS/Billing"
+
+  dimensions = {
+    "Currency" = "USD"
+  }
+
+  comparison_operator = "GreaterThanThreshold"
+
+  threshold = 10
+
+  alarm_actions = [
+    aws_sns_topic.billing_alarms.arn,
+  ]
+
+  evaluation_periods = 1
+  period             = 21600
+  statistic          = "Maximum"
+  treat_missing_data = "missing"
+
+  # Interestingly, 0 is the default when created via Monitoring tab, which is invalid for TF, which
+  # requires at least 1.
+  #
+  datapoints_to_alarm = 1
+}
+```
+
+#### Logs
+
+Log group:
+
+```hcl
+# Import ref.: name
+#
+resource "aws_cloudwatch_log_group" "lambda_example_log_group" {
+  name = "/aws/lambda/${aws_lambda_function.example.function_name}"
+}
+```
+
+#### Events
+
+Scheduled:
+
+```hcl
+# Import ref.: name
+#
+resource "aws_cloudwatch_event_rule" "execute_example_lambda_every_hour" {
+  name = "ExecuteExampleLambdaEveryHour"
+
+  # Cron format: `cron(0 20 * * ? *)`
+  #
+  schedule_expression = "rate(1 hour)"
+}
+
+# Import ref.: rule.name/target_id (target_id requires awscli)
+#
+resource "aws_cloudwatch_event_target" "execute_lambda" {
+  rule = aws_cloudwatch_event_rule.execute_example_lambda_every_hour.name
+  arn  = aws_lambda_function.example.arn
+}
+```
+
+With event pattern:
+
+```hcl
+resource "aws_cloudwatch_event_rule" "send_email_on_user_login" {
+  name = "SendEmailOnUserLogin"
+
+  event_pattern = <<-JSON
+    {
+        "detail-type": [
+            "AWS Console Sign In via CloudTrail"
+        ]
+    }
+  JSON
+}
+
+resource "aws_cloudwatch_event_target" "notify_on_login" {
+  rule = aws_cloudwatch_event_rule.send_email_on_user_login.name
+  arn  = aws_sns_topic.system_alarms.arn
+}
+```
+
+### CloudTrail
+
+Example. For the bucket, see the related project.
+
+```hcl
+locals {
+  cloudtrail_bucket_name = "cloudtrail-demo-s999"
+}
+
+resource "aws_cloudtrail" "demo_trail" {
+  name                       = "demo-trail"
+  s3_bucket_name             = aws_s3_bucket.cloudtrail_demo.bucket
+  is_multi_region_trail      = true
+  enable_log_file_validation = true
+}
+```
+
+### RDS
+
+```hcl
+# When an instance is created, the default (readonly) option and parameter groups are created for
+# the major version, if they don't exist:
+#
+# - option g.: `default:mysql-8-0`
+# - parameter g.: `default.mysql8.0`
+#
+# A subnet is group is created as well, and a subnet if requested.
+
+# Import ref.: identifier
+#
+resource "aws_db_instance" "demo" {
+  identifier = "database-1"
+
+  engine         = "mysql"
+  engine_version = "8.0.20"
+  instance_class = "db.t2.micro"
+
+  copy_tags_to_snapshot = true
+  skip_final_snapshot   = true
+
+  # The password is not required for an imported resource, however, if it's subsequently specified,
+  # it will be marked as changed even if it matches.
+  # Note the pwd is stored in the statefile!
+  #
+  # password = "password"
+}
+
+# Import ref.: name
+#
+resource "aws_db_subnet_group" "default" {
+  name        = "default-vpc-0c9209e70c0813162"
+  description = "Created from the RDS Management Console" # Console default
+
+  subnet_ids = [
+    aws_subnet.main.id,
+    aws_subnet.main2.id
+  ]
+}
+
+# AWS is inconsistent - the default PG has dots, which are actually disallowed.
+# This PG can't be deleted, and can't be kept also if imported (due to naming), so it's left
+# commented here only for reference.
+#
+# Import ref.: name
+#
+# resource "aws_db_parameter_group" "default" {
+#   name = "default.mysql.80"
+#
+#   family = "mysql8.0"
+#
+#   parameter {
+#     name  = "character_set_server"
+#     value = "utf8"
+#   }
+# }
+
+# Inconsistency here as well - colon not allowed.
+#
+# Import ref.: name
+#
+# resource "aws_db_option_group" "default" {
+#   name                 = "defaultmysql-8-0"
+#   engine_name          = "mysql"
+#   major_engine_version = "8.0"
+#
+#   option {
+#     option_name = "Timezone"
+#
+#     option_settings {
+#       name  = "TIME_ZONE"
+#       value = "UTC"
+#     }
+#   }
+# }
 ```

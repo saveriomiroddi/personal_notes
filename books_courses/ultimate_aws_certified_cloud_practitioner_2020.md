@@ -12,6 +12,7 @@
   - [Section 11: Deployments & Managing Infrastructure at Scale](#section-11-deployments--managing-infrastructure-at-scale)
   - [Section 12: Leveraging the AWS Global Infrastructure](#section-12-leveraging-the-aws-global-infrastructure)
   - [Section 13: Cloud integrations](#section-13-cloud-integrations)
+  - [Section 14: Cloud monitoring](#section-14-cloud-monitoring)
   - [Section 15: VPC & Networking](#section-15-vpc--networking)
   - [Section 16: Security & Compliance](#section-16-security--compliance)
   - [Section 17: Machine learning](#section-17-machine-learning)
@@ -320,6 +321,40 @@ AWS
 - Simple Notificaation System (SNS)
   - Push: messages are sent, with a topic assigned, and subscribers to the topic are sent the message
   - Subscribers can be many services, including Lambda, email etc.
+
+## Section 14: Cloud monitoring
+
+- CW Metrics
+  - Reported every 5 minutes (!!); extra payments for reporting every minute
+  - Billing estimated charge, only in `us-east-1`
+  - EC2 RAM not available!
+  - API metrics available
+  - Custom metric available
+
+- CW Actions: auto scaling, EC2 actions, SNS notifications...
+
+- CW Logs: captures logs from many sources
+  - including: CloudTrail, Elastic Beanstalk, Route53, etc.
+  - Agent needs to be installed in order to push the log files
+    - Agent can also be installed on on-premises host
+  - Groups: are automatically created for some services, e.g. Lambda
+
+- EventBridge (formerly CW Events): inputs from many sources
+  - AWS services (scheduled, resource events...)
+  - Partner services: Zendesk, etc.
+  - Custom Event buses
+  - Schema Registry
+
+- CloutTrails: logs all the events
+  - enabled by default
+  - sources: API, SDK, CLI, Services
+  - output to S3/CW logs
+
+- X-Ray: Visual analysis of application performance and (some) errors
+
+- Health dashboards:
+  - `Service`: Global status of services
+  - `Personal`: Related to services that may have an impact on one's infrastructure
 
 ## Section 15: VPC & Networking
 

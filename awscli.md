@@ -6,6 +6,8 @@
   - [Account-related](#account-related)
   - [Lightsail](#lightsail)
   - [Secrets Manager](#secrets-manager)
+  - [CloudWatch log groups](#cloudwatch-log-groups)
+  - [CloudWatch Events](#cloudwatch-events)
 
 ## Configuration
 
@@ -36,4 +38,18 @@ lightsail get-instances
 
 ```sh
 secretsmanager list-secret-version-ids --secret-id=$secret_arn
+```
+
+## CloudWatch log groups
+
+```sh
+logs describe-log-groups
+```
+
+## CloudWatch Events
+
+List targets for rule:
+
+```sh
+events list-targets-by-rule --rule $rule_name
 ```

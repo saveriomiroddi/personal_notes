@@ -31,7 +31,7 @@
 
 ## Shellopts
 
-Basic:
+Basic (important):
 
 ```sh
 set -o pipefail
@@ -44,16 +44,10 @@ shopt -s inherit_errexit  # subshells inherit errexit (Bash 4.4+)
 Extra:
 
 ```sh
+shopt -s nullglob         # IMPORTANT: when globs don't match anything, expand to null string, rather than to themselves
 set -o xtrace             # `-x`: debugging mode; prints all the statements
 shopt -s nocasematch      # case insensitive matches
-shopt -s nullglob         # when globs don't match anything, expand to null string, rather than to themselves
 ```
-
-**Important**:
-
-- set `inherit_errexit` when performing command substitution
-- set `errtrace` when trapping errors
-- set `nullglob` when globs not matching files should not expand
 
 ## Switch/case
 

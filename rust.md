@@ -522,9 +522,12 @@ Definition:
 
 ```rust
 // Each entry is called "variant".
-// The Debug trait is needed for printing.
 //
-#[derive(Debug)]
+// - `Debug`: allows printing (also required by asserts);
+// - `PartialEq`: allows comparison with asserts;
+// - `Eq`: good practice to implement if applies.
+//
+#[derive(Debug, PartialEq, Eq)]
 enum IpAddrKind {
   V4,
   V6,
@@ -934,10 +937,15 @@ string.is_empty();                        // must be 0 chars long
 string.push_str(&str);                    // concatenate (append) strings
 string.push('c');
 string.replace("a", "b");
+string.start_with("pref");
 
+// splits; there is a `r`split* version for each.
+//
 string.split("sep")
 string.split(char::is_numeric);
 string.split(|c: char| c.is_numeric()).collect();
+string.splitn(max_splits, "sep").collect::Vec<T>(); // splits from left by separator to Vec, long `max_splits` maximum
+
 string.lines();                           // the newline char is not included in the output!
 string.split_whitespace();
 

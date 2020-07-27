@@ -4,6 +4,7 @@
   - [Notes](#notes)
   - [Visual Studio Code](#visual-studio-code)
     - [Bindings](#bindings)
+      - [Custom](#custom)
       - [Extensions](#extensions)
   - [Sublime Text](#sublime-text)
     - [bindings](#bindings-1)
@@ -55,7 +56,10 @@ The VIM section requires some cleanup.
 - `Ctrl+Alt+C`                Copy file path (from explorer panel)
 - `Ctrl+Alt+Shift+C`          Copy file relative path (from explorer panel)
 
-`Ctrl + @`:                   Open link in browser (custom)
+#### Custom
+
+`Ctrl+K, Ctrl+T`              Run test
+`Ctrl+@`:                     Open link in browser
 
 #### Extensions
 

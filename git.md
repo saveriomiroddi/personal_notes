@@ -5,6 +5,7 @@
     - [More complex examples](#more-complex-examples)
   - [Format](#format)
   - [Merging](#merging)
+  - [Rebase](#rebase)
   - [Bisect](#bisect)
   - [Export (`archive`)](#export-archive)
   - [Informations gathering](#informations-gathering)
@@ -50,6 +51,15 @@ log --merges v0.1.8...v0.1.9	      # search merges between two tags
 
 ```sh
 checkout (--ours|--theirs) $files   # resolve conflict using ours/theirs version
+```
+
+## Rebase
+
+Add a root (initial) commit:
+
+```sh
+git add --allow-empty -m "Initial (empty) commit"
+git rebase -i --root	# and reorder the commits
 ```
 
 ## Bisect

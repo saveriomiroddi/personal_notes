@@ -26,10 +26,14 @@
     - [Dangling pointers](#dangling-pointers)
     - [Lifetimes](#lifetimes)
     - [Slices](#slices)
-  - [APIs/Crates](#apiscrates)
+  - [Packaging](#packaging)
+    - [Project structure](#project-structure)
+    - [Modules](#modules)
+  - [Standard library](#standard-library)
     - [Files/streams handling](#filesstreams-handling)
     - [Testing](#testing)
     - [String/char-related](#stringchar-related)
+  - [Crates](#crates)
     - [Random (`rand`)](#random-rand)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
     - [Date/times (standard)](#datetimes-standard)
@@ -81,6 +85,7 @@ Using cargo from root requires the member name; otherwise, each member can be tr
 
 ```toml
 # Some settings must be in the workspace configuration when using a workspace, eg. nightly features.
+# Add the member before creating the crate.
 
 [workspace]
 members = ["playground", "rust_programming_by_example"]
@@ -879,7 +884,104 @@ String slices are at *byte* points!
 
 Using string slices as arguments is preferrable to string references, as they're more generic (they can also take strings).
 
-## APIs/Crates
+## Packaging
+
+### Project structure
+
+A package (=set of 1+ crates) can contain at most one library crate.
+
+Crate "roots":
+
+- `src/main.rs` -> binary crate (same name as package)
+- `src/lib.rs` -> library crate (same name as package)
+
+Multiple crates can be put in `src/bin`:
+
+- `src/bin/mycrate.rs` -> binary crate (named `mycrate`)
+
+Alternative configuration for multiple crates, via `cargo.toml`:
+
+```toml
+# Array of tables -> there can be multiple.
+#
+[[bin]]
+name = "daemon"
+path = "src/daemon/bin/main.rs"
+```
+
+### Modules
+
+All items (including modules) and their children are private by default, but:
+
+- children can access their parents' items;
+- public enums' items are public.
+
+```rust
+mod front_of_house {
+  // Public module; doesn't make the *contents* public.
+  //
+  pub mod hosting {
+    // Can see stuff in `front_of_house`.
+    //
+    pub fn add_to_waitlist() {}
+  }
+}
+
+pub fn eat_at_restaurant() {
+  // Relative path.
+  // With this tree, the function invoked must be public.
+  //
+  front_of_house::hosting::add_to_waitlist();
+
+  hosting::add_to_waitlist();
+}
+```
+
+Modifiers (prefixes):
+
+- `crate`: absolute path
+- `super`: parent module
+- `self`
+
+Multiple files structure:
+
+```rust
+// Load the content, as a module.
+//
+// - if in the root crate, it will look into `<module_name>.rs`;
+// - otherwise, `<filename_without_prefix>/<module_name>.rs`
+//
+mod <module_name>;
+```
+
+Importing:
+
+```rust
+// The item imported must be public. Using doesn't make the item public!
+// In order to import relatively, must (currently) use `self`.
+//
+// It's unidiomatic to import functions, while it's idiomatic to import enums, structs, etc.
+//
+//
+use crate::front_of_house::hosting;
+
+// Solutions to clashing; both iditiomatic.
+//
+use std::io::Result as Ioresult;
+use std::io; // and reference `io::Result`
+
+// "Re-exporting"; allows referencing `hosting::add_to_waitlist`. Useful when the whole path is not
+// meaningful for the clients.
+//
+pub use crate::front_of_the_house::hosting;
+
+// Other use syntaxes
+//
+use std::io::{self, Write}
+use std::collections::*; // useful for testing; unidiomatic for the rest
+```
+
+## Standard library
 
 ### Files/streams handling
 
@@ -904,14 +1006,19 @@ let lines = reader.lines().collect::<Result<Vec<_>, _>>().unwrap();
 
 ### Testing
 
-Simple test function, with assertions:
+Simple test function, with assertions, and clean (modularized) structure:
 
 ```rust
-#[test]
-fn my_test() {
-  assert!(true);
-  assert_eq!(1, 1);
-  assert_ne!(1, 2);
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn my_test() {
+    assert!(true);
+    assert_eq!(1, 1);
+    assert_ne!(1, 2);
+  }
 }
 ```
 
@@ -932,7 +1039,7 @@ string.eq(&str)                           // test equality (compare)
 string.clear();                           // blank a string
 string.trim();                            // trim/strip
 string.len();
-string.as_bytes();                        // byte slice of the string contents
+string.as_bytes();                        // byte slice (&[u8]) of the string contents
 string.is_empty();                        // must be 0 chars long
 string.push_str(&str);                    // concatenate (append) strings
 string.push('c');
@@ -972,6 +1079,8 @@ Formatting:
 format!("The number is {}", 1);                          // the template *must* be a literal (!)
 format!("The number is {0}, again {0}, not {1}!", 1, 2); // numbered placeholders!
 ```
+
+## Crates
 
 ### Random (`rand`)
 

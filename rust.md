@@ -19,6 +19,8 @@
     - [Pattern matching](#pattern-matching)
       - [Error handling](#error-handling)
     - [Structs](#structs)
+    - [Generics](#generics)
+    - [Traits](#traits)
     - [[Static] Methods](#static-methods)
   - [Ownership](#ownership)
     - [Move](#move)
@@ -89,6 +91,9 @@ Using cargo from root requires the member name; otherwise, each member can be tr
 
 [workspace]
 members = ["playground", "rust_programming_by_example"]
+
+[dependencies]
+redisish = {path = "../redisish"}   # Relative dependency
 ```
 
 Versioning is pessimistic by default.
@@ -102,11 +107,14 @@ At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
 ### Basic structure/Printing/Input
 
 ```rust
+// crate attribute (see below); must be in the root crate.
+//
+#![allow(unused_variables)]
+
 use std::io;
 use std::io::Write; // bring flush() into scope
 
 // "attributes": metadata with different purposes.
-// #![...] is at crate level.
 //
 #[allow(dead_code)]
 fn testing(n: u32) -> String {
@@ -223,8 +231,11 @@ For strings, see the [Strings chapter](#strings).
 val += 1; val -= 1;             // increment/decrement value (no postfix)
 std::mem::swap(&mut a, &mut b); // !! swap two variables !!
 
-let val = 10_u64.pow(2);        // exponentiation (power)
-(f * 100.0).round() / 100.0;    // ugly: round to specific number of decimals (also see #printing)
+10_u64.pow(2);                  // exponentiation (power), int/int
+10_f64.powi(2);                 // exponentiation, float/int
+10_f64.sqrt();                  // square root
+
+(f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
 ```
 
 ### Closures
@@ -281,6 +292,10 @@ let my_list = [1, 2, 3];
 let my_list = [true; 4];                // 4 elements initialized as true; won't work with variable size (use a Vec)
 let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
 let mut my_list: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
+
+// invocation: process_list(&my_list)
+//
+fn process_list(list: &[i32]) {}
 ```
 
 Vectors (mutable):
@@ -689,6 +704,71 @@ fn create_user(email: String) -> User {
 let mut user2 = User {
   active: false,
   ..user
+}
+```
+
+### Generics
+
+"Monomorphization": turn generic types into concrete ones at compile time.
+
+```rust
+fn larger<T: PartialOrd>(a: T, b: T) -> bool {
+  a > b
+}
+
+enum Option<T> {
+  Some(T),
+  None
+}
+
+struct Point<T, U> {
+  x: T,
+  y: U,
+}
+
+impl<T, U> Point<T, U> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+```
+
+### Traits
+
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+
+pub struct Article {
+    pub text: String,
+}
+
+// Traits can be imlemented only if the trait or the type are local to the crate!
+// This way, one doesn't find "surprises" from other crates.
+//
+impl Summary for Article {
+    fn summarize(&self) -> String {
+        "Summary of an article!".to_string()
+    }
+}
+
+fn print_summary(text: Box<dyn Summary>) {
+    println!("{}", text.summarize());
+}
+
+fn main() {
+    let article = Article {
+        text: "news".to_string(),
+    };
+
+    // Can use directly
+    //
+    println!("{}", article.summarize());
+
+    // We need to box here! The size is not known at compile time.
+    //
+    print_summary(Box::new(article));
 }
 ```
 

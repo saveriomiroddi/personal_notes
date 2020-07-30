@@ -727,9 +727,9 @@ struct Point<T, U> {
 }
 
 impl<T, U> Point<T, U> {
-    fn x(&self) -> &T {
-        &self.x
-    }
+  fn x(&self) -> &T {
+    &self.x
+  }
 }
 ```
 
@@ -737,38 +737,60 @@ impl<T, U> Point<T, U> {
 
 ```rust
 pub trait Summary {
-    fn summarize(&self) -> String;
+  fn summarize(&self) -> String;
+
+  // Default method. Overriding doesn't require special syntax.
+  //
+  fn default_placeholder(&self) -> String {
+    "Filomegna donde estas"
+  }
 }
 
 pub struct Article {
-    pub text: String,
+  pub text: String,
 }
 
 // Traits can be imlemented only if the trait or the type are local to the crate!
 // This way, one doesn't find "surprises" from other crates.
 //
 impl Summary for Article {
-    fn summarize(&self) -> String {
-        "Summary of an article!".to_string()
-    }
+  fn summarize(&self) -> String {
+    "Summary of an article!".to_string()
+  }
 }
 
-fn print_summary(text: Box<dyn Summary>) {
-    println!("{}", text.summarize());
+// Specify trait as type. Can specify more (e.g. <T: Summary + Display>).
+// The alternative syntax is `print_summary(text: impl T) -> impl T`.
+//
+fn print_summary<T: Summary>(text: T) -> T {
+  println!("{}", text.summarize());
+  text
 }
+
+// Returning different types is not allowed this way!
+//
+fn get_summary_type<T: Summary>(switch: bool) -> T {
+  if switch {
+    Article { text: "article".to_string() }
+  } else {
+    Tweet { text: "tweet".to_string() }
+  }
+}
+
+// Syntactic sugar>
+//
+fn fancy_types_function<T, U>(t: T, u: U)
+where
+    T: Display + Clone,
+    U: Clone + Debug,
+{}
 
 fn main() {
-    let article = Article {
-        text: "news".to_string(),
-    };
+  let article = Article {
+    text: "news".to_string(),
+  };
 
-    // Can use directly
-    //
-    println!("{}", article.summarize());
-
-    // We need to box here! The size is not known at compile time.
-    //
-    print_summary(Box::new(article));
+  print_summary(article);
 }
 ```
 
@@ -1114,30 +1136,31 @@ let guess: u32 = string.parse().unwrap(); // string to numeric type
 String APIs:
 
 ```rust
-string.eq(&str)                           // test equality (compare)
+s.eq(&str)                              // test equality (compare)
 
-string.clear();                           // blank a string
-string.trim();                            // trim/strip
-string.len();
-string.as_bytes();                        // byte slice (&[u8]) of the string contents
-string.is_empty();                        // must be 0 chars long
-string.push_str(&str);                    // concatenate (append) strings
-string.push('c');
-string.replace("a", "b");
-string.start_with("pref");
+s.clear();                              // blank a string
+s.trim(); s.trim_end(); s.trim_start(); // trim/strip
+s.len();
+s.as_bytes();                           // byte slice (&[u8]) of the string contents
+s.is_empty();                           // must be 0 chars long
+s.push_str(&str);                       // concatenate (append) strings
+s.push('c');
+s.replace("a", "b");
+s.start_with("pref");
+s.trim_end_matches("suffix");           // chomp suffix (but repeated)! also accepts 
 
 // splits; there is a `r`split* version for each.
 //
-string.split("sep")
-string.split(char::is_numeric);
-string.split(|c: char| c.is_numeric()).collect();
-string.splitn(max_splits, "sep").collect::Vec<T>(); // splits from left by separator to Vec, long `max_splits` maximum
+s.split("sep")
+s.split(char::is_numeric);
+s.split(|c: char| c.is_numeric()).collect();
+s.splitn(max_splits, "sep").collect::Vec<T>(); // splits from left by separator to Vec, long `max_splits` maximum
 
-string.lines();                           // the newline char is not included in the output!
-string.split_whitespace();
+s.lines();                              // the newline char is not included in the output!
+s.split_whitespace();
 
-string += &string2;                       // concatenate via overloaded operator; can take &str or &String
-format!("{}/{}/{}"), s1, s2, s3);         // preferred format for more complex concatenations
+s += &s2;                               // concatenate via overloaded operator; can take &str or &String
+format!("{}/{}/{}"), s1, s2, s3);       // preferred format for more complex concatenations
 ```
 
 Char APIs:

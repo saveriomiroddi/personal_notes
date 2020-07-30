@@ -56,6 +56,11 @@ The VIM section requires some cleanup.
 - `Ctrl+Alt+C`                Copy file path (from explorer panel)
 - `Ctrl+Alt+Shift+C`          Copy file relative path (from explorer panel)
 
+- `F10/F11`                   Step over/into
+- `Shift+F11`                 Step out
+- `F5`                        Continue
+- `Shift+F5`                  Stop
+
 #### Custom
 
 `Ctrl+K, Ctrl+T`              Run test

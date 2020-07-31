@@ -20,7 +20,7 @@
       - [Error handling](#error-handling)
     - [Structs](#structs)
     - [Generics](#generics)
-    - [Traits](#traits)
+    - [Traits (and Generics #2)](#traits-and-generics-2)
     - [[Static] Methods](#static-methods)
   - [Ownership](#ownership)
     - [Move](#move)
@@ -35,6 +35,8 @@
     - [Files/streams handling](#filesstreams-handling)
     - [Testing](#testing)
     - [String/char-related](#stringchar-related)
+    - [VecDeque: double-ended queue](#vecdeque-double-ended-queue)
+    - [TCP client/server](#tcp-clientserver)
   - [Crates](#crates)
     - [Random (`rand`)](#random-rand)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
@@ -234,6 +236,8 @@ std::mem::swap(&mut a, &mut b); // !! swap two variables !!
 10_u64.pow(2);                  // exponentiation (power), int/int
 10_f64.powi(2);                 // exponentiation, float/int
 10_f64.sqrt();                  // square root
+
+std::cmp::max(x, u);            // maximum number
 
 (f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
 ```
@@ -733,7 +737,7 @@ impl<T, U> Point<T, U> {
 }
 ```
 
-### Traits
+### Traits (and Generics #2)
 
 ```rust
 pub trait Summary {
@@ -791,6 +795,35 @@ fn main() {
   };
 
   print_summary(article);
+}
+```
+
+Things to keep in mind when writing generic functions:
+
+```rust
+// With this specific structure, T needs to implement Copy because:
+//
+// - Returning the first element is a copy operation
+// - iter() also returns copies
+//
+// An alternative not using references is Clone, which is expensive.
+//
+fn first_element<T: Copy>(list: &[T]) -> T {
+  for &item in list.iter() {}
+  list[0]
+}
+```
+
+Conditional ("blanket") implementations (uses `Point` from [Generics](#generics)):
+
+```rust
+// Implement only for `Point`s whose T implements Display and Ord.
+//
+impl<T: Display + Ord, U> Point<T, U> {
+  fn greatest_x(&self, other: &Point<T, U>) {
+    let max_x = std::cmp::max(&self.x, &other.x);
+    println!("Largest x: {}", self.x);
+  }
 }
 ```
 
@@ -937,18 +970,16 @@ In Rust, it's not possible to have dangling pointers:
 ```rust
 // Invalid!
 //
-fn dangling -> &String {
-  let s = String::from("text");
-  &s
+fn dangling() -> &String {
+  &String::from("text");
 }
 
 // Must return the string directly.
 //
 // Valid!
 //
-fn not_dangling -> String {
-  let s = String::from("text");
-  s
+fn not_dangling() -> String {
+  String::from("text");
 }
 ```
 
@@ -961,9 +992,37 @@ For example, here, the returned vector is bound to the matches; if `matches` is 
 ```rust
 fn extract_interval_arguments<'a>(matches: &'a clap::ArgMatches) -> Vec<&'a str> {
     matches
-        .values_of("INTERVALS")
-        .unwrap()
-        .collect::<Vec<&str>>()
+      .values_of("INTERVALS")
+      .unwrap()
+      .collect::<Vec<&str>>()
+}
+```
+
+Structs can have lifetimes, but they must be applied to all the members.
+
+```rust
+struct ImportantExcerpt<'a> {
+  part: &'a str,
+}
+
+// Syntax for implemented methods:
+//
+impl<'a> ImportantExcerpt<'a> {
+  fn level(&self) -> i32 { 3 }
+}
+```
+
+In some cases, Rust can infer lifetimes, so they don't need to be specified.
+
+Syntax notes:
+
+```rust
+// lifetimes + mutable + generics
+//
+fn method<'a, T>(var: &'a mut T) {
+  // The `'static` lifetime lasts for the entire program execution (typically, hardcoded strings).
+  //
+  let str: &'static str = "hardcoded";
 }
 ```
 
@@ -1181,6 +1240,36 @@ Formatting:
 ```rust
 format!("The number is {}", 1);                          // the template *must* be a literal (!)
 format!("The number is {0}, again {0}, not {1}!", 1, 2); // numbered placeholders!
+```
+
+### VecDeque: double-ended queue
+
+```rust
+let mut mailbox = VecDeque::new();
+mailbox.push_back(item);
+let front_item: Option<T> = mailbox.pop_front();
+```
+
+### TCP client/server
+
+Client:
+
+```rust
+let mut read_buffer = String::new();
+let mut connection = TcpStream::connect("127.0.0.1:8080")?;
+
+connection.write_all("Hello".as_bytes())?; // requires `std::io::Read`
+
+connection.shutdown(Shutdown::Write)?; // Read/Write/Both
+
+let bytes_read = connection.read_to_string(&mut read_buffer)?; // requires `std::io::Write`
+```
+
+Server:
+
+```rust
+let listener = std::net::TcpListener::bind("127.0.0.1:8080")?;
+for stream in listener.incoming() { handle_client(stream?) } // Watch out (Result!)
 ```
 
 ## Crates

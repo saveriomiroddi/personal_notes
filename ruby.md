@@ -164,7 +164,7 @@ Updated up to: https://ruby-doc.org/stdlib-2.3.0/libdoc/English/rdoc/English.htm
 Entries marked with `ENG` need to `require 'English'` in order for the english version to be usable.
 
 ```ruby
-$:   $LOAD_PATH                      # load path
+$:   $LOAD_PATH                     # load path
 $0   $PROGRAM_NAME                  # the name of the ruby script file
 $*   $ARGV                          # [ENG] the command line arguments
 $?   $CHILD_STATUS                  # [ENG] exit status of last executed child process
@@ -175,7 +175,7 @@ $<n>                                # nth subexpression in the last match (same 
 $&   $MATCH                         # [ENG] string last matched by regexp
 $+   $LAST_PAREN_MATCH              # [ENG] last match from the previous successful pattern match
 $`   $PREMATCH                      # [ENG] string before the actual matched string of the previous successful pattern match.
-$'   $POSTMATCH                      # [ENG] string after the actual matched string of the previous successful pattern match.
+$'   $POSTMATCH                     # [ENG] string after the actual matched string of the previous successful pattern match.
 
 $!   $ERROR_INFO                    # [ENG] last error message
 $@   $ERROR_POSITION                # [ENG] last error backtrace
@@ -183,13 +183,13 @@ $@   $ERROR_POSITION                # [ENG] last error backtrace
 $_   $LAST_READ_LINE                # [ENG] string last read by gets
 $.   $NR, $INPUT_LINE_NUMBER        # [ENG] line number last read by interpreter
 
-$,  $OFS, $OUTPUT_FIELD_SEPARATOR    # [ENG]
-$;  $FS, $FIELD_SEPARATOR            # [ENG]
+$,  $OFS, $OUTPUT_FIELD_SEPARATOR   # [ENG]
+$;  $FS, $FIELD_SEPARATOR           # [ENG]
 $/  $RS, $INPUT_RECORD_SEPARATOR    # [ENG] input record separator
 $\  $ORS, $OUTPUT_RECORD_SEPARATOR  # [ENG] output record separator
 
 $>  $DEFAULT_OUTPUT                  # [ENG]
-$<  $DEFAULT_INPUT                  # [ENG]
+$<  $DEFAULT_INPUT                   # [ENG]
 
 $=  $IGNORECASE                      # [ENG] obsolete: case-insensitivity flag
 ```

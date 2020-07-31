@@ -286,7 +286,7 @@ echo $(< "$filename")
 ## Brace expansion
 
 ```sh
-{$start..$end [..$incr]}            # generate a sequence via brace expansion (!!)
+{$start..$end [..$incr]}            # generate a sequence (range) via brace expansion (!!)
 ```
 
 ## Arrays

@@ -6,8 +6,10 @@
       - [Printing](#printing)
     - [Variables/Data types](#variablesdata-types)
     - [Basic operators/operations](#basic-operatorsoperations)
-    - [Closures](#closures)
+    - [Closures/Functions](#closuresfunctions)
     - [Ranges and `std::iter::Iterator` methods](#ranges-and-stditeriterator-methods)
+      - [Composable iterators](#composable-iterators)
+      - [Iterator trait](#iterator-trait)
     - [Arrays/Vectors/Slices](#arraysvectorsslices)
     - [Hash maps](#hash-maps)
     - [Strings](#strings)
@@ -22,12 +24,14 @@
     - [Generics](#generics)
     - [Traits (and Generics #2)](#traits-and-generics-2)
     - [[Static] Methods](#static-methods)
-  - [Ownership](#ownership)
-    - [Move](#move)
-    - [Borrowing](#borrowing)
-    - [Dangling pointers](#dangling-pointers)
-    - [Lifetimes](#lifetimes)
-    - [Slices](#slices)
+    - [Ownership](#ownership)
+      - [Move](#move)
+      - [Borrowing](#borrowing)
+      - [Dangling pointers](#dangling-pointers)
+      - [Lifetimes](#lifetimes)
+      - [Slices](#slices)
+    - [Smart pointers](#smart-pointers)
+      - [Box<T>](#boxt)
   - [Packaging](#packaging)
     - [Project structure](#project-structure)
     - [Modules](#modules)
@@ -37,6 +41,8 @@
     - [String/char-related](#stringchar-related)
     - [VecDeque: double-ended queue](#vecdeque-double-ended-queue)
     - [TCP client/server](#tcp-clientserver)
+    - [Commandline arguments (basic)](#commandline-arguments-basic)
+    - [Processes](#processes)
   - [Crates](#crates)
     - [Random (`rand`)](#random-rand)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
@@ -109,16 +115,19 @@ At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
 ### Basic structure/Printing/Input
 
 ```rust
-// crate attribute (see below); must be in the root crate.
+// "attributes": metadata with different purposes.
+// with the `!`, they are at crate level (must be in the root crate); without, they are at method
+// level (place them immediately above the method definition).
 //
+#![allow(dead_code)]
 #![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(unused_assignments)]
+#![allow(unused_must_use)]
 
 use std::io;
 use std::io::Write; // bring flush() into scope
 
-// "attributes": metadata with different purposes.
-//
-#[allow(dead_code)]
 fn testing(n: u32) -> String {
   if n > 10 {
     panic!("Error message!");
@@ -128,7 +137,9 @@ fn testing(n: u32) -> String {
   String::from("abc")
 }
 
-fn main() {
+// The return value is optional. This specific one is convenient [for testing].
+//
+fn main() -> std::result::Result<(), Box<dyn Error>> {
   print!("Enter guess: ");
   io::stdout().flush().unwrap(); // makes sure that the output is flushed, since O/S generally do it per-line.
 
@@ -147,6 +158,10 @@ fn main() {
   // Placeholder: `{}`
   //
   println!("Guess: {}", guess);
+
+  // See fn return value.
+  //
+  Ok(());
 }
 ```
 
@@ -154,7 +169,7 @@ fn main() {
 
 ```rust
 println!("{:#?}", vec);                 // generic pretty printing
-println!("{:?}", vec);                  // `Debug` format (requires the `Debug` trait)
+println!("{:?}", vec);                  // `Debug` format (requires the `Debug` trait; if generic, requires `use std::fmt::Debug`)
 
 eprintln!("Error!");                    // print on stderr!
 
@@ -242,14 +257,61 @@ std::cmp::max(x, u);            // maximum number
 (f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
 ```
 
-### Closures
+### Closures/Functions
 
 Equivalent of Ruby blocks!
 
 ```rust
-let multiple_of_10 = |x| x % 10 == 0; // yay!
-(0..100).any(multiple_of_10);         // double yay!
+let multiple_of_10 = |x| { x % 10 == 0; }   // yay! note: the braces are optional
+(0..100).any(multiple_of_10);               // double yay!
+let is_0 = |x: i32| -> bool { x == 0; }     // with type annotations; they're not required
+
+// Generic closure signature. The closure types passed don't need to be annotated.
+//
+struct Calculator<T: Fn(u32) -> u32>
+{
+  calculation: T,
+}
 ```
+
+Functions are also first class citizes, however, they can't reference the (dynamic) environment, and they can't (therefore) be defined in a method:
+
+```rust
+fn sum_fn(x: i32) -> i32 {
+  x
+}
+
+fn main() {
+  let y = 10;
+
+  fn sum_fn(x: i32) -> i32 { x + y };   // Invalid
+
+  let my_fn = sum_fn;                   // Valid
+}
+```
+
+Because of the capturing, closures have overhead compared to functions.
+
+Closure can have three traits, which are inferred:
+
+- `FnOnce`: take ownership (which can't be taken more than "once")
+- `FnMut`: borrow mutably
+- `Fn`: borrow immutabley
+
+The compiler performs the "Deref coercion", if required - essentially, a series of dereferentiations (following the `Deref` trait):
+
+```rust
+fn hello_slice(name: &str) {
+    println!("Hello, {}!", name);
+}
+
+fn main() {
+    let pizza = Box::new(String::from("abc"));
+    hello_slice(&pizza);
+}
+```
+
+in the above case, both the box dereference, and the `String` deference that turns `&String` into `&str`.
 
 ### Ranges and `std::iter::Iterator` methods
 
@@ -260,10 +322,19 @@ Ranges are:
 - lazy;
 - open ended on the `end`, unless `=` is specified.
 
+Iterator getting methods:
+
+```rust
+collection.iter()            // immutable references
+collection.iter_mut()        // mutable references
+collection.into_iter()       // owned values
+```
+
 `std::iter::Iterator` methods, implemented by Range:
 
 ```rust
 map(|x| x * 2)               // Ruby map!!! 😍😍😍
+map(|(x, y)| x + y)          // Tuples unpacking: useful for example, on the result of zip()
 fold(a, |a, x| a + x)        // Ruby inject!!! 😍😍😍
 filter(|x| x % 2 == 0)       // Ruby select
 find(|x| x % 2 == 0)         // find first element matching the condition
@@ -281,10 +352,49 @@ chunks(n)                    // iterate in chunks of n elements; includes last c
 chunks_exact(n)              // iterate in chunks of n elements; does not include the last chunk, if smaller
 windows(n)                   // like chunks, but with overlapping slices
 
-// transform an iterator into a collection
+// transform an iterator into a collection ("consume")
 collect()
 collect::<Vec<i32>>()
 collect::<Vec<_>>()
+
+// Create an iterator for repeating a value
+std::iter::repeat(x)
+```
+
+#### Composable iterators
+
+Compose an iterator, AREL-style:
+
+```rust
+pub fn compose_iterator<T>(elements: &Vec<T>, reverse: bool) {
+    let mut base_iter = elements.iter();
+    let mut rev_iter;
+
+    let mut composed_iter: &mut dyn Iterator<Item = &T> = &mut base_iter;
+
+    if reverse {
+        rev_iter = base_iter.rev();
+        composed_iter = &mut rev_iter;
+    }
+
+    // ...
+}
+```
+
+Additional iterators can be added following the same `rev_iter` pattern.
+
+#### Iterator trait
+
+```rust
+// Basic Iterator implementation.
+//
+impl Iterator for PhonyCounter {
+  type Item = u32;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    Some(0)
+  }
+}
 ```
 
 ### Arrays/Vectors/Slices
@@ -311,13 +421,20 @@ let mut vec = vec![1, 2, 3];            // Macro to initialize a vector from a l
 let mut vec = vec![true; n];            // Same, with variable-specified length and initialization
 
 vec[0] = 2;
-vec.get(2);                             // Option version
-vec.push(1);                            // Push at the end
 
 let val = &vec[0];
+vec.get(2);                             // Safe (Option<T>) version
+vec.first();
+vec.last();
+
+vec.push(1);                            // Push at the end
 vec.pop();                              // Pop from the end
+vec.swap(pos1, pos2);
+vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) a list
+vec.extend(&[1, 2, 3]);                 // Apped (borrowing version)
 
 vec.len();
+vec.iter();                             // iterator
 
 // Pattern matching!
 match v.get(2) {
@@ -325,12 +442,10 @@ match v.get(2) {
   None => println!("There is no third element."),
 }
 
-vec.iter();                             // iterator
-vec.extend([1, 2, 3].iter().copied());  // append a list
-vec.extend(&[1, 2, 3]);                 // borrowing version
-
-vec.first();
-vec.last();
+// Vectors can be received as array reference type (mutable, if required).
+//
+fn process_list<T>(list: &[T]) {};
+process_list(&vec);
 ```
 
 Arrays implement the `Debug` trait.
@@ -482,7 +597,7 @@ for x in (0..100).step_by(2).rev() {}
 
 // Iterate an array/vector
 //
-for i in collection.iter() { }
+for i in collection.iter() { }        // see #ranges-and-stditeriterator-methods for the other methods
 for i in &collection { }
 for i in &mut collection { *i *= 2 }
 ```
@@ -853,9 +968,9 @@ impl Rectangle {
 }
 ```
 
-## Ownership
+### Ownership
 
-### Move
+#### Move
 
 Variables can be simple (eg. integers) or complex (eg. strings); by default Rust copies the "simple" part (shallow copying).
 
@@ -906,7 +1021,7 @@ but complex ones are _moved_; ownership is transferred when assigning or passing
 }
 ```
 
-### Borrowing
+#### Borrowing
 
 Passing references doesn't transfer ownership; this is called _borrowing_:
 
@@ -963,7 +1078,7 @@ Borrowing mutable references has restrictions:
 }
 ```
 
-### Dangling pointers
+#### Dangling pointers
 
 In Rust, it's not possible to have dangling pointers:
 
@@ -983,7 +1098,7 @@ fn not_dangling() -> String {
 }
 ```
 
-### Lifetimes
+#### Lifetimes
 
 Functions may need to know the lifetime of an object, in order to make sure that the resource is not freed prematurely.
 
@@ -1026,7 +1141,7 @@ fn method<'a, T>(var: &'a mut T) {
 }
 ```
 
-### Slices
+#### Slices
 
 Slices can refer to arrays and strings. They are immutable references, so the ownership needs to be considered:
 
@@ -1044,6 +1159,33 @@ Slices can refer to arrays and strings. They are immutable references, so the ow
 String slices are at *byte* points!
 
 Using string slices as arguments is preferrable to string references, as they're more generic (they can also take strings).
+
+### Smart pointers
+
+Smart pointers implement the traits:
+
+- `Deref`: makes the instances behave like a pointer (implementing the deference operator (`*`));
+- `Drop`.
+
+#### Box<T>
+
+Allow storing data on the heap rather than on the stack; useful for:
+
+- a type whose size can’t be known at compile, but it's required, e.g. recursive types;
+- data size constitutes a performance problem (if copied);
+- owning a value when a trait is required, without forcing it to be of a specific type
+
+```rust
+{
+  let boxed = Box::new(5);
+
+  // Dereference, in order to use the boxed value.
+  //
+  assert_eq!(5, *boxed);
+
+  // here the pointer and data are deallocated
+}
+```
 
 ## Packaging
 
@@ -1196,17 +1338,22 @@ String APIs:
 
 ```rust
 s.eq(&str)                              // test equality (compare)
-
-s.clear();                              // blank a string
-s.trim(); s.trim_end(); s.trim_start(); // trim/strip
 s.len();
-s.as_bytes();                           // byte slice (&[u8]) of the string contents
 s.is_empty();                           // must be 0 chars long
+s.contains("pattern");
+s.start_with("pref");
+
+s += &s2;                               // concatenate via overloaded operator; can take &str or &String
 s.push_str(&str);                       // concatenate (append) strings
 s.push('c');
+s.to_lowercase(); s.to_uppercase();
 s.replace("a", "b");
-s.start_with("pref");
-s.trim_end_matches("suffix");           // chomp suffix (but repeated)! also accepts 
+s.clear();                              // blank a string
+
+s.trim(); s.trim_end(); s.trim_start(); // trim/strip
+s.trim_end_matches("suffix");           // chomp suffix (but repeated)! also accepts a closure
+
+s.as_bytes();                           // byte slice (&[u8]) of the string contents
 
 // splits; there is a `r`split* version for each.
 //
@@ -1218,7 +1365,6 @@ s.splitn(max_splits, "sep").collect::Vec<T>(); // splits from left by separator 
 s.lines();                              // the newline char is not included in the output!
 s.split_whitespace();
 
-s += &s2;                               // concatenate via overloaded operator; can take &str or &String
 format!("{}/{}/{}"), s1, s2, s3);       // preferred format for more complex concatenations
 ```
 
@@ -1228,7 +1374,7 @@ Char APIs:
 c.is_alphabetic();
 c.is_numeric();
 
-c.to_uppercase();                         // returns an iterator (AAARGH!!!)
+c.to_lowercase(); c.to_uppercase();       // returns an iterator (AAARGH!!!)
 
 use std::char;
 
@@ -1270,6 +1416,19 @@ Server:
 ```rust
 let listener = std::net::TcpListener::bind("127.0.0.1:8080")?;
 for stream in listener.incoming() { handle_client(stream?) } // Watch out (Result!)
+```
+
+### Commandline arguments (basic)
+
+```rust
+std::env::args();     // only valid Unicode
+std::env::args_os();  // returns `OsString`s, which are not restricted to Unicode
+```
+
+### Processes
+
+```rust
+std::process::exit(exit_status);    // terminate program (exit)
 ```
 
 ## Crates

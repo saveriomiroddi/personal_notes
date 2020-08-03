@@ -8,7 +8,7 @@
     - [Basic operators/operations](#basic-operatorsoperations)
     - [Closures/Functions](#closuresfunctions)
     - [Ranges and `std::iter::Iterator` methods](#ranges-and-stditeriterator-methods)
-      - [Composable iterators](#composable-iterators)
+      - [Method chaining](#method-chaining)
       - [Iterator trait](#iterator-trait)
     - [Arrays/Vectors/Slices](#arraysvectorsslices)
     - [Hash maps](#hash-maps)
@@ -19,10 +19,11 @@
     - [Enums](#enums)
     - [Option<T>/Result<T, Error>](#optiontresultt-error)
     - [Pattern matching](#pattern-matching)
-      - [Error handling](#error-handling)
     - [Structs](#structs)
     - [Generics](#generics)
     - [Traits (and Generics #2)](#traits-and-generics-2)
+    - [Traits and Generics #3 (OO-approach)](#traits-and-generics-3-oo-approach)
+      - [State pattern](#state-pattern)
     - [[Static] Methods](#static-methods)
     - [Ownership](#ownership)
       - [Move](#move)
@@ -32,6 +33,13 @@
       - [Slices](#slices)
     - [Smart pointers](#smart-pointers)
       - [Box<T>](#boxt)
+      - [RC<T>](#rct)
+      - [RefCell<T> and interior mutability](#refcellt-and-interior-mutability)
+      - [Weak<T> and reference cycles](#weakt-and-reference-cycles)
+    - [Multithreading](#multithreading)
+      - [Channels](#channels)
+      - [Mutex<T>/Arc<T>](#mutextarct)
+      - [Send/Sync traits](#sendsync-traits)
   - [Packaging](#packaging)
     - [Project structure](#project-structure)
     - [Modules](#modules)
@@ -124,10 +132,13 @@ At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
 #![allow(unused_imports)]
 #![allow(unused_assignments)]
 #![allow(unused_must_use)]
+#![allow(unused_mut)]
 
 use std::io;
 use std::io::Write; // bring flush() into scope
 
+// Unused parameters can be named `_`.
+//
 fn testing(n: u32) -> String {
   if n > 10 {
     panic!("Error message!");
@@ -234,10 +245,13 @@ let foo = ("bar", "baz");
 let (mut bar, mut baz) = foo;     // multiple assignment (unpacking); foo can also be a tuple literal
 let first_element = tuple.0;      // tuple indexing
 
-// Use a tuple as function argument
-fn are(dimensions: (u32, u32)) -> u32 {
+// Use a tuple as function argument; borrowing is an option.
+//
+fn multiply(dimensions: &(u32, u32)) -> u32 {
   dimensions.0 * dimensions.1
 }
+
+multiply(&(2, 3));
 ```
 
 For strings, see the [Strings chapter](#strings).
@@ -274,7 +288,7 @@ struct Calculator<T: Fn(u32) -> u32>
 }
 ```
 
-Functions are also first class citizes, however, they can't reference the (dynamic) environment, and they can't (therefore) be defined in a method:
+Functions can be assigned to variables, but not inside a method; they can't reference the (dynamic) environment regardless:
 
 ```rust
 fn sum_fn(x: i32) -> i32 {
@@ -287,6 +301,10 @@ fn main() {
   fn sum_fn(x: i32) -> i32 { x + y };   // Invalid
 
   let my_fn = sum_fn;                   // Valid
+
+  fn return_value_fn(x: i32) -> i32 { x } // Valid
+
+  return_value_fn(1);
 }
 ```
 
@@ -361,9 +379,9 @@ collect::<Vec<_>>()
 std::iter::repeat(x)
 ```
 
-#### Composable iterators
+#### Method chaining
 
-Compose an iterator, AREL-style:
+Chain iterators, AREL-style:
 
 ```rust
 pub fn compose_iterator<T>(elements: &Vec<T>, reverse: bool) {
@@ -720,7 +738,15 @@ method.unwrap_or_else( |err | {
   println!("Problem parsing arguments: {}", err);
   std::process::exit(1);
 });
+
+// take(): extract a value and replace with None:
+//
+let mut x = Some(2);
+let y = x.take();
+x == None;
+y == Some(2);
 ```
+
 
 See next section for pattern matching.
 
@@ -731,9 +757,10 @@ See next section for pattern matching.
 //
 let xxx = match val {
   1 | 2 => "1 or 2",
+  3..5  => "between 3 and 5", // chars also allowed
   _     => {
     "other"
-  },
+  }
 };
 
 // Match enum; all the entries must be exhausted (or the `_` placeholder must be used).
@@ -742,21 +769,30 @@ let xxx = match val {
 // See `if let` for an alternative structure.
 //
 match message {
-  Message::Move{x, y} => { self.position = Point { x: x, y: y } },
-  Message::Echo(s) => { self.echo(s) },
-  Message::ChangeColor(c1, c2, c3) => { self.color = (c1, c2, c3) },
+  Message::Move{x, y} => { self.position = Point { x: x, y: y } }
+  Message::Echo(s) => { self.echo(s) }
+  Message::ChangeColor(c1, c2, c3) => { self.color = (c1, c2, c3) }
+  Message::Publish(Message(message)) => {} // nested!
+  Message::None(_) => {}                   // ignore content
 }
 
-// Match Option<T>, and example usage.
+// Match tuples
 //
-fn plus_one(x: Option<i32>) -> Option<i32> {
-  match x {
-    None => None,
-    Some(i) => Some(i + 1),
+match (2, 4, 8, 16, 32) {
+  (first, .., last) => { // ignore values
+    println!("Some numbers: {}, {}", first, last);
   }
-}
-let six = plus_one(Some(5));
-let none = plus_one(None);
+};
+
+// Match Option<T>
+//
+let y = 10;
+match x {
+  None              => None,
+  Some(i)           => Some(i + 1),
+  Some(x) if x == y => Some(10),    // "Match guard"
+  Some(y)           => Some(y * 2), // Shadowing! Not what it looks!
+};
 
 // Match Result<T, Err>
 //
@@ -764,7 +800,20 @@ match Url::parse(&line) {
   Ok(url) => println!("ok"),
   _ => println!("ko"),
 };
-```
+
+// Match a struct (!!)
+//
+let point = Point { x: 1, y: 1 };
+match point {
+    Point { x, y: 0 } => println!("On the x axis at {}", x),
+    Point { x: 0, y } => println!("On the y axis at {}", y),
+    Point { x, y }    => println!("On neither axis: ({}, {})", x, y),
+    Point { x, .. }   => {} // ignore rest of the struct
+
+    // Assign a value while testing (via `@`).
+    //
+    Point { x: x_val @ 3...7 } => println!("Found an x in range: {}", id_variable),
+};
 
 #### Error handling
 
@@ -789,10 +838,18 @@ struct User {
 // Instantiate it
 let mut user = User {
   username: String::from("sav"),
-}
+  active: false,
+};
 
 // Update it. Requires the whole struct to be mutable!
 user.active = true
+
+// Destructuring a struct (!!)
+let User {username: a, active: b} = user;
+println!("a:{}, b:{}", a, b); // "a:sav, b:false"
+
+// Hardcore destructuring
+let ((feet, inches), Point {x, y}) = ((3, 10), Point { x: 3, y: -10 });
 ```
 
 Printing requires `Debug` trait!
@@ -896,7 +953,7 @@ fn get_summary_type<T: Summary>(switch: bool) -> T {
   }
 }
 
-// Syntactic sugar>
+// `where`: syntactic sugar.
 //
 fn fancy_types_function<T, U>(t: T, u: U)
 where
@@ -941,6 +998,57 @@ impl<T: Display + Ord, U> Point<T, U> {
   }
 }
 ```
+
+### Traits and Generics #3 (OO-approach)
+
+```rust
+pub trait Draw { fn draw(&self); }
+
+pub struct Screen<T: Draw> {
+  pub components: Vec<T>,
+}
+impl<T: Draw> Screen<T> { pub fn run(&self) {} }
+
+pub struct Pizza {}
+impl Draw for Pizza { fn draw(&self) {} }
+
+pub struct Tapparella {}
+impl Draw for Tapparella { fn draw(&self) {} }
+
+Screen {
+  components: vec![Pizza {}, Pizza {}],
+};
+```
+
+Dynamic dispatch version. components needs to be declared as `Vec<Box<dyn Draw>>`, where `dyn` indicates dynamic dispatch.
+
+```rust
+pub trait Draw { fn draw(&self); }
+
+pub struct Screen {
+  pub components: Vec<Box<dyn Draw>>,
+}
+impl Screen { pub fn run(&self) {} }
+
+pub struct Pizza {}
+impl Draw for Pizza { fn draw(&self) {} }
+
+pub struct Tapparella {}
+impl Draw for Tapparella { fn draw(&self) {} }
+
+Screen {
+  components: vec![Pizza {}, Tapparella {}],
+};
+```
+
+`dyn <type>`s are called "trait objects". They require a pointer, like `Box<T>` or a reference (`&`); the methods in the thread must be "object safe":
+
+- return type isn't self;
+- no generics.
+
+#### State pattern
+
+See `The Rust Programming Language`, p.382.
 
 ### [Static] Methods
 
@@ -1164,8 +1272,12 @@ Using string slices as arguments is preferrable to string references, as they're
 
 Smart pointers implement the traits:
 
-- `Deref`: makes the instances behave like a pointer (implementing the deference operator (`*`));
-- `Drop`.
+- `Deref`: makes instances behave like pointers (implementing the deference operator (`*`));
+- `Drop`: invoked when instances go out of scope.
+
+In-depth deref coercion: see `The Rust Programming Language`, p.322.
+
+In order to manually drop an instance, use `std::mem::drop`.
 
 #### Box<T>
 
@@ -1173,7 +1285,9 @@ Allow storing data on the heap rather than on the stack; useful for:
 
 - a type whose size can’t be known at compile, but it's required, e.g. recursive types;
 - data size constitutes a performance problem (if copied);
-- owning a value when a trait is required, without forcing it to be of a specific type
+- owning a value when a trait is required, without forcing it to be of a specific type.
+
+Generic usage:
 
 ```rust
 {
@@ -1186,6 +1300,200 @@ Allow storing data on the heap rather than on the stack; useful for:
   // here the pointer and data are deallocated
 }
 ```
+
+Use in recursive structures:
+
+```rust
+// Without Box, the compiler complains that indirection is needed.
+//
+enum Node {
+  Parent(Box<Node>),
+  Nil,
+}
+
+use self::Node::{Nil, Parent};
+
+let parent_a = Parent(Box::new(Parent(Box::new(Nil))));
+```
+
+#### RC<T>
+
+"Reference Counting"; use when there are multiple owners, e.g. graphs, that is, when the compiler can't know who will use the reference last.
+
+Can hold only immutable values; can be used only on single thread contexts.
+
+```rust
+enum Node {
+  Parent(Rc<Node>),
+  Nil,
+}
+
+use self::Node::{Nil, Parent};
+use std::rc::Rc;
+
+// Invalid; immutable-only!
+//
+let value = Rc::new(1);
+*value = 32;
+
+// `Rc::clone()` is shallow; use `clone()` for deep copies.
+//
+let a = Rc::new(Parent(Rc::new(Parent(Rc::new(Nil)))));
+{
+  let _b = Parent(Rc::clone(&a));
+  let _c = Parent(Rc::clone(&a));
+  println!("Count: {}", Rc::strong_count(&a)); // 3
+}
+println!("Count: {}", Rc::strong_count(&a)); // 1
+```
+
+#### RefCell<T> and interior mutability
+
+`RefCell<T>` allows mutating the contained value, even if the variable itself is immutable, therefore bypassing the compiler; generally speaking, it allows multiple owners while retaining mutability. The rules are enforced at runtime though, so this has an overhead.
+
+Example of mock objects via `RefCell<T>`: see `The Rust Programming Language`, p.332.
+
+```rust
+enum Node {
+    Parent(Rc<RefCell<i32>>, Rc<Node>),
+    Nil,
+}
+
+use self::Node::{Nil, Parent};
+use std::cell::RefCell;
+use std::rc::Rc;
+
+let value = Rc::new(RefCell::new(1));
+
+let a = Rc::new(Parent(Rc::clone(&value), Rc::new(Nil)));
+let _b = Parent(Rc::new(RefCell::new(2)), Rc::clone(&a));
+let _c = Parent(Rc::new(RefCell::new(3)), Rc::clone(&a));
+
+*value.borrow_mut() += 10;
+```
+
+#### Weak<T> and reference cycles
+
+See `The Rust Programming Language`, p.339.
+
+Full tree data structure, with nodes pointing both to children and parents. The problem is that if we don't use weak references, there will be circular references (therefore leaks) because of parents pointing to children, and viceversa.
+
+It's important to always thing who is the owner. A parent ultimately owns the children - if the former is dropped, the children should be dropped too; therefore, the parent reference should be weak.
+
+In order to access a `Weak<T>` value, call `upgrade() -> Option<T>`.
+
+```rust
+use std::cell::RefCell;
+use std::rc::{Rc, Weak};
+
+#[derive(Debug)]
+struct Node {
+    value: i32,
+    parent: RefCell<Weak<Node>>,
+    children: RefCell<Vec<Rc<Node>>>,
+}
+
+let leaf = Rc::new(Node {
+    value: 3,
+    parent: RefCell::new(Weak::new()),
+    children: RefCell::new(vec![]),
+});
+
+println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+
+let branch = Rc::new(Node {
+    value: 5,
+    parent: RefCell::new(Weak::new()),
+    children: RefCell::new(vec![Rc::clone(&leaf)]),
+});
+
+*leaf.parent.borrow_mut() = Rc::downgrade(&branch);
+
+println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+```
+
+There are methods to perform counting:
+
+```rust
+// Example, referencing branch.
+//
+Rc::strong_count(&branch);
+Rc::weak_count(&branch);
+```
+
+### Multithreading
+
+Base usage:
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+let message = "Hello";
+
+// `move` is required to access variable in the context, with move semantics.
+//
+let handle = thread::spawn(move || {
+  println!("{}", message);
+  thread::sleep(Duration::from_millis(1));
+});
+
+handle.join().unwrap();
+```
+
+#### Channels
+
+```rust
+use std::sync::mpsc;
+use std::thread;
+
+// Sender channels can be cloned ("Multiple Producer Single Consumer").
+//
+let (tx1, rx) = mpsc::channel();
+let tx2 = mpsc::Sender::clone(&tx1);
+
+thread::spawn(move || {
+  let val = "hi";
+  tx1.send(val).unwrap();
+  // `val` is now moved; can't be used anymore
+});
+
+thread::spawn(move || {
+  tx2.send("hello").unwrap();
+});
+
+// Non-blocking version: `rx.try_recv()`.
+//
+println!("{}", rx.recv()?);
+
+for received in rx {
+  println!("{}", received);
+}
+```
+
+#### Mutex<T>/Arc<T>
+
+```rust
+// We need to use an "Atomic Reference Counter" because the counter is shared between threads;
+// the compiler interprets the counter usage as multiple move.
+//
+let counter = Arc::new(Mutex::new(0));
+
+for _ in 0..10 {
+  let counter = Arc::clone(&counter);
+
+  thread::spawn(move || {
+    let mut num = counter.lock().unwrap();
+    *num += 1;
+  });
+}
+
+// threads must be joined
+```
+
+#### Send/Sync traits
+
+See `The Rust Programming Language`, p.369.
 
 ## Packaging
 

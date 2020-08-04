@@ -13,6 +13,7 @@
     - [Array](#array)
     - [CGI/URI (encoding)](#cgiuri-encoding)
     - [Strings/encoding](#stringsencoding)
+    - [Openstruct (ostruct)](#openstruct-ostruct)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
     - [Using `IO.popen3`](#using-iopopen3)
@@ -229,6 +230,27 @@ HTMLEntities.new.decode("html")  # htmlentities gem
 
 ```ruby
 String.new(str, encoding: enc)         # !! Defaults to ASCII-8 encoding !!
+```
+
+### Openstruct (ostruct)
+
+Convenient solution for converting a Hash to a recursive openstruct (including arrays), builder pattern-style:
+
+```ruby
+# Convert to a recursive openstruct (including arrays), builder pattern-style:
+#
+# Origin: https://stackoverflow.com/a/42520668.
+#
+def to_recursive_ostruct(node)
+  case node
+  when Hash
+    node.each_with_object(OpenStruct.new) { |(key, value), ostruct| ostruct[key] = to_recursive_ostruct(value) }
+  when Array
+    node.map { |item| to_recursive_ostruct(item) }
+  else
+    node
+  end
+end
 ```
 
 ## Handling processes

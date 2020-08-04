@@ -9,7 +9,7 @@
     - [Closures/Functions](#closuresfunctions)
     - [Ranges and `std::iter::Iterator` methods](#ranges-and-stditeriterator-methods)
       - [Method chaining](#method-chaining)
-      - [Iterator trait](#iterator-trait)
+      - [Iterator trait/Associated types](#iterator-traitassociated-types)
     - [Arrays/Vectors/Slices](#arraysvectorsslices)
     - [Hash maps](#hash-maps)
     - [Strings](#strings)
@@ -22,8 +22,9 @@
     - [Structs](#structs)
     - [Generics](#generics)
     - [Traits (and Generics #2)](#traits-and-generics-2)
-    - [Traits and Generics #3 (OO-approach)](#traits-and-generics-3-oo-approach)
-      - [State pattern](#state-pattern)
+    - [Traits #2 (OO-approach and supertraits)](#traits-2-oo-approach-and-supertraits)
+    - [Traits #3 (disambiguation)](#traits-3-disambiguation)
+    - [Operator overloading](#operator-overloading)
     - [[Static] Methods](#static-methods)
     - [Ownership](#ownership)
       - [Move](#move)
@@ -39,7 +40,8 @@
     - [Multithreading](#multithreading)
       - [Channels](#channels)
       - [Mutex<T>/Arc<T>](#mutextarct)
-      - [Send/Sync traits](#sendsync-traits)
+    - [Unsafe](#unsafe)
+      - [Interoperability with other languages (C)](#interoperability-with-other-languages-c)
   - [Packaging](#packaging)
     - [Project structure](#project-structure)
     - [Modules](#modules)
@@ -185,6 +187,8 @@ println!("{:?}", vec);                  // `Debug` format (requires the `Debug` 
 eprintln!("Error!");                    // print on stderr!
 
 println!("{:.2}", f);                   // formatted printing (rounds float)
+
+writeln!("{}", buffer, 123);            // write formatted data into a buffer
 ```
 
 ### Variables/Data types
@@ -194,8 +198,18 @@ let int_as_float = (10 as f64);     // type casting
 
 const MAX_PRIMES: u32 = 100000;     // constants; the data type is required
 
-((1u128 << CONST_U64) - 1) as u64    // WATCH OUT the priorities! In this example, the brackets are all required!
+((1u128 << CONST_U64) - 1) as u64   // WATCH OUT the priorities! In this example, the brackets are all required!
+
+static HELLO_WORLD: u32 = 1000;     // static variable
+
+type Kilometers = i32;                    // type aliasing
+type Result<T> = Result<T, std::io:Error> // library example: `std::io::Result`
 ```
+
+SVs differ from constants:
+
+- constants can be duplicated in memory;
+- SVs can be mutable (in this case, they're unsafe).
 
 Integer types:
 
@@ -288,7 +302,7 @@ struct Calculator<T: Fn(u32) -> u32>
 }
 ```
 
-Functions can be assigned to variables, but not inside a method; they can't reference the (dynamic) environment regardless:
+Functions can be assigned to variables (function pointers); their type is `fn` (don't confuse with `Fn`!!). However, they can't reference the context, and functions defined inside a function can't be assigned to a variable.
 
 ```rust
 fn sum_fn(x: i32) -> i32 {
@@ -298,9 +312,9 @@ fn sum_fn(x: i32) -> i32 {
 fn main() {
   let y = 10;
 
-  fn sum_fn(x: i32) -> i32 { x + y };   // Invalid
+  fn sum_fn(x: i32) -> i32 { x + y };     // Invalid
 
-  let my_fn = sum_fn;                   // Valid
+  let my_fn = sum_fn;                     // Valid
 
   fn return_value_fn(x: i32) -> i32 { x } // Valid
 
@@ -310,13 +324,14 @@ fn main() {
 
 Because of the capturing, closures have overhead compared to functions.
 
-Closure can have three traits, which are inferred:
+Closures can use function pointers, including initializer functions!!:
 
-- `FnOnce`: take ownership (which can't be taken more than "once")
-- `FnMut`: borrow mutably
-- `Fn`: borrow immutabley
+```rust
+[0, 1, 2, 3].iter().map(ToString::to_string);   // Associated method `to_string()` of the `ToString` trait
+[0, 1, 2, 3].iter().map(Some);                  // Initializer function of the `Some` enum
+```
 
-The compiler performs the "Deref coercion", if required - essentially, a series of dereferentiations (following the `Deref` trait):
+The compiler performs the "Deref coercion", if required - essentially, a series of dereferencings (following the `Deref` trait):
 
 ```rust
 fn hello_slice(name: &str) {
@@ -330,6 +345,20 @@ fn main() {
 ```
 
 in the above case, both the box dereference, and the `String` deference that turns `&String` into `&str`.
+
+Closure can have three traits, which are inferred:
+
+- `FnOnce`: take ownership (which can't be taken more than "once")
+- `FnMut`: borrow mutably
+- `Fn`: borrow immutably
+
+In order to return closures from a function, they must be boxed:
+
+```rust
+fn my_closure() -> Box<dyn Fn(i32) -> i32> {
+  Box::new(|x| x + 1)
+}
+```
 
 ### Ranges and `std::iter::Iterator` methods
 
@@ -401,12 +430,16 @@ pub fn compose_iterator<T>(elements: &Vec<T>, reverse: bool) {
 
 Additional iterators can be added following the same `rev_iter` pattern.
 
-#### Iterator trait
+#### Iterator trait/Associated types
 
 ```rust
 // Basic Iterator implementation.
 //
 impl Iterator for PhonyCounter {
+  // Associated type. Similar to generics, however, doesn't require the type to be specified every
+  // time the related methods (in this case, `next()`) are invoked.
+  // In this case, a default is specified, which is optional.
+  //
   type Item = u32;
 
   fn next(&mut self) -> Option<Self::Item> {
@@ -812,7 +845,7 @@ match point {
 
     // Assign a value while testing (via `@`).
     //
-    Point { x: x_val @ 3...7 } => println!("Found an x in range: {}", id_variable),
+    Point { x: x_val @ 3..=7 } => println!("Found an x in range: {}", id_variable),
 };
 
 #### Error handling
@@ -961,6 +994,11 @@ where
     U: Clone + Debug,
 {}
 
+// Unsafe trait and implementation
+//
+unsafe trait Foo {}
+unsafe impl Foo for i32 {}
+
 fn main() {
   let article = Article {
     text: "news".to_string(),
@@ -999,7 +1037,7 @@ impl<T: Display + Ord, U> Point<T, U> {
 }
 ```
 
-### Traits and Generics #3 (OO-approach)
+### Traits #2 (OO-approach and supertraits)
 
 ```rust
 pub trait Draw { fn draw(&self); }
@@ -1046,9 +1084,85 @@ Screen {
 - return type isn't self;
 - no generics.
 
-#### State pattern
+Supertraits are traits depending on other traits:
 
-See `The Rust Programming Language`, p.382.
+```rust
+// Example using default implementation.
+//
+trait BetterDisplay: fmt::Display {
+    fn better_to_string(&self) -> String {
+        format!("Better!: {}", self.to_string())
+    }
+}
+```
+
+### Traits #3 (disambiguation)
+
+Specify which function to invoke, when there is overlapping with/between traits:
+
+```rust
+trait Flyer {
+  fn fly(&self);
+  fn mean() -> String;          // associated method
+}
+
+struct Human;
+
+impl Flyer for Human {
+  fn fly(&self) {
+    println!("Flying!");
+  }
+  fn mean() -> String {
+    "Plane".to_string()
+  }
+}
+
+impl Human {
+  fn fly(&self) {
+    println!("No way");
+  }
+  fn mean() -> String {
+    "Arms, hopefully".to_string()
+  }
+}
+
+let person = Human;
+
+person.fly();        // "No way"
+Flyer::fly(&person); // "Flying"
+
+println!("{}", Human::mean());            // "Arms, hopefully"
+println!("{}", <Human as Flyer>::mean()); // "Plan"
+println!("{}", Flyer::mean());            // error!
+```
+
+### Operator overloading
+
+```rust
+struct Point(i32);
+struct BigPoint(i32);
+
+impl Add for Point {
+  type Output = Point;
+
+  // `rhs` stays for `Right Hand Side`
+  //
+  fn add(self, rhs: Self) -> Self::Output {
+    Point(self.0 + rhs.0)
+  }
+}
+
+impl Add<BigPoint> for Point {
+  type Output = Point;
+
+  fn add(self, rhs: BigPoint) -> Self::Output {
+    Point(self.0 + 1000 * rhs.0)
+  }
+}
+
+Point(10) + Point(20)
+Point(10) + BigPoint(1)
+```
 
 ### [Static] Methods
 
@@ -1275,8 +1389,6 @@ Smart pointers implement the traits:
 - `Deref`: makes instances behave like pointers (implementing the deference operator (`*`));
 - `Drop`: invoked when instances go out of scope.
 
-In-depth deref coercion: see `The Rust Programming Language`, p.322.
-
 In order to manually drop an instance, use `std::mem::drop`.
 
 #### Box<T>
@@ -1351,8 +1463,6 @@ println!("Count: {}", Rc::strong_count(&a)); // 1
 
 `RefCell<T>` allows mutating the contained value, even if the variable itself is immutable, therefore bypassing the compiler; generally speaking, it allows multiple owners while retaining mutability. The rules are enforced at runtime though, so this has an overhead.
 
-Example of mock objects via `RefCell<T>`: see `The Rust Programming Language`, p.332.
-
 ```rust
 enum Node {
     Parent(Rc<RefCell<i32>>, Rc<Node>),
@@ -1373,8 +1483,6 @@ let _c = Parent(Rc::new(RefCell::new(3)), Rc::clone(&a));
 ```
 
 #### Weak<T> and reference cycles
-
-See `The Rust Programming Language`, p.339.
 
 Full tree data structure, with nodes pointing both to children and parents. The problem is that if we don't use weak references, there will be circular references (therefore leaks) because of parents pointing to children, and viceversa.
 
@@ -1491,9 +1599,89 @@ for _ in 0..10 {
 // threads must be joined
 ```
 
-#### Send/Sync traits
+### Unsafe
 
-See `The Rust Programming Language`, p.369.
+Raw pointers:
+
+```rust
+let mut num = 5;
+
+// Creating pointers is not (considered) unsafe.
+//
+let ref_const = &num as *const i32;
+let ref_mut = &mut num as *mut i32;
+
+unsafe {
+  println!("r1:{}, r2:{}", *ref_const, *ref_mut);
+}
+```
+
+Functions:
+
+```rust
+// Unsafe function; unsafe calls themselves don't require the enclosing function to be marked as such.
+//
+unsafe fn dangerous() {}
+
+// Unsafe funcion call
+//
+unsafe {
+  dangerous();
+}
+```
+
+Example: slicing an array. It can't be done safely, because we can't mutably borrow twice.
+
+```rust
+let slice = &mut [0, 1, 2, 3][..];
+let mid = 2;
+
+let len = slice.len();
+let ptr = slice.as_mut_ptr();
+
+let (slice1, slice2) = unsafe {
+  (
+    std::slice::from_raw_parts_mut(ptr, mid),
+    std::slice::from_raw_parts_mut(ptr.offset(mid as isize), len - mid),
+  )
+};
+```
+
+Referencing raw memory (undefined behavior):
+
+```rust
+let address = 0x012345usize;
+let r = address as *mut i32;
+
+let slice: &[i32] = unsafe {
+  std::slice::from_raw_parts_mut(r, 10000)
+};
+```
+
+#### Interoperability with other languages (C)
+
+Invoking C code:
+
+```rust
+// `"C"` defines the ABI, in this case, the C one.
+//
+extern "C" {
+  fn abs(input: i32) -> i32;
+}
+
+unsafe {
+  println!("Absolute value of -3 according to C: {}", abs(-3));
+}
+```
+
+Allow code to be invoked from C:
+
+```rust
+// Requires disabling mangling.
+//
+#[no_mangle]
+pub extern "C" fn call_from_c() { }
+```
 
 ## Packaging
 

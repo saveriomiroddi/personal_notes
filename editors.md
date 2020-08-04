@@ -51,6 +51,7 @@ The VIM section requires some cleanup.
 - `Alt+L`                     Switch to replace inside selection (after `Ctrl+H`); it seems it doesn't currently support block selection
 
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)
+- `Ctrl+.`                    Quick fix(es) code
 
 - `Ctrl+K, P`                 Copy file path
 - `Ctrl+Alt+C`                Copy file path (from explorer panel)
@@ -74,6 +75,8 @@ The VIM section requires some cleanup.
 - `Ctrl+Alt+I`                Increment selection, inside column selection
 
 - `Ctrl+K, Ctrl+X`		        Trim trailing whitespace
+
+- `Ctrl+K, Ctrl+A`            Align by regex (modified)
 
 ## Sublime Text
 

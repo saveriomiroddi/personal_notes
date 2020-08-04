@@ -44,10 +44,13 @@ shopt -s inherit_errexit  # subshells inherit errexit (Bash 4.4+)
 Extra:
 
 ```sh
+set -o monitor            # `-m`: enable job control
 shopt -s nullglob         # IMPORTANT: when globs don't match anything, expand to null string, rather than to themselves
 set -o xtrace             # `-x`: debugging mode; prints all the statements
 shopt -s nocasematch      # case insensitive matches
 ```
+
+See http://linuxcommand.org/lc3_man_pages/seth.html.
 
 ## Switch/case
 

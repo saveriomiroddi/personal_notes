@@ -48,7 +48,9 @@ The VIM section requires some cleanup.
 - `Ctrl+(↓/↑)`                  Scroll the viewport without moving the cursor
 
 - `Alt+Shift+(↓/↑)`           Column (box) selection
-- `Alt+L`                     Switch to replace inside selection (after `Ctrl+H`); it seems it doesn't currently support block selection
+- `Alt+C`                     Search box: Match case
+- `Alt+R`                     Search box: Regex
+- `Alt+L`                     Search box: Switch to replace inside selection (after `Ctrl+H`); it doesn't support block selection
 
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)
 - `Ctrl+.`                    Quick fix(es) code
@@ -77,6 +79,9 @@ The VIM section requires some cleanup.
 - `Ctrl+K, Ctrl+X`		        Trim trailing whitespace
 
 - `Ctrl+K, Ctrl+A`            Align by regex (modified)
+
+- `Ctrl+Shift+G, B`           GitLens: Blame file
+- `Ctrl+Shift+G, C`           GitLens: Show commit details (and operations)
 
 ## Sublime Text
 

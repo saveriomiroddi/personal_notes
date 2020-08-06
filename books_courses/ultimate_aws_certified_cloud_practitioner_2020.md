@@ -345,7 +345,7 @@ AWS
   - Custom Event buses
   - Schema Registry
 
-- CloutTrails: logs all the events
+- CloudTrail: logs all the events
   - enabled by default
   - sources: API, SDK, CLI, Services
   - output to S3/CW logs

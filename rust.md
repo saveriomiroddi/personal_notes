@@ -3,9 +3,9 @@
   - [Cargo](#cargo)
   - [Syntax/basics](#syntaxbasics)
     - [Basic structure/Printing/Input](#basic-structureprintinginput)
-      - [Printing](#printing)
+      - [Printing/formatting](#printingformatting)
     - [Variables/Data types](#variablesdata-types)
-    - [Basic operators/operations](#basic-operatorsoperations)
+    - [Basic operators/operations/arithmetic](#basic-operatorsoperationsarithmetic)
     - [Closures/Functions](#closuresfunctions)
     - [Ranges and `std::iter::Iterator` methods](#ranges-and-stditeriterator-methods)
       - [Method chaining](#method-chaining)
@@ -178,7 +178,7 @@ fn main() -> std::result::Result<(), Box<dyn Error>> {
 }
 ```
 
-#### Printing
+#### Printing/formatting
 
 ```rust
 println!("{:#?}", vec);                 // generic pretty printing
@@ -186,9 +186,17 @@ println!("{:?}", vec);                  // `Debug` format (requires the `Debug` 
 
 eprintln!("Error!");                    // print on stderr!
 
-println!("{:.2}", f);                   // formatted printing (rounds float)
+format!("The number is {}", 1);                          // the template *must* be a literal (!)
+format!("The number is {0}, again {0}, not {1}!", 1, 2); // numbered placeholders!
 
 writeln!("{}", buffer, 123);            // write formatted data into a buffer
+```
+
+Formatting (see https://doc.rust-lang.org/std/fmt):
+
+```rust
+"{:.2}"             // round float
+"{x}/{X}"           // lower/upper hex
 ```
 
 ### Variables/Data types
@@ -202,8 +210,11 @@ const MAX_PRIMES: u32 = 100000;     // constants; the data type is required
 
 static HELLO_WORLD: u32 = 1000;     // static variable
 
-type Kilometers = i32;                    // type aliasing
-type Result<T> = Result<T, std::io:Error> // library example: `std::io::Result`
+type Kilometers = i32;                     // type aliasing
+type Result<T> = Result<T, std::io:Error>; // library example: `std::io::Result`
+
+let bool_as_int = true as i32;      // true: 1, false: 0
+let int_as_bool = 1 as bool;        // 1: true, 0: false, other: !!undefined!!
 ```
 
 SVs differ from constants:
@@ -270,7 +281,7 @@ multiply(&(2, 3));
 
 For strings, see the [Strings chapter](#strings).
 
-### Basic operators/operations
+### Basic operators/operations/arithmetic
 
 ```rust
 val += 1; val -= 1;             // increment/decrement value (no postfix)
@@ -281,6 +292,8 @@ std::mem::swap(&mut a, &mut b); // !! swap two variables !!
 10_f64.sqrt();                  // square root
 
 std::cmp::max(x, u);            // maximum number
+
+z, carry = x.overflowing_add(y); // WOW!! there are several other operations. <carry> is bool.
 
 (f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
 ```
@@ -320,6 +333,16 @@ fn main() {
 
   return_value_fn(1);
 }
+
+// Syntax to pass methods (both instance/static):
+
+fn cycle_decode(&self) -> (fn(&Self, u8), u8) {
+  let cycle_execute = Self::cycle_execute_foo;
+  (cycle_execute, 0)
+}
+
+let (cycle_execute, x) = self.cycle_decode();
+cycle_execute(self, x);
 ```
 
 Because of the capturing, closures have overhead compared to functions.
@@ -458,6 +481,8 @@ let my_list = [true; 4];                // 4 elements initialized as true; won't
 let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
 let mut my_list: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
 
+my_list[512..].copy_from_slice(&source) // memcpy (copy) from/to slices/vectors; source/dest size must be the same!
+
 // invocation: process_list(&my_list)
 //
 fn process_list(list: &[i32]) {}
@@ -482,7 +507,8 @@ vec.push(1);                            // Push at the end
 vec.pop();                              // Pop from the end
 vec.swap(pos1, pos2);
 vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) a list
-vec.extend(&[1, 2, 3]);                 // Apped (borrowing version)
+vec.extend(&[1, 2, 3]);                 // Append (borrowing version)
+vec[512..].copy_from_slice(&source)     // memcpy; see array example
 
 vec.len();
 vec.iter();                             // iterator
@@ -1786,6 +1812,7 @@ use std::collections::*; // useful for testing; unidiomatic for the rest
 
 ```rust
 std::fs::read_to_string(filename) -> Result<String, Error>; // content must be valid UTF-8; filename can be relative.
+std::fs::read(game_rom_filename) -> Result<Vec<u8>, Error>; // read binary content
 
 // Buffered read; requires the import below
 //
@@ -1875,13 +1902,6 @@ c.to_lowercase(); c.to_uppercase();       // returns an iterator (AAARGH!!!)
 use std::char;
 
 let c = char::from_digit(4, 10);          // (number, radix)
-```
-
-Formatting:
-
-```rust
-format!("The number is {}", 1);                          // the template *must* be a literal (!)
-format!("The number is {0}, again {0}, not {1}!", 1, 2); // numbered placeholders!
 ```
 
 ### VecDeque: double-ended queue
@@ -1995,7 +2015,7 @@ duration < Duration::zero();
 
 ### Commandline parsing (`clap`)
 
-Example of varargs, and how to encapsulate the parsing logic:
+Example of varargs, partially encapsulated:
 
 ```rust
 fn parse_commandline_arguments<'a>(args: &'a Vec<String>) -> clap::ArgMatches {
@@ -2021,6 +2041,30 @@ fn main() {
     let commandline_args = std::env::args().collect::<Vec<String>>();
     let matches = parse_commandline_arguments(&commandline_args);
     let intervals = extract_interval_arguments(&matches);
+}
+```
+
+Example, fully encapsulated, but owned:
+
+```rust
+fn decode_commandline_args() -> Vec<String> {
+  let commandline_args = std::env::args().collect::<Vec<String>>();
+
+  let matches = App::new("test")
+    .setting(AppSettings::TrailingVarArg)
+    .arg(
+      Arg::with_name("INTERVALS")
+        .required(true)
+        .index(1)
+        .multiple(true),
+    )
+    .get_matches_from(commandline_args);
+
+  matches
+    .values_of("INTERVALS")
+    .unwrap()
+    .map(|arg| arg.to_string())
+    .collect::<Vec<String>>()
 }
 ```
 

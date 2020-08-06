@@ -307,6 +307,8 @@ convert -size 1920x1080 xc:white "$output.pdf"    # Create blank pdf page, with 
 convert -coalesce animation.gif target.png        # Split an animated gif into its frames; `-coalesce` is required for more complex sources.
 ```
 
+Use coalesce, then, separately, resize, in order to resize an animated gif.
+
 ## PGP (GnuPG/gpg)
 
 Main commands (`gpg...`); `$key_id` can be email or key id.

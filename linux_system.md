@@ -99,6 +99,10 @@ Package/file operations:
 #
 apt-get install $package=$version
 
+# Mark a package as manually installed (apt[itude])
+#
+aptitude install "${package}&m"
+
 # Install/remove package ignoring dependencies, via dpkg
 #
 dpkg (-i|-r) --ignore-depends=libdbd-mysql-perl libmysqlclient18

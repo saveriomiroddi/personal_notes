@@ -285,6 +285,7 @@ For strings, see the [Strings chapter](#strings).
 
 ```rust
 val += 1; val -= 1;             // increment/decrement value (no postfix)
+val <<= n; val >>= n;           // overflows are ignored
 std::mem::swap(&mut a, &mut b); // !! swap two variables !!
 
 10_u64.pow(2);                  // exponentiation (power), int/int
@@ -294,6 +295,7 @@ std::mem::swap(&mut a, &mut b); // !! swap two variables !!
 std::cmp::max(x, u);            // maximum number
 
 z, carry = x.overflowing_add(y); // WOW!! there are several other operations. <carry> is bool.
+z, carry = x.overflowing_shl(y); // Shift left, like the above.
 
 (f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
 ```
@@ -403,17 +405,17 @@ collection.into_iter()       // owned values
 `std::iter::Iterator` methods, implemented by Range:
 
 ```rust
-map(|x| x * 2)               // Ruby map!!! 😍😍😍
+map(|x| x * 2)               // Ruby :map
 map(|(x, y)| x + y)          // Tuples unpacking: useful for example, on the result of zip()
-fold(a, |a, x| a + x)        // Ruby inject!!! 😍😍😍
-filter(|x| x % 2 == 0)       // Ruby select
+fold(a, |a, x| a + x)        // Ruby :inject
+filter(|x| x % 2 == 0)       // Ruby :select
 find(|x| x % 2 == 0)         // find first element matching the condition
 rev()                        // reverse. WATCH OUT, UNINTUITIVE: since it's not inclusive, it goes from 99 to 0.
 any(|x| x == 33)             // terminates on the first true
 all(|x| x % 2 == 0)          // terminates on the first false
 nth(n)                       // nth element (0-based)
 take(n)                      // iterator for the first n elements
-enumerate()                  // iterator (index, &value)
+enumerate()                  // iterator (index, &value) (Ruby :each_with_index)
 join("str")                  // join using str
 zip(iter)                    // zip two arrays (iterators)!!!
 sum::<T>()
@@ -1952,12 +1954,17 @@ std::process::exit(exit_status);    // terminate program (exit)
 ### Random (`rand`)
 
 ```rust
-use rand::Rng;
-
-// `thread_rng()`: seeded by the O/S; local to the current thread.
-// `gen_range()`: close,open ends.
+// Simplest way
 //
-let secret_number = rand::thread_rng().gen_range(0, 2);
+let rand_byte: u8 = rand::random();
+
+// Use thread_rng
+// `thread_rng()`: seeded by the O/S; local to the current thread.
+//
+use rand::prelude::*;
+let mut rng = rand::thread_rng();
+let myrnd: f64 = rng.gen();
+let myrnd: i32 = rng.gen_range(0, 2); // close,open ends.
 ```
 
 ### Regular expressions (`regex`)

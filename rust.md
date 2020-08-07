@@ -497,6 +497,7 @@ let mut vec = Vec::new();               // Basic (untyped) instantiation (if the
 let mut vec: Vec<i32> = Vec::new();     // Basic, if type can't be inferred
 let mut vec = vec![1, 2, 3];            // Macro to initialize a vector from a literal list
 let mut vec = vec![true; n];            // Same, with variable-specified length and initialization
+Vec::with_capacity(cap);                // Preallocating version
 
 vec[0] = 2;
 
@@ -510,7 +511,8 @@ vec.pop();                              // Pop from the end
 vec.swap(pos1, pos2);
 vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) a list
 vec.extend(&[1, 2, 3]);                 // Append (borrowing version)
-vec[512..].copy_from_slice(&source)     // memcpy; see array example
+vec[range].copy_from_slice(&source)     // memcpy; see array example
+vec.split_off(split_point)              // split an array!
 
 vec.len();
 vec.iter();                             // iterator

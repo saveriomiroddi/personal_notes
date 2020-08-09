@@ -511,8 +511,9 @@ vec.pop();                              // Pop from the end
 vec.swap(pos1, pos2);
 vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) a list
 vec.extend(&[1, 2, 3]);                 // Append (borrowing version)
-vec[range].copy_from_slice(&source)     // memcpy; see array example
-vec.split_off(split_point)              // split an array!
+vec[range].copy_from_slice(&source);    // memcpy; see array example
+(sl1, sl2) = vec.split_at(split_point); // immutably split an array, into two slices
+vec2 = vec.split_off(split_point);      // mutably split an array: the second half is removed from `vec` and returned as new array
 
 vec.len();
 vec.iter();                             // iterator

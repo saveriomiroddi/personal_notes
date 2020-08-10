@@ -16,7 +16,9 @@
   - [Dates](#dates)
     - [Formatting](#formatting)
     - [Operations](#operations)
-  - [Imagemagick](#imagemagick)
+  - [Images handling](#images-handling)
+    - [Imagemagick](#imagemagick)
+    - [Raw to JPEG conversion](#raw-to-jpeg-conversion)
   - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
   - [Formatting tools](#formatting-tools)
   - [htop](#htop)
@@ -283,7 +285,9 @@ highlight_start_secs=`date -d "$highlight_start" +"%s"`
 rel_highlight_start=`expr $highlight_start_secs - $data_start_secs`
 ```
 
-## Imagemagick
+## Images handling
+
+### Imagemagick
 
 Resample to 200 DPI (resample+units)
 
@@ -308,6 +312,22 @@ convert -coalesce animation.gif target.png        # Split an animated gif into i
 ```
 
 Use coalesce, then, separately, resize, in order to resize an animated gif.
+
+### Raw to JPEG conversion
+
+Use dcraw, Darktable or RawTherapee:
+
+```bash
+# This seems to produce nicer-looking photos than DarkTable.
+#
+ls -1 *.ORF | parallel 'dcraw -c {} | ppmtojpeg > {}.jpg'
+
+# Can't be parallelized due to global lock (possibly there's a flag to disable this).
+#
+for f in *.ORF; do darktable-cli "$f" "$f".jpg; done
+```
+
+[Reference](https://askubuntu.com/a/1256073/46091).
 
 ## PGP (GnuPG/gpg)
 

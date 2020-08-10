@@ -46,6 +46,7 @@ The VIM section requires some cleanup.
 - `Ctrl+Shift+O`              Go to symbol in current file (includes Markdown headers)
 - `Alt+(←/→)`               Navigate through history
 - `Ctrl+(↓/↑)`                  Scroll the viewport without moving the cursor
+- `F8`                        Show next warning/error
 
 - `Alt+Shift+(↓/↑)`           Column (box) selection
 - `Alt+C`                     Search box: Match case
@@ -67,6 +68,7 @@ The VIM section requires some cleanup.
 #### Custom
 
 `Ctrl+K, Ctrl+T`              Run test
+`Ctrl+K, Ctrl+P`              Du(p)licate selection!!
 `Ctrl+@`:                     Open link in browser
 
 #### Extensions

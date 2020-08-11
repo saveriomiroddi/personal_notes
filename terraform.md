@@ -1179,6 +1179,10 @@ Log group:
 #
 resource "aws_cloudwatch_log_group" "lambda_example_log_group" {
   name = "/aws/lambda/${aws_lambda_function.example.function_name}"
+
+  # Options: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653
+  #
+  retention_in_days = 7
 }
 ```
 

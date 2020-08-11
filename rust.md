@@ -1986,9 +1986,9 @@ for cap in re.captures_iter(text) {
 ### Date/times (standard)
 
 ```rust
-// Compute time elapsed
+// Compute time elapsed.
 //
-let current_time = SystemTime::now();
+let current_time: SystemTime = SystemTime::now();
 current_time.elapsed();
 
 // Get current time in seconds
@@ -1997,6 +1997,16 @@ let current_time_secs = SystemTime::now()
     .duration_since(UNIX_EPOCH)
     .unwrap()
     .as_secs();
+```
+`SystemTime` is not monotonic; `Instant` is, which is important for gameloops, benchmarks etc. See [Instance manpage](https://doc.rust-lang.org/std/time/struct.Instant.html) for the details.
+
+Simplified game loop:
+
+```rust
+let cycle_start_time = Instant::now();
+some_work();
+let next_cycle_time = cycle_start_time + Duration::new(0, 1_000_000_000 / 500);
+thread::sleep(next_cycle_time - Instant::now());
 ```
 
 ### Date/times (`chrono`)

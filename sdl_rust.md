@@ -1,29 +1,107 @@
 # SDL/Rust
 - [SDL/Rust](#sdlrust)
-  - [Base Rust Programming By Example](#base-rust-programming-by-example)
+  - [Terminology and general concepts](#terminology-and-general-concepts)
+  - [Base operations](#base-operations)
+    - [Using textures](#using-textures)
 
-## Base Rust Programming By Example
+## Terminology and general concepts
+
+In SDL terminology, to "clear" means to fill with color.
+
+## Base operations
 
 Create a window, color it red, and draw in it a red square.
 
 ```rust
-let sdl_context = sdl2::init()?;
+use sdl2::{event::Event, keyboard::Keycode, pixels::Color, rect::Rect, render::Canvas, video::Window, Sdl};
+use std::{thread::sleep, time::Duration};
 
-let video_subsystem = sdl_context.video()?;
+extern crate rand;
 
-// Parameters are: title, width, height
-let window = video_subsystem
-  .window("Tetris", 800, 600)
-  .position_centered()
-  .opengl()
-  .build()?;
+fn main() {
+  let sdl_context = sdl2::init().unwrap();
 
-let mut canvas = window
-  .into_canvas()
-  .target_texture()
-  .present_vsync() // Enable v-sync.
-  .build()?;
+  let mut canvas = prepare_canvas(&sdl_context);
 
+  flush_events_and_wait_one(&sdl_context);
+
+  fill_canvas(&mut canvas);
+
+  let mut event_pump = sdl_context.event_pump().unwrap();
+
+  'main_loop: loop {
+    // Polling: all events are caught, not only the current (last) one, e.g. KeyDown->KeyUp.
+    for event in event_pump.poll_iter() {
+      match event {
+        Event::Quit { .. } |
+        Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+          break 'main_loop;
+        }
+        _ => println!("Event: {:?}", event),
+      }
+    }
+
+    draw_filled_rectangle(&mut canvas);
+
+    // Update window's display. SDL operations operate on a back buffer, so this is required.
+    canvas.present();
+
+    sleep(Duration::new(0, 1_000_000_000 / 2));
+  }
+}
+
+fn prepare_canvas(sdl_context: &Sdl) -> Canvas<Window> {
+  let video_subsystem = sdl_context.video().unwrap();
+
+  // Parameters are: title, width, height
+  let window = video_subsystem
+    .window("Tetris", 800, 600)
+    .position_centered()
+    .opengl()
+    .build()
+    .unwrap();
+
+  window
+    .into_canvas() // Convert Window to Canvas (simpler to manipulate)
+    .target_texture() // Activate texture rendering support
+    .present_vsync() // Enable v-sync
+    .build()
+    .unwrap()
+}
+
+// If we need to wait on an event, we first need to pump+flush the queue, since already at
+// start, there are several events (mainly, Window).
+// See https://wiki.libsdl.org/SDL_FlushEvents.
+//
+fn flush_events_and_wait_one(sdl_context: &sdl2::Sdl) {
+  let mut event_pump = sdl_context.event_pump().unwrap();
+  let event_subsystem = sdl_context.event().unwrap();
+
+  event_pump.pump_events();
+  event_subsystem.flush_events(0, std::u32::MAX);
+
+  println!("Press any key...");
+
+  println!("{:?}", event_pump.wait_event());
+}
+
+fn fill_canvas(canvas: &mut Canvas<Window>) {
+  canvas.set_draw_color(Color::RGB(255, 0, 0));
+  canvas.clear();
+}
+
+fn draw_filled_rectangle(canvas: &mut Canvas<Window>) {
+  canvas.set_draw_color(Color::RGB(rand::random(), rand::random(), rand::random()));
+  canvas.fill_rect(Rect::new(0, 0, 32, 32)).unwrap();
+}
+```
+
+### Using textures
+
+Rust programming by example has a more sophisticated approach, seemingly trading off speed (not really required in this case) with simplicity:
+
+```rust
+// Create and fill the texture, outside the main loop.
 let texture_creator = canvas.texture_creator();
 
 let mut square_texture =
@@ -34,36 +112,11 @@ canvas.with_texture_canvas(&mut square_texture, |texture| {
   texture.clear();
 })?;
 
-let mut event_pump = sdl_context.event_pump()?;
-
-'main_loop: loop {
-  for event in event_pump.poll_iter() {
-    match event {
-      Event::Quit { .. }
-      | Event::KeyDown {
-        keycode: Some(Keycode::Escape),
-        ..
-      } => {
-        break 'main_loop;
-      }
-      _ => {}
-    }
-  }
-
-  canvas.set_draw_color(Color::RGB(255, 0, 0));
-  // Draw the window.
-  canvas.clear();
-
-  // Copy our texture into the window.
-  canvas.copy(
-    &square_texture,
-    None,
-    Rect::new(0, 0, TEXTURE_SIZE, TEXTURE_SIZE),
-  )?;
-
-  // Update window's display.
-  canvas.present();
-
-  sleep(Duration::new(0, 1_000_000_000u32 / 60));
-}
+// Copy the texture, inside the loop.
+canvas.copy(
+  &square_texture,
+  None,
+  Rect::new(0, 0, TEXTURE_SIZE, TEXTURE_SIZE),
+)?;
 ```
+

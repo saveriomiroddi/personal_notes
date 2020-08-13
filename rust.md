@@ -54,7 +54,7 @@
     - [Commandline arguments (basic)](#commandline-arguments-basic)
     - [Processes](#processes)
   - [Crates](#crates)
-    - [Random (`rand`)](#random-rand)
+    - [Random (with and without `rand`)](#random-with-and-without-rand)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
     - [Date/times (standard)](#datetimes-standard)
     - [Date/times (`chrono`)](#datetimes-chrono)
@@ -287,6 +287,7 @@ For strings, see the [Strings chapter](#strings).
 val += 1; val -= 1;             // increment/decrement value (no postfix)
 val <<= n; val >>= n;           // overflows are ignored
 std::mem::swap(&mut a, &mut b); // !! swap two variables !!
+std::u32::MAX;                  // Max value for a given type
 
 10_u64.pow(2);                  // exponentiation (power), int/int
 10_f64.powi(2);                 // exponentiation, float/int
@@ -1954,7 +1955,23 @@ std::process::exit(exit_status);    // terminate program (exit)
 
 ## Crates
 
-### Random (`rand`)
+### Random (with and without `rand`)
+
+Poor man's random:
+
+```rust
+extern "C" {
+  fn srand() -> u32;
+  fn rand() -> u32;
+}
+
+unsafe {
+  srand();
+  println!("{}", rand());
+}
+```
+
+With crate:
 
 ```rust
 // Simplest way

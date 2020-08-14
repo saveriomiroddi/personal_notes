@@ -13,7 +13,7 @@ In SDL terminology, to "clear" means to fill with color.
 Create a window, color it red, and draw in it a red square.
 
 ```rust
-use sdl2::{event::Event, keyboard::Keycode, pixels::Color, rect::Rect, render::Canvas, video::Window, Sdl};
+use sdl2::{event::Event, keyboard::Keycode, pixels::Color, rect::{Point, Rect}, render::Canvas, video::Window, Sdl};
 use std::{thread::sleep, time::Duration};
 
 extern crate rand;
@@ -42,6 +42,8 @@ fn main() {
     }
 
     draw_filled_rectangle(&mut canvas);
+
+    draw_points(&mut canvas);
 
     // Update window's display. SDL operations operate on a back buffer, so this is required.
     canvas.present();
@@ -86,6 +88,8 @@ fn flush_events_and_wait_one(sdl_context: &sdl2::Sdl) {
 }
 
 fn fill_canvas(canvas: &mut Canvas<Window>) {
+  // Also Color::RGBA is supported.
+  //
   canvas.set_draw_color(Color::RGB(255, 0, 0));
   canvas.clear();
 }
@@ -94,11 +98,25 @@ fn draw_filled_rectangle(canvas: &mut Canvas<Window>) {
   canvas.set_draw_color(Color::RGB(rand::random(), rand::random(), rand::random()));
   canvas.fill_rect(Rect::new(0, 0, 32, 32)).unwrap();
 }
+
+fn draw_points(canvas: &mut Canvas<Window>) {
+  canvas.set_draw_color(Color::RGB(rand::random(), rand::random(), rand::random()));
+
+  let points = (10..100)
+    .into_iter()
+    .map(|x| Point::new(x, 10))
+    .collect::<Vec<Point>>();
+
+  // Watch out! Very ugly signature. Takes a slice.
+  canvas.draw_points(&points[..]).unwrap();
+
+  canvas.draw_point(Point::new(13, 10)).unwrap();
+}
 ```
 
 ### Using textures
 
-Rust programming by example has a more sophisticated approach, seemingly trading off speed (not really required in this case) with simplicity:
+Textures are the preferred way to draw in SDL, since they're faster, however, for per-pixel drawing, `draw_point()`/`draw_points()` are faster.
 
 ```rust
 // Create and fill the texture, outside the main loop.

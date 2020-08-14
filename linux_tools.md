@@ -20,6 +20,7 @@
     - [Imagemagick](#imagemagick)
     - [Raw to JPEG conversion](#raw-to-jpeg-conversion)
   - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
+    - [Key servers](#key-servers)
   - [Formatting tools](#formatting-tools)
   - [htop](#htop)
 
@@ -331,13 +332,13 @@ for f in *.ORF; do darktable-cli "$f" "$f".jpg; done
 
 ## PGP (GnuPG/gpg)
 
-Main commands (`gpg...`); `$key_id` can be email or key id.
+Main commands (`gpg...`); `$key_id` can be email or key id. See the [Key Servers section](#key-servers) for important notes.
 
 ```sh
 --gen-key                                            # generate a gpg keypair (store in the database)
 
 --armor --export[-secret-key] $key_id                # export a key
---import $pubkey                                     # import a key (also secret)
+--import [$pubkey]                                   # import a key (also secret); accepts stdin (don't specify $pubkey)
 
 printf $'fpr\nsign\n'   | gpg --command-fd 0 --edit-key $key_id  # self-sign a key
 printf $'trust\n5\ny\n' | gpg --command-fd 0 --edit-key $key_id  # ultimately trust a key [required by some programs]
@@ -352,12 +353,14 @@ printf $'passwd' | gpg --command-fd 0 --edit-key $key_id   # remove passphrase -
 --recipient $key_id --encrypt [--output $destfile]   # encrypt from stdin
 --decrypt [file] [--output $destfile]
 
---detach-sign $doc                                   # don't include the original
---clearsign $doc                                     # don't compress the original, useful for ascii files
+--detach-sign [--default-key $key_id] $doc           # don't include the original; use default key for specifying to key
+--clearsign [--default-key $key_id] $doc             # don't compress the original, useful for ascii files
 --verify $doc
 
 --keyserver $keyserver_address --search-key $key_id  # search key, by email, on a keyserver
 ```
+
+**IMPORTANT** GnuPG private keys are composed of a "master" and a "subordinate" key. Both are necessary. If for some reason, a master key is missing the `sec` entry in the listings will show as `sec#`.
 
 Snippets:
 
@@ -366,6 +369,16 @@ Snippets:
 #
 find . -name *.log.gz | xargs -I {} gpg -r phony@recipient.com [--output {}.xxx] --encrypt {}
 ```
+
+### Key servers
+
+Key servers are surprisingly terrible (timeouts, usability, correct practices...).
+
+**IMPORTANT**: once a key has been published, the master key is required in order to replace an existing public key; without it, nothing can be done, aside waiting for the expiry.
+
+The best choice is [The HKPS pool](http://hkps.pool.sks-keyservers.net/) (see [Stack Overflow](https://superuser.com/a/228033)).
+
+When searching keys in servers via fingerprint, the prefix `0x` must be added.
 
 ## Formatting tools
 

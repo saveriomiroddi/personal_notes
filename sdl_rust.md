@@ -23,7 +23,7 @@ fn main() {
 
   let mut canvas = prepare_canvas(&sdl_context);
 
-  flush_events_and_wait_one(&sdl_context);
+  wait_keyboard_event(&sdl_context);
 
   fill_canvas(&mut canvas);
 
@@ -31,6 +31,7 @@ fn main() {
 
   'main_loop: loop {
     // Polling: all events are caught, not only the current (last) one, e.g. KeyDown->KeyUp.
+    // The poll iterator stops once there are no more events in the queue.
     for event in event_pump.poll_iter() {
       match event {
         Event::Quit { .. } |
@@ -71,20 +72,33 @@ fn prepare_canvas(sdl_context: &Sdl) -> Canvas<Window> {
     .unwrap()
 }
 
-// If we need to wait on an event, we first need to pump+flush the queue, since already at
-// start, there are several events (mainly, Window).
-// See https://wiki.libsdl.org/SDL_FlushEvents.
-//
-fn flush_events_and_wait_one(sdl_context: &sdl2::Sdl) {
+fn wait_keyboard_event(sdl_context: &sdl2::Sdl) {
   let mut event_pump = sdl_context.event_pump().unwrap();
+
+  println!("Press any key...");
+
+  // If we need to wait on the first event (although it may not make sense), we'd first need to
+  // pump and flush the queue, since already at program start, there are several events (mainly,
+  // Window).
+  // See https://wiki.libsdl.org/SDL_FlushEvents.
+
+  /*
   let event_subsystem = sdl_context.event().unwrap();
 
   event_pump.pump_events();
   event_subsystem.flush_events(0, std::u32::MAX);
 
-  println!("Press any key...");
+  let event = event_pump.wait_event();
+  */
 
-  println!("{:?}", event_pump.wait_event());
+  'event_loop: for event in event_pump.wait_iter() {
+    if let Event::KeyDown { keycode, .. } = event {
+      println!("Keyboard event: {:?}", keycode);
+      break 'event_loop;
+    } else {
+      println!("Other event: {:?}", event);
+    }
+  }
 }
 
 fn fill_canvas(canvas: &mut Canvas<Window>) {

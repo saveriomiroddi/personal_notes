@@ -1,6 +1,7 @@
 # Linux tools
 
 - [Linux tools](#linux-tools)
+  - [ls](#ls)
   - [find](#find)
     - [Examples](#examples)
       - [Search text inside multiple PDFs](#search-text-inside-multiple-pdfs)
@@ -23,6 +24,19 @@
     - [Key servers](#key-servers)
   - [Formatting tools](#formatting-tools)
   - [htop](#htop)
+
+## ls
+
+```sh
+ls -d           # don't [d]escend into directories
+ls -D           # don't [D]ereference files
+
+ls -r           # [r]everse order
+
+ls -S           # sort by [S]ize (default: desc.)
+ls -t           # sort by m[t]ime (default: desc.)
+ls -v           # sort numerically (!)
+```
 
 ## find
 

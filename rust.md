@@ -295,11 +295,11 @@ std::u32::MAX;                  // Max value for a given type
 
 std::cmp::max(x, u);            // maximum number
 
-z, carry = x.overflowing_add(y); // WOW!! there are several other operations. <carry> is bool.
-z, carry = x.overflowing_shl(y); // Shift left, like the above.
+z, carry = x.overflowing_add(y); // <carry> is bool. WATCH OUT! For other operations, overflow is not necessarily the carry, eg. bit shift
 
 (f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
 0_u32.to_be_bytes();            // convert big endian u32 to array of bytes
+&[u8].from_be_bytes() -> u32    // convert big endian array of bytes to u32
 ```
 
 ### Closures/Functions
@@ -486,6 +486,7 @@ let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
 let mut my_list: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
 
 my_list[512..].copy_from_slice(&source) // memcpy (copy) from/to slices/vectors; source/dest size must be the same!
+my_list.fill(value)                     // memset; unstable as of Aug/2020
 
 // invocation: process_list(&my_list)
 //
@@ -499,7 +500,7 @@ let mut vec = Vec::new();               // Basic (untyped) instantiation (if the
 let mut vec: Vec<i32> = Vec::new();     // Basic, if type can't be inferred
 let mut vec = vec![1, 2, 3];            // Macro to initialize a vector from a literal list
 let mut vec = vec![true; n];            // Same, with variable-specified length and initialization
-Vec::with_capacity(cap);                // Preallocating version
+Vec::with_capacity(cap);                // Preallocating version; WATCH OUT! The length is still 0 at start; use `vec![<val>, n]` if required
 
 vec[0] = 2;
 
@@ -724,7 +725,7 @@ let (a, b) =
     (3, 4)
   };
 
-// If let (see enum+pattern matching sections)
+// If let (can match the same way pattern matching does; see specific section).
 //
 if let Coin::Quarter(state) = coin {
   println!("State quarter from {:?}!", state);
@@ -1116,6 +1117,13 @@ Screen {
 
 - return type isn't self;
 - no generics.
+
+In order to specify a dynamic type when boxing, must explicitly cast:
+
+```rust
+Box::new(NullLogger {});                    // type = Box<NullLogger>
+Box::new(NullLogger {}) as Box<dyn Logger>; // type = Box<dyn Logger>
+```
 
 Supertraits are traits depending on other traits:
 
@@ -2027,6 +2035,8 @@ let next_cycle_time = cycle_start_time + Duration::new(0, 1_000_000_000 / 500);
 thread::sleep(next_cycle_time - Instant::now());
 ```
 
+WATCH OUT! While `Instant`s can be compared, it's not possible to perform an operation whose result is negative.
+
 ### Date/times (`chrono`)
 
 Don't use `time::Duration`, since it doesn't implement the operation traits.
@@ -2052,6 +2062,12 @@ duration < Duration::zero();
 ```
 
 ### Commandline parsing (`clap`)
+
+Notes:
+
+- In order to check boolean flags, use `ArgMatches#is_present(<str>)`;
+- `Arg#takes_value(<bool>)` defaults to false;
+- `Arg#index(<int>)` indicates the position of the argument (for positional arguments).
 
 Example of varargs, partially encapsulated:
 

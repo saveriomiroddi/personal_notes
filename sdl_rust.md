@@ -2,6 +2,7 @@
 - [SDL/Rust](#sdlrust)
   - [Terminology and general concepts](#terminology-and-general-concepts)
   - [Base operations](#base-operations)
+    - [Keys polling consideration](#keys-polling-consideration)
     - [Using textures](#using-textures)
 
 ## Terminology and general concepts
@@ -127,6 +128,14 @@ fn draw_points(canvas: &mut Canvas<Window>) {
   canvas.draw_point(Point::new(13, 10)).unwrap();
 }
 ```
+
+### Keys polling consideration
+
+Watch out! In the context of a regular game, keys handling is synchronous; if input is detected, action is taken immediately.
+
+In emulators, keys handling is asynchronous: if input is detected, there could be several cycles before the input is detected, so resetting the keys on each cycle won't work, since the event for the given event will be fired at relatively large intervals, causing cycle in between to miss it.
+
+In this context, handling keys in terms of Down/Up is probably the appropriate solution.
 
 ### Using textures
 

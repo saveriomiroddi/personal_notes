@@ -196,8 +196,19 @@ Formatting (see https://doc.rust-lang.org/std/fmt):
 
 ```rust
 "{:.2}"             // round float
-"{x}/{X}"           // lower/upper hex
+"{:x}/{:X}"         // lower/upper hex
+
+"{:5}"              // padding (right align)
+"{:05}"             // padding with char (zero)
+
+"{:<5}"             // left align
+"{:^5}"             // center align
+"{:>5}"             // right align
+
+"{:-^5X}"           // pad with char, align, and convert ot hex
 ```
+
+In order to escape a curly brace, duplicate it.
 
 ### Variables/Data types
 

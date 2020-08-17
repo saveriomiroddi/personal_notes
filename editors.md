@@ -4,7 +4,6 @@
   - [Notes](#notes)
   - [Visual Studio Code](#visual-studio-code)
     - [Bindings](#bindings)
-      - [Custom](#custom)
       - [Extensions](#extensions)
   - [Sublime Text](#sublime-text)
     - [bindings](#bindings-1)
@@ -45,8 +44,9 @@ The VIM section requires some cleanup.
 
 - `Ctrl+Shift+O`              Go to symbol in current file (includes Markdown headers)
 - `Alt+(←/→)`               Navigate through history
-- `Ctrl+(↓/↑)`                  Scroll the viewport without moving the cursor
+- `Ctrl+(↓/↑)`                 Scroll the viewport without moving the cursor
 - `F8`                        Show next warning/error
+- `Ctrl+@`:                   Open link in browser (custom)
 
 - `Alt+Shift+(↓/↑)`           Column (box) selection
 - `Alt+C`                     Search box: Match case
@@ -55,21 +55,18 @@ The VIM section requires some cleanup.
 
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)
 - `Ctrl+.`                    Quick fix(es) code
+- `Ctrl+K, Ctrl+T`            Run test (custom)
 
 - `Ctrl+K, P`                 Copy file path
-- `Ctrl+Alt+C`                Copy file path (from explorer panel)
-- `Ctrl+Alt+Shift+C`          Copy file relative path (from explorer panel)
 
 - `F10/F11`                   Step over/into
 - `Shift+F11`                 Step out
-- `F5`                        Continue
+- `F5`                        Start/Continue
 - `Shift+F5`                  Stop
+- `Ctrl+F5`                   Run without debug
+- `Shift+F9`                  Toggle breakpoint (custom)
 
-#### Custom
-
-`Ctrl+K, Ctrl+T`              Run test
-`Ctrl+K, Ctrl+P`              Du(p)licate selection!!
-`Ctrl+@`:                     Open link in browser
+- `Ctrl+K, Ctrl+P`              Du(p)licate selection!! (custom)
 
 #### Extensions
 

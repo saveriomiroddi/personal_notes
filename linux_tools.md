@@ -390,7 +390,7 @@ Key servers are surprisingly terrible (timeouts, usability, correct practices...
 
 **IMPORTANT**: once a key has been published, the master key is required in order to replace an existing public key; without it, nothing can be done, aside waiting for the expiry.
 
-The best choice is [The HKPS pool](http://hkps.pool.sks-keyservers.net/) (see [Stack Overflow](https://superuser.com/a/228033)).
+The best choice is [The HKPS pool](http://hkps.pool.sks-keyservers.net) (see [Stack Overflow](https://superuser.com/a/228033)).
 
 When searching keys in servers via fingerprint, the prefix `0x` must be added.
 

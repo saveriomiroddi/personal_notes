@@ -59,6 +59,7 @@
     - [Date/times (standard)](#datetimes-standard)
     - [Date/times (`chrono`)](#datetimes-chrono)
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
+    - [Map literals (`maplit`)](#map-literals-maplit)
 
 ## Cargo
 
@@ -610,6 +611,10 @@ let scores: HashMap<_, _> = teams
     .zip(initial_scores.iter())
     .collect();
 ```
+
+In order to use enums as keys, annotate them with `#[derive(Eq, PartialEq, Hash)]`.
+
+Map literals are not supported. See the maplit crate.
 
 ### Strings
 
@@ -2221,4 +2226,15 @@ let matches = App::new("myapp")
             .arg_from_usage("-d, --debug 'Print debug information'"),
     )
     .get_matches();
+```
+
+### Map literals (`maplit`)
+
+```
+#[macro_use] extern crate maplit;
+
+let map = hashmap!{
+    "a" => 1,
+    "b" => 2,
+};
 ```

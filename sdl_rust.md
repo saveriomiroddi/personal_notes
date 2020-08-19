@@ -4,6 +4,7 @@
   - [Base operations](#base-operations)
     - [Keys polling consideration](#keys-polling-consideration)
     - [Using textures](#using-textures)
+  - [Maximizing the window](#maximizing-the-window)
 
 ## Terminology and general concepts
 
@@ -144,20 +145,39 @@ Textures are the preferred way to draw in SDL, since they're faster, however, fo
 ```rust
 // Create and fill the texture, outside the main loop.
 let texture_creator = canvas.texture_creator();
+let mut texture = texture_creator.create_texture_target(None, TEXTURE_SIZE, TEXTURE_SIZE)?;
 
-let mut square_texture =
-  texture_creator.create_texture_target(None, TEXTURE_SIZE, TEXTURE_SIZE)?;
-
-canvas.with_texture_canvas(&mut square_texture, |texture| {
+canvas.with_texture_canvas(&mut texture, |texture| {
   texture.set_draw_color(Color::RGB(0, 255, 0));
   texture.clear();
 })?;
 
-// Copy the texture, inside the loop.
+// Copy the texture.
 canvas.copy(
-  &square_texture,
+  &texture,
   None,
   Rect::new(0, 0, TEXTURE_SIZE, TEXTURE_SIZE),
 )?;
 ```
 
+Note that the
+
+## Maximizing the window
+
+```rust
+// Set it as maximized (ok also is in the builder).
+//
+let mut window = window.maximized();
+
+// Then wait for the event, which gives the data. Note that this logic consumes the events (and
+// generates a new one).
+//
+let mut event_pump = sdl_context.event_pump().unwrap();
+
+for event in event_pump.poll_iter() {
+  if let Event::Window { win_event: WindowEvent::SizeChanged(new_width, new_height), .. } = event {
+    window.set_size(new_width as u32, new_height as u32).unwrap();
+    break;
+  }
+}
+```

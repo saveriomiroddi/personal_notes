@@ -5,7 +5,7 @@
     - [Basic structure/Printing/Input](#basic-structureprintinginput)
       - [Printing/formatting](#printingformatting)
     - [Variables/Data types](#variablesdata-types)
-    - [Basic operators/operations/arithmetic](#basic-operatorsoperationsarithmetic)
+    - [Basic operators/operations/arithmetic/math](#basic-operatorsoperationsarithmeticmath)
     - [Closures/Functions](#closuresfunctions)
     - [Ranges and `std::iter::Iterator` methods](#ranges-and-stditeriterator-methods)
       - [Method chaining](#method-chaining)
@@ -19,6 +19,7 @@
     - [Enums](#enums)
     - [Option<T>/Result<T, Error>](#optiontresultt-error)
     - [Pattern matching](#pattern-matching)
+      - [Error handling](#error-handling)
     - [Structs](#structs)
     - [Generics](#generics)
     - [Traits (and Generics #2)](#traits-and-generics-2)
@@ -240,7 +241,7 @@ Integer types:
   - the `size` ones depend on the architecture
   - the default, if not specified and can't be inferred, is `i32`
 
-Max value function (example): `u64::max_value()`
+Max value functions (example): `u64::max_value()`, `u64::MAX`
 
 Floats types: `f(32|64)`.
 
@@ -293,19 +294,23 @@ multiply(&(2, 3));
 
 For strings, see the [Strings chapter](#strings).
 
-### Basic operators/operations/arithmetic
+### Basic operators/operations/arithmetic/math
 
 ```rust
 val += 1; val -= 1;             // increment/decrement value (no postfix)
 val <<= n; val >>= n;           // overflows are ignored
 std::mem::swap(&mut a, &mut b); // !! swap two variables !!
-std::u32::MAX;                  // Max value for a given type
 
 10_u64.pow(2);                  // exponentiation (power), int/int
 10_f64.powi(2);                 // exponentiation, float/int
 10_f64.sqrt();                  // square root
+10_f64.sin();                   // sine (in rad)
+10_f64.signum();                // positive: 1.0, negative: -1.0
 
-std::cmp::max(x, u);            // maximum number
+std::f64::consts::PI;           // Pi
+
+u32::max(1, 2);                 // maximum between two numbers
+std::cmp::max(x, u);            // maximum between two numbers
 
 z, carry = x.overflowing_add(y); // <carry> is bool. WATCH OUT! For other operations, overflow is not necessarily the carry, eg. bit shift
 
@@ -692,7 +697,8 @@ For loops iterate over ranges:
 //
 for x in 0..10 { }
 
-// Custom increment/decrement. See previous comment; goes from 98 to 0.
+// Custom increment/decrement. See previous comment; goes from 98 to 0. It's not possible to write
+// `.rev().step_by(-2)`, since `step_by()` takes a usize.
 //
 for x in (0..100).step_by(2).rev() {}
 
@@ -897,6 +903,11 @@ match point {
     //
     Point { x: x_val @ 3..=7 } => println!("Found an x in range: {}", id_variable),
 };
+
+// Match an enum inside a struct (!!!):
+//
+if let Event::Window { win_event: WindowEvent::SizeChanged(new_width, new_height), .. } = event { /* .. */ }
+```
 
 #### Error handling
 

@@ -7,12 +7,13 @@
     - [Block-oriented processing methods](#block-oriented-processing-methods)
     - [Ampersand prefix operator `&<object>`](#ampersand-prefix-operator-object)
     - [Heredoc](#heredoc)
-    - [Numerical base conversion](#numerical-base-conversion)
+    - [Data type conversions](#data-type-conversions)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
   - [APIs/Stdlib](#apisstdlib)
     - [Array](#array)
     - [CGI/URI (encoding)](#cgiuri-encoding)
-    - [Strings/encoding](#stringsencoding)
+    - [Strings](#strings)
+      - [Encoding](#encoding)
     - [Openstruct (ostruct)](#openstruct-ostruct)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
@@ -115,7 +116,7 @@ With tilde, also allows delimiter to be anywhere:
   EOF
 ```
 
-### Numerical base conversion
+### Data type conversions
 
 Common conversions. Everything is a string; "int" represents a decimal.
 
@@ -150,6 +151,11 @@ arr.map(&:chr).join                           # array of ints → bytes
 int.chr                                       # int   → byte/char (ASCII-8)
 
 hex.hex                                       # hex   → int (same as `to_i(16)`)
+
+str.codepoints          	                    # like str.bytes, but each entry is a full codepoint
+[codepoints].pack('U*') 		                  # codepoints to string
+[bytes].map(&:chr).join                       # print string with printable chars and non-printable as escape sequence, from bytes;
+                                              # add :inspect at the end to have the string not automatically converted.
 ```
 
 See https://idiosyncratic-ruby.com/49-what-the-format.html for `printf`-style formatting.
@@ -223,13 +229,101 @@ URI.encode_www_form(p1: "&&&", "p2" => "!!!") # URL-encode params: "p1=%26%26%26
 CGI::escapeHTML('"html"')       # escape HTML
 
 CGI.unescapeHTML("html")        # decode HTML entities; use only for basic cases, as it' not 100% complete (gem: https://github.com/threedaymonk/htmlentities)
-HTMLEntities.new.decode("html")  # htmlentities gem
+HTMLEntities.new.decode("html") # htmlentities gem
 ```
 
-### Strings/encoding
+### Strings
+
+Useful methods:
+
+- `casecmp(str)`: case insensitive comparison
+- `center`, `ljust(int)`, `rjust(int)`
+- `strip`, `lstrip`, `rstrip`
+- `index(substr)`, `rindex(substr)`
+- `slice(start[, end])`, `slice!`
+- `split(separator[, limit])`
+- `start_with?`
+- `lcomp`: doesn't exist; use `str.gsub(/^(Regexp.escape(expr))+/)`
+- `% *values`: equal to `sprintf(str, *values)`
+
+Splitting:
 
 ```ruby
-String.new(str, encoding: enc)         # !! Defaults to ASCII-8 encoding !!
+split(/(separator)/)          	    # retain the separator as separate token
+split(/(?<=\+)\n(?=\+)/)		        # retain the separator in the splitted fields via LB/LA (complex case: `\n` is discarded)
+
+"ä\x00ß\x00\x00".split("\x00") 	    # ["ä", "ß"] - empty tokens are not included by default!!
+"ä\x00ß\x00\x00".split("\x00", -1) 	# ["ä", "ß", "", ""] - pass `-1` as limit in order to keep them
+```
+
+Substituting/matching:
+
+```ruby
+# The closure is not supported for [g]sub!.
+#
+'foobar'.gsub(/(ba.)/, '\1\1')                        # 'foobarbar'; WATCH OUT!: the replacement string can't be manipulated, e.g. `reverse()`
+'foobar'.gsub(/(ba.)/) { |entire_match| $1.reverse }  # 'foorab'
+"Saverio <a@b.c>".match(/<(.*)>/)                     # returns MatchData object; [0] = entire match; [1..] = matching groups
+stri[/regex/, idx]                                    # same as `str.match(/regex/)[idx]`
+"saverio".scan(/(ver(io))/)                           # [["verio", "io"]]
+"saverio".scan(/cusumano/)                            # []
+
+# when a non-capturing group ("?:") is used, gsub nonetheless replaces the entire
+# string; this is also valid when using a block - in this case, the entire string will be
+# passed as parameter.
+# this is inconsistent with :scan, which will only extract the capturing groups.
+#
+# when using a block, in order to reference capturing groups, one can use the last match
+# global variables:
+#
+"y:33".gsub( /(?:y:)(\d+)/ ) { "y:#{ $1.to_i + 1 }" }		# returns "y:34"
+
+# in order to replace non-capturing groups with gsub, use the lookahead/behind, instead
+# of non-capturing groups:
+#
+"abc".gsub( /a(?=b)/, 'x' )		# returns 'xbc'
+```
+
+#### Encoding
+
+Also see [Data type Conversions](#data-type-conversions).
+
+```ruby
+String.new(str, encoding: enc)    # !! Defaults to ASCII-8 encoding !!
+str.encode(encoding)
+str.force_encoding(encoding)
+str.valid_encoding?
+
+# Clean non UTF-8 chars.
+#
+str.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+
+# scrub 4-bytes characters from an utf8 string (essentially, mysql's `utf8mb4` to `utf8mb3`)
+#
+string.each_char.select { |char| char.bytesize < 4 }.join
+
+# Scripting encoding magic comment; must be in first or second line.
+#
+# [en]coding: UTF-8
+
+# Scripting encoding.
+#
+__ENCODING__
+
+# The external encoding is the encoding used when creating the IO object.
+# If the internal enc. is specified, IO objects (valid for read and write) are transcoded
+# to it before being read/write.
+#
+Encoding.default_(internal|external)
+
+# File opening options
+#
+open(file, "r:<external_enc>:<internal_enc>")
+open(file, "w:<external_enc>"
+
+# ignore Byte Order Mark
+#
+IO.read(filename, 'bom|utf-8')
 ```
 
 ### Openstruct (ostruct)

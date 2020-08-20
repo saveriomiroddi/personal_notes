@@ -54,6 +54,8 @@
     - [TCP client/server](#tcp-clientserver)
     - [Commandline arguments (basic)](#commandline-arguments-basic)
     - [Processes](#processes)
+  - [Traits](#traits)
+    - [Default](#default)
   - [Crates](#crates)
     - [Random (with and without `rand`)](#random-with-and-without-rand)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
@@ -1987,6 +1989,24 @@ std::env::args_os();  // returns `OsString`s, which are not restricted to Unicod
 
 ```rust
 std::process::exit(exit_status);    // terminate program (exit)
+```
+
+## Traits
+
+### Default
+
+```rust
+// Generates a `::default()` method that fills the fields with the default values (0 for numeric, false for bool).
+//
+#[derive(Default)]
+struct SomeOptions {
+  foo: i32,
+  bar: bool,
+}
+
+// Override the defaults.
+//
+SomeOptions { foo: 42, ..Default::default() };
 ```
 
 ## Crates

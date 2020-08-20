@@ -15,6 +15,7 @@
     - [Strings](#strings)
       - [Encoding](#encoding)
     - [Openstruct (ostruct)](#openstruct-ostruct)
+    - [CSV](#csv)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
     - [Using `IO.popen3`](#using-iopopen3)
@@ -345,6 +346,33 @@ def to_recursive_ostruct(node)
     node
   end
 end
+```
+
+### CSV
+
+Options:
+
+- `headers: :first_row`
+- `force_quotes: true`
+
+```ruby
+CSV.read(filename)                                        # Read csv; the output is a CSV::Table, which can be iterated.
+CSV.read(filename).to_a                                   # Doesn't work as expected: first entry is the header; each entry is a flat array, not a hash.
+CSV.parse(data_string[,options])                          # Parse a string
+CSV.foreach(filename, options) { |row| ... }              # Stream (for large files)
+
+csv_content = CSV.generate { |csv| csv << [values] }      # Write to string
+CSV.open("/path/file.csv", "w", options) { |csv| ... }    # Write to file
+CSV.open('links.csv', 'ab', options) { |csv| ... }        # Append to file
+```
+
+Row can be indexed as a hash; empty fields are parsed as nil.
+
+Utils:
+
+```ruby
+CSV.read(csv_file)[0]                                     # Read headers. There is no obvious way from the API (what if the file has only headers?)
+row.to_hash.merge(row) { |_, value| value.to_s }          # Simple way to convert each row nil values to blank strings
 ```
 
 ## Handling processes

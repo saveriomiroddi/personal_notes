@@ -62,6 +62,14 @@ git add --allow-empty -m "Initial (empty) commit"
 git rebase -i --root	# and reorder the commits
 ```
 
+Programmatically run an interactive rebase:
+
+```sh
+# Edit all the commits of a branch!
+#
+GIT_SEQUENCE_EDITOR="sed -i -re 's/^pick /e /'" git rebase -i "$(git merge-base HEAD master)"
+```
+
 ## Bisect
 
 Run using the command passed exit code in order to discern failures:

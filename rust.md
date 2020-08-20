@@ -598,6 +598,8 @@ let entry = map.entry("b").or_insert(50);
 
 // Getters use references.
 //
+// There's no function for getting with a default, but `[cloned()].unwrap_or()` works well.
+//
 map["b"];
 map.get("a");                   // Option
 
@@ -1914,7 +1916,7 @@ s += &s2;                               // concatenate via overloaded operator; 
 s.push_str(&str);                       // concatenate (append) strings
 s.push('c');
 s.to_lowercase(); s.to_uppercase();
-s.replace("a", "b");
+s.replace("a", "b");                    // gsub
 s.clear();                              // blank a string
 
 s.trim(); s.trim_end(); s.trim_start(); // trim/strip

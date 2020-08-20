@@ -73,7 +73,7 @@ ls -v           # sort numerically (!)
 -empty                            # empty files/directories
 
 -print                            # when passing the content to the pipe, adds the filename to the start of every line
--print0 | xargs -0                # use null-char to separate filenames (useful for filenames with spaces) 
+-print0 | xargs -0                # use null-char to separate filenames (useful for filenames with spaces)
 -print -quit                      # print one entry and quit; useful to check if there is one or more files in a directory (or matching)
 
 -exec <command> {} \;             # execute command for every file found, passing the name as {}; multiple -exec can be passed
@@ -188,7 +188,7 @@ echo "<$(cat /tmp/fifo)>"
 
 #### Using GNU Parallel
 
-The number of jobs is automatically limited to the number of cores.  
+The number of jobs is automatically limited to the number of cores.
 Quoting is not required.
 
 ```sh

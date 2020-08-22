@@ -40,7 +40,8 @@ The VIM section requires some cleanup.
 - `Ctrl+\`                    Split editor vertically
 - `Ctrl+K, Ctrl+\`            Split editor horizontally
 
-- `Ctrl+K, M`                 Select language
+- `Ctrl+R`                    Quick switch workspace
+- `Ctrl+K, M`                 Select language mode
 
 - `Ctrl+Shift+O`              Go to symbol in current file (includes Markdown headers)
 - `Alt+(←/→)`               Navigate through history

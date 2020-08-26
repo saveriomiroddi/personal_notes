@@ -6,6 +6,9 @@
     - [Using textures](#using-textures)
   - [Maximizing the window](#maximizing-the-window)
   - [Audio play](#audio-play)
+    - [Callback](#callback)
+    - [Push](#push)
+    - [Frequencies reference](#frequencies-reference)
 
 ## Terminology and general concepts
 
@@ -184,6 +187,22 @@ for event in event_pump.poll_iter() {
 ```
 
 ## Audio play
+
+There are two ways of playing audio:
+
+- callback: a struct provides a trait method that is called by the audio subsystem at regular intervals, providing a mapped array for writing the samples;
+- push: an array with the samples is sent to the audio subsystem.
+
+Besides structure, the main difference is that callback is invoked indefinitely (until paused/dropped), while when pushing, the samples are finite.
+
+### Callback
+
+```rust
+```
+
+### Push
+
+### Frequencies reference
 
 ```rust
 #[macro_use]

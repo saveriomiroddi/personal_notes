@@ -36,7 +36,7 @@ Basic (important):
 ```sh
 set -o pipefail
 set -o errexit
-set -o nounset
+set -o nounset            # WATCH OUT! Unset arrays don't cause errors
 set -o errtrace           # `-E`: trap errors also inside functions
 shopt -s inherit_errexit  # subshells inherit errexit (Bash 4.4+)
 ```

@@ -314,7 +314,8 @@ std::f64::consts::PI;           // Pi
 u32::max(1, 2);                 // maximum between two numbers
 std::cmp::max(x, u);            // maximum between two numbers
 
-z, carry = x.overflowing_add(y); // <carry> is bool. WATCH OUT! For other operations, overflow is not necessarily the carry, eg. bit shift
+z, carry = x.overflowing_add(y); // adds and wraps around in case of overflow; <carry> is bool.
+                                 // WATCH OUT! For other `overflow_` operations, `carry` is not the intuitive value, eg. for bit shift
 
 (f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
 0_u32.to_be_bytes();            // convert big endian u32 to array of bytes

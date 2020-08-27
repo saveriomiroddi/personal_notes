@@ -6,6 +6,7 @@
   - [Test conditions](#test-conditions)
     - [Regular expressions](#regular-expressions)
     - [Applications](#applications)
+  - [Jobs management](#jobs-management)
   - [Cycle a string tokens based on separator (IFS)](#cycle-a-string-tokens-based-on-separator-ifs)
   - [String operations](#string-operations)
     - [Examples](#examples)
@@ -154,6 +155,14 @@ Execute a command if a process is not running:
 ```sh
 ! pgrep -fa mysqld && (mysqld &)                       # Zsh doesn't need brackets for this semantics
 if [[ -z "$(pgrep -fa mysqld)" ]]; then mysqld & fi
+```
+
+## Jobs management
+
+```sh
+jobs                # job currently running; use tipically when `there are stopped jobs`
+kill %[-]<n>				# kill nth (1-based) job; if `-`, start from the end (-1 = last)
+kill $!					    # kill latest backgrounded job; note that "$!" is the PID of the latest background job
 ```
 
 ## Cycle a string tokens based on separator (IFS)

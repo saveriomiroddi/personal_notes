@@ -49,6 +49,7 @@
   - [Standard library](#standard-library)
     - [Files/streams handling](#filesstreams-handling)
     - [Testing](#testing)
+      - [Integration tests](#integration-tests)
     - [String/char-related](#stringchar-related)
     - [VecDeque: double-ended queue](#vecdeque-double-ended-queue)
     - [TCP client/server](#tcp-clientserver)
@@ -1879,21 +1880,74 @@ let lines = reader.lines().collect::<Result<Vec<_>, _>>().unwrap();
 
 ### Testing
 
-Simple test function, with assertions, and clean (modularized) structure:
+Unit testing:
 
 ```rust
-#[cfg(test)]
+fn my_method() -> u32 {
+  1
+}
+
+#[cfg(test)] // Comple and run only in test mode
 mod tests {
+  // If really required, since this is a child module, this allows private functions to be tested.
+  //
   use super::*;
 
   #[test]
-  fn my_test() {
-    assert!(true);
-    assert_eq!(1, 1);
-    assert_ne!(1, 2);
+  fn test_my_method() {
+    assert_eq!(my_method(), 1);
+    assert_ne!(my_method(), 0);
+    assert!(my_method() == 1, "Value not matching!");
+  }
+
+  #[test]
+  #[should_panic(expected = "yikes!")]
+  fn test_my_method_panic() {
+    panic!("yikes!")
+  }
+
+  #[test]
+  fn test_with_result() -> Result<(), &'static str> {
+    if true {
+      Ok(())
+    } else {
+      Err("Error!")
+    }
+  }
+
+  #[test]
+  #[ignore] // Not included unless specified
+  fn slow_test() {
+    thread::sleep(Duration::from_secs(1));
   }
 }
 ```
+
+Cargo options:
+
+```sh
+cargo test $test_name_substring      # no patterns/regexes supported
+cargo test -- --test=test-threads=1  # run serially (default is parallel)
+cargo test -- --nocapture            # don't steal stdout output
+cargo test -- --ignored              # include ignored tests
+```
+
+#### Integration tests
+
+Integration tests are placed in the standard location `$project_root/tests`; run using `cargo test`.
+
+```rust
+// `#[cfg(test)]` is not required (assumed because of the directory), but the import is, because
+// integration tests are not in scope
+//
+use mylibrary;
+
+#[test] // blahblah
+```
+
+If one wants to write a shared module, put it in a submodule (eg. file `tests/common/mod.rs`), otherwise, it's interpreted as integration test suite.
+
+When testing binary crates, don't forget that binary crates can't expose functions to be used by other crates (one of the reasons why `main.rs` is canonically thin an imports `lib.rs`).
 
 ### String/char-related
 

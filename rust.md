@@ -39,8 +39,9 @@
       - [RefCell<T> and interior mutability](#refcellt-and-interior-mutability)
       - [Weak<T> and reference cycles](#weakt-and-reference-cycles)
     - [Multithreading](#multithreading)
-      - [Channels](#channels)
+      - [Channels: Multiple Producers Single Consumer](#channels-multiple-producers-single-consumer)
       - [Mutex<T>/Arc<T>](#mutextarct)
+      - [Atomic primitive type wrappers](#atomic-primitive-type-wrappers)
     - [Unsafe](#unsafe)
       - [Interoperability with other languages (C)](#interoperability-with-other-languages-c)
   - [Packaging](#packaging)
@@ -64,6 +65,7 @@
     - [Date/times (`chrono`)](#datetimes-chrono)
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
     - [Map literals (`maplit`)](#map-literals-maplit)
+    - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
 
 ## Cargo
 
@@ -1623,19 +1625,26 @@ let handle = thread::spawn(move || {
 handle.join().unwrap();
 ```
 
-#### Channels
+#### Channels: Multiple Producers Single Consumer
+
+For SPMC, see crate [bus](#channels-single-producer-multiple-consumers-bus).
+
+SPMC can be emulated with multiple channels, however, performance is significantly slower than `bus`.
 
 ```rust
 use std::sync::mpsc;
-use std::thread;
 
 // Sender channels can be cloned ("Multiple Producer Single Consumer").
+//
+// For synchronous channels (bound by a buffer), use mpsc::sync_channel(bufsize). A buffer size of
+// 0 blocks until a receiver reads.
 //
 let (tx1, rx) = mpsc::channel();
 let tx2 = mpsc::Sender::clone(&tx1);
 
 thread::spawn(move || {
   let val = "hi";
+  // send() doesn't block
   tx1.send(val).unwrap();
   // `val` is now moved; can't be used anymore
 });
@@ -1646,7 +1655,7 @@ thread::spawn(move || {
 
 // Non-blocking version: `rx.try_recv()`.
 //
-println!("{}", rx.recv()?);
+println!("{}", rx.recv().unwrap());
 
 for received in rx {
   println!("{}", received);
@@ -1672,6 +1681,26 @@ for _ in 0..10 {
 
 // threads must be joined
 ```
+
+#### Atomic primitive type wrappers
+
+Primitive types have special atomic structs that are very efficient, e.g. (simplified):
+
+```rust
+// AtomicU128 is only in nightly.
+//
+let counter = Arc::new(AtomicU32::new(0));
+
+let thread_counter = counter.clone();
+
+thread::spawn(move || {
+  counter.load(Ordering::Relaxed);
+}
+
+let previous_value = counter.fetch_add(1, Ordering::Relaxed);
+```
+
+**WATCH OUT**: Check out the [CPP reference](https://en.cppreference.com/w/cpp/atomic/memory_order) to understand memory orderings.
 
 ### Unsafe
 
@@ -2318,11 +2347,34 @@ let matches = App::new("myapp")
 
 ### Map literals (`maplit`)
 
-```
+```rust
 #[macro_use] extern crate maplit;
 
 let map = hashmap!{
     "a" => 1,
     "b" => 2,
 };
+```
+
+### Channels: Single Producer Multiple Consumers (`bus`)
+
+```rust
+// Buffer size. zero causes undefined behavior.
+// Messages are put into the buffer, and the buffer is emptied when all the readers have read.
+// There is a sweet spot in the buffer size for the performance.
+//
+let mut tx = bus::Bus::new(1);
+
+let mut rx1 = tx.add_rx();
+let mut rx2 = tx.add_rx();
+
+tx.broadcast("Hello");
+
+thread::spawn(move || {
+  println!("{}", rx1.recv().unwrap());
+});
+
+thread::spawn(move || {
+  println!("{}", rx2.recv().unwrap());
+});
 ```

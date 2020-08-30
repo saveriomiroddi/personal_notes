@@ -42,6 +42,8 @@
       - [Channels: Multiple Producers Single Consumer](#channels-multiple-producers-single-consumer)
       - [Mutex<T>/Arc<T>](#mutextarct)
       - [Atomic primitive type wrappers](#atomic-primitive-type-wrappers)
+      - [Barrier](#barrier)
+      - [Condvar](#condvar)
     - [Unsafe](#unsafe)
       - [Interoperability with other languages (C)](#interoperability-with-other-languages-c)
   - [Packaging](#packaging)
@@ -56,6 +58,7 @@
     - [TCP client/server](#tcp-clientserver)
     - [Commandline arguments (basic)](#commandline-arguments-basic)
     - [Processes](#processes)
+    - [Blackbox (nightly)](#blackbox-nightly)
   - [Traits](#traits)
     - [Default](#default)
   - [Crates](#crates)
@@ -1627,9 +1630,7 @@ handle.join().unwrap();
 
 #### Channels: Multiple Producers Single Consumer
 
-For SPMC, see crate [bus](#channels-single-producer-multiple-consumers-bus).
-
-SPMC can be emulated with multiple channels, however, performance is significantly slower than `bus`.
+For SPMC, see crate [bus](#channels-single-producer-multiple-consumers-bus), although it can be emulated with multiple channels.
 
 ```rust
 use std::sync::mpsc;
@@ -1701,6 +1702,33 @@ let previous_value = counter.fetch_add(1, Ordering::Relaxed);
 ```
 
 **WATCH OUT**: Check out the [CPP reference](https://en.cppreference.com/w/cpp/atomic/memory_order) to understand memory orderings.
+
+#### Barrier
+
+Enable multiple threads to start synchronized; `wait()` will block on each thread until the number has been reached.  
+A random thread is the elected leader (`is_leader() == true`).  
+After the barrier is released, it can be reused.
+
+```rust
+  let threads_number = 10;
+  let barrier = Arc::new(std::sync::Barrier::new(threads_number));
+
+  for _ in 0..threads_number {
+    let barrier = barrier.clone();
+
+    thread::spawn(move || {
+      let barrier_wait_result = barrier.wait();
+      barrier_wait_result.is_leader();
+      my_operation();
+    });
+  }
+```
+
+#### Condvar
+
+A condvar allows threads to wait, and then be notified when a condition is met.
+
+See https://doc.rust-lang.org/beta/std/sync/struct.Condvar.html.
 
 ### Unsafe
 
@@ -2077,6 +2105,18 @@ std::env::args_os();  // returns `OsString`s, which are not restricted to Unicod
 std::process::exit(exit_status);    // terminate program (exit)
 ```
 
+### Blackbox (nightly)
+
+Be pessimistic about the side effects of this function. Can't make any absolute guarantee.
+
+```rust
+#![feature(test)]
+
+use test::bench::black_box;
+
+pub fn black_box<T>(dummy: T) -> T
+```
+
 ## Traits
 
 ### Default
@@ -2165,6 +2205,10 @@ Simplified game loop:
 let cycle_start_time = Instant::now();
 some_work();
 let next_cycle_time = cycle_start_time + Duration::new(0, 1_000_000_000 / 500);
+
+// Remember the sleep time is the *minimum* quantity. For very small sleeps (e.g. 0.1ms), a sleep
+// of 2.5 times as specified has been observed; this is expected in O/S implementations.
+//
 thread::sleep(next_cycle_time - Instant::now());
 ```
 
@@ -2362,6 +2406,7 @@ let map = hashmap!{
 // Buffer size. zero causes undefined behavior.
 // Messages are put into the buffer, and the buffer is emptied when all the readers have read.
 // There is a sweet spot in the buffer size for the performance.
+// Performance need to be verified (in release mode) against the MPSC analog.
 //
 let mut tx = bus::Bus::new(1);
 

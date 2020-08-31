@@ -1690,16 +1690,36 @@ Primitive types have special atomic structs that are very efficient, e.g. (simpl
 ```rust
 // AtomicU128 is only in nightly.
 //
-let counter = Arc::new(AtomicU32::new(0));
+let current_cycle = Arc::new(AtomicU32::new(0));
 
-let thread_counter = counter.clone();
+{
+    let current_cycle = current_cycle.clone();
 
-thread::spawn(move || {
-  counter.load(Ordering::Relaxed);
+    thread::spawn(move || {
+      let mut executed_cycle = 0;
+
+      loop {
+        while executed_cycle < current_cycle.load(Ordering::Relaxed) {
+          // some work
+
+          executed_cycle += 1;
+        }
+
+        if executed_cycle == cycles {
+          break;
+        }
+      }
+    })
 }
 
-let previous_value = counter.fetch_add(1, Ordering::Relaxed);
+for cycle_i in 1..(cycles + 1) {
+  current_cycle.store(cycle_i, Ordering::Relaxed);
+}
 ```
+
+Some APIs:
+
+- `fetch_add(value)`: returns the previous
 
 **WATCH OUT**: Check out the [CPP reference](https://en.cppreference.com/w/cpp/atomic/memory_order) to understand memory orderings.
 
@@ -1726,9 +1746,43 @@ After the barrier is released, it can be reused.
 
 #### Condvar
 
-A condvar allows threads to wait, and then be notified when a condition is met.
+A [condvar](https://doc.rust-lang.org/beta/std/sync/struct.Condvar.html) allows threads to wait, and then be notified when a condition is met.
 
-See https://doc.rust-lang.org/beta/std/sync/struct.Condvar.html.
+Watch out! This can't be used for as a pseudo-channel, because the mutex value could be changed between the notification, and the time the thread resumes. Example:
+
+```rust
+  let pair = Arc::new((Mutex::new(0), Condvar::new()));
+
+  let handle = {
+    let pair = pair.clone();
+
+    thread::spawn(move || {
+      let (lock, cvar) = &*pair;
+
+      loop {
+        let cycle_number_mutex = lock.lock().unwrap();
+
+        // some work
+
+        if *cycle_number_mutex == cycles - 1 {
+          break;
+        } else {
+          cvar.wait(cycle_number_mutex).unwrap();
+        }
+      }
+    })
+  };
+
+  let (lock, cvar) = &*pair;
+
+  for cycle_number in 0..cycles {
+    let mut mutex_cycle_number = lock.lock().unwrap();
+    *mutex_cycle_number = cycle_number;
+    cvar.notify_one();
+  }
+
+  handle.join();
+```
 
 ### Unsafe
 

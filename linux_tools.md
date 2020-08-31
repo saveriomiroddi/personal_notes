@@ -369,7 +369,7 @@ printf $'passwd' | gpg --command-fd 0 --edit-key $key_id   # remove passphrase -
 
 --detach-sign [--default-key $key_id] $doc           # don't include the original; use default key for specifying to key
 --clearsign [--default-key $key_id] $doc             # don't compress the original, useful for ascii files
---verify $doc
+--verify [$sig] $doc                                 # see https://security.stackexchange.com/a/45534 about key not trusted
 
 --keyserver $keyserver_address --search-key $key_id  # search key, by email, on a keyserver
 ```

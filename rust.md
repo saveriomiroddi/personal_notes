@@ -207,6 +207,7 @@ Formatting (see https://doc.rust-lang.org/std/fmt):
 ```rust
 "{:.2}"             // round float
 "{:x}/{:X}"         // lower/upper hex
+"{:b}"              // binary
 
 "{:5}"              // padding (right align)
 "{:05}"             // padding with char (zero)
@@ -1696,30 +1697,26 @@ let current_cycle = Arc::new(AtomicU32::new(0));
     let current_cycle = current_cycle.clone();
 
     thread::spawn(move || {
-      let mut executed_cycle = 0;
+      let mut cycle_to_execute = 0;
 
-      loop {
-        while executed_cycle < current_cycle.load(Ordering::Relaxed) {
+      while cycle_to_execute < cycles {
+        while cycle_to_execute <= current_cycle.load(Ordering::Relaxed) {
           // some work
-
-          executed_cycle += 1;
-        }
-
-        if executed_cycle == cycles {
-          break;
+          cycle_to_execute += 1;
         }
       }
     })
 }
 
-for cycle_i in 1..(cycles + 1) {
+for cycle_i in 0..cycles {
   current_cycle.store(cycle_i, Ordering::Relaxed);
 }
 ```
 
-Some APIs:
+Some APIs (return the previous value):
 
-- `fetch_add(value)`: returns the previous
+- `fetch_add(value, ordering)`:                add
+- `compare_and_swap(current, value, ordering`: if the existing value equals `current`, set to `value`
 
 **WATCH OUT**: Check out the [CPP reference](https://en.cppreference.com/w/cpp/atomic/memory_order) to understand memory orderings.
 

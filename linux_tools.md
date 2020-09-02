@@ -20,6 +20,7 @@
   - [Images handling](#images-handling)
     - [Imagemagick](#imagemagick)
     - [Raw to JPEG conversion](#raw-to-jpeg-conversion)
+  - [SSH](#ssh)
   - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
     - [Key servers](#key-servers)
   - [Formatting tools](#formatting-tools)
@@ -343,6 +344,12 @@ for f in *.ORF; do darktable-cli "$f" "$f".jpg; done
 ```
 
 [Reference](https://askubuntu.com/a/1256073/46091).
+
+## SSH
+
+```sh
+ssh-keyscan -H $address > ~/.ssh/known_hosts         # Programmatically add fingerprints to known_hosts
+```
 
 ## PGP (GnuPG/gpg)
 

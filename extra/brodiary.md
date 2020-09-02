@@ -1,3 +1,26 @@
+## Wed Sep/02
+
+- Emulation/Rust
+  - Scheduler
+    - [x] Implementation of a fast enough scheduler (insane)
+    - [ ] Readings
+      - [ ] https://matklad.github.io/2020/01/02/spinlocks-considered-harmful.html
+
+
+## Mon Sep/01
+
+- Emulation/Rust
+  - Scheduler
+    - [ ] Think scheduler
+    - [x] Playground: improve, reorganize, and review
+    - [x] Experiments with async
+    - [x] Cleanup the async experiments, merge, and conclude
+  - [ ] Theory
+    - [ ] Study [Emulation of Nintendo Game Boy](https://git.io/JUtp6)
+  - Misc (Project)
+    - [x] Review and merge playground
+    - [x] Rename the CHIP-8 component to system
+
 ## Sun Aug/30
 
 - Extra
@@ -40,6 +63,10 @@
         - https://stackoverflow.com/questions/7086220/what-does-rep-nop-mean-in-x86-assembly-is-it-the-same-as-the-pause-instru
     - [x] Experiment further with sleep/sync implementation
       - Conclusion: Atomic data types are very fast; follow up on building the machine, and think about communication when it's time.
+  - Game Boy
+    - [ ] Theory
+      - [x] Review what to study, and dump to offline format
+      - [ ] Study [Emulation of Nintendo Game Boy](https://git.io/JUtp6)
 
 ## Sat Aug/29
 

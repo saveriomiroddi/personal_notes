@@ -1,13 +1,17 @@
 ## Wed Sep/02
 
+- Extra
+  - [x] Switch to alternative Android sync service, after Dropbox disaster
+
+## Tue Sep/01
+
 - Emulation/Rust
   - Scheduler
     - [x] Implementation of a fast enough scheduler (insane)
     - [ ] Readings
       - [ ] https://matklad.github.io/2020/01/02/spinlocks-considered-harmful.html
 
-
-## Mon Sep/01
+## Mon Aug/31
 
 - Emulation/Rust
   - Scheduler

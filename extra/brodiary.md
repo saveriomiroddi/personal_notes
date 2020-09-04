@@ -1,3 +1,24 @@
+## Thu Sep/03
+
+- ZFS
+  - [x] Review issue/reply
+
+- Emulation/Rust
+  - Scheduler
+    - [x] Locking Readings
+      - Spinlocks/Mutexes: https://matklad.github.io/2020/01/02/spinlocks-considered-harmful.html
+      - Linux reply: https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723
+      - Reference: https://en.cppreference.com/w/cpp/atomic/memory_order
+      - Explanation: https://stackoverflow.com/questions/12346487/what-do-each-memory-order-mean
+      - Explanation, great!: https://gcc.gnu.org/wiki/Atomic/GCCMM/AtomicSync
+  - Game Boy
+    - [ ] Theory
+      - [x] Think basic design/components interrelation
+      - [x] Review all available guides
+    - [ ] Implementation: basic CPU
+      - [x] Write base struct + UT
+      - [x] Write one decode + UT
+
 ## Wed Sep/02
 
 - Extra

@@ -3,6 +3,7 @@
 - [Text processing](#text-processing)
   - [Perl](#perl)
     - [Syntax](#syntax)
+    - [Commandline args](#commandline-args)
     - [General concepts](#general-concepts)
       - [Line numbers/Position-based operations](#line-numbersposition-based-operations)
       - [Priority](#priority)
@@ -34,6 +35,10 @@ if (CONDITION) { TRUE_BRANCH } else { ELSE_BRANCH }
 # Ternary operator
 CONDITION ? TRUE_BRANCH : FALSE_BRANCH
 ```
+
+### Commandline args
+
+- `-0`: use null character as line separator
 
 ### General concepts
 

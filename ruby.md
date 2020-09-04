@@ -15,6 +15,7 @@
     - [Strings](#strings)
       - [Encoding](#encoding)
     - [Openstruct (ostruct)](#openstruct-ostruct)
+    - [Dates](#dates)
     - [CSV](#csv)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
@@ -346,6 +347,13 @@ def to_recursive_ostruct(node)
     node
   end
 end
+```
+
+### Dates
+
+```ruby
+@date >> @months; @date << @months                        # Adds/subtracts months to a date (!!)
+@date.next_month(@months=1), @date.prev_month(@months=1)  # More readable; also supports `day`, `year`
 ```
 
 ### CSV

@@ -69,6 +69,7 @@
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
     - [Map literals (`maplit`)](#map-literals-maplit)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
+    - [Unit testing: ruspec](#unit-testing-ruspec)
 
 ## Cargo
 
@@ -220,6 +221,16 @@ Formatting (see https://doc.rust-lang.org/std/fmt):
 ```
 
 In order to escape a curly brace, duplicate it.
+
+In order to convert bytes to a hex string, use:
+
+```rust
+use core::fmt::Write;
+let mut buffer = String::with_capacity(2 * array.len());
+for byte in buffer {
+  write!(s, "{:02X}", byte)?;
+}
+```
 
 ### Variables/Data types
 
@@ -447,7 +458,7 @@ take(n)                      // iterator for the first n elements
 enumerate()                  // iterator (index, &value) (Ruby :each_with_index)
 join("str")                  // join using str
 zip(iter)                    // zip two arrays (iterators)!!!
-sum::<T>()
+sum()                        // WATCH OUT! Returns the same type, so conversion is needed, e.g. `.map(|&x| x as u32).sum();`
 
 chunks(n)                    // iterate in chunks of n elements; includes last chunk, if smaller
 chunks_exact(n)              // iterate in chunks of n elements; does not include the last chunk, if smaller
@@ -2218,6 +2229,9 @@ use rand::prelude::*;
 let mut rng = rand::thread_rng();
 let myrnd: f64 = rng.gen();
 let myrnd: i32 = rng.gen_range(0, 2); // close,open ends.
+
+let mut data = [0u8; 32];
+rand::thread_rng().fill_bytes(&mut data);
 ```
 
 ### Regular expressions (`regex`)
@@ -2473,4 +2487,30 @@ thread::spawn(move || {
 thread::spawn(move || {
   println!("{}", rx2.recv().unwrap());
 });
+```
+
+### Unit testing: ruspec
+
+```rust
+use ruspec::ruspec;
+
+ruspec! {
+  describe "test module 2" {
+    before { let context = 5; }
+    subject { context + 5 }
+
+    it "test subject" {
+      assert_eq!(subject, 10);
+    }
+
+    context "context is 6" {
+      // Watch out! Outer blocks (before/etc) are not executed.
+      before { let context = 6; }
+
+      it "should equal 6" {
+        assert_eq!(context, 6);
+      }
+    }
+  }
+}
 ```

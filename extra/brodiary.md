@@ -1,3 +1,14 @@
+## Fri Sep/04
+
+- Emulation/Rust
+  - [x] Extra
+    - [x] Find out how to print Pan Docs in acceptable PDF
+    - [x] Add Demonstrate to Awesome-Rust
+    - [x] Review Demonstrate as test framework
+  - Game Boy
+    - [ ] Theory
+      - [x] Study [Emulation of Nintendo Game Boy](https://git.io/JUtp6)
+
 ## Thu Sep/03
 
 - ZFS

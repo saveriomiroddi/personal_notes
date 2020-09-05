@@ -69,7 +69,7 @@
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
     - [Map literals (`maplit`)](#map-literals-maplit)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
-    - [Unit testing: ruspec](#unit-testing-ruspec)
+    - [Unit testing: ruspec/demonstrate](#unit-testing-ruspecdemonstrate)
 
 ## Cargo
 
@@ -2489,7 +2489,14 @@ thread::spawn(move || {
 });
 ```
 
-### Unit testing: ruspec
+### Unit testing: ruspec/demonstrate
+
+Both similar, although demonstrate is maintained.
+
+The difference is that demonstrate:
+
+- executes before/after in outer blocks;
+- doesn't allow strings as block arguments.
 
 ```rust
 use ruspec::ruspec;

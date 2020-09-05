@@ -42,6 +42,7 @@
       - [Events](#events)
     - [CloudTrail](#cloudtrail)
     - [RDS](#rds)
+    - [EFS](#efs)
 
 ## Base configuration
 
@@ -137,6 +138,17 @@ path.module     # path of the current module
 ### Functions
 
 ```hcl
+# Collections
+
+element(list, index)
+length(collection)
+split(separator, string)      # split a string into a list
+join(separator, list)         # join a list
+
+# String
+
+replace(string, from, to)
+
 # Encodings
 
 base64encode(string)
@@ -1324,4 +1336,54 @@ resource "aws_db_subnet_group" "default" {
 #     }
 #   }
 # }
+```
+
+### EFS
+
+EFS suffers from the typical "2-step" problem:
+
+- in the final form, it's desirable to disable root permissions,
+- but in order to create directories etc., one needs to be user.
+
+```hcl
+resource "aws_efs_file_system" "network_file_server" {}
+
+resource "aws_security_group" "network_file_server" {
+  name   = "nfs"
+  vpc_id = my_vpc.id
+}
+
+resource "aws_efs_mount_target" "network_file_server" {
+  for_each = toset(my_vpc.my_subnet_ids)
+
+  file_system_id = aws_efs_file_system.network_file_server.id
+  security_groups = [
+    aws_security_group.network_file_server.id
+  ]
+  subnet_id = each.key
+}
+
+# Sample; also the egress rules are required, on the client resource.
+#
+resource "aws_security_group_rule" "network_file_server" {
+  for_each = toset(my_security_groups.ids)
+
+  type              = "ingress"
+  from_port         = 2049
+  to_port           = 2049
+  protocol          = "tcp"
+  security_group_id = each.key
+}
+
+# Bonus: (Route 53) DNS entry
+#
+resource "aws_route53_record" "network_file_server" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "nfs.${aws_route53_zone.main.name}"
+  type    = "CNAME"
+  ttl     = "300"
+  records = [
+    aws_efs_file_system.network_file_server.dns_name
+  ]
+}
 ```

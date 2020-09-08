@@ -7,6 +7,7 @@
     - [General concepts](#general-concepts)
       - [Line numbers/Position-based operations](#line-numbersposition-based-operations)
       - [Priority](#priority)
+    - [Predefined functions](#predefined-functions)
     - [Search/replace](#searchreplace)
       - [Regex extra backslash sequences](#regex-extra-backslash-sequences)
     - [Arrays](#arrays)
@@ -75,6 +76,12 @@ printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline and print $line'
 printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line'
 ```
 
+### Predefined functions
+
+```perl
+length $str                             # length of a string
+```
+
 ### Search/replace
 
 ```sh
@@ -104,6 +111,9 @@ perl -i -pe 's/- (\w)/- \u$1/'
 ### Arrays
 
 ```perl
+(1, 2, 3)                             # array literal
+(1..3)                                # array literal, as range; inclusive
+
 push(@array, item)                    # append an item to an array
 item = pop(@array)                    # pop an item from an array
 

@@ -1340,13 +1340,37 @@ resource "aws_db_subnet_group" "default" {
 
 ### EFS
 
-EFS suffers from the typical "2-step" problem:
-
-- in the final form, it's desirable to disable root permissions,
-- but in order to create directories etc., one needs to be user.
-
 ```hcl
 resource "aws_efs_file_system" "network_file_server" {}
+
+# EFS (policy) suffers from the typical "2-step" problem:
+#
+# - in the final form, it's desirable to disable root permissions,
+# - but in order to create directories etc., one needs to be root.
+#
+resource "aws_efs_file_system_policy" "network_file_server" {
+  file_system_id = aws_efs_file_system.network_file_server.id
+
+  policy = <<POLICY
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "efs-disable-root-access-${aws_efs_file_system.network_file_server.id}",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": [
+                    "elasticfilesystem:ClientMount",
+                    "elasticfilesystem:ClientWrite"
+                ],
+                "Resource": "${aws_efs_file_system.network_file_server.arn}"
+            }
+        ]
+    }
+  POLICY
+}
 
 resource "aws_security_group" "network_file_server" {
   name   = "nfs"

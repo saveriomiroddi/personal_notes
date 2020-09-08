@@ -17,6 +17,8 @@
     - [Openstruct (ostruct)](#openstruct-ostruct)
     - [Dates](#dates)
     - [CSV](#csv)
+    - [open-uri](#open-uri)
+    - [Tempfile, Tmpdir](#tempfile-tmpdir)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
     - [Using `IO.popen3`](#using-iopopen3)
@@ -381,6 +383,43 @@ Utils:
 ```ruby
 CSV.read(csv_file)[0]                                     # Read headers. There is no obvious way from the API (what if the file has only headers?)
 row.to_hash.merge(row) { |_, value| value.to_s }          # Simple way to convert each row nil values to blank strings
+```
+
+### open-uri
+
+Open files/download http content; automatically detects the appropriate class for loading the stream content:
+
+```ruby
+open('http://cippa-lippa').read
+```
+
+### Tempfile, Tmpdir
+
+Do not use tempfile for references that stick around!! Tempfile instances are always deleted on garbage collection.
+
+```ruby
+file = Tempfile.new('prefix')
+filename = file.path
+file.close
+File.unlink(file)  # optional
+
+# <naming> can be either "prefix" or ["prefix", ".extension"]
+file = Tempfile.new(<naming>)
+
+Tempfile.open(<naming>) { |f| operation(f) }    # Creates, operates, but doesn't immediately delete
+Tempfile.create(<naming>)                       # Opens and closes, but doesn't immediately delete
+Tempfile.create(<naming>) { |f| operation(f) }  # Creates, operates, and deletes
+
+# Generates a temporary filename with `a`/`.png` prefix/extension, in the system temporary directory.
+# !!This is the best API for tempfiles that need to stick around!! Note that no file is created.
+# The block is ugly, but required.
+#
+require 'tmpdir'
+Dir::Tmpname.create(['a', '.png']) { }
+
+# Find system temporary directory
+require 'tmpdir'
+Dir.tmpdir
 ```
 
 ## Handling processes

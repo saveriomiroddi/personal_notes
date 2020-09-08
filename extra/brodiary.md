@@ -1,3 +1,22 @@
+## Mon Sep/07
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Write script for converting https://gbdev.io/gb-opcodes/Opcodes.json to UTs and Code
+
+- Extra
+  - [x] Understand proper testing descriptions
+    - [x] Review and copy examples
+  - [ ] Review: https://simpleprogrammer.com/ultimate-list-developer-podcasts
+  - [x] Pandocs project: test local run, to research the pdf export
+
+## Sat Sep/05
+
+- Extra
+  - [ ] Understand proper testing descriptions
+    - [x] Quick look at the RSpec book
+
 ## Fri Sep/04
 
 - Emulation/Rust

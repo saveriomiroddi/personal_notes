@@ -46,6 +46,8 @@
       - [Condvar](#condvar)
     - [Unsafe](#unsafe)
       - [Interoperability with other languages (C)](#interoperability-with-other-languages-c)
+    - [Macros](#macros)
+      - [Rules and details](#rules-and-details)
   - [Packaging](#packaging)
     - [Project structure](#project-structure)
     - [Modules](#modules)
@@ -333,7 +335,7 @@ u32::max(1, 2);                 // maximum between two numbers
 std::cmp::max(x, u);            // maximum between two numbers
 
 z, carry = x.overflowing_add(y); // adds and wraps around in case of overflow; <carry> is bool.
-                                 // WATCH OUT! For other `overflow_` operations, `carry` is not the intuitive value, eg. for bit shift
+                                 // WATCH OUT! For other `overflow_` operations, `carry` may not the intuitive value, eg. for bit shift
 
 (f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
 0_u32.to_be_bytes();            // convert big endian u32 to array of bytes
@@ -1875,6 +1877,165 @@ Allow code to be invoked from C:
 #[no_mangle]
 pub extern "C" fn call_from_c() { }
 ```
+
+### Macros
+
+Simple, fixed expressions:
+
+```rust
+// Capture the `expr`ession as `$name`.
+//
+macro_rules! simple_print {
+    ($name:expr) => {
+        println!("Hey {}", $name)
+    };
+}
+
+// `envar!(setValue: "/home/me" forKey: "HOME")`
+//
+macro_rules! envar {
+    (setValue: $value:tt forKey: $key:tt) => {
+        println!("setValue:{} forKey:{}", $value, $key);
+    };
+}
+
+// Multiple expressions for one macro:
+//
+// - `add!(one to 5)`
+// - `add!(two to 5)`
+//
+macro_rules! add {
+    (one to $input:expr) => {
+        $input + 1
+    };
+    (two to $input:expr) => {
+        $input + 2
+    };
+}
+```
+
+Macros can also be invoked using both round and square brackets.
+
+Multiple occurrences. Metachars are:
+
+- `*`: 0+
+- `+`: 1+
+- `?`: 0 or 1 (doesn't take a separator)
+
+```rust
+// The character preceding `*` is the separator.
+//
+macro_rules! repeated_print {
+    ($( $name:expr ),*) => {
+      $( println!("Hey {}", $name); )*
+    };
+}
+
+// Accepts expressions with the Ruby hash (rocket) syntax.
+// Since we return a value, we need to define a scope (extra curly braces).
+//
+macro_rules! ruby_hash {
+    ($( $key:expr => $value:expr ),*) => {{
+        let mut hm = HashMap::new();
+        $( hm.insert($key, $value); )*
+        hm
+    }};
+}
+
+// Simulate an optional parameter.
+// Different use of the comma here; it's consumed as part of the expression, but the expanded one is
+// the one defined by the repetition.
+//
+macro_rules! optional_param {
+    ($mandatory:expr $(, $optional:expr)*) => {
+        println!("M:{} O:{}", $mandatory, $($optional),*)
+    };
+}
+
+// Simulate optional, named, parameters.
+// For simplicity, the comma after each expression is mandatory.
+//
+//     test_cpu_execute!(
+//         zf:80=>81,
+//         hf:82=>83,
+//     );
+//
+macro_rules! test_cpu_execute {
+    (
+        $( zf: $zf_pre_value:literal => $zf_post_value:literal, )?
+        $( nf: $nf_pre_value:literal => $nf_post_value:literal, )?
+        $( hf: $hf_pre_value:literal => $hf_post_value:literal, )?
+        $( cf: $cf_pre_value:literal => $cf_post_value:literal, )?
+    ) => {
+        $( println!("zf: {} -> {}", $zf_pre_value, $zf_post_value); )*
+        $( println!("nf: {} -> {}", $nf_pre_value, $nf_post_value); )*
+        $( println!("hf: {} -> {}", $hf_pre_value, $hf_post_value); )*
+        $( println!("cf: {} -> {}", $cf_pre_value, $cf_post_value); )*
+    };
+}
+```
+
+Other usages:
+
+```rust
+// Define a function (!!).
+// If we don't define `$name` as `ident`, but for example as `expr`, the compiler will complain that
+// an identifier is expected.
+//
+macro_rules! generate_func {
+    ($name:ident) => {
+        fn $name(param: i32) {
+            println!("Value: {}", param);
+        }
+    };
+}
+
+generate_func!(foo);
+foo(123); // `Value: 123`
+
+// Define variables (!)
+//
+macro_rules! vars {
+    ($data:expr, $stride:expr, $var1:ident, $var2:ident, $var3:ident) => {
+        let $var1 = $data[0];
+        let $var2 = $data[1 * $stride];
+    };
+}
+
+// Pass self
+//
+macro_rules! call_on_self {
+    ($self:ident, $F:ident) => {
+        $self.$F()
+    };
+}
+```
+
+#### Rules and details
+
+There are some rules:
+
+- Statements and expressions can only be followed by `=>`, a comma, or a semicolon
+- (other)
+
+Macro variable types:
+
+`expr`: Expressions that you can write after an `=` sign, such as `76+4` or `if a==1 {"something"} else {"other thing"}`.
+`ident`: An identifier or binding name, such as `foo` or `bar`.
+`path`: A qualified path. This will be a path that you could write in a use sentence, such as `foo::bar::MyStruct` or `foo::bar::my_func`.
+`ty`: A type, such as `u64` or `MyStruct`. It can also be a path to the type.
+`pat`: A pattern that you can write at the left side of an `=` sign or in a match expression, such as `Some(t)` or `(a, b, _)`.
+`stmt`: A full statement, such as a `let` binding like `let a = 43;`.
+`block`: A block element that can have multiple statements and a possible expression between braces, such as `{vec.push(33); vec.len()}`.
+`item`: What Rust calls items. For example, function or type declarations, complete modules, or trait definitions.
+`meta`: A meta element, which you can write inside of an attribute (`#[]`). For example, `cfg(feature = "foo")`.
+`tt`: Any token tree that will eventually get parsed by a macro pattern, which means almost anything. This is useful for creating recursive macros, for example.
+`literal`
+
+Interesting articles:
+
+- Tutorial: https://hub.packtpub.com/creating-macros-in-rust-tutorial
+- Case study: https://notes.iveselov.info/programming/time_it-a-case-study-in-rust-macros
 
 ## Packaging
 

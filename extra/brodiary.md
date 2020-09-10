@@ -1,3 +1,11 @@
+## Wed Sep/09
+
+- ZFS
+  - [x] Review  mount issue (deadline: 09/Sep)
+    - Reference: https://openzfs.github.io/openzfs-docs/Getting%20Started/Ubuntu/Ubuntu%2018.04%20Root%20on%20ZFS.html
+      - 4.8b: /boot/efi
+      - 5.7: /boot
+
 ## Mon Sep/07
 
 - Emulation/Rust

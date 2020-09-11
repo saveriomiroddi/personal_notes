@@ -6,6 +6,28 @@
       - 4.8b: /boot/efi
       - 5.7: /boot
 
+## Tue Sep/08
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Rename flag variables
+      - [ ] Write script for converting https://gbdev.io/gb-opcodes/Opcodes.json to UTs and Code
+        - [x] Review CPU sources; https://rednex.github.io/rgbds/gbz80.7.html is unhelpful, as it misses the opcodes
+        - [x] Review opcodes json #1, and start separating the concepts that can be translated
+        - [x] Join discord, and ask the `immediate` meaning (seems the opposite of what it is)
+        - [x] Raise issue with maintainers about `immediate` misnaming (see https://bit.ly/33boc9l)
+        - [x] Implement cycle counts (`bytes`)
+        - [x] Implement flags (`flags`)
+        - [x] Review opcodes json #2 for further concepts translation
+        - [ ] Follow up implementation execution generator
+          - [x] Inspect INC n
+          - [x] Inspect LD nn, n
+          - [ ] Write macro for test fx invocation (update personal notes)
+            - [x] Study macros
+            - [x] Fight find implementation of optional parameters along with the required style
+            - [ ] Implement
+
 ## Mon Sep/07
 
 - Emulation/Rust

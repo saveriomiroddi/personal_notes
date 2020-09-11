@@ -13,7 +13,8 @@
       - [Example cases](#example-cases)
       - [sudo -i, login shell test, and bash](#sudo--i-login-shell-test-and-bash)
   - [Systemctl](#systemctl)
-  - [Terminal](#terminal)
+  - [fstab](#fstab)
+  - [Terminal emulator](#terminal-emulator)
   - [Desktop Environment: windows](#desktop-environment-windows)
   - [Dconf/Gsettings](#dconfgsettings)
   - [MIME (extensions) (file associations) handling](#mime-extensions-file-associations-handling)
@@ -350,7 +351,25 @@ List everything (with their states), including timers:
 systemctl -a
 ```
 
-## Terminal
+## fstab
+
+Columns:
+
+- `options` (-3)
+  - `X-mount.mkdir[=mode]`: create the mountpoint (as `mkdir -p`) if not exists
+  - `nofail`: don't report error if the device is not present; best used with timeout (`x-systemd.device-timeout`)
+  - `x-systemd.device-timeout=<time>`: time can be specified with suffixes, eg. `1ms`; `0` is infinite; defaults to 90"
+- `dump` (-2): `1` if the partition is included when using dump tool
+- `pass` (-1): order when checking with fsck
+
+Test the content of fstab (not reliable for actual mounting; for example, doesn't detect if the nfs tools are installed, and reports success):
+
+```sh
+# [f]ake, [a]ll, [v]erbose
+mount -fav
+```
+
+## Terminal emulator
 
 Open a new tab, execute a command, and leave the tab open:
 

@@ -1343,10 +1343,14 @@ resource "aws_db_subnet_group" "default" {
 ```hcl
 resource "aws_efs_file_system" "network_file_server" {}
 
+# Policy that disables root access.
+#
 # EFS (policy) suffers from the typical "2-step" problem:
 #
 # - in the final form, it's desirable to disable root permissions,
 # - but in order to create directories etc., one needs to be root.
+#
+# Using an access point solves this problem, as allows the directory to be created if not present.
 #
 resource "aws_efs_file_system_policy" "network_file_server" {
   file_system_id = aws_efs_file_system.network_file_server.id
@@ -1372,11 +1376,6 @@ resource "aws_efs_file_system_policy" "network_file_server" {
   POLICY
 }
 
-resource "aws_security_group" "network_file_server" {
-  name   = "nfs"
-  vpc_id = my_vpc.id
-}
-
 resource "aws_efs_mount_target" "network_file_server" {
   for_each = toset(my_vpc.my_subnet_ids)
 
@@ -1387,27 +1386,47 @@ resource "aws_efs_mount_target" "network_file_server" {
   subnet_id = each.key
 }
 
+# Mount targets are still required!
+#
+resource "aws_efs_access_point" "application_logs_my_user" {
+  file_system_id = aws_efs_file_system.application_logs.id
+
+  tags = {
+    "Name" = "NFS myuser user"
+  }
+
+  posix_user {
+    gid            = 1001
+    secondary_gids = []
+    uid            = 1001
+  }
+
+  root_directory {
+    path = "/myuser"
+
+    creation_info {
+      owner_gid   = 1001
+      owner_uid   = 1001
+      permissions = "0755"
+    }
+  }
+}
+
+resource "aws_security_group" "network_file_server" {
+  name   = "nfs"
+  vpc_id = my_vpc.id
+}
+
 # Sample; also the egress rules are required, on the client resource.
 #
 resource "aws_security_group_rule" "network_file_server" {
   for_each = toset(my_security_groups.ids)
 
-  type              = "ingress"
-  from_port         = 2049
-  to_port           = 2049
-  protocol          = "tcp"
-  security_group_id = each.key
-}
-
-# Bonus: (Route 53) DNS entry
-#
-resource "aws_route53_record" "network_file_server" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "nfs.${aws_route53_zone.main.name}"
-  type    = "CNAME"
-  ttl     = "300"
-  records = [
-    aws_efs_file_system.network_file_server.dns_name
-  ]
+  type                     = "ingress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.network_file_server.id
+  source_security_group_id = each.key
 }
 ```

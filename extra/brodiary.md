@@ -1,3 +1,23 @@
+## Sat Sep/12
+
+- Emulation/Rust
+  - [x] Minor cleanups
+    - [x] Rename `*-interfaces` to `interfaces-*`
+    - [x] Remove distributed systems mention from README
+    - [x] Switch testing framework to `demonstrate`
+      - [x] Report issue with mutable variables in `before` block
+    - [x] Fight complete `assert_cpu_execute!` macro
+      - [x] Ask for cleaner way of writing it
+      - [x] Evaluate a mixed approach macro + struct+default()
+    - [ ] Implementation: basic CPU
+      - [x] Write script base for converting a few https://gbdev.io/gb-opcodes/Opcodes.json to UTs and Code
+        - [x] Update generated testing code with new macro, and add automated test values
+        - [x] Follow up with generator base structure
+        - [x] Follow up with first instruction: `INC n`, without UTs
+
+- Extra
+  - [x] Investigate and report unnecessary warning on ruspec/demonstrate
+
 ## Wed Sep/09
 
 - ZFS
@@ -12,7 +32,7 @@
   - Game Boy
     - [ ] Implementation: basic CPU
       - [x] Rename flag variables
-      - [ ] Write script for converting https://gbdev.io/gb-opcodes/Opcodes.json to UTs and Code
+      - [ ] Write script base for converting a few https://gbdev.io/gb-opcodes/Opcodes.json to UTs and Code
         - [x] Review CPU sources; https://rednex.github.io/rgbds/gbz80.7.html is unhelpful, as it misses the opcodes
         - [x] Review opcodes json #1, and start separating the concepts that can be translated
         - [x] Join discord, and ask the `immediate` meaning (seems the opposite of what it is)
@@ -33,7 +53,7 @@
 - Emulation/Rust
   - Game Boy
     - [ ] Implementation: basic CPU
-      - [ ] Write script for converting https://gbdev.io/gb-opcodes/Opcodes.json to UTs and Code
+      - [ ] Write script base for converting a few https://gbdev.io/gb-opcodes/Opcodes.json to UTs and Code
 
 - Extra
   - [x] Understand proper testing descriptions

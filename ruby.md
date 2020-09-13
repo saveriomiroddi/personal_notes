@@ -19,6 +19,7 @@
     - [CSV](#csv)
     - [open-uri](#open-uri)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
+    - [StringIO](#stringio)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
     - [Using `IO.popen3`](#using-iopopen3)
@@ -118,6 +119,14 @@ With tilde, also allows delimiter to be anywhere:
 <<~EOF
   test
   EOF
+```
+
+Syntax for passing to a method:
+
+```ruby
+StringIO.new(<<~HEADER, "a")
+  myheader
+HEADER
 ```
 
 ### Data type conversions
@@ -420,6 +429,14 @@ Dir::Tmpname.create(['a', '.png']) { }
 # Find system temporary directory
 require 'tmpdir'
 Dir.tmpdir
+```
+
+### StringIO
+
+```ruby
+# Watch out! If the `a`ppend mode is not specified, the string passed is overwritten!
+#
+StringIO.new("start_string", "a")
 ```
 
 ## Handling processes

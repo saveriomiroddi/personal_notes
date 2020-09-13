@@ -71,7 +71,7 @@
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
     - [Map literals (`maplit`)](#map-literals-maplit)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
-    - [Unit testing: ruspec/demonstrate](#unit-testing-ruspecdemonstrate)
+    - [Unit testing: demonstrate](#unit-testing-demonstrate)
 
 ## Cargo
 
@@ -1935,11 +1935,13 @@ macro_rules! repeated_print {
 // Since we return a value, we need to define a scope (extra curly braces).
 //
 macro_rules! ruby_hash {
-    ($( $key:expr => $value:expr ),*) => {{
-        let mut hm = HashMap::new();
-        $( hm.insert($key, $value); )*
-        hm
-    }};
+    ($( $key:expr => $value:expr ),*) => {
+        {
+            let mut hm = HashMap::new();
+            $( hm.insert($key, $value); )*
+            hm
+        }
+    };
 }
 
 // Simulate an optional parameter.
@@ -1967,10 +1969,10 @@ macro_rules! test_cpu_execute {
         $( hf: $hf_pre_value:literal => $hf_post_value:literal, )?
         $( cf: $cf_pre_value:literal => $cf_post_value:literal, )?
     ) => {
-        $( println!("zf: {} -> {}", $zf_pre_value, $zf_post_value); )*
-        $( println!("nf: {} -> {}", $nf_pre_value, $nf_post_value); )*
-        $( println!("hf: {} -> {}", $hf_pre_value, $hf_post_value); )*
-        $( println!("cf: {} -> {}", $cf_pre_value, $cf_post_value); )*
+        $( println!("zf: {} -> {}", $zf_pre_value, $zf_post_value); )?
+        $( println!("nf: {} -> {}", $nf_pre_value, $nf_post_value); )?
+        $( println!("hf: {} -> {}", $hf_pre_value, $hf_post_value); )?
+        $( println!("cf: {} -> {}", $cf_pre_value, $cf_post_value); )?
     };
 }
 ```
@@ -2650,19 +2652,14 @@ thread::spawn(move || {
 });
 ```
 
-### Unit testing: ruspec/demonstrate
-
-Both similar, although demonstrate is maintained.
-
-The difference is that demonstrate:
-
-- executes before/after in outer blocks;
-- doesn't allow strings as block arguments.
+### Unit testing: demonstrate
 
 ```rust
-use ruspec::ruspec;
+use demonstrate::demonstrate;
 
-ruspec! {
+demonstrate! {
+  use super::*;
+
   describe "test module 2" {
     before { let context = 5; }
     subject { context + 5 }
@@ -2671,14 +2668,13 @@ ruspec! {
       assert_eq!(subject, 10);
     }
 
-    context "context is 6" {
-      // Watch out! Outer blocks (before/etc) are not executed.
-      before { let context = 6; }
-
-      it "should equal 6" {
-        assert_eq!(context, 6);
+    context "context is 5" {
+      it "should equal 5" {
+        assert_eq!(context, 5);
       }
     }
   }
 }
 ```
+
+The `use super::*` is not needed in this case.

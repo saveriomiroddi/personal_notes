@@ -1,3 +1,35 @@
+## Tue Sep/15
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement instructions (via script extension): base version
+        - [x] Implement UT templates
+        - [x] Add memory testing support to assertion
+        - [x] Allow replacing the templates multiple times
+
+## Mon Sep/14
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement instructions (via script extension)
+        - [x] Implement `LD nn, n`
+        - [x] Implement `LD r1, r2`
+        - [x] Implement `LD A,n`
+          - convert `HL_location()` to `indirect_reference(register)`
+        - [x] Reimplement `NOP` as table-based
+        - [x] Implement automatic insertion in `cpu.rs`, and cargo check
+        - [x] Fix existing issues
+          - (follow up)
+          - [x] Big borrow problem
+            - [x] pass all the flags as mutable
+            - [x] convert `indirect_address()` to `compose_address()`
+            - [x] add `REGISTER_INDIRECT` operand_type
+            - [x] merge `execute_LD A, nn` into `LD r, nn`
+          - [x] Remaining changes to make the output valid
+          - [x] Update document
+
 ## Sat Sep/12
 
 - Emulation/Rust

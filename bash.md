@@ -2,6 +2,7 @@
 
 - [Bash](#bash)
   - [Shellopts](#shellopts)
+  - [Variables](#variables)
   - [Switch/case](#switchcase)
   - [Test conditions](#test-conditions)
     - [Regular expressions](#regular-expressions)
@@ -28,6 +29,7 @@
     - [Check if a script is `source`d](#check-if-a-script-is-sourced)
     - [Workaround sudo expiry during a long-running script](#workaround-sudo-expiry-during-a-long-running-script)
     - [Interesting/useful time-related functionalities](#interestinguseful-time-related-functionalities)
+    - [Poor man's configfile parser](#poor-mans-configfile-parser)
   - [Shell colors](#shell-colors)
 
 ## Shellopts
@@ -52,6 +54,25 @@ shopt -s nocasematch      # case insensitive matches
 ```
 
 See http://linuxcommand.org/lc3_man_pages/seth.html.
+
+## Variables
+
+```sh
+myvar=value                         # no spaces around equal; if value includes spaces, it must be quoted
+myvar=$myvar2                       # $myvar2 doesn't require quotes
+unset myvar                         # delete myvar
+export myvar=value                  # makes available to subshells. `local export` is allowed, but doesn't work as intended
+((var+=1))                          # increment variable value
+((var++)) || true                   # increment variable value. WATCH OUT!!! `|| true` is required if var=0 before the increment/decrement!!!!
+
+# Indirect variable referencing
+#
+declare -n myvar=var_name_ref       # bash only; watch out! `unset` will unset also the source var!
+echo ${!var_name_ref}               # bash only
+eval local myvar2=\$$var_name_ref   # works both on bash/zsh; this shows how to use local modifier
+
+myvar=$(nonexiting_command 2>&1)    # the assignment value is stdout's output; for stderr we need redirection (eg. see whiptail)
+```
 
 ## Switch/case
 
@@ -161,8 +182,8 @@ if [[ -z "$(pgrep -fa mysqld)" ]]; then mysqld & fi
 
 ```sh
 jobs                # job currently running; use tipically when `there are stopped jobs`
-kill %[-]<n>				# kill nth (1-based) job; if `-`, start from the end (-1 = last)
-kill $!					    # kill latest backgrounded job; note that "$!" is the PID of the latest background job
+kill %[-]<n>        # kill nth (1-based) job; if `-`, start from the end (-1 = last)
+kill $!              # kill latest backgrounded job; note that "$!" is the PID of the latest background job
 ```
 
 ## Cycle a string tokens based on separator (IFS)
@@ -508,6 +529,30 @@ SECONDS=0; while [[ $SECONDS -lt 10 ]]; do sleep 1; done
 
 # Wait until next beginning of second
 sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))
+```
+
+### Poor man's configfile parser
+
+Source (modified): https://stackoverflow.com/a/20815951.
+
+Supports empty lines and single-line comments; spaces around the equal sign are trimmed.
+
+```sh
+while IFS='= ' read -r key value || [[ -n $key ]]; do   # `-n`: include the last line, if it hasn't a newline
+  if [[ -n $key && ! $key =~ ^\ *# ]]; then
+    declare -g "$key"="$value"                          # `-g`: declare as global (otherwise, it's local)
+  fi
+done < "$configuration_file"
+```
+
+A useful functionality is to interpret all values starting with `$`:
+
+```sh
+    if [[ $value == \$* ]]; then
+      eval declare -g $key=$value
+    else
+      declare -g $key="$value"
+    fi
 ```
 
 ## Shell colors

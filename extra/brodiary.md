@@ -3,6 +3,23 @@
 - Emulation/Rust
   - Game Boy
     - [ ] Implementation: basic CPU
+      - [x] Implement instructions (via script extension): base version
+        - [x] Add test metadata fragments support
+        - [x] Large refactoring
+      - [ ] Implement instructions (via script extension)
+        - [x] Fill some spec data
+        - [x] Simplify tests structure and improve flags testing
+        - [ ] Add flags testing support
+
+- Extra
+  - [x] Archive past resources; update current/pool tasks
+  - [x] Search other Ruby editor, out of VSC Ruby desperation
+
+## Tue Sep/15
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
       - [ ] Implement instructions (via script extension): base version
         - [x] Implement UT templates
         - [x] Add memory testing support to assertion

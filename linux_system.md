@@ -3,6 +3,7 @@
 - [Linux system](#linux-system)
   - [Filesystems/partitions](#filesystemspartitions)
   - [Packages](#packages)
+    - [Apt/dpkg installation hooks (`etc/apt/apt.conf.d`)](#aptdpkg-installation-hooks-etcaptaptconfd)
   - [Repositories](#repositories)
     - [Keys handling](#keys-handling)
   - [Debconf](#debconf)
@@ -153,6 +154,18 @@ apt-cache policy $(dpkg --get-selections | grep -v deinstall$ | awk '{ print $1 
 #
 ppa-purge ppa:oibaf/graphics-drivers
 ```
+
+### Apt/dpkg installation hooks (`etc/apt/apt.conf.d`)
+
+Add the following to `/etc/apt/apt.conf.d/99-post-upgrade`:
+
+- `Dpkg::Post-Invoke {"command";};`: Runs for every dpkg execution (package essentially) invoked by apt
+- `APT::Update::Post-Invoke-Success {"command";};`: Run after successful apt update (**update only**)
+- `APT::Update::Post-Invoke {"command";};`: Run after apt update (independently of exit status)
+
+See [apt repository](https://salsa.debian.org/apt-team/apt.git) (search `RunScripts`).
+
+Comments can be added with `//` and `/* */`.
 
 ## Repositories
 

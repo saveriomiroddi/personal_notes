@@ -1,3 +1,17 @@
+## Wed Sep/16
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement instructions: 100% coverage of current metadata
+        - [x] Fix a couple of bugs
+        - [x] Add flags testing support
+        - [x] Improve naming, minor cleanups, and update document
+        - [x] In tests, add round brackets if indirect
+
+- Extra
+  - Fight setup new printer
+
 ## Tue Sep/15
 
 - Emulation/Rust

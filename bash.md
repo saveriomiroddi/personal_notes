@@ -72,6 +72,9 @@ echo ${!var_name_ref}               # bash only
 eval local myvar2=\$$var_name_ref   # works both on bash/zsh; this shows how to use local modifier
 
 myvar=$(nonexiting_command 2>&1)    # the assignment value is stdout's output; for stderr we need redirection (eg. see whiptail)
+
+declare -g                          # declare variable as global (eg. from a function)
+declare -x                          # export; can add to `-g`
 ```
 
 ## Switch/case
@@ -540,7 +543,7 @@ Supports empty lines and single-line comments; spaces around the equal sign are 
 ```sh
 while IFS='= ' read -r key value || [[ -n $key ]]; do   # `-n`: include the last line, if it hasn't a newline
   if [[ -n $key && ! $key =~ ^\ *# ]]; then
-    declare -g "$key"="$value"                          # `-g`: declare as global (otherwise, it's local)
+    declare -g "$key"="$value"                          # `-g`: declare as global (otherwise, it's local); add `-x` to also export them
   fi
 done < "$configuration_file"
 ```

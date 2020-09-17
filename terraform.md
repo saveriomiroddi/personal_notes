@@ -15,7 +15,7 @@
       - [`aws_iam_group`/`aws_iam_group_policy_attachment`](#aws_iam_groupaws_iam_group_policy_attachment)
       - [`aws_iam_user`/`aws_iam_user_group_membership`](#aws_iam_useraws_iam_user_group_membership)
       - [`aws_iam_account_password_policy`](#aws_iam_account_password_policy)
-      - [`aws_iam_role`/`aws_iam_role_policy_attachment`/`aws_iam_policy`](#aws_iam_roleaws_iam_role_policy_attachmentaws_iam_policy)
+      - [`aws_iam_role`/`aws_iam_role_policy_attachment`/`aws_iam_policy`/`aws_iam_group_policy`](#aws_iam_roleaws_iam_role_policy_attachmentaws_iam_policyaws_iam_group_policy)
     - [KMS/Secrets Manager](#kmssecrets-manager)
     - [Account-related](#account-related)
       - [`aws_budgets_budget`](#aws_budgets_budget)
@@ -263,7 +263,7 @@ resource "aws_iam_account_password_policy" "strict" {
 }
 ```
 
-#### `aws_iam_role`/`aws_iam_role_policy_attachment`/`aws_iam_policy`
+#### `aws_iam_role`/`aws_iam_role_policy_attachment`/`aws_iam_policy`/`aws_iam_group_policy`
 
 The attachment is non-exclusive.
 
@@ -333,6 +333,33 @@ resource "aws_iam_policy" "lambda_example_logging" {
                 "Resource": [
                     "${aws_cloudwatch_log_group.lambda_example_log_group.arn}"
                 ]
+            }
+        ]
+    }
+  JSON
+}
+```
+
+(Inline) Group policy:
+
+```hcl
+# Import ref.: group.name:group_policy.name
+#
+resource "aws_iam_group_policy" "audit_trusted_advisor" {
+  name  = "AuditTrustedAdvisor"
+  group = aws_iam_group.security_auditors.name
+
+  policy = <<-JSON
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "support:DescribeTrustedAdvisorCheckResult",
+                    "support:DescribeTrustedAdvisorChecks"
+                ],
+                "Resource": "*"
             }
         ]
     }

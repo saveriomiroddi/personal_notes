@@ -1,3 +1,14 @@
+## Thu Sep/17
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Implement instructions: 100% coverage of current metadata
+        - [x] Fix failures
+          - [x] Remove the `pre` concept from the testing API
+          - [x] Allow expressions for `mem` expectations
+        - [x] Fixup commits
+
 ## Wed Sep/16
 
 - Emulation/Rust

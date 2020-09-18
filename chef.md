@@ -10,6 +10,9 @@
     - [`bash`](#bash)
     - [`directory`](#directory)
     - [`execute`](#execute)
+    - [`line` (manual file editing)](#line-manual-file-editing)
+    - [`mount`](#mount)
+    - [`package`/`dpkg_package`](#packagedpkg_package)
     - [`remote_file`](#remote_file)
   - [Tools](#tools)
     - [Knife](#knife)
@@ -79,6 +82,8 @@ Chef::Config[:cookbook_path]      # Cookbook path, usable in recipes
 
 ## Resources
 
+The attributes, are the ones specified in the example resource, unless specified.
+
 ### `bash`
 
 ```ruby
@@ -109,6 +114,71 @@ Each command must be in an execute block, otherwise they will be all executed ev
 ```ruby
 execute "Description" do
   command "command"
+end
+```
+
+### `line` (manual file editing)
+
+If manual editing is required, **do not use Chef::Util::FileEdit** as widely suggested (see https://git.io/JURBC), instead, use this cookbook.
+
+Examples (see [repo](https://supermarket.chef.io/cookbooks/line)):
+
+```ruby
+# Append a line, if it doesn't exist; matches exactly.
+#
+append_if_no_line "title" do
+  path "/path/to/file"
+  line "exact_line_content"
+end
+
+# Replaces a line, or appends it; matches a pattern.
+#
+replace_or_add "title" do
+  path              "/path/to/file"
+  pattern           "regex.*"
+  line              "replacement"
+
+  remove_duplicates false
+  replace_only      false            # don't append, if there are no matches
+end
+```
+
+### `mount`
+
+```ruby
+# Generates:
+#
+# "fs-id:/dir /path/to/mountdir efs defaults,tls,accesspoint=fsap-id 0 0"
+#
+mount "/path/to/mountdir" do
+  device  "fs-id:/dir"
+  fstype  "efs"                               # default: `auto`
+  options "defaults,tls,accesspoint=fsap-id"
+  pass    0                                   # default: 2
+
+  action [:enable, :mount]
+end
+```
+
+### `package`/`dpkg_package`
+
+There is currently no way of installing a local deb package, and pull the dependencies (the `gdebi` cookbook does it, but it's unmaintained).
+
+```ruby
+package 'package_name' do
+  action :install                       # :purge, ...
+  version '1.3.4-2'                     # optional
+end
+
+# Version with multiple packages; it installs them faster, and has a more compact output.
+# The `version` attributes takes an Array, in this case.
+#
+package %w(package1 package2)
+```
+
+```ruby
+dpkg_package 'package_name' do
+  source '/path/to/local_filename.deb'
 end
 ```
 

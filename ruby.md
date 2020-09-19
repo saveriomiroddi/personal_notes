@@ -17,6 +17,7 @@
     - [Openstruct (ostruct)](#openstruct-ostruct)
     - [Dates](#dates)
     - [CSV](#csv)
+    - [Optparse](#optparse)
     - [open-uri](#open-uri)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
     - [StringIO](#stringio)
@@ -392,6 +393,55 @@ Utils:
 ```ruby
 CSV.read(csv_file)[0]                                     # Read headers. There is no obvious way from the API (what if the file has only headers?)
 row.to_hash.merge(row) { |_, value| value.to_s }          # Simple way to convert each row nil values to blank strings
+```
+### Optparse
+
+```ruby
+# Set default options
+options = { garbage: false, logfile: nil, volume: 1.0, is_moron: nil, crappy: true }
+
+optparse = OptionParser.new do |op|
+  op.banner = "Usage: #{File.basename(__FILE__)} [-b|--base] [-p PARAM] [-c PARAM] [-e PARAM] [-[no-]n|--[no-]negated]"
+
+  # Base form; if there is more than one param (e.g. the long version), the last array entry is the
+  # description.
+  #
+  op.on('-b', '--base', 'Base form') do
+    options[:base] = true
+  end
+
+  # With optional parameter (not enforced, due to default); upper case is not necessary.
+  #
+  op.on('-p PARAM' 'Optional param') do |param|
+    options[:param] = param || 'default_value'
+  end
+
+  # Class conversion. An Array can be passed, it takes the form 'a,b,c'
+  #
+  op.on('-c PARAM', Float, 'Converted param') do |param|
+    options[:converted] = param
+  end
+
+  # Enum params. Can be specified as symbol or string, and are passed the same
+  #
+  op.on('-e PARAM', ['yes', 'no', 'maybe']) do |param|
+    options[:enum] = param
+  end
+
+  # Negation; passes false when negated, true otherwise.
+  # When specified in long form, it's automatically activated for the short one (in this example,
+  # '-no-c').
+  #
+  op.on( '-n', '--[no-]negated' ) do |param|
+    options[:negated] = param
+  end
+end
+
+# Removes options/params from ARGV
+#
+optparse.parse!
+
+puts "Options: [#{ options.inspect }]"
 ```
 
 ### open-uri

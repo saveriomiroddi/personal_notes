@@ -48,6 +48,7 @@
       - [Interoperability with other languages (C)](#interoperability-with-other-languages-c)
     - [Macros](#macros)
       - [Rules and details](#rules-and-details)
+    - [Unions](#unions)
   - [Packaging](#packaging)
     - [Project structure](#project-structure)
     - [Modules](#modules)
@@ -335,6 +336,7 @@ u32::max(1, 2);                 // maximum between two numbers
 std::cmp::max(x, u);            // maximum between two numbers
 
 z, carry = x.overflowing_add(y); // adds and wraps around in case of overflow; <carry> is bool.
+z, carry = x.overflowing_sub(y); // subtracts and wraps around, as above
                                  // WATCH OUT! For other `overflow_` operations, `carry` may not the intuitive value, eg. for bit shift
 
 (f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
@@ -2038,6 +2040,47 @@ Interesting articles:
 
 - Tutorial: https://hub.packtpub.com/creating-macros-in-rust-tutorial
 - Case study: https://notes.iveselov.info/programming/time_it-a-case-study-in-rust-macros
+
+### Unions
+
+```rust
+// Watch out, x86 is little endian!
+//
+#[derive(Copy, Clone)]
+struct Register8Pair {
+    l: u8,
+    h: u8,
+}
+
+// `#[repr(C)]` is necessary, to ensure that all the fields start at the same location.
+//
+#[repr(C)]
+union Register16 {
+    r16: u16,
+    r8: Register8Pair,
+}
+
+let mut ax = Register16 { r16: 0xCAFE };
+
+// Access is unsafe, because it's effectively undefined behavior.
+unsafe { println!("AX:{:4X} AH:{:2X} AL:{:2X}", ax.r16, ax.r8.h, ax.r8.l) };
+
+// Unsafe is not required for writes to `Copy` union fields.
+ax.r8.l = 0xFF;
+
+// Borrowing rules still apply: the first invocation is valid, but not the second!
+//
+fn test(_r1: &mut u8, _r2: &mut u8) {}
+fn test2(_r1: &mut u16, _r2: &mut u8) {}
+unsafe { test(&mut ax.r8.h, &mut ax.r8.l) };
+unsafe { test2(&mut ax.r16, &mut ax.r8.l) };
+```
+
+Pattern matching works as usual, but exactly one field must be specified.
+
+See [reference](https://doc.rust-lang.org/reference/items/unions.html#pattern-matching-on-unions) for the so-called "tagged" unions.
+
+A proposal for ["unnamed" fields](https://rust-lang.github.io/rfcs/2102-unnamed-fields.html) has been approved, but not yet implemented.
 
 ## Packaging
 

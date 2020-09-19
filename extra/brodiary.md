@@ -1,8 +1,24 @@
+## Fri Sep/18
+
+- Extra
+  - Passenger
+    - Allow sections skipping in `passenger-mem-stats`
+      - Fight odd newlines introduced
+  - Minor discussions/searches
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] LD A, FF00 + C
+      - [x] LD FF00 + C, A
+      - [ ] Think architectural change for LDD
+
 ## Thu Sep/17
 
 - Emulation/Rust
   - Game Boy
     - [ ] Implementation: basic CPU
+      - [x] Review the manual for the correctess of the current metadata/logic
       - [x] Implement instructions: 100% coverage of current metadata
         - [x] Fix failures
           - [x] Remove the `pre` concept from the testing API

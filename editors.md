@@ -92,6 +92,7 @@ The VIM section requires some cleanup.
 `Ctrl+Alt+(select)`         start rectangular selection
 `Ctrl+Shift+(Up/Down)`   		move a line
 `Alt+Shift+2`               two columns (split screen)
+`Alt+F,E`                   open another view of the same file
 
 #### search/replace
 
@@ -111,9 +112,9 @@ Replace:
 
 Misc:
 
-`F3`                        Search Forward Using Most Recent Pattern:      
-`Shift + F3`                Search Backwards Using Most Recent Pattern:    
-`Alt + F3`                  Select All Matches Using Most Recent Pattern:  
+`F3`                        Search Forward Using Most Recent Pattern
+`Shift + F3`                Search Backwards Using Most Recent Pattern
+`Alt + F3`                  Select All Matches Using Most Recent Pattern
 
 ## Meld
 

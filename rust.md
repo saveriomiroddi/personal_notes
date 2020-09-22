@@ -64,6 +64,7 @@
     - [Blackbox (nightly)](#blackbox-nightly)
   - [Traits](#traits)
     - [Default](#default)
+    - [Copy, Clone, Drop and their relationships](#copy-clone-drop-and-their-relationships)
   - [Crates](#crates)
     - [Random (with and without `rand`)](#random-with-and-without-rand)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
@@ -2402,6 +2403,15 @@ struct SomeOptions {
 //
 SomeOptions { foo: 42, ..Default::default() };
 ```
+
+### Copy, Clone, Drop and their relationships
+
+See:
+
+- https://stackoverflow.com/questions/51704063/why-does-rust-not-allow-the-copy-and-drop-traits-on-one-type
+  - copy of `Copy` data is done via trivial `memcpy`; if drop was performed on a `Copy`+`Drop` copy, the original instance could include reference to invalid (not cleaned up) data
+- https://www.reddit.com/r/rust/comments/8laxam/why_does_copy_require_clone
+  - `Clone` is a supertrait of `Copy`
 
 ## Crates
 

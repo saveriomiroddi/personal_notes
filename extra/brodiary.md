@@ -1,3 +1,11 @@
+## Sat Sep/19
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Study (overlapping) unions - wow!!
+        - [x] understand why Copy+Clone are required
+
 ## Fri Sep/18
 
 - Extra

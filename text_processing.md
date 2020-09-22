@@ -12,6 +12,7 @@
       - [Regex extra backslash sequences](#regex-extra-backslash-sequences)
     - [Arrays](#arrays)
     - [Mathematical operations](#mathematical-operations)
+    - [Formatting/printing](#formattingprinting)
     - [Useful examples](#useful-examples)
   - [Sed](#sed)
     - [Useful examples](#useful-examples-1)
@@ -128,6 +129,12 @@ List::Util qw/sum/ -> sum(@Array)     # sum the elements of an array
 
 ```perl
 Math::Complex -> sqrt($value)         # square root (but `$value ** 0.5` works as well)
+```
+
+### Formatting/printing
+
+```perl
+printf "DB: $db, TOTAL: $total, \%:%.1f\n", 100*$db/$total  # printf formatting (`sprintf` also supported)
 ```
 
 ### Useful examples

@@ -1,3 +1,16 @@
+## Tue Sep/22
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Implement architectural change for LDD
+      - [x] Refactoring: Merge `operation_code` with `flags_code`? that's what testing does
+      - [x] Massive nightmare: Improve (now required) solution for operations involving twice the same register
+        - [x] Requires: push down the address calculation
+        - [x] Study Rust unsafe code
+        - [x] Good time to: Improve naming for operands/values
+      - [x] Move `extra` components to the respective component crates
+
 ## Sat Sep/19
 
 - Emulation/Rust

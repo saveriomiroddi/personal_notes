@@ -9,6 +9,8 @@
     - [Heredoc](#heredoc)
     - [Data type conversions](#data-type-conversions)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
+  - [Reflection](#reflection)
+    - [Pass a method as map block parameter](#pass-a-method-as-map-block-parameter)
   - [APIs/Stdlib](#apisstdlib)
     - [Array](#array)
     - [CGI/URI (encoding)](#cgiuri-encoding)
@@ -219,6 +221,16 @@ $=  $IGNORECASE                      # [ENG] obsolete: case-insensitivity flag
 RUBY_PATCHLEVEL                     # patch level (Integer)
 RUBY_VERSION                        # e.g. "2.7.0"
 __dir__                              # directory of current file
+```
+
+## Reflection
+
+### Pass a method as map block parameter
+
+```ruby
+# Invokes :mymethod on each of the `enumerable` items.
+#
+enumerable.map(&method(:mymethod))
 ```
 
 ## APIs/Stdlib

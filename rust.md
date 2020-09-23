@@ -1802,16 +1802,25 @@ Watch out! This can't be used for as a pseudo-channel, because the mutex value c
 Raw pointers:
 
 ```rust
+fn print_raw_pointers(ref_mut: *mut i32, ref_const: *const i32) {
+  unsafe {
+    println!("r1:{}, r2:{}", *ref_const, *ref_mut);
+  }
+}
+
 let mut num = 5;
 
-// Creating pointers is not (considered) unsafe.
+// Creating pointers is not unsafe - only dereferencing them.
 //
-let ref_const = &num as *const i32;
 let ref_mut = &mut num as *mut i32;
+let ref_const = &num as *const i32;
 
-unsafe {
-  println!("r1:{}, r2:{}", *ref_const, *ref_mut);
-}
+print_raw_pointers(ref_mut, ref_const);
+
+// Invalid: (currently) this can't be done, in order to work around the BC - the variable needs to be
+// declared (separately).
+//
+mymethod(&mut num, &num as *const i32);
 ```
 
 Functions:

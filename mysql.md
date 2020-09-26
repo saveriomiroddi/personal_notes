@@ -9,6 +9,7 @@
       - [Strategies](#strategies)
     - [XPath](#xpath)
   - [Window functions](#window-functions)
+    - [Define each window extent (`PARTITION BY`), and picking a row per window](#define-each-window-extent-partition-by-and-picking-a-row-per-window)
     - [Window function aggregates](#window-function-aggregates)
 
 ## Privileges
@@ -210,6 +211,8 @@ ORDER BY sales_year_week;
 When there are multiple equal windows, use named windows, otherwise, each window is evaluated separately:
 
 ```sql
+# In this example, the window is the entire rowset, as we only define the ordering.
+#
 SELECT
   id,
   LAG(id) OVER w                       `reference_sale_id`,
@@ -221,9 +224,26 @@ WHERE special_customer
 WINDOW w AS (ORDER BY id DESC)
 ```
 
+### Define each window extent (`PARTITION BY`), and picking a row per window
+
+`PARTITION BY` defines each window extent; in this case, the ordering must happen for each specific customer (id).
+
+This example is a typical application - selecting a row within a window:
+
+```sql
+WITH ordered_items AS
+(
+  SELECT id, customer_id, active, expires_on,
+         ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY active DESC, id DESC) `item_order`
+  FROM items
+  WHERE customer_id IN (1, 2, 3)
+)
+SELECT * FROM ordered_items WHERE item_order = 1;
+```
+
 ### Window function aggregates
 
-```
+```sql
 ROW_NUMBER()                         # 1-based
 LAG(@expr[, @position[, @default]])  # @position defaults to 1; @default defaults to NULL, and can be an expression (great to avoid the first NULL)
 ```

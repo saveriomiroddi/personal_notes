@@ -1,3 +1,25 @@
+## Sun Sep/27
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Simplify `FF00 + C` logic (can just compute inside the exec block!)
+        - [x] Add `indirect` attribute to JSON
+      - [x] Split generator into multiple files
+      - [x] Implement `LD SP, HL`
+      - [~] Implement `LDHL SP, n`
+
+## Sat Sep/26
+
+- Emulation/Rust
+  - Game Boy
+    - Review: https://blog.ryanlevick.com/DMG-01/public/book/introduction.html
+    - [ ] Implementation: basic CPU
+      - [x] Add LDD/LDI
+      - [x] component_sharp_lr35902: generator: Simplify logic via new, richer, class OperandType
+      - [ ] Simplify `FF00 + C` logic (can just compute inside the exec block!)
+        - [x] Basic implementation
+
 ## Wed Sep/23
 
 - Extra

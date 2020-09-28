@@ -52,7 +52,8 @@ The VIM section requires some cleanup.
 - `Alt+Shift+(↓/↑)`           Column (box) selection
 - `Alt+C`                     Search box: Match case
 - `Alt+R`                     Search box: Regex
-- `Alt+L`                     Search box: Switch to replace inside selection (after `Ctrl+H`); it doesn't support block selection
+- `Alt+L`                     Search box: Switch to replace inside selection (after `Ctrl+H`); it doesn't support block selection↵
+                              See option `Auto Find in Selection` (can be annoying).
 
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)
 - `Ctrl+.`                    Quick fix(es) code

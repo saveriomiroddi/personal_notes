@@ -254,6 +254,13 @@ let bool_as_int = true as i32;      // true: 1, false: 0
 let int_as_bool = 1 as bool;        // 1: true, 0: false, other: !!undefined!!
 ```
 
+Numeric casts:
+
+```rust
+255_u8 as u16; // 255 ("zero-extend")
+-1_i8 as u16;  // 65535 ("signed-extend")
+```
+
 SVs differ from constants:
 
 - constants can be duplicated in memory;

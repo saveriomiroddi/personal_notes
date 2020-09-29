@@ -1,3 +1,23 @@
+## Mon Sep/28
+
+- ZFS
+  - [x] Review PR
+  - [x] Update Shellcheck link (the current started breaking the build)
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement 16-bit loads
+        - [ ] Implement `LDHL SP, n` (77)
+          - [x] Handle signed immediate
+          - [x] Think general problem of `H` flag
+          - [x] Fight general problem of `uM + iN # M > n`
+            - [x] Think neat solution
+        - [ ] Support more than two registers for an operation in the implementation (*unexpected*)
+          - [x] Ask question about method design
+          - [x] Copy all the commands
+          - [x] Review alternatives to to current method design
+
 ## Sun Sep/27
 
 - Emulation/Rust
@@ -5,7 +25,7 @@
     - [ ] Implementation: basic CPU
       - [x] Simplify `FF00 + C` logic (can just compute inside the exec block!)
         - [x] Add `indirect` attribute to JSON
-      - [x] Split generator into multiple files
+      - [x] Split generator into multiple files (*unexpected*)
       - [x] Implement `LD SP, HL`
       - [~] Implement `LDHL SP, n`
 

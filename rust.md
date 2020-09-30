@@ -65,6 +65,7 @@
   - [Traits](#traits)
     - [Default](#default)
     - [Copy, Clone, Drop and their relationships](#copy-clone-drop-and-their-relationships)
+    - [Index[Mut]](#indexmut)
   - [Crates](#crates)
     - [Random (with and without `rand`)](#random-with-and-without-rand)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
@@ -2428,6 +2429,42 @@ See:
   - copy of `Copy` data is done via trivial `memcpy`; if drop was performed on a `Copy`+`Drop` copy, the original instance could include reference to invalid (not cleaned up) data
 - https://www.reddit.com/r/rust/comments/8laxam/why_does_copy_require_clone
   - `Clone` is a supertrait of `Copy`
+
+### Index[Mut]
+
+Allow convenient map-like access to a struct.
+
+```rust
+struct Registers {
+    SP: u16,
+    PC: u16,
+}
+
+impl Index<Register> for Registers {
+    type Output = u16;
+
+    fn index(&self, register: Register) -> &Self::Output {
+        match register {
+            Register::SP => &self.SP,
+            Register::PC => &self.PC,
+        }
+    }
+}
+
+impl IndexMut<Register> for Registers {
+    fn index_mut(&mut self, register: Register) -> &mut Self::Output {
+        match register {
+            Register::SP => &mut self.SP,
+            Register::PC => &mut self.PC,
+        }
+    }
+}
+
+// Access
+//
+let addr = self.registers[src_register] as usize;
+self.registers[dst_register] = 0x21;
+```
 
 ## Crates
 

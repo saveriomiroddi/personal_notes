@@ -245,5 +245,7 @@ SELECT * FROM ordered_items WHERE item_order = 1;
 
 ```sql
 ROW_NUMBER()                         # 1-based
-LAG(@expr[, @position[, @default]])  # @position defaults to 1; @default defaults to NULL, and can be an expression (great to avoid the first NULL)
+LAG(@expr[, @position[, @default]])  # value of @expr from the previous row of the frame
+                                     # @position defaults to 1; @default defaults to NULL, and can be an expression (great to avoid the first NULL)
+FIRST_VALUE(@expr)                   # value of @expr from the first row of the frame
 ```

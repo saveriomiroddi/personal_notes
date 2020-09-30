@@ -1,3 +1,17 @@
+## Tue Sep/29
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement 16-bit loads
+        - [ ] Support more than two registers for an operation in the implementation (*unexpected*)
+          - [x] Review structure with separate scopes; reply question
+          - [x] Review [`Index`/`IndexMut`](https://is.gd/bGBIJH)
+            - [x] Review: How does it workaround the borrowing rules?
+            - [x] Copy `Index[Mut]` to notes
+          - [~] New implementation with enums
+            - [x] Inspect the number and nature of register
+
 ## Mon Sep/28
 
 - ZFS

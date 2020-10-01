@@ -44,6 +44,7 @@
       - [Atomic primitive type wrappers](#atomic-primitive-type-wrappers)
       - [Barrier](#barrier)
       - [Condvar](#condvar)
+      - [Busy waiting/spin loops](#busy-waitingspin-loops)
     - [Unsafe](#unsafe)
       - [Interoperability with other languages (C)](#interoperability-with-other-languages-c)
     - [Macros](#macros)
@@ -935,7 +936,7 @@ match point {
     Point { x, y }    => println!("On neither axis: ({}, {})", x, y),
     Point { x, .. }   => {} // ignore rest of the struct
 
-    // Assign a value while testing (via `@`).
+    // "Binding": assign a value while testing, via `@`.
     //
     Point { x: x_val @ 3..=7 } => println!("Found an x in range: {}", id_variable),
 };
@@ -1803,6 +1804,14 @@ Watch out! This can't be used for as a pseudo-channel, because the mutex value c
   }
 
   handle.join();
+```
+
+#### Busy waiting/spin loops
+
+Intrinsic to use in busy waiting:
+
+```rust
+std::sync::atomic::spin_loop_hint();
 ```
 
 ### Unsafe

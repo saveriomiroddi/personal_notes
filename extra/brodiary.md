@@ -1,3 +1,15 @@
+## Wed Sep/30
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement 16-bit loads
+        - [ ] Support more than two registers for an operation in the implementation (*unexpected*)
+          - [x] New implementation with enums
+          - [x] Add instructions data generator (breaks templates generator)
+          - [x] Pseudo-Manually copy all the instruction data into metadata
+          - [x] Remove implied registers from the JSON
+
 ## Tue Sep/29
 
 - Emulation/Rust
@@ -72,6 +84,10 @@
         - [x] Study Rust unsafe code
         - [x] Good time to: Improve naming for operands/values
       - [x] Move `extra` components to the respective component crates
+      - [x] Implement `LHD A, (n)`
+      - [x] component_sharp_lr35902: generator: Generalize the operand type-based switch/case (*unexpected*)
+      - [x] Implement `LD r, nn`
+        - [x] Handle `SP` registers being split in two when passed (*unexpected*)
 
 ## Sat Sep/19
 

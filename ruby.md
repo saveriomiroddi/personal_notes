@@ -19,6 +19,7 @@
     - [Openstruct (ostruct)](#openstruct-ostruct)
     - [Dates](#dates)
     - [CSV](#csv)
+    - [JSON](#json)
     - [Optparse](#optparse)
     - [open-uri](#open-uri)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
@@ -30,6 +31,7 @@
     - [Backticks](#backticks)
   - [Misc](#misc)
     - [System](#system)
+    - [Poor man's deep_dup (deep duplicate objects)](#poor-mans-deep_dup-deep-duplicate-objects)
     - [Convert curl request to Ruby](#convert-curl-request-to-ruby)
 
 ## General syntax
@@ -307,7 +309,11 @@ stri[/regex/, idx]                                    # same as `str.match(/rege
 # in order to replace non-capturing groups with gsub, use the lookahead/behind, instead
 # of non-capturing groups:
 #
-"abc".gsub( /a(?=b)/, 'x' )		# returns 'xbc'
+"abc".gsub(/a(?=b)/, 'x')		                            # returns 'xbc'
+
+# Linux tool `tr`
+#
+"abcZHNC".tr("ZHNC", "*")                               # return "abc****"
 ```
 
 #### Encoding
@@ -406,6 +412,13 @@ Utils:
 CSV.read(csv_file)[0]                                     # Read headers. There is no obvious way from the API (what if the file has only headers?)
 row.to_hash.merge(row) { |_, value| value.to_s }          # Simple way to convert each row nil values to blank strings
 ```
+
+### JSON
+
+```ruby
+JSON.pretty_generate(input)                              # `input` can be a hash
+```
+
 ### Optparse
 
 ```ruby
@@ -579,6 +592,25 @@ Current user run dir, on Linux:
 
 ```ruby
 ENV.fetch('XDG_RUNTIME_DIR')
+```
+
+### Poor man's deep_dup (deep duplicate objects)
+
+```ruby
+def deep_dup(source)
+  case source
+  when Hash
+    source.each_with_object({}) do |(key, value), destination|
+      destination[key] = deep_dup(value)
+    end
+  when Array
+    source.map do |entry|
+      deep_dup(entry)
+    end
+  else
+    source.dup
+  end
+end
 ```
 
 ### Convert curl request to Ruby

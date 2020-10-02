@@ -89,6 +89,10 @@ length $str                             # length of a string
 # Replace with code evaluation.
 #
 perl -pe 's/(@\S+)/" " x length($1)/e'
+
+# Regex matches print the groups.
+#
+echo 'a_b_c' | perl -lne 'print /(a)_(b)_(c)/' # `abc`
 ```
 
 #### Regex extra backslash sequences

@@ -24,6 +24,7 @@
     - [open-uri](#open-uri)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
     - [StringIO](#stringio)
+    - [JSON](#json)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
     - [Using `IO.popen3`](#using-iopopen3)
@@ -512,6 +513,14 @@ Dir.tmpdir
 # Watch out! If the `a`ppend mode is not specified, the string passed is overwritten!
 #
 StringIO.new("start_string", "a")
+```
+
+### JSON
+
+```ruby
+JSON.parse(string)
+string = JSON.generate(object)
+string = JSON.pretty_generate(object)
 ```
 
 ## Handling processes

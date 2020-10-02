@@ -1,3 +1,13 @@
+## Thu Oct/01
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement 16-bit loads
+        - [ ] Support more than two registers for an operation in the implementation (*unexpected*)
+          - [x] Add the operand type to the instructions data (*unexpected*)
+          - [x] Move docs to their own directory
+
 ## Wed Sep/30
 
 - Emulation/Rust

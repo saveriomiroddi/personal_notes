@@ -5,6 +5,7 @@
   - [Mocks](#mocks)
     - [??? SECTION ???](#-section-)
     - [Arbitrary handling](#arbitrary-handling)
+  - [Testing modules](#testing-modules)
 
 ## Structure examples
 
@@ -61,3 +62,8 @@ expect(double).to receive(:msg) do |*args|
 end
 ```
 
+## Testing modules
+
+```ruby
+let(:helper) { Class.new { extend ModuleToTest } }
+```

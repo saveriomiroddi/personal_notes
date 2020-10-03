@@ -1,10 +1,23 @@
+## Fri Oct/02
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement 16-bit loads
+        - [ ] Support more than two registers for an operation in the implementation (*difficult*)
+          - [x] Instructions data: Move the operand types to the instruction level (*mistake*)
+          - [x] Simplify instructions with multiple flag outcomes (*difficult*)
+            - [x] Instructions data: Correct `SUB A, R` (and similar) (*unexpected*)
+            - [x] Move flags data to the instruction level
+          - [~] Repair templates generator
+
 ## Thu Oct/01
 
 - Emulation/Rust
   - Game Boy
     - [ ] Implementation: basic CPU
       - [ ] Implement 16-bit loads
-        - [ ] Support more than two registers for an operation in the implementation (*unexpected*)
+        - [ ] Support more than two registers for an operation in the implementation (*difficult*)
           - [x] Add the operand type to the instructions data (*unexpected*)
           - [x] Move docs to their own directory
 
@@ -14,7 +27,7 @@
   - Game Boy
     - [ ] Implementation: basic CPU
       - [ ] Implement 16-bit loads
-        - [ ] Support more than two registers for an operation in the implementation (*unexpected*)
+        - [ ] Support more than two registers for an operation in the implementation (*difficult*)
           - [x] New implementation with enums
           - [x] Add instructions data generator (breaks templates generator)
           - [x] Pseudo-Manually copy all the instruction data into metadata
@@ -26,7 +39,7 @@
   - Game Boy
     - [ ] Implementation: basic CPU
       - [ ] Implement 16-bit loads
-        - [ ] Support more than two registers for an operation in the implementation (*unexpected*)
+        - [ ] Support more than two registers for an operation in the implementation (*difficult*)
           - [x] Review structure with separate scopes; reply question
           - [x] Review [`Index`/`IndexMut`](https://is.gd/bGBIJH)
             - [x] Review: How does it workaround the borrowing rules?
@@ -49,7 +62,7 @@
           - [x] Think general problem of `H` flag
           - [x] Fight general problem of `uM + iN # M > n`
             - [x] Think neat solution
-        - [ ] Support more than two registers for an operation in the implementation (*unexpected*)
+        - [ ] Support more than two registers for an operation in the implementation (*difficult*)
           - [x] Ask question about method design
           - [x] Copy all the commands
           - [x] Review alternatives to to current method design

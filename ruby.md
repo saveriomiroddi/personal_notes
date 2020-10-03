@@ -11,12 +11,14 @@
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
   - [Reflection](#reflection)
     - [Pass a method as map block parameter](#pass-a-method-as-map-block-parameter)
+  - [Concurrency](#concurrency)
+    - [Mutex](#mutex)
+    - [Thread-safe data structures](#thread-safe-data-structures)
   - [APIs/Stdlib](#apisstdlib)
     - [Array](#array)
     - [CGI/URI (encoding)](#cgiuri-encoding)
     - [Strings](#strings)
       - [Encoding](#encoding)
-    - [Openstruct (ostruct)](#openstruct-ostruct)
     - [Dates](#dates)
     - [CSV](#csv)
     - [JSON](#json)
@@ -24,7 +26,6 @@
     - [open-uri](#open-uri)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
     - [StringIO](#stringio)
-    - [JSON](#json)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
     - [Using `IO.popen3`](#using-iopopen3)
@@ -33,6 +34,7 @@
   - [Misc](#misc)
     - [System](#system)
     - [Poor man's deep_dup (deep duplicate objects)](#poor-mans-deep_dup-deep-duplicate-objects)
+    - [Convert Hash/Array to recursive openstruct](#convert-hasharray-to-recursive-openstruct)
     - [Convert curl request to Ruby](#convert-curl-request-to-ruby)
 
 ## General syntax
@@ -236,6 +238,47 @@ __dir__                              # directory of current file
 enumerable.map(&method(:mymethod))
 ```
 
+## Concurrency
+
+### Mutex
+
+```ruby
+mutex = Mutex.new
+mutex.synchronize { }
+```
+
+### Thread-safe data structures
+
+`Queue`s are thread-safe, although very primitive.
+
+It has a `empty?` method, which is useless, since the class doesn't provide an atomic way to atomically check and pop.
+
+```ruby
+queue = Queue.new
+(0..9).each { |item| queue << item }
+
+threads = 3.times.map do |i|
+  Thread.new do
+    loop do
+      begin
+        sleep(rand * 0.1)
+
+        # param `non_block` (false): if false, blocks until an element is available; if true, raises
+        # a ThreadError if no elements are available.
+        #
+        value = queue.pop(true)
+
+        puts "Thread #{i}: #{value}"
+      rescue ThreadError
+        break
+      end
+    end
+  end
+end
+
+threads.each(&:join)
+```
+
 ## APIs/Stdlib
 
 ### Array
@@ -359,27 +402,6 @@ open(file, "w:<external_enc>"
 IO.read(filename, 'bom|utf-8')
 ```
 
-### Openstruct (ostruct)
-
-Convenient solution for converting a Hash to a recursive openstruct (including arrays), builder pattern-style:
-
-```ruby
-# Convert to a recursive openstruct (including arrays), builder pattern-style:
-#
-# Origin: https://stackoverflow.com/a/42520668.
-#
-def to_recursive_ostruct(node)
-  case node
-  when Hash
-    node.each_with_object(OpenStruct.new) { |(key, value), ostruct| ostruct[key] = to_recursive_ostruct(value) }
-  when Array
-    node.map { |item| to_recursive_ostruct(item) }
-  else
-    node
-  end
-end
-```
-
 ### Dates
 
 ```ruby
@@ -417,7 +439,9 @@ row.to_hash.merge(row) { |_, value| value.to_s }          # Simple way to conver
 ### JSON
 
 ```ruby
-JSON.pretty_generate(input)                              # `input` can be a hash
+JSON.parse(string)                                        # Returns the tree; the root object class depends on the input (eg. Array, Hash, ...)
+string = JSON.generate(input)                             # `input` can be a hash
+string = JSON.pretty_generate(input)
 ```
 
 ### Optparse
@@ -513,14 +537,6 @@ Dir.tmpdir
 # Watch out! If the `a`ppend mode is not specified, the string passed is overwritten!
 #
 StringIO.new("start_string", "a")
-```
-
-### JSON
-
-```ruby
-JSON.parse(string)
-string = JSON.generate(object)
-string = JSON.pretty_generate(object)
 ```
 
 ## Handling processes
@@ -622,6 +638,31 @@ def deep_dup(source)
 end
 ```
 
+### Convert Hash/Array to recursive openstruct
+
+Convenient solution for converting a Hash/Array to a recursive openstruct, builder pattern-style:
+
+```ruby
+def to_recursive_ostruct(node)
+  case node
+  when Hash
+    node.each_with_object(OpenStruct.new) { |(key, value), ostruct| ostruct[key] = to_recursive_ostruct(value) }
+  when Array
+    node.map { |item| to_recursive_ostruct(item) }
+  else
+    node
+  end
+end
+
+strk = to_recursive_ostruct({key: [1,2,3], key2: {subkey: 'a'}})
+strk.key           # [1,2,3]
+strk.key2.subkey   # 'a'
+strk.key2.notfound # nil
+```
+
+Original source: https://stackoverflow.com/a/42520668.
+
 ### Convert curl request to Ruby
 
 See https://jhawthorn.github.io/curl-to-ruby.
+

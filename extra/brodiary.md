@@ -1,3 +1,24 @@
+## Sat Oct/03
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement 16-bit loads
+        - [x] Support more than two registers for an operation in the implementation (*difficult*)
+          - [x] Repair templates generator
+            - [~] Use overlapping unions for registers
+              - [x] Review macros to declare the 8 bit field names, e.g. `ah`/`al`,  instead of `h`, `l`
+                - See https://is.gd/r1Fa8A
+            - [x] Complete repair
+              - [x] Per-opcode generation doesn't work anymore
+              - [x] When running in per-opcode mode, don't print the `WRITEME`
+            - [x] Some renames, to improve readability
+        - [~] Implement `LDHL SP, n` (77)
+          - [~] Find out exact semantics of `H` flag, and dependency on `N`
+        - [x] Implement `LD (nn), SP`
+          - [x] Add support for testing an array of memory to the testing APIs (*difficult*)
+            - Fight macro/passing array reference
+
 ## Fri Oct/02
 
 - Emulation/Rust

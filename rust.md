@@ -604,7 +604,7 @@ vec.push(CsvRow::Float(2.0));
 Slices apply to arrays as well:
 
 ```rust
-let array = [8u32; 5];
+let array = [8u32; 5];          // type is [u32; _]
 let slice = &array[..];         // type is `&[u32]`
 ```
 
@@ -1958,6 +1958,15 @@ macro_rules! repeated_print {
     ($( $name:expr ),*) => {
       $( println!("Hey {}", $name); )*
     };
+}
+
+// This way repeats only the expressions.
+//
+macro_rules! build_and_print_array {
+  ($( $item:expr ),*) => {
+    let myvec = vec![$( $item ),*];
+    println!("{:?}", myvec);
+  };
 }
 
 // Accepts expressions with the Ruby hash (rocket) syntax.

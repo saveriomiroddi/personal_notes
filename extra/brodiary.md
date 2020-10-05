@@ -1,3 +1,13 @@
+## Sun Oct/04
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Fix new testing issues
+      - [x] Testing framework improvements
+        - [x] Allow multiple tests per testing flag type
+        - [x] Allow tests skipping (*unexpected*)
+
 ## Sat Oct/03
 
 - Emulation/Rust

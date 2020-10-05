@@ -8,6 +8,7 @@
     - [Ampersand prefix operator `&<object>`](#ampersand-prefix-operator-object)
     - [Heredoc](#heredoc)
     - [Data type conversions](#data-type-conversions)
+    - [Collections destructuring in blocks](#collections-destructuring-in-blocks)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
   - [Reflection](#reflection)
     - [Pass a method as map block parameter](#pass-a-method-as-map-block-parameter)
@@ -184,6 +185,18 @@ See https://idiosyncratic-ruby.com/49-what-the-format.html for `printf`-style fo
 There is a gem, `bitarray`, however, it's not so much better than just using a string (bits = `"0" * 8`) for generic work, as it doesn't even support bit operations like `OR`.
 
 Another gem, `bitset`, is very functional, but it's old, and needs to be checked.
+
+### Collections destructuring in blocks
+
+Destructure an array in blocks ("unpacking" refers to arrays):
+
+```ruby
+# "key:a, b:1, c:2" !!!
+#
+{a: {b: 1, c: 2}}.each do |key, b:, c: nil| # default provided for :c
+  puts "key:#{key}, b:#{b}, c:#{c}"
+end
+```
 
 ## Special variables/Built-in constants
 

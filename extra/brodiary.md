@@ -1,8 +1,37 @@
+## Mon Oct/05
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement signed/carry operations
+        - [x] Make 100% sure that `c` flag can be bit 8 or 16, depending on context (review emulators)
+          - !!! Different for each case !!!
+          - `ADD HL, BC` (0x09)
+            - `SameBoy/Core/sm83_cpu.c:470`
+            - `visualboyadvance-m/src/gb/gbCodes.h:1235`
+        - [x] Study exactly `carry` (out/in) and `overflow` flags (and `borrow`)
+          - [x] carry/overflow: http://teaching.idallen.com/dat2343/10f/notes/040_overflow.txt
+            - overflow: sign changed in signed operation
+          - [x] carry formula: https://stackoverflow.com/q/62006764 + https://stackoverflow.com/q/20494087
+          - [x] carry in<>out: https://www.quora.com/What-does-carry-in-and-carry-out-mean-in-electronics
+            - in/out: just the wiring of the ports
+        - [x] Review half/carry implementation in common GB emulator
+        - [x] Remove dead method set_flags(), and also not needed `compose_address()`
+        - [x] Convert flags to register (*unexpected*)
+          - [x] Fight flag/lifetimes in Index
+        - [ ] Correct half/carry implementation (*unexpected*)
+          - [x] Automate half/carry implementation
+            - [x] Flags: change definition: `null`, `true`, `false`, `<n>` -> position for carry
+          - [x] `INC r`
+          - [~] Correct existing implementations
+
 ## Sun Oct/04
 
 - Emulation/Rust
   - Game Boy
     - [ ] Implementation: basic CPU
+      - [ ] Implement 16-bit loads
+        - [x] Review half/carry implementation in common GB emulator
       - [x] Fix new testing issues
       - [x] Testing framework improvements
         - [x] Allow multiple tests per testing flag type

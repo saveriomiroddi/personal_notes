@@ -1,3 +1,24 @@
+## Tue Oct/06
+
+- ZFS
+  - [x] Test and release keyboard layout issue
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Correct half/carry implementation (*unexpected*)
+        - [x] Add carry metadata to `opcodes_data_integration.rb`
+          - [x] Add `instructions.json` carry metadata integration
+        - [x] Correct existing implementations
+        - [x] Complete automatic flags code generation
+      - [x] Move immediates decoding from the execution to the decoding
+      - [ ] Registers algorithmic decoding possible implementation (*unexpected*)
+        - [x] Review
+        - [x] Think of generator/cpu architectural differences
+      - [x] Allow tests skipping: lost commit!?
+      - [ ] Implement 16-bit loads
+        - [x] `LDHL SP, n`
+
 ## Mon Oct/05
 
 - Emulation/Rust

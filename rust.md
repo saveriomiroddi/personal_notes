@@ -259,8 +259,11 @@ let int_as_bool = 1 as bool;        // 1: true, 0: false, other: !!undefined!!
 Numeric casts:
 
 ```rust
-255_u8 as u16; // 255 ("zero-extend")
--1_i8 as u16;  // 65535 ("signed-extend")
+0xFF_u8 as u16; // 0x00FF ("zero-extend")
+  -1_i8 as u16;  // 0xFFFF ("signed-extend")
+
+0xFF_u8 as i16;         // WATCH OUT!!: 0x00FF
+(0xFF_u8 as i8) as i16; // 0xFFFF
 ```
 
 SVs differ from constants:

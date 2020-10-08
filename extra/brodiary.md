@@ -1,3 +1,14 @@
+## Wed Oct/07
+
+- Extra
+  - [x] Test workaround for VSC viewport jumping issue (https://git.io/JUxB1)
+  - [x] Report
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Further review algorithmic decoding
+
 ## Tue Oct/06
 
 - ZFS

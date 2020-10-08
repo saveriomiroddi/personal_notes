@@ -23,6 +23,7 @@
     - [Dates](#dates)
     - [CSV](#csv)
     - [JSON](#json)
+    - [YAML/Psych](#yamlpsych)
     - [Optparse](#optparse)
     - [open-uri](#open-uri)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
@@ -455,6 +456,19 @@ row.to_hash.merge(row) { |_, value| value.to_s }          # Simple way to conver
 JSON.parse(string)                                        # Returns the tree; the root object class depends on the input (eg. Array, Hash, ...)
 string = JSON.generate(input)                             # `input` can be a hash
 string = JSON.pretty_generate(input)
+```
+
+### YAML/Psych
+
+The `yaml` library is actually an alias for `psych`.
+
+```ruby
+YAML.load_file(filename)
+YAML.load(string)         # Parse into Ruby objects
+object.to_yaml            # Dump convenience
+
+YAML.parse(string)        # Parse into Psych objects
+YAML.dump(object)
 ```
 
 ### Optparse

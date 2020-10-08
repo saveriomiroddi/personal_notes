@@ -1,3 +1,15 @@
+## Thu Oct/08
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Implement 16-bit loads
+        - [x] PUSH rr
+        - [x] POP rr
+      - [ ] Implement 8-bit ALU
+        - [~] ADD A, r
+          - Fight bug with carry on the 8th bit with 8-bit operands
+
 ## Wed Oct/07
 
 - Extra

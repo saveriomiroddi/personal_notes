@@ -354,7 +354,8 @@ z, carry = x.overflowing_sub(y); // subtracts and wraps around, as above
 
 (f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
 0_u32.to_be_bytes();            // convert big endian u32 to array of bytes
-u32::from_le_bytes(&[u8])       // convert big endian array of bytes to u32
+u32::from_le_bytes([u8; _])                   // convert big endian array of bytes to u32
+u32::from_le_bytes(&[u8].try_into().unwrap()) // same, from slice; requires `std::convert::TryInto`
 ```
 
 ### Closures/Functions

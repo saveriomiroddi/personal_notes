@@ -6,7 +6,9 @@
     - [Variables](#variables)
     - [Predefined variables](#predefined-variables)
     - [Strings](#strings)
+    - [Maps](#maps)
     - [Functions](#functions)
+    - [Iteration](#iteration)
   - [State operations](#state-operations)
     - [Move resources from one statefile to another](#move-resources-from-one-statefile-to-another)
   - [Resources](#resources)
@@ -135,6 +137,18 @@ path.module     # path of the current module
   EOF
 ```
 
+### Maps
+
+```hcl
+mymap = {
+  "k1" = "v1"
+  "k2" = "v2"
+}
+
+mymap["k2"]               # "v2"
+lookup(mymap, "k3", "v3") # "v3"
+```
+
 ### Functions
 
 ```hcl
@@ -144,6 +158,7 @@ element(list, index)
 length(collection)
 split(separator, string)      # split a string into a list
 join(separator, list)         # join a list
+lookup(map, "key", "default") # use a default value on map access
 
 # String
 
@@ -159,6 +174,20 @@ jsondecode(string)
 
 file(filename)       # read a file into a string
 filebase64(filename) # read a file into a string, converting it to base64
+
+# Other
+
+coalesce(v1, v2)         # IFNULL; blank string is treated as null
+coalesce(["", "v2"]...)  # unpack operator
+```
+
+### Iteration
+
+```hcl
+# Inside a resource/module; the variable is a map
+#
+for_each = var.project
+name     = "web-server-sg-${each.key}-${each.value.environment}"
 ```
 
 ## State operations

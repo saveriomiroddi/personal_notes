@@ -1,3 +1,22 @@
+## Fri Oct/09
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Remove unused (and broken) functionality to set custom PC
+        - may be required, if so, will add in correct form
+      - [ ] Implement 8-bit ALU
+        - [x] ADD A, r
+          - [x] Correct flag automatic generation (in execution)
+        - [x] ADD A, (HL)
+        - [x] ADD A, n
+        - [x] ADC A, r
+        - [x] ADC A, (HL)
+        - [x] ADC A, n
+        - [x] SUB A, r
+        - [x] SUB A, (HL)
+        - [x] SUB A, n
+
 ## Thu Oct/08
 
 - Emulation/Rust

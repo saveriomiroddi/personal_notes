@@ -541,7 +541,7 @@ let my_list = [true; 4];                // 4 elements initialized as true; won't
 let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
 let mut my_list: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
 
-my_list[512..].copy_from_slice(&source) // memcpy (copy) from/to slices/vectors; source/dest size must be the same!
+my_list[512..512 + source.len()].copy_from_slice(&source) // memcpy (copy) from/to slices/vectors; source/dest size must be the same!
 my_list.fill(value)                     // memset; unstable as of Aug/2020
 
 // invocation: process_list(&my_list)

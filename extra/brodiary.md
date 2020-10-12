@@ -1,3 +1,24 @@
+## Sun Oct/11
+
+- [x] Extra: Test Ripcord
+
+- Training/CS+Rust
+  - Hands-On Data Structures and Algorithms in Rust
+    - [x] Setup repository
+    - [x] Fix source material st00pid warnings
+    - [x] Separate implementation into modules
+    - [x] Write macro for unit testing (and add UTs)
+      - Fight variable scoping
+      - Fight module scoping
+    - [x] Improve merge sorting, and clear the old implementations
+    - [x] Section 2
+      - [x] Quicksort
+      - [x] Quicksort with pseudo random
+      - [x] Threaded quicksort
+      - [x] Rayon/work stealing
+      - [x] Dynamic programming
+      - [x] Test
+
 ## Fri Oct/09
 
 - Emulation/Rust

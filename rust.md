@@ -49,6 +49,7 @@
       - [Interoperability with other languages (C)](#interoperability-with-other-languages-c)
     - [Macros](#macros)
       - [Rules and details](#rules-and-details)
+      - [Importing](#importing)
     - [Unions](#unions)
   - [Packaging](#packaging)
     - [Project structure](#project-structure)
@@ -75,7 +76,9 @@
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
     - [Map literals (`maplit`)](#map-literals-maplit)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
-    - [Unit testing: demonstrate](#unit-testing-demonstrate)
+    - [Unit testing (`demonstrate`)](#unit-testing-demonstrate)
+    - [Allow initializing static constants with any function (`lazy_static`)](#allow-initializing-static-constants-with-any-function-lazy_static)
+    - [Concurrency (multithreading) tools (`rayon`/`crossbeam`)](#concurrency-multithreading-tools-rayoncrossbeam)
 
 ## Cargo
 
@@ -567,26 +570,34 @@ vec.last();
 
 vec.push(1);                            // Push at the end
 vec.pop();                              // Pop from the end
-vec.swap(pos1, pos2);
+
 vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) a list
 vec.extend(&[1, 2, 3]);                 // Append (borrowing version)
 vec[range].copy_from_slice(&source);    // memcpy; see array example
-(sl1, sl2) = vec.split_at(split_point); // immutably split an array, into two slices
-vec2 = vec.split_off(split_point);      // mutably split an array: the second half is removed from `vec` and returned as new array
-
-vec.len();
-vec.iter();                             // iterator
-
-// Pattern matching!
-match v.get(2) {
-  Some(entry) => println!("The third element is {}", entry),
-  None => println!("There is no third element."),
-}
 
 // Vectors can be received as array reference type (mutable, if required).
 //
 fn process_list<T>(list: &[T]) {};
 process_list(&vec);
+```
+
+Common methods:
+
+```rust
+vec.swap(pos1, pos2);
+
+// Splitting
+(sl1, sl2) = coll.split_at(split_point);     // immutable
+(sl1, sl2) = coll.split_at_mut(split_point); // mutable: the two arrays are subarrays of the source
+coll2 = coll.split_off(split_point);         // mutable: the returned (sub)array is removed from the source
+
+vec.len();
+vec.iter();                             // iterator
+
+// Sorting (destructive!)
+vec.sort();                             // stable
+vec.sort_by_key(|e| e.abs());           // stable, by key!
+vec.sort_unstable();                    // unstable (typically faster than stable)
 ```
 
 Arrays implement the `Debug` trait.
@@ -864,10 +875,14 @@ let value = method()?;
 
 // Convenient pattern
 //
-method.unwrap_or_else( |err | {
+result.unwrap_or_else( |err | {
   println!("Problem parsing arguments: {}", err);
   std::process::exit(1);
 });
+
+// Use this is one is sure that there can't be an error.
+//
+result.ok();
 
 // take(): extract a value and replace with None:
 //
@@ -1193,7 +1208,7 @@ Box::new(NullLogger {});                    // type = Box<NullLogger>
 Box::new(NullLogger {}) as Box<dyn Logger>; // type = Box<dyn Logger>
 ```
 
-Supertraits are traits depending on other traits:
+Supertraits are traits depending on other traits. `X` is a supertrait of `Y` means that `Y` must implement `X` (this "super" as higher in a tree).
 
 ```rust
 // Example using default implementation.
@@ -1658,6 +1673,8 @@ let handle = thread::spawn(move || {
 handle.join().unwrap();
 ```
 
+If there are serious problems with lifetimes (eg. recursively passing references), use concurrent toolkits (see concurrency tools section).
+
 #### Channels: Multiple Producers Single Consumer
 
 For SPMC, see crate [bus](#channels-single-producer-multiple-consumers-bus), although it can be emulated with multiple channels.
@@ -2053,6 +2070,27 @@ macro_rules! call_on_self {
         $self.$F()
     };
 }
+
+// Receive a statement; use a variable defined inside the macro
+//
+macro_rules! test_sort {
+  ($collection:ident, $stat:stmt) => {
+      #[cfg(test)]
+      mod tests {
+          use super::*;
+
+          #[test]
+          fn test_sort() {
+              let mut $collection = &mut vec![3, 2, 1];
+              $stat
+              let expected_collection = &vec![1, 2, 3];
+              assert_eq!($collection, expected_collection);
+          }
+      }
+  };
+}
+
+test_sort!(collection, bubble_sort(collection));
 ```
 
 #### Rules and details
@@ -2080,6 +2118,28 @@ Interesting articles:
 
 - Tutorial: https://hub.packtpub.com/creating-macros-in-rust-tutorial
 - Case study: https://notes.iveselov.info/programming/time_it-a-case-study-in-rust-macros
+
+#### Importing
+
+Sample of importing macros across files:
+
+```rust
+// helpers.rs
+//
+#[macro_export]
+macro_rules! test_sort {}
+
+// main.rs
+//
+mod helpers;
+
+// tests.rs
+//
+use crate::test_sort;
+test_sort!(collection, bubble_sort(collection));
+```
+
+Macros are pulled in the main scope, so the `use` must not be followed by the macro enclosing module (`helpers`).
 
 ### Unions
 
@@ -2512,6 +2572,7 @@ With crate:
 // Simplest way
 //
 let rand_byte: u8 = rand::random();
+let rand_i = rand::thread_rng().gen_range(0, 10);
 
 // Use thread_rng
 // `thread_rng()`: seeded by the O/S; local to the current thread.
@@ -2780,7 +2841,7 @@ thread::spawn(move || {
 });
 ```
 
-### Unit testing: demonstrate
+### Unit testing (`demonstrate`)
 
 ```rust
 use demonstrate::demonstrate;
@@ -2806,3 +2867,31 @@ demonstrate! {
 ```
 
 The `use super::*` is not needed in this case.
+
+### Allow initializing static constants with any function (`lazy_static`)
+
+```rust
+lazy_static::lazy_static! {
+  static ref RG: Mutex<RandGen> = Mutex::new(RandGen::new(34052));
+}
+```
+
+### Concurrency (multithreading) tools (`rayon`/`crossbeam`)
+
+Easy parallel iteration!!!:
+
+```rust
+use rayon::prelude::*;
+
+array.par_iter()
+     .map(|&i| i * i)
+     .sum()
+```
+
+Both Rayon and [Crossbeam](https://github.com/crossbeam-rs/crossbeam) provide tools for concurrent programming:
+
+```rust
+// Threads pooling. Queue size is chosen automatically based on cores.
+//
+rayon::join(|| quicksort(a), || quicksort(&mut b[1..]))
+```

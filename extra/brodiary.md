@@ -1,3 +1,18 @@
+## Mon Oct/12
+
+- Study macros: https://danielkeep.github.io/quick-intro-to-macros.html
+  - [x] hygiene
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [~] Testing: Extend to all registers, include `[A]F`, and simplify
+        - The refactoring has been driven by the required addition of the `[A]F` registers support, which was causing way too much logic to be duplicated
+        - Additional logic is required due to handling of flag register <> individual flag by the macro (*unexpected*)
+        - [x] Refactor: use cycles (required new crate) to test registers
+        - [x] Add remaining registers, including `[A]F`
+      - [¬] Implement forgotten: POP AF
+
 ## Sun Oct/11
 
 - [x] Extra: Test Ripcord

@@ -1,3 +1,18 @@
+## Tue Oct/13
+
+- [x] Add `strum` to notes
+
+- [~] Terraform: issue raised about Java
+  - [x] write a test executor
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Significant testing APIs extension and simplification
+        - Fight design
+        - Sad drop of implicit register expectations
+      - [x] Implement forgotten: POP AF
+
 ## Mon Oct/12
 
 - Study macros: https://danielkeep.github.io/quick-intro-to-macros.html

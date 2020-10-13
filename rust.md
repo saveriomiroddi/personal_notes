@@ -79,6 +79,7 @@
     - [Unit testing (`demonstrate`)](#unit-testing-demonstrate)
     - [Allow initializing static constants with any function (`lazy_static`)](#allow-initializing-static-constants-with-any-function-lazy_static)
     - [Concurrency (multithreading) tools (`rayon`/`crossbeam`)](#concurrency-multithreading-tools-rayoncrossbeam)
+    - [Enum utils, e.g. iterate (`strum`)](#enum-utils-eg-iterate-strum)
 
 ## Cargo
 
@@ -656,6 +657,10 @@ map.get("a");                   // Option
 let key = String::from("abc");
 map.insert(key, 20);
 println!("{}", key)
+
+// Iterate a map
+//
+for (book, review) in &book_reviews { /* ... */ };
 ```
 
 Conveniences:
@@ -671,7 +676,7 @@ let scores: HashMap<_, _> = teams
 
 In order to use enums as keys, annotate them with `#[derive(Eq, PartialEq, Hash)]`.
 
-Map literals are not supported. See the maplit crate.
+Map literals are not supported. See the `maplit` crate.
 
 ### Strings
 
@@ -854,6 +859,8 @@ let home = IpAddr::V4(127, 0, 0, 1);
 fn route(ip_kind: IpAddrKind) { }
 ```
 
+Enums can't be iterated. See `strum` crate for this purpose.
+
 ### Option<T>/Result<T, Error>
 
 Foundation of Rust. In order to use the contained value, we must extract (and test) it.
@@ -892,10 +899,11 @@ x == None;
 y == Some(2);
 ```
 
-
 See next section for pattern matching.
 
 ### Pattern matching
+
+(for testing a value directly, one can use `value.is_none()`/`value.is_some()`).
 
 ```rust
 // Generic match
@@ -2894,4 +2902,24 @@ Both Rayon and [Crossbeam](https://github.com/crossbeam-rs/crossbeam) provide to
 // Threads pooling. Queue size is chosen automatically based on cores.
 //
 rayon::join(|| quicksort(a), || quicksort(&mut b[1..]))
+```
+
+### Enum utils, e.g. iterate (`strum`)
+
+```rust
+// include both `strum` and `strum_macros`.
+
+use strum_macros::EnumIter;
+
+#[derive(Copy, Clone, Debug, EnumIter)]
+pub enum Flag {
+  z,
+  n,
+  h,
+  c,
+}
+
+use strum::IntoEnumIterator;
+
+for flag in Flag::iter() { /* ... */ }
 ```

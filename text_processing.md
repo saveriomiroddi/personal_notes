@@ -4,9 +4,9 @@
   - [Perl](#perl)
     - [Syntax](#syntax)
     - [Commandline args](#commandline-args)
-    - [General concepts](#general-concepts)
-      - [Line numbers/Position-based operations](#line-numbersposition-based-operations)
-      - [Priority](#priority)
+    - [Line numbers/Position-based operations](#line-numbersposition-based-operations)
+    - [Priority](#priority)
+    - [Data types and conversions](#data-types-and-conversions)
     - [Predefined functions](#predefined-functions)
     - [Search/replace](#searchreplace)
       - [Regex extra backslash sequences](#regex-extra-backslash-sequences)
@@ -42,9 +42,7 @@ CONDITION ? TRUE_BRANCH : FALSE_BRANCH
 
 - `-0`: use null character as line separator
 
-### General concepts
-
-#### Line numbers/Position-based operations
+### Line numbers/Position-based operations
 
 ```sh
 # Insert at specific positions (line number):
@@ -64,7 +62,7 @@ printf "0\n1\n2" | perl -pe '$_ .= "abc\n" if /1/'        # print after a match;
 printf "0\n0\n0" | perl -pe '$_ .= "abc\n" if /0/ && ++$cnt == 2'  # 2nd occurrence of the pattern (!!) => 0 0 abc 0
 ```
 
-#### Priority
+### Priority
 
 Watch out the priority!!!
 
@@ -75,6 +73,14 @@ printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline && print $line'
 # Prints "Line 1" and "Line 2"
 printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline and print $line'
 printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line'
+```
+
+### Data types and conversions
+
+```sh
+# Regex matches and boolean true conditions, evaluate to 1
+$counter += /matching_line/
+$counter += ($match != "1")
 ```
 
 ### Predefined functions

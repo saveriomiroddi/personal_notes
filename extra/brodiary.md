@@ -1,3 +1,22 @@
+## Wed Oct/14
+
+- Training/CS+Rust
+  - Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 3
+      - [~] Creating a Linked List
+      - [~] Viewing Data in Both Directions with Doubly Linked Lists
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [ ] Implement 8-bit ALU
+        - [x] Tests generator: Improve tests skipping (*unexpected*)
+          - Testing SBC A, A got difficult with the existing logic
+          - Update existing tests
+        - [x] SBC A, r
+        - [x] SBC A, (HL)
+          - Fight H flag semantic mistake in test
+
 ## Tue Oct/13
 
 - [x] Add `strum` to notes

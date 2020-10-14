@@ -3,13 +3,15 @@
 - [Bash](#bash)
   - [Shellopts](#shellopts)
   - [Variables](#variables)
+  - [Strings](#strings)
+  - [Herestrings/Heredocs (+stdin handling)](#herestringsheredocs-stdin-handling)
   - [Switch/case](#switchcase)
   - [Test conditions](#test-conditions)
     - [Regular expressions](#regular-expressions)
     - [Applications](#applications)
   - [Jobs management](#jobs-management)
   - [Cycle a string tokens based on separator (IFS)](#cycle-a-string-tokens-based-on-separator-ifs)
-  - [String operations](#string-operations)
+  - [String functions](#string-functions)
     - [Examples](#examples)
   - [printf/escaping](#printfescaping)
   - [Arithmetic operations](#arithmetic-operations)
@@ -75,6 +77,71 @@ myvar=$(nonexiting_command 2>&1)    # the assignment value is stdout's output; f
 
 declare -g                          # declare variable as global (eg. from a function)
 declare -x                          # export; can add to `-g`
+```
+
+## Strings
+
+```sh
+# Interpret new lines!. It won't be interpolated when inside double quotes.
+#
+echo $'l\'s\n'          # prints `l's` and newline
+```
+
+## Herestrings/Heredocs (+stdin handling)
+
+Herestring: Bash alternative for "echo X | command", with the difference that it doesn't create a subshell.  
+WATCH OUT: it adds a newline, which in some cases is undesirable.
+
+```sh
+command <<< X
+```
+
+Heredoc:
+
+```sh
+# The heredoc data is sent to stdin - it's not a parameter!
+#
+ruby -ne 'puts $_' <<STR
+$this_is_interpolated
+STR
+
+ruby -ne 'puts $_' <<'STR'
+$this_is_not_interpolated
+STR
+
+# Indentation. WATCH OUT! The prefix is tabs, not spaces!!
+#
+  ruby -ne 'puts $_' <<-STR
+    can be indented
+  STR # <-- prefix this with tabs
+```
+
+Assignment/passing:
+
+```sh
+# Check if stdin/heredoc is passed.
+# WATCH OUT this is timing-based, so it won't work for anything that sends data with a delay.
+#
+if read -t 0; then ...; fi
+
+# Assign stdin to a variable 
+# `read -r`: don't interpret backslashes.
+#
+read -r <var_name>           # single line
+<var_name>="$(</dev/stdin)"  # multi-line, but will block if there is no input!
+<var_name>="$(cat)"          # (same)
+
+# Assign heredoc to variable; will lose indentation.
+# See: https://stackoverflow.com/questions/1167746/how-to-assign-a-heredoc-value-to-a-variable-in-bash
+#
+read -r -d '' body <<STR
+{
+  "title": "$1",
+  "body": "$2",
+  "head": "$head",
+  "base": "master"
+}
+STR
 ```
 
 ## Switch/case
@@ -213,7 +280,7 @@ while IFS= read -r token; do : done <<< $input
 
 it doesn't work as intended for this purpose.
 
-## String operations
+## String functions
 
 Substitutions generally have the single (single operator) or global (double operator) version; where this is the case, the global version is presented.
 
@@ -262,11 +329,15 @@ printf "%q" "$str"                # escape a string
 ## Arithmetic operations
 
 ```sh
-(( <expr> ))                      # if <expr> == 0, evaluates to false!
-let param=<expr>                  # if <expr> == 0, evaluates to false!
+(( <expr> ))                      # preferred form
+let param=<expr>                  # alternative
+
+a=$((a++))                        # numerical values don't need `$`
+((a+=1))                          # `+=` for numbers
+a+=1                              # WRONG!!! this is a string operation
 ```
 
-**Important**: arithmetic operations will cause exit if they evaluate to 0 and the `errexit` shellopt is set:
+WATCH OUT: arithmetic operations will cause exit if they evaluate to 0 and the `errexit` shellopt is set (also applies to `let`):
 
 ```sh
 (( val ))                         # exits if `val` is 0

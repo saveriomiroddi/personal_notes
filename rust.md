@@ -891,7 +891,8 @@ result.unwrap_or_else( |err | {
 //
 result.ok();
 
-// take(): extract a value and replace with None:
+// take(): extract a value and replace with None.
+// This is useful when we want to move out an instance that doesn't implement Copy.
 //
 let mut x = Some(2);
 let y = x.take();
@@ -1618,7 +1619,7 @@ let _c = Parent(Rc::new(RefCell::new(3)), Rc::clone(&a));
 
 Full tree data structure, with nodes pointing both to children and parents. The problem is that if we don't use weak references, there will be circular references (therefore leaks) because of parents pointing to children, and viceversa.
 
-It's important to always thing who is the owner. A parent ultimately owns the children - if the former is dropped, the children should be dropped too; therefore, the parent reference should be weak.
+It's important to always think who is the owner. A parent ultimately owns the children - if the former is dropped, the children should be dropped too; therefore, the parent reference should be weak.
 
 In order to access a `Weak<T>` value, call `upgrade() -> Option<T>`.
 

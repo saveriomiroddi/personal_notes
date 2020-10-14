@@ -8,6 +8,7 @@
   - [xargs](#xargs)
   - [rsync](#rsync)
   - [mkfifo](#mkfifo)
+  - [Files](#files)
   - [Processes](#processes)
     - [Parallel execution](#parallel-execution)
       - [Using GNU Parallel](#using-gnu-parallel)
@@ -181,6 +182,12 @@ echo -n > /tmp/fifo &
 
 echo "<$(cat /tmp/fifo)>"
 # <>
+```
+
+## Files
+
+```sh
+mktemp --suffix="${filename##*.}"     # Create a temporary filename (using the extension of $filename)
 ```
 
 ## Processes
@@ -381,7 +388,7 @@ printf $'passwd' | gpg --command-fd 0 --edit-key $key_id   # remove passphrase -
 --keyserver $keyserver_address --search-key $key_id  # search key, by email, on a keyserver
 ```
 
-**IMPORTANT** GnuPG private keys are composed of a "master" and a "subordinate" key. Both are necessary. If for some reason, a master key is missing the `sec` entry in the listings will show as `sec#`.
+WATCH OUT GnuPG private keys are composed of a "master" and a "subordinate" key. Both are necessary. If for some reason, a master key is missing the `sec` entry in the listings will show as `sec#`.
 
 Snippets:
 
@@ -395,7 +402,7 @@ find . -name *.log.gz | xargs -I {} gpg -r phony@recipient.com [--output {}.xxx]
 
 Key servers are surprisingly terrible (timeouts, usability, correct practices...).
 
-**IMPORTANT**: once a key has been published, the master key is required in order to replace an existing public key; without it, nothing can be done, aside waiting for the expiry.
+WATCH OUT: once a key has been published, the master key is required in order to replace an existing public key; without it, nothing can be done, aside waiting for the expiry.
 
 The best choice is [The HKPS pool](http://hkps.pool.sks-keyservers.net) (see [Stack Overflow](https://superuser.com/a/228033)).
 

@@ -1,3 +1,12 @@
+## Sat Oct/17
+
+- Training/CS+Rust
+  - Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 3
+      - [ ] Creating a Linked List
+        - [~] Fight borrow checker, day 2
+      - [~] Viewing Data in Both Directions with Doubly Linked Lists
+
 ## Fri Oct/16
 
 - Training/CS+Rust

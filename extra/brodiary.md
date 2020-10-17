@@ -1,3 +1,45 @@
+## Thu Oct/15
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Implement 8-bit ALU
+        - [x] SBC A, n
+          - Add to metadata (it's missing in the reference document)
+        - [x] AND A, r
+          - [x] Correct missing false/true case in h/c flags code generation
+        - [x] AND A, (HL)
+        - [x] AND A, n
+        - [x] OR A, r
+        - [x] OR A, (HL)
+        - [x] OR A, n
+        - [x] XOR A, r
+        - [x] XOR A, (HL)
+        - [x] XOR A, n
+        - [x] CP A, r
+          - [x] Fix missing carry position data in `CP` instructions
+        - [x] CP A, (HL)
+        - [x] CP A, n
+        - [x] DEC r
+        - [x] DEC (HL)
+      - [x] Implement 16-bit arithmetic
+        - [x] ADD HL, rr
+        - [x] ADD SP, n
+        - [x] INC rr
+        - [x] DEC rr
+      - [x] Add support for prefixed instructions
+        - [x] Convert metadata prefix format (*improvable*)
+          - Could have thought better
+      - [ ] Implement Miscellaneous
+        - [x] SWAP r
+
+- Training/CS+Rust
+  - Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 3
+      - [ ] Creating a Linked List
+        - [~] Exercise
+        - [~] Fight borrow checker
+
 ## Wed Oct/14
 
 - Training/CS+Rust

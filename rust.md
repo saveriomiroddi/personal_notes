@@ -630,6 +630,8 @@ See the [ownership chapter](#ownership), for the related properties.
 
 The default hashing function is cryptographically secure!!. For faster versions, must use a crate.
 
+WATCH OUT! In order to avoid BCK headaches when getting and setting in the same scope/function, use the [Entry API](https://stackoverflow.com/a/28512504/210029) (see below).
+
 ```rust
 use std::collections::HashMap;
 
@@ -638,11 +640,11 @@ let mut map = HashMap::new();
 map.insert("b", 10);
 map.insert("b", 10);            // Overwrites the existing value
 
-// `entry()` gets the value for in-place modification.
+// Entry API: `entry()` gets the value for in-place modification.
 // `or_insert()` sets the given value if the key doesn't exist; its return value can be used to
 // modify the value in-place.
 //
-let entry = map.entry("b").or_insert(50);
+let entry = map.entry(key).or_insert(50);
 *entry = 100;
 
 // Getters use references.

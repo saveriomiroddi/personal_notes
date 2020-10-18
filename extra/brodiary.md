@@ -3,9 +3,42 @@
 - Training/CS+Rust
   - Hands-On Data Structures and Algorithms in Rust
     - [ ] Section 3
-      - [ ] Creating a Linked List
-        - [~] Fight borrow checker, day 2
-      - [~] Viewing Data in Both Directions with Doubly Linked Lists
+      - [x] Creating a Linked List
+        - [x] Fight borrow checker: found solution
+        - [x] Exercise
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Implement Miscellaneous
+        - [x] SWAP (HL)
+        - [x] DAA
+        - [x] CPL
+        - [x] CCF
+        - [x] SCF
+
+- Rust
+  - Understand borrow checker issue
+    - [x] https://stackoverflow.com/questions/50251487/what-are-non-lexical-lifetimes
+      - non-lexical lifetimes
+        - [x] https://stackoverflow.com/questions/32300132/why-cant-i-store-a-value-and-a-reference-to-that-value-in-the-same-struct
+          - rental
+            - [ ] https://stackoverflow.com/questions/50496879/returning-a-rwlockreadguard-independently-from-a-method
+            - [ ] https://stackoverflow.com/questions/51664098/how-can-i-return-an-iterator-over-a-locked-struct-member-in-rust
+            - [ ] https://stackoverflow.com/questions/40095383/how-to-return-a-reference-to-a-sub-value-of-a-value-that-is-under-a-mutex
+            - [ ] https://stackoverflow.com/questions/43702185/how-do-i-store-a-result-using-serde-zero-copy-deserialization-of-a-futures-enabl
+            - [ ] https://stackoverflow.com/questions/49300618/how-to-store-a-reference-without-having-to-deal-with-lifetimes
+        - [x] https://stackoverflow.com/questions/38023871/returning-a-reference-from-a-hashmap-or-vec-causes-a-borrow-to-last-beyond-the-s
+          - lifetime-related container issues
+            - [ ] https://stackoverflow.com/questions/50519147/double-mutable-borrow-error-in-a-loop-happens-even-with-nll-on
+            - [ ] https://stackoverflow.com/questions/50440074/when-is-it-necessary-to-circumvent-rusts-borrow-checker
+        - [x] https://stackoverflow.com/questions/32761524/why-does-hashmapget-mut-take-ownership-of-the-map-for-the-rest-of-the-scope
+        - [x] https://stackoverflow.com/questions/41187296/cannot-borrow-as-immutable-because-it-is-also-borrowed-as-mutable-in-function-ar
+        - [x] https://stackoverflow.com/questions/47395171/how-to-update-or-insert-on-a-vec
+        - [x] https://stackoverflow.com/questions/41601197/is-there-a-way-to-release-a-binding-before-it-goes-out-of-scope
+          - [x] https://stackoverflow.com/questions/30243606/why-is-a-borrow-still-held-in-the-else-block-of-an-if-let
+            - [x] https://bluss.github.io/rust/fun/2015/10/11/stuff-the-identity-function-does/
+        - [x] https://stackoverflow.com/questions/37986640/cannot-obtain-a-mutable-reference-when-iterating-a-recursive-structure-cannot-b
 
 ## Fri Oct/16
 
@@ -13,7 +46,7 @@
   - Hands-On Data Structures and Algorithms in Rust
     - [ ] Section 3
       - [ ] Creating a Linked List
-        - [~] Fight borrow checker, day 2
+        - [x] Fight borrow checker, day 2
           - [x] Ask on forum
       - [~] Viewing Data in Both Directions with Doubly Linked Lists
 

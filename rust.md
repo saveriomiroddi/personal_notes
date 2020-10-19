@@ -355,9 +355,12 @@ std::cmp::max(x, u);            // maximum between two numbers
 z, carry = x.overflowing_add(y); // adds and wraps around in case of overflow; <carry> is bool.
 z, carry = x.overflowing_sub(y); // subtracts and wraps around, as above
                                  // WATCH OUT! For other `overflow_` operations, `carry` may not the intuitive value, eg. for bit shift
+z = x.rotate_left(y);
+(_, _) = x.overflowing_shl(y);   // WATCH OUT! This is not the intuitive 1-bit left shift - Rust doesn't have it predefined; for that,
+                                 // manually compute the carry, then execute `wrapping_shl()`. Alternatively, override the shift operator.
 
-(f * 100.0).round() / 100.0;    // round to specific number of decimals (ugly!!; also see #printing)
-0_u32.to_be_bytes();            // convert big endian u32 to array of bytes
+(f * 100.0).round() / 100.0;     // round to specific number of decimals (ugly!!; also see #printing)
+0_u32.to_be_bytes();             // convert big endian u32 to array of bytes
 u32::from_le_bytes([u8; _])                   // convert big endian array of bytes to u32
 u32::from_le_bytes(&[u8].try_into().unwrap()) // same, from slice; requires `std::convert::TryInto`
 ```
@@ -1623,8 +1626,6 @@ Full tree data structure, with nodes pointing both to children and parents. The 
 
 It's important to always think who is the owner. A parent ultimately owns the children - if the former is dropped, the children should be dropped too; therefore, the parent reference should be weak.
 
-In order to access a `Weak<T>` value, call `upgrade() -> Option<T>`.
-
 ```rust
 use std::cell::RefCell;
 use std::rc::{Rc, Weak};
@@ -1642,14 +1643,21 @@ let leaf = Rc::new(Node {
     children: RefCell::new(vec![]),
 });
 
+// In order to access a `Weak<T>` value, call `upgrade() -> Option<T>`.
+//
 println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
 
+// Can also invoke `Rc#clone()` rather than `Rc::clone()`.
+//
 let branch = Rc::new(Node {
     value: 5,
     parent: RefCell::new(Weak::new()),
     children: RefCell::new(vec![Rc::clone(&leaf)]),
 });
 
+// In order to change the content of a `Rc<RefCell>`, use `borrow_mut()`.
+// Can't instantiate `Weak` with a reference; must use `Rc::downgrade()`.
+//
 *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
 
 println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());

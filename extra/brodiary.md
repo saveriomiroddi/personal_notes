@@ -1,3 +1,67 @@
+## Sun Oct/18
+
+- Emulation/Rust
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Discussion about feasibility of non-ROM-based automated testing
+      - [x] Implement Rotates & Shifts
+        - All: manual `cf`; no `hf`
+        - [x] RLCA
+        - [x] RLA
+          - [x] Tests generator: Order flag expectations (*unexpected*)
+            - The automation in the test generation is proving confusing, although this was a simple addition.
+        - [x] RRCA
+        - [x] RRA
+        - [x] RLC r
+          - [x] Open upstream fix PR
+          - [x] Add RLCA data transform, and regenerate metadata
+        - [x] RLC (HL)
+        - [x] RL r
+          - [x] Check if there is the same issue of RLCA and fix
+            - [x] Scan opcodes: other three found
+              - [x] Fix
+            - [x] Update Issue/PR
+            - [x] Regenerate data + fix UTs
+          - [x] Brief check documentation (gekkio); test Latex editors
+        - [x] RL (HL)
+        - [x] RRC r
+        - [X] RRC (HL)
+        - [x] RR r
+        - [x] RR (HL)
+        - [x] SLA r
+        - [x] SLA (HL)
+        - [x] SRA r
+        - [x] SRA (HL)
+        - [x] SRL r
+        - [x] SRL (HL)
+      - [x] Implement Bit Opcodes
+        - [x] BIT n, r
+        - [x] BIT n, (HL)
+        - [x] SET n, r
+        - [x] SET n, (HL)
+        - [x] RES n, r
+        - [x] RES n, (HL)
+      - [x] Implement Jumps
+        - [x] Add support for manually specifying the PC expectation (*expected*)
+        - [x] Add support for `cc` condition (*expected*)
+        - [x] JP nn
+        - [x] JP cc, nn
+        - [x] JP (HL)
+        - [x] JR n
+        - [x] JR cc, n
+      - [ ] Implement Calls
+        - [x] CALL nn
+
+- Blog
+  - [x] Discuss tcl/tk libraries version with reader
+
+- Training/CS+Rust
+  - Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 3
+      - [~] Viewing Data in Both Directions with Doubly Linked Lists
+        - [x] Implement `push_front()`
+        - [x] Massive fight against iterating the `Rc/RefCell` references
+
 ## Sat Oct/17
 
 - Training/CS+Rust
@@ -18,20 +82,11 @@
         - [x] SCF
 
 - Rust
-  - Understand borrow checker issue
+  - [~] Understand BCK issue with linked list iterative traversal
     - [x] https://stackoverflow.com/questions/50251487/what-are-non-lexical-lifetimes
       - non-lexical lifetimes
         - [x] https://stackoverflow.com/questions/32300132/why-cant-i-store-a-value-and-a-reference-to-that-value-in-the-same-struct
-          - rental
-            - [ ] https://stackoverflow.com/questions/50496879/returning-a-rwlockreadguard-independently-from-a-method
-            - [ ] https://stackoverflow.com/questions/51664098/how-can-i-return-an-iterator-over-a-locked-struct-member-in-rust
-            - [ ] https://stackoverflow.com/questions/40095383/how-to-return-a-reference-to-a-sub-value-of-a-value-that-is-under-a-mutex
-            - [ ] https://stackoverflow.com/questions/43702185/how-do-i-store-a-result-using-serde-zero-copy-deserialization-of-a-futures-enabl
-            - [ ] https://stackoverflow.com/questions/49300618/how-to-store-a-reference-without-having-to-deal-with-lifetimes
         - [x] https://stackoverflow.com/questions/38023871/returning-a-reference-from-a-hashmap-or-vec-causes-a-borrow-to-last-beyond-the-s
-          - lifetime-related container issues
-            - [ ] https://stackoverflow.com/questions/50519147/double-mutable-borrow-error-in-a-loop-happens-even-with-nll-on
-            - [ ] https://stackoverflow.com/questions/50440074/when-is-it-necessary-to-circumvent-rusts-borrow-checker
         - [x] https://stackoverflow.com/questions/32761524/why-does-hashmapget-mut-take-ownership-of-the-map-for-the-rest-of-the-scope
         - [x] https://stackoverflow.com/questions/41187296/cannot-borrow-as-immutable-because-it-is-also-borrowed-as-mutable-in-function-ar
         - [x] https://stackoverflow.com/questions/47395171/how-to-update-or-insert-on-a-vec

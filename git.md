@@ -1,6 +1,7 @@
 # Git
 
 - [Git](#git)
+  - [General concepts](#general-concepts)
   - [Log](#log)
     - [More complex examples](#more-complex-examples)
   - [Format](#format)
@@ -11,6 +12,12 @@
   - [Informations gathering](#informations-gathering)
   - [Ignoring](#ignoring)
   - [Batch operations  (message/tree filtering)](#batch-operations-messagetree-filtering)
+
+## General concepts
+
+```sh
+HEAD~$n                             # reference to HEAD minus $n (0 is also valid, and it refers to HEAD)
+```
 
 ## Log
 

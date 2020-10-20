@@ -76,7 +76,7 @@
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
     - [Map literals (`maplit`)](#map-literals-maplit)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
-    - [Unit testing (`demonstrate`)](#unit-testing-demonstrate)
+    - [Unit testing](#unit-testing)
     - [Allow initializing static constants with any function (`lazy_static`)](#allow-initializing-static-constants-with-any-function-lazy_static)
     - [Concurrency (multithreading) tools (`rayon`/`crossbeam`)](#concurrency-multithreading-tools-rayoncrossbeam)
     - [Enum utils, e.g. iterate (`strum`)](#enum-utils-eg-iterate-strum)
@@ -113,6 +113,13 @@ edition = "2018"
 [[bin]]
 name = "play"
 path = "src/play.rs"
+
+[[test]]
+harness = false # Allow Cucumber to print output instead of libtest
+name = "cucumber"
+
+[dev-dependencies]
+cucumber = {package = "cucumber_rust", version = "^0.7.0"}
 
 [dependencies]
 rand = "0.7.3"
@@ -832,7 +839,7 @@ Definition:
 // Each entry is called "variant".
 //
 // - `Debug`: allows printing (also required by asserts);
-// - `PartialEq`: allows comparison with asserts;
+// - `PartialEq`: allows comparison with asserts; floats implement this, because NaN != NaN.
 // - `Eq`: good practice to implement if applies.
 //
 #[derive(Debug, PartialEq, Eq)]
@@ -930,7 +937,7 @@ let xxx = match val {
 match message {
   Message::Move{x, y} => { self.position = Point { x: x, y: y } }
   Message::Echo(s) => { self.echo(s) }
-  Message::ChangeColor(c1, c2, c3) => { self.color = (c1, c2, c3) }
+  Message::ChangeColor(c1, c2, c3) => { self.color = (c1, c2, c3) } // enum of tuple struct
   Message::Publish(Message(message)) => {} // nested!
   Message::None(_) => {}                   // ignore content
 }
@@ -2216,7 +2223,7 @@ Multiple crates can be put in `src/bin`:
 
 - `src/bin/mycrate.rs` -> binary crate (named `mycrate`)
 
-Alternative configuration for multiple crates, via `cargo.toml`:
+Alternative configuration for multiple crates, via `Cargo.toml`:
 
 ```toml
 # Array of tables -> there can be multiple.
@@ -2860,12 +2867,13 @@ thread::spawn(move || {
 });
 ```
 
-### Unit testing (`demonstrate`)
+### Unit testing
 
 ```rust
 use demonstrate::demonstrate;
 
 demonstrate! {
+  // Not needed in this case; here for reference.
   use super::*;
 
   describe "test module 2" {
@@ -2885,7 +2893,12 @@ demonstrate! {
 }
 ```
 
-The `use super::*` is not needed in this case.
+```rust
+// assert_float_eq: nice, but doesn't support messages
+//
+assert_float_absolute_eq!(3.0, 3.0);      # default epsilon = 1e-6
+assert_float_absolute_eq!(3.0, 3.9, 1.0);
+```
 
 ### Allow initializing static constants with any function (`lazy_static`)
 

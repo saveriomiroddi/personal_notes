@@ -149,7 +149,12 @@ printf "DB: $db, TOTAL: $total, \%:%.1f\n", 100*$db/$total  # printf formatting 
 
 ### Useful examples
 
-Strip trailing file spaces: `chomp if eof`.
+Strip trailing file spaces:
+
+```sh
+perl -pe 'chomp if eof'    # only last whitespace
+perl -0777 -pe 's/\s+$//'  # all the whitespaces
+```
 
 Print part of line if there is a match:
 

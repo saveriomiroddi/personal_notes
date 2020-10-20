@@ -1,3 +1,18 @@
+## Mon Oct/19
+
+- Ray tracer challenge
+  - [ ] Chapter 1
+    - [x] First couple of exercises
+      - [x] Try cucumber
+      - [x] Search crate with assertions for floats
+
+- Extra
+  - Tooling
+    - git: configure aliases for copying commit titles/messages at relative HEAD positions
+  - Community
+    - [x] Add `cucumber-rust` to Awesome Rust
+    - [x] Report/fix `cubumber-rust` improper badge
+
 ## Sun Oct/18
 
 - Emulation/Rust

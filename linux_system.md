@@ -13,7 +13,10 @@
     - [Shell (initscripts)](#shell-initscripts)
       - [Example cases](#example-cases)
       - [sudo -i, login shell test, and bash](#sudo--i-login-shell-test-and-bash)
-  - [Systemctl](#systemctl)
+  - [Systemd](#systemd)
+    - [Systemctl](#systemctl)
+    - [sournalctl](#sournalctl)
+  - [Configuring a unit](#configuring-a-unit)
   - [fstab](#fstab)
   - [Terminal emulator](#terminal-emulator)
   - [Desktop Environment: windows](#desktop-environment-windows)
@@ -356,12 +359,81 @@ Bash options:
 -l, --login : Make bash act as if it had been invoked as a login shell (see INVOCATION below).
 ```
 
-## Systemctl
+## Systemd
 
-List everything (with their states), including timers:
+### Systemctl
 
 ```sh
-systemctl -a
+systemctl enable $service           # execute on boot
+systemctl start $service            # start immediately
+
+systemctl disable $service.service    # disable a systemd service autostart
+systemctl --failed                    # show units that failed to start
+systemctl --all                       # list everything (with their states), including timers
+```
+
+### sournalctl
+
+```sh
+journalctl --pager-end --unit=$service.service     # show unit log; `page-end`: go to end
+journalctl --vacuum-time=1d                        # clean systemd journal (/var/log/journal)
+```
+
+## Configuring a unit
+
+See:
+
+- https://www.freedesktop.org/software/systemd/man/systemd.service.html
+- https://www.freedesktop.org/software/systemd/man/systemd.kill.html
+
+Almost all the entries are optional.
+
+```sh
+cat > /etc/systemd/system/myservice.service <<UNIT
+[Unit]
+Description=My Service
+
+After=network.target
+
+[Service]
+# If ExecStart is specified (and `BusName` not specified), `simple` is implicit.
+# Use `forking` when the process forks (e.g. nmon).
+#
+Type=simple
+
+# Convenient.
+#
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=my-service
+
+User=app
+Group=app
+
+WorkingDirectory=/path/to/base_dir
+
+Environment=BUNDLE_GEMFILE=/path/to/Gemfile
+Environment=RAILS_ENV=my_rail_env
+
+ExecStart=/usr/bin/bundle exec my_command
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Other options: `mixed`, `process`, `none`
+# Better not to specify, unless required.
+#
+KillMode=control-group
+
+# Other options: `no` (default), `on-failure`, ...
+#
+Restart=always
+
+[Install]
+# Generally, this is the setting.
+#
+WantedBy=multi-user.target
+UNIT
+
+# now enable and start
 ```
 
 ## fstab

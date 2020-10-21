@@ -1,3 +1,21 @@
+## Tue Oct/20
+
+- Ray tracer challenge
+  - [ ] Chapter 1
+    - [x] Complete theory
+
+- Emulation
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Implement Calls
+        - [x] Add new category of testing for conditional jumps
+          - [x] Simplify previous tests
+          - Adding the conditional jumps support was expected, however not this little tricky part
+        - [x] CALL cc, nn
+      - [x] Implement Restarts
+        - [x] RST n
+          - [x] Handle address not encoded as parameter, but in the opcode (*unexpected*)
+
 ## Mon Oct/19
 
 - Ray tracer challenge

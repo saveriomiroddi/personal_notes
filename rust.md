@@ -1309,6 +1309,13 @@ Point(10) + Point(20)
 Point(10) + BigPoint(1)
 ```
 
+Some operators:
+
+- `std::ops::Add`: `self.add` -> `Output`
+- `std::ops::Sub`: `self.sub` -> `Output`
+- `PartialEq`: `&self.eq`
+- `std::ops::Neg`: `self.neg` -> `Output` (unary negation)
+
 ### [Static] Methods
 
 Methods definition (essentially, struct functions)

@@ -131,12 +131,22 @@ With tilde, also allows delimiter to be anywhere:
   EOF
 ```
 
-Syntax for passing to a method:
+Special syntaxes:
 
 ```ruby
+# Pass to a method
+#
 StringIO.new(<<~HEADER, "a")
   myheader
 HEADER
+
+# Apply a condition (for cases where parentheses are required)
+#
+{
+  expectations: (<<~RUST if condition_matching)
+    cond
+  RUST
+}
 ```
 
 ### Data type conversions

@@ -253,7 +253,8 @@ if [[ -z "$(pgrep -fa mysqld)" ]]; then mysqld & fi
 ```sh
 jobs                # job currently running; use tipically when `there are stopped jobs`
 kill %[-]<n>        # kill nth (1-based) job; if `-`, start from the end (-1 = last)
-kill $!              # kill latest backgrounded job; note that "$!" is the PID of the latest background job
+kill $!             # kill latest backgrounded job; note that "$!" is the PID of the latest background job
+wait $pid           # wait for the process to finish; if no $pid is provided, all the baground jobs are waited
 ```
 
 ## Cycle a string tokens based on separator (IFS)

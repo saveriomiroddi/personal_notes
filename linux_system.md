@@ -13,6 +13,7 @@
     - [Shell (initscripts)](#shell-initscripts)
       - [Example cases](#example-cases)
       - [sudo -i, login shell test, and bash](#sudo--i-login-shell-test-and-bash)
+  - [Cron](#cron)
   - [Systemd](#systemd)
     - [Systemctl](#systemctl)
     - [sournalctl](#sournalctl)
@@ -359,13 +360,28 @@ Bash options:
 -l, --login : Make bash act as if it had been invoked as a login shell (see INVOCATION below).
 ```
 
+## Cron
+
+Cron doesn't need to be restarted when files are changed.
+
+Note that besides the `/etc/cron*` files/dirs, there are also files in the locations `/var/spool/cron/crontabs/$user`.
+
+User operation:
+
+```sh
+crontab -l   # list
+crontab -e   # edit
+crontab -d   # delete
+```
+
 ## Systemd
 
 ### Systemctl
 
 ```sh
-systemctl enable $service           # execute on boot
-systemctl start $service            # start immediately
+systemctl enable $service             # execute on boot
+systemctl start $service              # start immediately
+systemctl daemon-reload               # invoke this after updating a unit
 
 systemctl disable $service.service    # disable a systemd service autostart
 systemctl --failed                    # show units that failed to start
@@ -389,6 +405,10 @@ See:
 Almost all the entries are optional.
 
 ```sh
+# If entries need escaping, use double quotes, but not slashes. In at least the `ExecStart` entry, if,
+# for example, a space is escaped with a slash, both the slash and the space will be part of the string
+# (!).
+#
 cat > /etc/systemd/system/myservice.service <<UNIT
 [Unit]
 Description=My Service

@@ -1,3 +1,16 @@
+## Wed Oct/21
+
+- Ray tracer challenge
+  - [x] Chapter 1
+    - [x] Complete library exercises
+      - [x] Correct the exercises to use tuples/vectors/points according to the test specs!
+    - [x] Split in crates (`library`, `practice`)
+    - [x] Practice exercise
+    - [x] Think about separating Vector/Point types
+      - [x] Review Subclassing in Rust
+        - [x] Deprecated trait objects
+      - [x] Make conclusion
+
 ## Tue Oct/20
 
 - Ray tracer challenge

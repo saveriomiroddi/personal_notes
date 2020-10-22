@@ -8,12 +8,14 @@
     - [Available variables](#available-variables)
   - [Resources](#resources)
     - [`bash`](#bash)
+    - [`cron`](#cron)
     - [`directory`](#directory)
     - [`execute`](#execute)
     - [`line` (manual file editing)](#line-manual-file-editing)
     - [`mount`](#mount)
     - [`package`/`dpkg_package`](#packagedpkg_package)
     - [`remote_file`](#remote_file)
+    - [`systemd_unit`](#systemd_unit)
   - [Tools](#tools)
     - [Knife](#knife)
 
@@ -94,13 +96,37 @@ bash 'extract_module' do
 end
 ```
 
+### `cron`
+
+```ruby
+cron default["aws_monitoring"]["nmon_cron_filename"] do
+  command          String
+
+  minute           Integer, String         # default value: "*"
+  hour             Integer, String         # default value: "*"
+  day              Integer, String         # default value: "*"
+  month            Integer, String         # default value: "*"
+  weekday          Integer, String, Symbol # default value: "*"
+
+  user             String                  # default value: "root"
+
+  environment      Hash
+  home             String
+  mailto           String
+  path             String
+  shell            String
+  time             Symbol
+  time_out         Hash
+end
+```
+
 ### `directory`
 
 Watch out! One can't use two resources with the same name, for creation and (cleanup-time) deletion, as they will at least cause problems with notifications.
 
 ```ruby
 directory '/etc/apache2' do
-  mode      '0755'
+  mode      '0755'        # default = 0777 + umask -> typically 0755; if recursive, the permission are applied to the entire created tree
   recursive false         # If true and :create, owner/group apply only to the leaf!
   action    :create       # :delete (don't forget :recursive=true!)
 end
@@ -187,6 +213,38 @@ end
 ```ruby
 remote_file local_tarball_filename do
   source node[:mysql_server][:tarball_uri]
+end
+```
+
+### `systemd_unit`
+
+```ruby
+systemd_unit 'nmon.service' do
+  content <<~UNIT
+    [Unit]
+    Description=Nmon system stats recording
+
+    [Service]
+    Type=forking
+
+    StandardOutput=syslog
+    StandardError=syslog
+    SyslogIdentifier=nmon
+
+    ExecStart=$nmon_location -F #{node[:monitoring][:nmon_stats_file]} -s #{node[:monitoring][:nmon_collection_interval]}
+    ExecReload=/bin/kill -HUP $MAINPID
+
+    Restart=on-failure
+
+    [Install]
+    WantedBy=multi-user.target
+  UNIT
+
+  # Systemd can be overly strict when verifying units, so in certain cases it is preferable not to verify the unit.
+  #
+  verify false
+
+  action [:create, :enable, :reload_or_restart]
 end
 ```
 

@@ -20,12 +20,14 @@
     - [CGI/URI (encoding)](#cgiuri-encoding)
     - [Strings](#strings)
       - [Encoding](#encoding)
-    - [Dates](#dates)
+    - [Date/time](#datetime)
+      - [Date/time parsing](#datetime-parsing)
     - [CSV](#csv)
     - [JSON](#json)
     - [YAML/Psych](#yamlpsych)
     - [Optparse](#optparse)
     - [open-uri](#open-uri)
+    - [Dir](#dir)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
     - [StringIO](#stringio)
   - [Handling processes](#handling-processes)
@@ -426,11 +428,60 @@ open(file, "w:<external_enc>"
 IO.read(filename, 'bom|utf-8')
 ```
 
-### Dates
+### Date/time
 
 ```ruby
 @date >> @months; @date << @months                        # Adds/subtracts months to a date (!!)
 @date.next_month(@months=1), @date.prev_month(@months=1)  # More readable; also supports `day`, `year`
+```
+
+#### Date/time parsing
+
+- `%a`: The abbreviated weekday name ('Sun')
+- `%A`: The full weekday name ('Sunday')
+- `%b`: The abbreviated month name ('Jan')
+- `%B`: The full month name ('January')
+- `%c`: The preferred local date and time representation
+- `%d`: Day of the month (01..31)
+- `%H`: Hour of the day, 24-hour clock (00..23)
+- `%I`: Hour of the day, 12-hour clock (01..12)
+- `%j`: Day of the year (001..366)
+- `%L`: Millisecond of the second (000..999)
+- `%N`: Fractional seconds digits, default is 9 digits (nanosecond)
+  - `%3N`: millisecond (3 digits)
+  - `%6N`: microsecond (6 digits)
+  - `%9N`: nanosecond (9 digits)
+  - `%12N`: picosecond (12 digits)
+- `%m`: Month of the year (01..12)
+- `%M`: Minute of the hour (00..59)
+- `%p`: Meridian indicator ('AM' or 'PM')
+- `%S`: Second of the minute (00..60)
+- `%U`: Week number of the current year,starting with the first Sunday as the first day of the first week (00..53)
+- `%W`: Week number of the current year, starting with the first Monday as the first day of the first week (00..53)
+- `%w`: Day of the week (Sunday is 0, 0..6)
+- `%x`: Preferred representation for the date alone, no time
+- `%X`: Preferred representation for the time alone, no date
+- `%y`: Year without a century (00..99)
+- `%Y`: Year with century
+- `%z`: Time zone as hour and minute offset from UTC (+0900)
+  - `%:z`: hour and minute offset from UTC with a colon (+09:00)
+  - `%::z`: hour, minute and second offset from UTC (+09:00:00)
+- `%Z`: Time zone name (CEST)
+- `%%`: Literal ``%'' character
+
+Combinations:
+
+- `%F`: The ISO 8601 date format (%Y-%m-%d)
+- `%R`: 24-hour time (%H:%M)
+- `%T`: 24-hour time (%H:%M:%S)
+
+Examples:
+
+```ruby
+'%F %T'             # 2008-12-31 01:23:45
+'%a %b %d %T %Z %Y' # Wed May 02 01:23:45 GMT 2014
+'%m/%d/%y %I:%M %p' # 10/31/09 01:23 PM
+'%YT%T%:z'          # 2014T14:20:54+00:00 (json format)
 ```
 
 ### CSV
@@ -537,6 +588,12 @@ Open files/download http content; automatically detects the appropriate class fo
 
 ```ruby
 open('http://cippa-lippa').read
+```
+
+### Dir
+
+```ruby
+File.dirname(path)                              # Parent dir
 ```
 
 ### Tempfile, Tmpdir

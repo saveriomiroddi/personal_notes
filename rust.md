@@ -123,6 +123,7 @@ cucumber = {package = "cucumber_rust", version = "^0.7.0"}
 
 [dependencies]
 rand = "0.7.3"
+redisish = {path = "../redisish"}   # Relative dependency
 
 [profile.release]
 strip = "symbols"
@@ -137,9 +138,6 @@ Using cargo from root requires the member name; otherwise, each member can be tr
 
 [workspace]
 members = ["playground", "rust_programming_by_example"]
-
-[dependencies]
-redisish = {path = "../redisish"}   # Relative dependency
 ```
 
 Versioning is pessimistic by default.
@@ -1097,7 +1095,7 @@ pub struct Article {
   pub text: String,
 }
 
-// Traits can be imlemented only if the trait or the type are local to the crate!
+// Traits can be implemented only if the trait or the type are local to the crate!
 // This way, one doesn't find "surprises" from other crates.
 //
 impl Summary for Article {
@@ -1202,6 +1200,8 @@ Dynamic dispatch version. components needs to be declared as `Vec<Box<dyn Draw>>
 pub trait Draw { fn draw(&self); }
 
 pub struct Screen {
+  // Previously, this could be defined as `Vec<&Draw>`, which is now deprecated.
+  //
   pub components: Vec<Box<dyn Draw>>,
 }
 impl Screen { pub fn run(&self) {} }
@@ -1307,12 +1307,21 @@ impl Add<BigPoint> for Point {
 
 Point(10) + Point(20)
 Point(10) + BigPoint(1)
+
+// Overload operations.
+//
+impl Mul<f64> for Tuple {
+    type Output = Tuple;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Tuple(self.0 * rhs, self.1 * rhs, self.2 * rhs, self.3 * rhs)
+    }
+}
 ```
 
 Some operators:
 
-- `std::ops::Add`: `self.add` -> `Output`
-- `std::ops::Sub`: `self.sub` -> `Output`
+- `std::ops::Add/Sub/Mul/Div`: `self.add`, etc -> `Output`
 - `PartialEq`: `&self.eq`
 - `std::ops::Neg`: `self.neg` -> `Output` (unary negation)
 

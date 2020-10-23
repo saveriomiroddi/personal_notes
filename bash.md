@@ -518,9 +518,9 @@ Execute a (explicit) command on exit; generally convenient to trap ERR and INT:
 ```sh
 LOCKFILE=/var/lock/makewhatis.lock
 
-# Explicit command form:
+# Explicit command form. WATCH OUT! Use single outer quotes, otherwise the content is interpolated!
 #
-trap "{ rm -f $LOCKFILE; }" ERR INT EXIT
+trap '{ rm -f $LOCKFILE; }' ERR INT EXIT
 
 # Function form:
 #

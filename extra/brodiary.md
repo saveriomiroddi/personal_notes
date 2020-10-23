@@ -1,4 +1,25 @@
+## Thu Oct/22
+
+- Blog
+  - [x] Article: Monitoring EC2 CPU Steal time on AWS instances
+  - [x] Ruby Tk bindings article: Update to Ubuntu 20.04
+
+- Emulation
+  - Game Boy
+    - [ ] Implementation: basic CPU
+      - [x] Implement Returns
+        - [x] RET
+        - [x] RET cc, nn
+    - [x] Cleanup and merge current state
+    - [ ] Implementation: basic CPU
+      - [ ] Remaining instructions
+        - [ ] Extend test framework to accommodate interrupts testing (*expected*)
+          - [x] Design
+
 ## Wed Oct/21
+
+- Blog
+  - [~] Article: Monitoring EC2 CPU Steal time on AWS instances
 
 - Ray tracer challenge
   - [x] Chapter 1

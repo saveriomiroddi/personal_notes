@@ -402,7 +402,7 @@ See:
 - https://www.freedesktop.org/software/systemd/man/systemd.service.html
 - https://www.freedesktop.org/software/systemd/man/systemd.kill.html
 
-Almost all the entries are optional.
+Almost all the entries are optional. Escaping is not standard; in order to escape, use `systemd-escape`.
 
 ```sh
 # If entries need escaping, use double quotes, but not slashes. In at least the `ExecStart` entry, if,

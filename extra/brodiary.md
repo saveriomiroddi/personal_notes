@@ -1,3 +1,19 @@
+## Fri Oct/23
+
+- Training/CS+Rust
+  - Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 3
+      - [ ] Viewing Data in Both Directions with Doubly Linked Lists
+        - [x] Re-study `Rc/RefCell`
+          - https://stackoverflow.com/questions/57367092/what-is-the-difference-between-rcrefcellt-and-refcellrct
+          - https://github.com/rust-lang/book/issues/1543#issuecomment-696995826
+        - [x] Understand and copy to notes the iterative weak reference madness
+          - https://stackoverflow.com/questions/36597987/cyclic-reference-of-refcell-borrows-in-traversal
+        - [x] Review push_back (7:52) and implement 🤯
+        - [x] Implement exercise: pop front
+          - [x] Bloody fight with Rc/Weak references and unwrapping
+        - [x] Study https://stackoverflow.com/questions/27687872/cannot-move-out-of-dereference-of-mut-pointer-when-calling-optionunwrap
+
 ## Thu Oct/22
 
 - Blog

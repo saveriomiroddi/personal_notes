@@ -27,8 +27,9 @@
     - [YAML/Psych](#yamlpsych)
     - [Optparse](#optparse)
     - [open-uri](#open-uri)
-    - [Dir](#dir)
+    - [Dir/FileUtils](#dirfileutils)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
+    - [Etc](#etc)
     - [StringIO](#stringio)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
@@ -590,10 +591,26 @@ Open files/download http content; automatically detects the appropriate class fo
 open('http://cippa-lippa').read
 ```
 
-### Dir
+### Dir/FileUtils
 
 ```ruby
 File.dirname(path)                              # Parent dir
+
+Dir.pwd                                         # working path
+Dir.chdir(path) { }                             # Change current dir; WATCH OUT! not thread safe! see https://bugs.ruby-lang.org/issues/9785
+
+Dir.foreach(dosPath){|fname|}                   # not recursive; includes '.[.]'
+Dir.glob(antPath){|fname|}                      # glob format; 'path/**/pattern' => '**' recurses under path
+Dir["**/*"]                                     # recursive dir list; can prepend dir; dirs before files
+
+Dir.mkdir                                       # not recursive
+FileUtils.mkdir_p(path)                         # recursive
+
+Dir.delete(dosPath)                             # not recursive
+FileUtils.remove_dir(path, true)                # recursive
+
+FileUtils.touch(filename)
+FileUtils.chown(user[, group[, filename]])	    # change owner - File.chown needs the group/user id!!
 ```
 
 ### Tempfile, Tmpdir
@@ -623,6 +640,13 @@ Dir::Tmpname.create(['a', '.png']) { }
 # Find system temporary directory
 require 'tmpdir'
 Dir.tmpdir
+```
+
+### Etc
+
+```ruby
+Etc.getlogin                                # Current user
+Etc.getpwuid.dir                		        # Get current user home dir
 ```
 
 ### StringIO

@@ -1191,8 +1191,10 @@ resource "aws_cloudwatch_metric_alarm" "ec2_first_instance_system_status_check_f
     aws_sns_topic.system_alarms.arn,
   ]
 
+  # seconds (int); default=300; valid: 1,5,10,30,n*60
+  period = 60
+
   evaluation_periods = 2
-  period             = 60
   statistic          = "Maximum"
   treat_missing_data = "missing"
 

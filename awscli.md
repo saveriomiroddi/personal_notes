@@ -1,55 +1,73 @@
 # AWS CLI
 
 - [AWS CLI](#aws-cli)
-  - [Configuration](#configuration)
-  - [User-related](#user-related)
-  - [Account-related](#account-related)
-  - [Lightsail](#lightsail)
-  - [Secrets Manager](#secrets-manager)
-  - [CloudWatch log groups](#cloudwatch-log-groups)
-  - [CloudWatch Events](#cloudwatch-events)
+  - [Tool configuration](#tool-configuration)
+  - [Resources](#resources)
+    - [EC2](#ec2)
+    - [IAM](#iam)
+    - [Account-related](#account-related)
+    - [Lightsail](#lightsail)
+    - [Secrets Manager](#secrets-manager)
+    - [CloudWatch log groups](#cloudwatch-log-groups)
+    - [CloudWatch Events](#cloudwatch-events)
 
-## Configuration
+## Tool configuration
 
 ```sh
-configure
+aws configure
 ```
 
-## User-related
+## Resources
+
+### EC2
 
 ```sh
-iam list-users
-iam get-user --user-name=$username
+# Show private shapshot ids; use `all` for public
+#
+aws ec2 describe-snapshots --restorable-by-user-ids self | grep '"SnapshotId"'
+
+# Delete all public shapshots (in parallel) (won't succeed, but here for reference); continues on error
+#
+aws ec2 describe-snapshots --restorable-by-user-ids all |
+  perl -ne 'print "$1\n" if /"SnapshotId": "(.*)"/' |
+  xargs -I {} -n 1 -P 0 sh -c "aws ec2 delete-snapshot --snapshot-id {} || true"
 ```
 
-## Account-related
+### IAM
 
 ```sh
-budgets describe-budgets --account-id=$account_id
+aws iam list-users
+aws iam get-user --user-name=$username
 ```
 
-## Lightsail
+### Account-related
 
 ```sh
-lightsail get-instances
+aws budgets describe-budgets --account-id=$account_id
 ```
 
-## Secrets Manager
+### Lightsail
 
 ```sh
-secretsmanager list-secret-version-ids --secret-id=$secret_arn
+aws lightsail get-instances
 ```
 
-## CloudWatch log groups
+### Secrets Manager
 
 ```sh
-logs describe-log-groups
+aws secretsmanager list-secret-version-ids --secret-id=$secret_arn
 ```
 
-## CloudWatch Events
-
-List targets for rule:
+### CloudWatch log groups
 
 ```sh
-events list-targets-by-rule --rule $rule_name
+aws logs describe-log-groups
+```
+
+### CloudWatch Events
+
+```sh
+# List targets for rule
+#
+aws events list-targets-by-rule --rule $rule_name
 ```

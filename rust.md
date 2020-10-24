@@ -38,6 +38,8 @@
       - [RC<T>](#rct)
       - [RefCell<T> and interior mutability](#refcellt-and-interior-mutability)
       - [Weak<T> and reference cycles](#weakt-and-reference-cycles)
+        - [`Rc<RefCell>` or `RefCell<Rc>`](#rcrefcell-or-refcellrc)
+        - [Real complex case of iterating a recursive structure with Rc/RefCell](#real-complex-case-of-iterating-a-recursive-structure-with-rcrefcell)
     - [Multithreading](#multithreading)
       - [Channels: Multiple Producers Single Consumer](#channels-multiple-producers-single-consumer)
       - [Mutex<T>/Arc<T>](#mutextarct)
@@ -875,6 +877,9 @@ Enums can't be iterated. See `strum` crate for this purpose.
 
 Foundation of Rust. In order to use the contained value, we must extract (and test) it.
 
+WATCH OUT! unwrap() moves the value out, so trying to do `&mut opt.unwrap()` doesn't work, because it's a reference to the result, rather than the content.  
+In order to solve this case, use `if let`.
+
 ```rust
 enum Option<T> {
   Some(T),
@@ -908,6 +913,11 @@ let mut x = Some(2);
 let y = x.take();
 x == None;
 y == Some(2);
+
+// replace(): extract a value and replace it with the value passed.
+//
+let mut x = Some(2);
+let old = x.replace(5);
 ```
 
 See next section for pattern matching.
@@ -1645,9 +1655,9 @@ let _c = Parent(Rc::new(RefCell::new(3)), Rc::clone(&a));
 
 #### Weak<T> and reference cycles
 
-Full tree data structure, with nodes pointing both to children and parents. The problem is that if we don't use weak references, there will be circular references (therefore leaks) because of parents pointing to children, and viceversa.
+Example with a tree data structure, with nodes pointing both to children and parents. The problem is that if we don't use weak references, there will be circular references (therefore leaks) because of parents pointing to children, and viceversa.
 
-It's important to always think who is the owner. A parent ultimately owns the children - if the former is dropped, the children should be dropped too; therefore, the parent reference should be weak.
+It's important to always think who is the owner. A parent ultimately owns the children - if the former is dropped, the children should be dropped too; therefore, the reference to the parent should be weak.
 
 ```rust
 use std::cell::RefCell;
@@ -1655,44 +1665,149 @@ use std::rc::{Rc, Weak};
 
 #[derive(Debug)]
 struct Node {
-    value: i32,
-    parent: RefCell<Weak<Node>>,
-    children: RefCell<Vec<Rc<Node>>>,
+  value: i32,
+  // RefCell is needed here, because Node will be wrapped in an Rc; without it, the contents can't
+  // be mutated.
+  //
+  parent: RefCell<Weak<Node>>,
+  children: RefCell<Vec<Rc<Node>>>,
 }
 
+// Can't instantiate `Weak` with a reference; must use `Rc::downgrade()`.
+// `Weak::new()` is essentially a placeholder.
+//
 let leaf = Rc::new(Node {
-    value: 3,
-    parent: RefCell::new(Weak::new()),
-    children: RefCell::new(vec![]),
+  value: 3,
+  parent: RefCell::new(Weak::new()),
+  children: RefCell::new(vec![]),
 });
 
-// In order to access a `Weak<T>` value, call `upgrade() -> Option<T>`.
-//
-println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
-
-// Can also invoke `Rc#clone()` rather than `Rc::clone()`.
+// It's possible to use `&ref.clone()` instead of `Rc::clone(&ref)`, but it's not idiomatic.
 //
 let branch = Rc::new(Node {
-    value: 5,
-    parent: RefCell::new(Weak::new()),
-    children: RefCell::new(vec![Rc::clone(&leaf)]),
+  value: 5,
+  parent: RefCell::new(Weak::new()),
+  children: RefCell::new(vec![Rc::clone(&leaf)]),
 });
 
-// In order to change the content of a `Rc<RefCell>`, use `borrow_mut()`.
-// Can't instantiate `Weak` with a reference; must use `Rc::downgrade()`.
+// Common WATCH OUT! concepts:
+//
+// - don't forget to pass a reference when up/downgrading;
+// - if a reference is borrowed, and must assign it, clone() it.
+
+// When invoking `clone()`, it's important to use the for `(Weak|Rc)::clone(ref)`, otherwise, a deep
+// clone is performed.
+// For consistency with `Rc::downgrade()`, one can always use the type function `Weak::upgrade(ref)`,
+// rather than `ref.upgrade()`.
+
+// The `Rc`-enclosed type methods can be accessed via auto-dereferencing (`leaf.parent`).
+//
+// In order to change the content of a `RefCell`, use `borrow_mut()`.
+//
+// WATCH OUT! One may need to borrow and do the desired operation on the same statement, otherwise, BCK
+// hilarity may ensue.
 //
 *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
 
-println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+// In order to access a `Weak<T>` value, one must upgrade and `unwrap()` (if sure that there is a value).
+//
+println!("leaf parent = {:?}", Weak::upgrade(leaf.parent.borrow()).unwrap());
+
+// When accessing an Option<Weak|Rc>, use the `if let`, or `clone().unwrap()`.
+// Otherwise, an error is raised: `cannot move out of dereference of `RefMut<'_, ...>``
+//
+if let Some(ref mut child_wk) = opt_weak_ref { /* */ };
+opt_weak_ref.clone().unwrap();
 ```
 
-There are methods to perform counting:
+Counting functions:
 
 ```rust
-// Example, referencing branch.
-//
 Rc::strong_count(&branch);
 Rc::weak_count(&branch);
+```
+
+##### `Rc<RefCell>` or `RefCell<Rc>`
+
+This is not trivial. See:
+
+1. https://stackoverflow.com/questions/57367092/what-is-the-difference-between-rcrefcellt-and-refcellrct
+2. https://github.com/rust-lang/book/issues/1543#issuecomment-696995826
+
+First case:
+
+With `RefCell<Rc>`, `RefCell` can't be shared, and `Rc` can't be mutated.  
+With `Rc<RefCell>`, `Rc` can be shared, and `RefCell` allows mutation.
+
+Second case:
+
+`children` (nodes) options:
+
+```rust
+// Vector is not shared, but it can be modified; the children are shared.
+// Understanding: since the parent node is wrapped in an Rc, although the vector is not directly shared,
+// it ends up being indirectly so.
+//
+RefCell<Vec<Rc<Node>>>
+
+// Vector is shared, but can't be itself modified; instead, the children can be modified.
+//
+Rc<Vec<RefCell<Node>>>
+
+// Vector is shared; it can be modified, and the children, too.
+// ??? -> When cloning, the list of nodes is shared, which is not what wanted.
+//
+Rc<RefCell<Vec<Node>>>
+```
+
+##### Real complex case of iterating a recursive structure with Rc/RefCell
+
+See https://stackoverflow.com/questions/36597987/cyclic-reference-of-refcell-borrows-in-traversal.
+
+```rust
+struct LinkedList<T: Copy>(
+  Option<(
+    Rc<RefCell<Node<T>>>,
+    RefCell<Node<T>>>
+  )>
+);
+
+struct Node<T: Copy> {
+  value: T,
+  next: Option<Rc<RefCell<Node<T>>>>,
+  previous: Option<Weak<RefCell<Node<T>>>>,
+}
+
+impl<T: Copy> LinkedList<T> {
+  pub fn print_values(&self) -> Vec<T> {
+    if let Some((ref front, _)) = self.0 {
+      let mut current = Rc::clone(front);
+
+      loop {
+        println!("{}", current.borrow().value);
+
+        // The are two crucial aspects.
+
+        // 1. we can't borrow current outside of the `if let`, otherwise, the `current` assignment fails
+        // because it's borrowed.
+        //
+        // let current_brw = current.borrow()
+        // if let Some(_) = current_brw.next()
+
+        let next = if let Some(ref next) = current.borrow().next {
+          // 2. we need an `if let` construct, because if we assign current inside here, again, it's
+          // borrowed. The solution here is to return an owned value, while releasing the borrow.
+
+          Rc::clone(next)
+        } else {
+          break;
+        };
+
+        current = next;
+      }
+    }
+  }
+}
 ```
 
 ### Multithreading

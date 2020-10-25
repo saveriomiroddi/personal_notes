@@ -1,3 +1,12 @@
+## Sat Oct/24
+
+- Training/CS+Rust
+  - Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 3
+      - [x] Viewing Data in Both Directions with Doubly Linked Lists
+        - [x] Implement exercise: pop back
+        - [x] Fight: implement iteration without deep clone of the `next` reference
+
 ## Fri Oct/23
 
 - Training/CS+Rust

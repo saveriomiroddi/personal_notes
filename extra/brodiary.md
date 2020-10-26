@@ -1,3 +1,20 @@
+## Sun Oct/25
+
+- Extra
+  - SWE
+    - [x] Read C++ templates: http://people.cs.uchicago.edu/~jacobm/pubs/templates.html
+      - [x] constexpr vs. templates metaprogramming: https://stackoverflow.com/questions/59538054/constexpr-vs-template-metaprogramming-performance-differences
+      - [x] https://www.modernescpp.com/index.php/c-core-guidelines-programming-at-compile-time-with-constexpr
+      - [x] https://www.variadic.xyz/2019/07/03/constexpr2
+
+- Training/CS+Rust
+  - Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 3
+      - [ ] Building a Binary Tree to Efficiently Store and Sort Data
+        - [x] Study
+        - [x] Think binary trees printing algorithm
+          - [x] Review established solutions (favorite: https://stackoverflow.com/a/8948691/210029)
+
 ## Sat Oct/24
 
 - Training/CS+Rust

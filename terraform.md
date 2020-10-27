@@ -162,10 +162,12 @@ lookup(map, "key", "default") # use a default value on map access
 
 # String
 
-replace(string, from, to)
+replace(string, from, to)     # if from is wrapped in slashes, it's a regex, otherwise, it's a plain string
+trimspace(string)             # remove leading/trailing whitespace
 
 # Encodings
 
+urlencode(string)    # Encodes spaces as `+`.
 base64encode(string)
 jsonencode(object)   # can encode maps!
 jsondecode(string)
@@ -1159,6 +1161,10 @@ resource "aws_cloudwatch_metric_alarm" "ec2_first_instance_cpu_utilization_alarm
 
   threshold = 80
 
+  # Default is "missing"; "breaching" triggers the alarm.
+  #
+  treat_missing_data  = "breaching"
+
   alarm_actions = [
     aws_sns_topic.system_alarms.arn,
   ]
@@ -1253,6 +1259,13 @@ resource "aws_cloudwatch_log_group" "lambda_example_log_group" {
   # Options: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653
   #
   retention_in_days = 7
+}
+
+# Import ref.: log_group_name:name
+#
+resource "aws_cloudwatch_log_stream" "all_events_cloudtrail_log_stream" {
+  name           = "${data.aws_caller_identity.current.account_id}_CloudTrail_${data.aws_region.main.name}"
+  log_group_name = aws_cloudwatch_log_group.all_events_cloudtrail_group.name
 }
 ```
 

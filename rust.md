@@ -15,7 +15,7 @@
     - [Strings](#strings)
       - [Internal representation (bytes/chars/graphemes)](#internal-representation-bytescharsgraphemes)
     - [For/while (/loop) loops](#forwhile-loop-loops)
-    - [If/then/else](#ifthenelse)
+    - [If (let)/then/else](#if-letthenelse)
     - [Enums](#enums)
     - [Option<T>/Result<T, Error>](#optiontresultt-error)
     - [Pattern matching](#pattern-matching)
@@ -555,12 +555,19 @@ let my_list = [true; 4];                // 4 elements initialized as true; won't
 let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
 let mut my_list: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
 
+// Uninitialized array 🤯 (std::mem)
+let mut result: [MaybeUninit<crate::Color>; pixels_count] = unsafe { MaybeUninit::uninit().assume_init() };
+result[0] = MaybeUninit::new(crate::Color { r: 0.0, g: 0.0, b: 0.0 });
+let result = unsafe { std::mem::transmute::<_, [crate::Color; pixels_count]>(result) };
+
 my_list[512..512 + source.len()].copy_from_slice(&source) // memcpy (copy) from/to slices/vectors; source/dest size must be the same!
 my_list.fill(value)                     // memset; unstable as of Aug/2020
 
 // invocation: process_list(&my_list)
 //
 fn process_list(list: &[i32]) {}
+
+// For unpacking, see `if let`
 ```
 
 Vectors (mutable):
@@ -796,7 +803,7 @@ loop {
 };
 ```
 
-### If/then/else
+### If (let)/then/else
 
 ```rust
 if x > 5 {
@@ -958,6 +965,10 @@ match (2, 4, 8, 16, 32) {
   }
 };
 
+// Match (unpack) slices/arrays
+
+if let [r, g, b] = &raw_pixels[..] { /* .. */ } else { panic!() }
+
 // Match Option<T>
 //
 let y = 10;
@@ -1092,6 +1103,11 @@ impl<T, U> Point<T, U> {
 
 ```rust
 pub trait Summary {
+  // Trait constants can't be imported, and they must be accessed from the implementig type (in this
+  // case, Article::MAX_LENGTH).
+  //
+  const MAX_LENGTH: u16 = 4096;
+
   fn summarize(&self) -> String;
 
   // Default method. Overriding doesn't require special syntax.
@@ -1110,6 +1126,12 @@ pub struct Article {
 //
 impl Summary for Article {
   fn summarize(&self) -> String {
+    // See note above on trait constants.
+    //
+    if text.len() > Self::MAX_LENGTH {
+      panic!();
+    }
+
     "Summary of an article!".to_string()
   }
 }
@@ -3003,6 +3025,15 @@ thread::spawn(move || {
 ```rust
 use demonstrate::demonstrate;
 
+// If a single instance needs to be shared between UTs ("before all"), then trickery is needed.
+// The Mutex is required for mutability.
+//
+use std::sync::Mutex;
+unsafe impl Send for Sdl2Interface {}
+lazy_static! {
+  static ref INTERFACE: Mutex<Sdl2Interface> = Mutex::new(Sdl2Interface::init("test"));
+}
+
 demonstrate! {
   // Not needed in this case; here for reference.
   use super::*;
@@ -3010,6 +3041,10 @@ demonstrate! {
   describe "test module 2" {
     before { let context = 5; }
     subject { context + 5 }
+
+    it "used a shared object" {
+      INTERFACE().lock().unwrap().read_pixel(0, 0)
+    }
 
     it "test subject" {
       assert_eq!(subject, 10);
@@ -3034,6 +3069,8 @@ assert_float_absolute_eq!(3.0, 3.9, 1.0);
 ### Allow initializing static constants with any function (`lazy_static`)
 
 ```rust
+// Don't forget that access will required RG.lock().unwrap().
+//
 lazy_static::lazy_static! {
   static ref RG: Mutex<RandGen> = Mutex::new(RandGen::new(34052));
 }

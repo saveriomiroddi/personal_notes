@@ -1,7 +1,17 @@
+## Mon Oct/26
+
+- Ray tracer challenge
+  - [ ] Chapter 2
+    - [~] Theory+exercises
+      - [x] Fix mistake with epsilon
+      - [x] Fight multiple issues with SDL library
+        - extremely slow pixel read, integration with test suite, improper pixel read structure, read pixels not working stably
+      - [x] Fight accidental omission of the screen update
+
 ## Sun Oct/25
 
-- Extra
-  - SWE
+- Theory
+  - C++/SWE
     - [x] Read C++ templates: http://people.cs.uchicago.edu/~jacobm/pubs/templates.html
       - [x] constexpr vs. templates metaprogramming: https://stackoverflow.com/questions/59538054/constexpr-vs-template-metaprogramming-performance-differences
       - [x] https://www.modernescpp.com/index.php/c-core-guidelines-programming-at-compile-time-with-constexpr
@@ -190,19 +200,20 @@
         - [x] CCF
         - [x] SCF
 
-- Rust
-  - [~] Understand BCK issue with linked list iterative traversal
-    - [x] https://stackoverflow.com/questions/50251487/what-are-non-lexical-lifetimes
-      - non-lexical lifetimes
-        - [x] https://stackoverflow.com/questions/32300132/why-cant-i-store-a-value-and-a-reference-to-that-value-in-the-same-struct
-        - [x] https://stackoverflow.com/questions/38023871/returning-a-reference-from-a-hashmap-or-vec-causes-a-borrow-to-last-beyond-the-s
-        - [x] https://stackoverflow.com/questions/32761524/why-does-hashmapget-mut-take-ownership-of-the-map-for-the-rest-of-the-scope
-        - [x] https://stackoverflow.com/questions/41187296/cannot-borrow-as-immutable-because-it-is-also-borrowed-as-mutable-in-function-ar
-        - [x] https://stackoverflow.com/questions/47395171/how-to-update-or-insert-on-a-vec
-        - [x] https://stackoverflow.com/questions/41601197/is-there-a-way-to-release-a-binding-before-it-goes-out-of-scope
-          - [x] https://stackoverflow.com/questions/30243606/why-is-a-borrow-still-held-in-the-else-block-of-an-if-let
-            - [x] https://bluss.github.io/rust/fun/2015/10/11/stuff-the-identity-function-does/
-        - [x] https://stackoverflow.com/questions/37986640/cannot-obtain-a-mutable-reference-when-iterating-a-recursive-structure-cannot-b
+- Theory
+  - Rust
+    - [~] Understand BCK issue with linked list iterative traversal
+      - [x] https://stackoverflow.com/questions/50251487/what-are-non-lexical-lifetimes
+        - non-lexical lifetimes
+          - [x] https://stackoverflow.com/questions/32300132/why-cant-i-store-a-value-and-a-reference-to-that-value-in-the-same-struct
+          - [x] https://stackoverflow.com/questions/38023871/returning-a-reference-from-a-hashmap-or-vec-causes-a-borrow-to-last-beyond-the-s
+          - [x] https://stackoverflow.com/questions/32761524/why-does-hashmapget-mut-take-ownership-of-the-map-for-the-rest-of-the-scope
+          - [x] https://stackoverflow.com/questions/41187296/cannot-borrow-as-immutable-because-it-is-also-borrowed-as-mutable-in-function-ar
+          - [x] https://stackoverflow.com/questions/47395171/how-to-update-or-insert-on-a-vec
+          - [x] https://stackoverflow.com/questions/41601197/is-there-a-way-to-release-a-binding-before-it-goes-out-of-scope
+            - [x] https://stackoverflow.com/questions/30243606/why-is-a-borrow-still-held-in-the-else-block-of-an-if-let
+              - [x] https://bluss.github.io/rust/fun/2015/10/11/stuff-the-identity-function-does/
+          - [x] https://stackoverflow.com/questions/37986640/cannot-obtain-a-mutable-reference-when-iterating-a-recursive-structure-cannot-b
 
 ## Fri Oct/16
 

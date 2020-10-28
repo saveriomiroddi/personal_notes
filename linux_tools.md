@@ -264,9 +264,18 @@ Options:
 #
 curl "$URL"
 
-# `-d` implies `-X POST`
+# `-d` implies `-X POST`.
+# In this case, the data format must be specified.
 #
-curl  -d '{ "query": { "query_string": { "query": "kill" } } }' "http://localhost:9200/_search"
+curl \
+  -H "Authorization: Bearer $token" \
+  -H 'Content-type: application/json; charset=utf-8' \
+  -d '
+  {
+    "channel": "'"$channel"'",
+    "text": "test",
+  }' \
+  "https://slack.com/api/chat.postMessage"
 
 # Send an HTTP request for a specific format
 #

@@ -4,7 +4,7 @@
   - [Syntax/basics](#syntaxbasics)
     - [Basic structure/Printing/Input](#basic-structureprintinginput)
       - [Printing/formatting](#printingformatting)
-    - [Variables/Data types](#variablesdata-types)
+    - [Variables/Data types/Casting](#variablesdata-typescasting)
     - [Basic operators/operations/arithmetic/math](#basic-operatorsoperationsarithmeticmath)
     - [Closures/Functions](#closuresfunctions)
     - [Ranges and `std::iter::Iterator` methods](#ranges-and-stditeriterator-methods)
@@ -26,7 +26,9 @@
     - [Traits #2 (OO-approach and supertraits)](#traits-2-oo-approach-and-supertraits)
     - [Traits #3 (disambiguation)](#traits-3-disambiguation)
     - [Operator overloading](#operator-overloading)
-    - [[Static] Methods](#static-methods)
+    - [Method overloading (workaround)](#method-overloading-workaround)
+    - [Static methods](#static-methods)
+    - [Partially emulate inheritance (composition) via Deref[Mut]](#partially-emulate-inheritance-composition-via-derefmut)
     - [Ownership](#ownership)
       - [Move](#move)
       - [Borrowing](#borrowing)
@@ -60,7 +62,7 @@
     - [Files/streams handling](#filesstreams-handling)
     - [Testing](#testing)
       - [Integration tests](#integration-tests)
-    - [String/char-related](#stringchar-related)
+    - [String/char-related (conversions)](#stringchar-related-conversions)
     - [VecDeque: double-ended queue](#vecdeque-double-ended-queue)
     - [TCP client/server](#tcp-clientserver)
     - [Commandline arguments (basic)](#commandline-arguments-basic)
@@ -249,7 +251,7 @@ for byte in buffer {
 }
 ```
 
-### Variables/Data types
+### Variables/Data types/Casting
 
 ```rust
 let int_as_float = (10 as f64);     // type casting
@@ -270,11 +272,11 @@ let int_as_bool = 1 as bool;        // 1: true, 0: false, other: !!undefined!!
 Numeric casts:
 
 ```rust
-0xFF_u8 as u16; // 0x00FF ("zero-extend")
-  -1_i8 as u16;  // 0xFFFF ("signed-extend")
+0xFF_u8 as u16;          // 0x00FF ("zero-extend")
+  -1_i8 as u16;          // 0xFFFF ("signed-extend")
 
-0xFF_u8 as i16;         // WATCH OUT!!: 0x00FF
-(0xFF_u8 as i8) as i16; // 0xFFFF
+0xFF_u8 as i16;          // WATCH OUT!!: 0x00FF
+(0xFF_u8 as i8) as i16;  // 0xFFFF
 ```
 
 SVs differ from constants:
@@ -715,6 +717,15 @@ let mut string = String::new();
 
 let slice: &str = &string[0..3];
 let literal: &str = "Your pizza";             // string literals are slices!
+
+// multi-line string, with leading spaces removed.
+// for the Ruby squiggly heredoc, use the `indoc` crate.
+//
+let string = "\
+  a\n\
+    b c\n\
+    d \n\
+"
 ```
 
 Using strings with functions:
@@ -1357,7 +1368,37 @@ Some operators:
 - `PartialEq`: `&self.eq`
 - `std::ops::Neg`: `self.neg` -> `Output` (unary negation)
 
-### [Static] Methods
+### Method overloading (workaround)
+
+```rust
+struct Foo {
+  value: uint
+}
+
+trait HasUIntValue {
+  fn as_uint(self) -> uint;
+}
+
+impl Foo {
+  fn add<T:HasUIntValue>(&mut self, value: T) {
+    self.value += value.as_uint();
+  }
+}
+
+impl HasUIntValue for int {
+  fn as_uint(self) -> uint {
+    self
+  }
+}
+
+impl HasUIntValue for f64 {
+  fn as_uint(self) -> uint {
+    self as uint
+  }
+}
+```
+
+### Static methods
 
 Methods definition (essentially, struct functions)
 
@@ -1381,6 +1422,32 @@ impl Rectangle {
     Rectangle { width: size, height: size }
   }
 }
+```
+
+### Partially emulate inheritance (composition) via Deref[Mut]
+
+It seems that this is considered an [antipattern](https://github.com/rust-unofficial/patterns/blob/master/anti_patterns/deref.md).
+
+```rust
+struct Foo {}
+
+impl Foo {
+  fn m(&self) { /* ... */ }
+}
+
+struct Bar {
+  f: Foo
+}
+
+impl Deref for Bar {
+  type Target = Foo;
+  fn deref(&self) -> &Foo {
+    &self.f
+  }
+}
+
+let b = Bar { Foo {} };
+b.m();
 ```
 
 ### Ownership
@@ -2465,6 +2532,7 @@ use std::collections::*; // useful for testing; unidiomatic for the rest
 ```rust
 std::fs::read_to_string(filename) -> Result<String, Error>; // content must be valid UTF-8; filename can be relative.
 std::fs::read(game_rom_filename) -> Result<Vec<u8>, Error>; // read binary content
+std::fs::write(filename, data: AsRef<[u8]>) -> Result<()>   // write to file
 
 // Buffered read; requires the import below
 //
@@ -2481,6 +2549,14 @@ let len = reader.read_line(&mut line)?;
 for line in reader.lines() { println!("{}", line?); }
 let lines = reader.lines().collect::<Result<Vec<_>, _>>().unwrap();
 ```
+
+Abstract operation traits:
+
+- `std::io::Read`
+- `std::io::Write`: `write(buf: &[u8])`
+  - `Vec` implements it, so it can be trivially used!
+
+for more complex operations (ie. involving seek), can use [io::Cursor](https://doc.rust-lang.org/std/io/struct.Cursor.html).
 
 ### Testing
 
@@ -2553,13 +2629,14 @@ If one wants to write a shared module, put it in a submodule (eg. file `tests/co
 
 When testing binary crates, don't forget that binary crates can't expose functions to be used by other crates (one of the reasons why `main.rs` is canonically thin an imports `lib.rs`).
 
-### String/char-related
+### String/char-related (conversions)
 
 Conversions:
 
 ```rust
 integer.to_string();                      // integer to string
 let guess: u32 = string.parse().unwrap(); // string to numeric type
+String::from_utf8(bytes).unwrap();        // string from (valid) utf-8 bytes
 ```
 
 String APIs:

@@ -1,3 +1,28 @@
+## Tue Oct/27
+
+- Theory
+  - Rust
+    - [x] [Method overloading](https://stackoverflow.com/q/24857831)
+    - [x] Composition
+      - https://hackernoon.com/why-im-dropping-rust-fd1c32986c88
+        - https://news.ycombinator.com/item?id=12474445
+        - https://github.com/rust-unofficial/patterns/blob/master/anti_patterns/deref.md
+    - [x] `Read`/`Write` traits and usages
+
+- Blog admin
+  - [x] Rename `_books` to `_bookshelf`
+
+- SDL (Ray tracer challenge/Libemuls)
+  - [x] Simplify SDL logic, by using the logical size
+    - Fight canvas update (was not invoking update() on init)
+    - Fight redraw on resize (couldn't find how to redraw when resizing)
+
+- Ray tracer challenge
+  - [ ] Chapter 2
+    - [x] Theory+exercises
+      - [x] Other fight with pixel reading
+      - [x] Implement overloaded `Color::new()`!
+
 ## Mon Oct/26
 
 - Ray tracer challenge

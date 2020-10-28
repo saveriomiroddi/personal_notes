@@ -382,6 +382,7 @@ crontab -d   # delete
 systemctl enable $service             # execute on boot
 systemctl start $service              # start immediately
 systemctl daemon-reload               # invoke this after updating a unit
+systemctl daemon-reexec               # required to reload Sytemd's own configuration (e.g. changes to `/etc/systemd/system.conf`)
 
 systemctl disable $service.service    # disable a systemd service autostart
 systemctl --failed                    # show units that failed to start

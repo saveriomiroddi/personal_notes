@@ -21,7 +21,7 @@
     - [Strings](#strings)
       - [Encoding](#encoding)
     - [Date/time](#datetime)
-      - [Date/time parsing](#datetime-parsing)
+      - [Date/time templated parsing](#datetime-templated-parsing)
     - [CSV](#csv)
     - [JSON](#json)
     - [YAML/Psych](#yamlpsych)
@@ -431,12 +431,27 @@ IO.read(filename, 'bom|utf-8')
 
 ### Date/time
 
+Operations/conversions:
+
 ```ruby
+@time + seconds
+
 @date >> @months; @date << @months                        # Adds/subtracts months to a date (!!)
 @date.next_month(@months=1), @date.prev_month(@months=1)  # More readable; also supports `day`, `year`
+
+@date_time.to_time.to_i                                   # DateTime to Unix time
 ```
 
-#### Date/time parsing
+For parsing a freeform time, use DateTime (required `time`), but mind the offset:
+
+```ruby
+# If the offset is not specified, it's assumed to be UTC.
+#
+DateTime.parse("10:40 #{Time.now.strftime("%z")}")     # => #<DateTime: 2020-10-27T10:40:00+01:00 ...>
+DateTime.parse("thu 10:33 #{Time.now.strftime("%z")}") # => #<DateTime: 2020-10-29T10:33:00+01:00 ...>
+```
+
+#### Date/time templated parsing
 
 - `%a`: The abbreviated weekday name ('Sun')
 - `%A`: The full weekday name ('Sunday')

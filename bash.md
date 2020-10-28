@@ -257,6 +257,24 @@ kill $!             # kill latest backgrounded job; note that "$!" is the PID of
 wait $pid           # wait for the process to finish; if no $pid is provided, all the baground jobs are waited
 ```
 
+In order to get the exit status of a backgrounded process, use `wait $pid`, and inspect its exit status (`$?`)``:
+
+```sh
+$ false &
+[1] 790772
+$ wait 790772
+[1]+  Exit 1                  false
+$ echo $?
+1
+
+$ true &
+[1] 791005
+$ wait 791005
+[1]+  Done                    true
+$ echo $?
+0
+```
+
 ## Cycle a string tokens based on separator (IFS)
 
 Use IFS to tokenize a string with alternative characters (they're considered a set of **single** chars); **must** unset after:

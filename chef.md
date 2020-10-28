@@ -8,9 +8,11 @@
     - [Available variables](#available-variables)
   - [Resources](#resources)
     - [`bash`](#bash)
-    - [`cron`](#cron)
-    - [`directory`](#directory)
     - [`execute`](#execute)
+    - [`cron`](#cron)
+    - [`cookbook_file`](#cookbook_file)
+    - [`directory`](#directory)
+    - [`execute`](#execute-1)
     - [`line` (manual file editing)](#line-manual-file-editing)
     - [`mount`](#mount)
     - [`package`/`dpkg_package`](#packagedpkg_package)
@@ -69,7 +71,9 @@ file '/etc/nginx/ssl/example.crt' do
   owner 'root'
 end
 
+# Notification happens when the referenced resource state is changed.
 # Don't forget that the :subscribes action is the action of the enclosing resource!
+#
 service 'nginx' do
   action :nothing
   subscribes :reload, 'file[/etc/nginx/ssl/example.crt]', :immediately
@@ -96,6 +100,15 @@ bash 'extract_module' do
 end
 ```
 
+### `execute`
+
+```ruby
+execute 'apache_configtest' do
+  command '/usr/sbin/apachectl configtest'
+  action  :run
+end
+```
+
 ### `cron`
 
 ```ruby
@@ -117,6 +130,15 @@ cron default["aws_monitoring"]["nmon_cron_filename"] do
   shell            String
   time             Symbol
   time_out         Hash
+end
+```
+
+### `cookbook_file`
+
+```ruby
+cookbook_file '/etc/systemd/system.conf' do
+  source    'etc/systemd/system.conf'
+  mode      '0644'        # best to always specify; the default (not in all case) is 0777 + umask -> typically 0755.
 end
 ```
 

@@ -71,6 +71,8 @@
   - [Traits](#traits)
     - [Default](#default)
     - [Copy, Clone, Drop and their relationships](#copy-clone-drop-and-their-relationships)
+    - [Display](#display)
+    - [From (/Into)](#from-into)
     - [Index[Mut]](#indexmut)
   - [Crates](#crates)
     - [Random (with and without `rand`)](#random-with-and-without-rand)
@@ -219,7 +221,7 @@ eprintln!("Error!");                    // print on stderr!
 format!("The number is {}", 1);                          // the template *must* be a literal (!)
 format!("The number is {0}, again {0}, not {1}!", 1, 2); // numbered placeholders!
 
-writeln!("{}", buffer, 123);            // write formatted data into a buffer
+writeln!("{}", writer, 123);            // write formatted data into a Write implementor; `write()` also available
 ```
 
 Formatting (see https://doc.rust-lang.org/std/fmt):
@@ -591,9 +593,11 @@ vec.last();
 vec.push(1);                            // Push at the end
 vec.pop();                              // Pop from the end
 
-vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) a list
+vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) an array
 vec.extend(&[1, 2, 3]);                 // Append (borrowing version)
 vec[range].copy_from_slice(&source);    // memcpy; see array example
+
+vec.as_slice().try_into().unwrap();      // Convert to array; requires TryInto
 
 // Vectors can be received as array reference type (mutable, if required).
 //
@@ -2534,7 +2538,7 @@ std::fs::read_to_string(filename) -> Result<String, Error>; // content must be v
 std::fs::read(game_rom_filename) -> Result<Vec<u8>, Error>; // read binary content
 std::fs::write(filename, data: AsRef<[u8]>) -> Result<()>   // write to file
 
-// Buffered read; requires the import below
+// Buffered read/write require the import below
 //
 use std::io::prelude::*;
 //
@@ -2548,6 +2552,10 @@ let len = reader.read_line(&mut line)?;
 // Read whole lines (two ways: iteration, vector)
 for line in reader.lines() { println!("{}", line?); }
 let lines = reader.lines().collect::<Result<Vec<_>, _>>().unwrap();
+
+// Buffered write
+let mut stream = BufWriter::new(TcpStream::connect("127.0.0.1:34254").unwrap());
+stream.write(&[666]).unwrap();
 ```
 
 Abstract operation traits:
@@ -2756,7 +2764,7 @@ struct SomeOptions {
 
 // Override the defaults.
 //
-SomeOptions { foo: 42, ..Default::default() };
+SomeOptions { bar: true, ..Default::default() };
 ```
 
 ### Copy, Clone, Drop and their relationships
@@ -2767,6 +2775,37 @@ See:
   - copy of `Copy` data is done via trivial `memcpy`; if drop was performed on a `Copy`+`Drop` copy, the original instance could include reference to invalid (not cleaned up) data
 - https://www.reddit.com/r/rust/comments/8laxam/why_does_copy_require_clone
   - `Clone` is a supertrait of `Copy`
+
+### Display
+
+Simple implementation of Display:
+
+```rust
+impl std::fmt::Display for MyType {
+  fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+    write!(formatter, "value: {}", self.value)
+  }
+}
+```
+
+### From (/Into)
+
+Implement when representing conversions from a type; used by the `Into` trait (`into()`).
+
+```rust
+struct Number {
+  value: i32,
+}
+
+impl From<i32> for Number {
+  fn from(item: i32) -> Self {
+    Number { value: item }
+  }
+}
+
+let num = Number::from(30);
+let num: Number = int.into();
+```
 
 ### Index[Mut]
 

@@ -1,9 +1,15 @@
 # Regexes
 
 - [Regexes](#regexes)
-  - [Capturing sequences of N characters](#capturing-sequences-of-n-characters)
+  - [Complex cases](#complex-cases)
+    - [Capturing sequences of N characters](#capturing-sequences-of-n-characters)
+    - [Matching a pattern when it's not at the beginning](#matching-a-pattern-when-its-not-at-the-beginning)
+  - [Language incompatibilities](#language-incompatibilities)
+    - [Javascript](#javascript)
 
-## Capturing sequences of N characters
+## Complex cases
+
+### Capturing sequences of N characters
 
 Use a null-character match, followed by lookahead!
 
@@ -13,3 +19,19 @@ The characters in the lookahead need to be in a group, otherwise, they're not ca
 "01234".scan /(?=(\d{3}))/
 # [["012"], ["123"], ["234"]]
 ```
+
+### Matching a pattern when it's not at the beginning
+
+Use a negative lookahead with the beginning-of-input metacharacter, as it's supported in capturing groups:
+
+```ruby
+"Re: Re: Re: Pizza".gsub /(?!^)Re: /, '' # "Re: Pizza"
+```
+
+The lookbehind version (`/(?<!^)Re: /`) is semantically more precise, however, it's not supported in all JS versions.
+
+## Language incompatibilities
+
+### Javascript
+
+The negative lookbehind (`?<!`) may not be supported in some Javascript versions. Where possible, use the negative lookahead (`?!`).

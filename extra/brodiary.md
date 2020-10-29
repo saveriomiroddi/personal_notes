@@ -1,3 +1,29 @@
+## Wed Oct/28
+
+- Extra
+  - Regexes/Thunderbird
+    - [x] Configure addon and regex for compacting multiple email title prefixes
+      - [x] Help other user with other use case
+
+- Theory
+  - Design
+    - [x] https://technology.riotgames.com/news/future-leagues-engine
+  - Rust
+    - [x] Frequent traits: https://stevedonovan.github.io/rustifications/2018/09/08/common-rust-traits.html
+
+- SDL (Ray tracer challenge/Libemuls)
+  - [x] Ask how to redraw the screen [in rust]
+
+- Open source
+  - [x] Follow up issue on demonstrate
+
+- Ray tracer challenge
+  - [x] Chapter 2
+    - [x] Practice exercise
+      - [x] Extract HasFloat64Value, and implement, along with overloaded functions, in Tuple
+      - [x] Add Color#u8_components, and adjust to match the book's logic
+      - [x] Fight correct mistakes due to allowed warnings -> disable warnings
+
 ## Tue Oct/27
 
 - Theory

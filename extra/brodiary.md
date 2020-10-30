@@ -1,3 +1,14 @@
+## Thu Oct/29
+
+- Extra
+  - Regexes
+    - [x] Help other user with another use case
+  - New tablet
+    - [x] Update
+    - [x] Fight wifi on
+      - [x] Sleepywifi
+    - [x] Test battery
+
 ## Wed Oct/28
 
 - Extra

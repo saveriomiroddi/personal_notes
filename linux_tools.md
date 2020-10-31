@@ -15,6 +15,7 @@
       - [Using xargs](#using-xargs)
   - [Networking](#networking)
     - [curl](#curl)
+    - [Netcat (nc)](#netcat-nc)
   - [Dates](#dates)
     - [Formatting](#formatting)
     - [Operations](#operations)
@@ -30,14 +31,16 @@
 ## ls
 
 ```sh
-ls -d           # don't [d]escend into directories
-ls -D           # don't [D]ereference files
+ls -d               # don't [d]escend into directories
+ls -D               # don't [D]ereference files
 
-ls -r           # [r]everse order
+ls -r               # [r]everse order
 
-ls -S           # sort by [S]ize (default: desc.)
-ls -t           # sort by m[t]ime (default: desc.)
-ls -v           # sort numerically (!)
+ls -S               # sort by [S]ize (default: desc.)
+ls -t               # sort by m[t]ime (default: desc.)
+ls -v               # sort numerically (!)
+
+ls --block-size=K   # human-readable; use K,M,G...
 ```
 
 ## find
@@ -280,6 +283,29 @@ curl \
 # Send an HTTP request for a specific format
 #
 curl -H 'Accept: application/halo+json' "$URL"
+```
+
+### Netcat (nc)
+
+```sh
+nc <address> $port           # simulate telnet
+nc -lk -p $port              # listen to port; [k]=keep listening after a connection terminates
+```
+
+Examples:
+
+```sh
+# Net transfer from 1.1.1.1 via port 666
+#
+echo 'pizza' | nc -l -p 666 ==> nc highnotes.org 666 > pizza.txt
+
+# Bidirectional proxy (3000→3001→3000)
+#
+mkfifo loop.pipe && cat loop.pipe | nc -l -p 3000 | nc localhost 3001 > loop.pipe
+
+# Wait until a port is open.
+#
+while ! nc -z localhost 9200; do sleep 0.5; done
 ```
 
 ## Dates

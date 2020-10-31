@@ -19,6 +19,7 @@
     - [sournalctl](#sournalctl)
   - [Configuring a unit](#configuring-a-unit)
   - [fstab](#fstab)
+  - [Logging/syslog/tools](#loggingsyslogtools)
   - [Terminal emulator](#terminal-emulator)
   - [Desktop Environment: windows](#desktop-environment-windows)
   - [Dconf/Gsettings](#dconfgsettings)
@@ -473,6 +474,13 @@ Test the content of fstab (not reliable for actual mounting; for example, doesn'
 ```sh
 # [f]ake, [a]ll, [v]erbose
 mount -fav
+```
+
+## Logging/syslog/tools
+
+```sh
+logger [-t $tag] $message           # write to system logger; --[t]ag
+logrotate -d -f $config_file        # test configuration; --[d]ebug: dry run; --[f]orce: force file rotation
 ```
 
 ## Terminal emulator

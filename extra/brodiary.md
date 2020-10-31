@@ -1,3 +1,8 @@
+## Fri Oct/30
+
+- Ray tracer challenge
+  - [~] Chapter 3
+
 ## Thu Oct/29
 
 - Extra

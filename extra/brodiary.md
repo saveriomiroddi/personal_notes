@@ -1,7 +1,14 @@
+## Sun Nov/01
+
+- Ray tracer challenge
+  - [ ] Chapter 3
+    - [x] Theory
+
 ## Fri Oct/30
 
 - Ray tracer challenge
-  - [~] Chapter 3
+  - [ ] Chapter 3
+    - [~] Theory
 
 ## Thu Oct/29
 

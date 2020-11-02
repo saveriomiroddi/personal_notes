@@ -11,6 +11,8 @@
       - [Method chaining](#method-chaining)
       - [Iterator trait/Associated types](#iterator-traitassociated-types)
     - [Arrays/Vectors/Slices](#arraysvectorsslices)
+      - [Uninitialized memory (`std::mem`)](#uninitialized-memory-stdmem)
+      - [Bidimensional array struct, uninitialized and macro'ed](#bidimensional-array-struct-uninitialized-and-macroed)
     - [Hash maps](#hash-maps)
     - [Strings](#strings)
       - [Internal representation (bytes/chars/graphemes)](#internal-representation-bytescharsgraphemes)
@@ -486,6 +488,7 @@ map(|(x, y)| x + y)          // Tuples unpacking: useful for example, on the res
 fold(a, |a, x| a + x)        // Ruby :inject
 filter(|x| x % 2 == 0)       // Ruby :select
 find(|x| x % 2 == 0)         // find first element matching the condition
+flatten()                    // Ruby :flatten
 rev()                        // reverse. WATCH OUT, UNINTUITIVE: since it's not inclusive, it goes from 99 to 0.
 any(|x| x == 33)             // terminates on the first true
 all(|x| x % 2 == 0)          // terminates on the first false
@@ -497,7 +500,7 @@ zip(iter)                    // zip two arrays (iterators)!!!
 sum()                        // WATCH OUT! Returns the same type, so conversion is needed, e.g. `.map(|&x| x as u32).sum();`
 
 chunks(n)                    // iterate in chunks of n elements; includes last chunk, if smaller
-chunks_exact(n)              // iterate in chunks of n elements; does not include the last chunk, if smaller
+chunks_exact(n)              // (preferred) iterate in chunks of n elements; does not include the last chunk, if smaller
 windows(n)                   // like chunks, but with overlapping slices
 
 // transform an iterator into a collection ("consume")
@@ -559,13 +562,11 @@ let my_list = [true; 4];                // 4 elements initialized as true; won't
 let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
 let mut my_list: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
 
-// Uninitialized array 🤯 (std::mem)
-let mut result: [MaybeUninit<crate::Color>; pixels_count] = unsafe { MaybeUninit::uninit().assume_init() };
-result[0] = MaybeUninit::new(crate::Color { r: 0.0, g: 0.0, b: 0.0 });
-let result = unsafe { std::mem::transmute::<_, [crate::Color; pixels_count]>(result) };
+// If a struct has an array, it's possible to initialize the array implicitly by using the [Default](#default) trait on the struct.
 
 my_list[512..512 + source.len()].copy_from_slice(&source) // memcpy (copy) from/to slices/vectors; source/dest size must be the same!
 my_list.fill(value)                     // memset; unstable as of Aug/2020
+[1, 2, 3] == [1, 2, 4]                  // arrays can be compared via `==`
 
 // invocation: process_list(&my_list)
 //
@@ -648,6 +649,73 @@ let slice = &array[..];         // type is `&[u32]`
 ```
 
 See the [ownership chapter](#ownership), for the related properties.
+
+#### Uninitialized memory (`std::mem`)
+
+Safe(r) version of initialization with uninitialized values of Array and i32; the simpler but unsafe(r) versions are below.
+
+```rust
+let mut result: [MaybeUninit<crate::Color>; pixels_count] = unsafe { MaybeUninit::uninit().assume_init() };
+result[0] = MaybeUninit::new(crate::Color { r: 0.0, g: 0.0, b: 0.0 });
+let result = unsafe { mem::transmute::<_, [crate::Color; pixels_count]>(result) };
+
+let mut x = MaybeUninit::<&i32>::uninit();
+unsafe { x.as_mut_ptr().write(&0); }
+let x = unsafe { x.assume_init() };
+```
+
+For a more sophisticated application to bidimensional arrays, see the [subsection below](#bidimensional-array-struct-uninitialized-and-macroed).
+
+Other uninitialized forms:
+
+```rust
+let mut result: [[f64; $order]; $order] = usafe { mem::zeroed() };
+let mut result: [[f64; $order]; $order] = usafe { MaybeUninit::zeroed().assume_init( }) // same as previous
+
+let mut result: [[f64; $order]; $order] = usafe { mem::uninitialized() };
+let mut result: [[f64; $order]; $order] = usafe { MaybeUninit::uninit().assume_init( }) // same as previous
+```
+
+There are also more sophisticated uses, e.g. partially initialized arrays.
+
+#### Bidimensional array struct, uninitialized and macro'ed
+
+For the lulz; in such cases, avoiding the MaybeUninit intermediate value is simpler.
+
+```rust
+macro_rules! matrix {
+  ($name:ident, $order: literal) => {
+    #[derive(Debug)]
+    pub struct $name {
+      pub values: [[f64; $order]; $order],
+    }
+
+    impl $name {
+      pub fn new(source_values: &[f64]) -> Self {
+        let mut dest_values: [MaybeUninit<[f64; $order]>; $order] = unsafe { MaybeUninit::uninit().assume_init() };
+
+        for (dest_row, source_row) in dest_values.iter_mut().zip(source_values.chunks($order)) {
+          *dest_row = MaybeUninit::new(source_row.try_into().unwrap());
+        }
+
+        let dest_values = unsafe { mem::transmute::<_, [[f64; $order]; $order]>(dest_values) };
+
+        $name { values: dest_values }
+      }
+    }
+  };
+}
+```
+
+Simpler/unsafer logic:
+
+```rust
+let mut values: [[f64; $order]; $order] = unsafe { MaybeUninit::uninit().assume_init() };
+
+for (row, source_row) in values.iter_mut().zip(source_values.chunks($order)) {
+  row.copy_from_slice(source_row);
+}
+```
 
 ### Hash maps
 
@@ -2244,13 +2312,13 @@ macro_rules! build_and_print_array {
 // Since we return a value, we need to define a scope (extra curly braces).
 //
 macro_rules! ruby_hash {
-    ($( $key:expr => $value:expr ),*) => {
-        {
-            let mut hm = HashMap::new();
-            $( hm.insert($key, $value); )*
-            hm
-        }
-    };
+  ($( $key:expr => $value:expr ),*) => {
+    {
+      let mut hm = HashMap::new();
+      $( hm.insert($key, $value); )*
+      hm
+    }
+  };
 }
 
 // Simulate an optional parameter.
@@ -2258,9 +2326,9 @@ macro_rules! ruby_hash {
 // the one defined by the repetition.
 //
 macro_rules! optional_param {
-    ($mandatory:expr $(, $optional:expr)*) => {
-        println!("M:{} O:{}", $mandatory, $($optional),*)
-    };
+  ($mandatory:expr $(, $optional:expr)*) => {
+    println!("M:{} O:{}", $mandatory, $($optional),*)
+  };
 }
 
 // Simulate optional, named, parameters.
@@ -2272,17 +2340,17 @@ macro_rules! optional_param {
 //     );
 //
 macro_rules! test_cpu_execute {
-    (
-        $( zf: $zf_pre_value:literal => $zf_post_value:literal, )?
-        $( nf: $nf_pre_value:literal => $nf_post_value:literal, )?
-        $( hf: $hf_pre_value:literal => $hf_post_value:literal, )?
-        $( cf: $cf_pre_value:literal => $cf_post_value:literal, )?
-    ) => {
-        $( println!("zf: {} -> {}", $zf_pre_value, $zf_post_value); )?
-        $( println!("nf: {} -> {}", $nf_pre_value, $nf_post_value); )?
-        $( println!("hf: {} -> {}", $hf_pre_value, $hf_post_value); )?
-        $( println!("cf: {} -> {}", $cf_pre_value, $cf_post_value); )?
-    };
+  (
+    $( zf: $zf_pre_value:literal => $zf_post_value:literal, )?
+    $( nf: $nf_pre_value:literal => $nf_post_value:literal, )?
+    $( hf: $hf_pre_value:literal => $hf_post_value:literal, )?
+    $( cf: $cf_pre_value:literal => $cf_post_value:literal, )?
+  ) => {
+    $( println!("zf: {} -> {}", $zf_pre_value, $zf_post_value); )?
+    $( println!("nf: {} -> {}", $nf_pre_value, $nf_post_value); )?
+    $( println!("hf: {} -> {}", $hf_pre_value, $hf_post_value); )?
+    $( println!("cf: {} -> {}", $cf_pre_value, $cf_post_value); )?
+  };
 }
 ```
 
@@ -2294,49 +2362,51 @@ Other usages:
 // an identifier is expected.
 //
 macro_rules! generate_func {
-    ($name:ident) => {
-        fn $name(param: i32) {
-            println!("Value: {}", param);
-        }
-    };
+  ($name:ident) => {
+    fn $name(param: i32) {
+      println!("Value: {}", param);
+    }
+  };
 }
 
 generate_func!(foo);
 foo(123); // `Value: 123`
 
+// Define a struct.
+//
+macro_rules! matrix {
+  ($name:ident, $order: literal) => {
+    pub struct $name {
+      pub values: [[u32; $order]; $order],
+    }
+  };
+}
+
 // Define variables (!)
 //
 macro_rules! vars {
-    ($data:expr, $stride:expr, $var1:ident, $var2:ident, $var3:ident) => {
-        let $var1 = $data[0];
-        let $var2 = $data[1 * $stride];
-    };
-}
-
-// Pass self
-//
-macro_rules! call_on_self {
-    ($self:ident, $F:ident) => {
-        $self.$F()
-    };
+  ($data:expr, $stride:expr, $var1:ident, $var2:ident, $var3:ident) => {
+    let $var1 = $data[0];
+    let $var2 = $data[1 * $stride];
+  };
 }
 
 // Receive a statement; use a variable defined inside the macro
 //
 macro_rules! test_sort {
   ($collection:ident, $stat:stmt) => {
-      #[cfg(test)]
-      mod tests {
-          use super::*;
+    #[cfg(test)]
+    mod tests {
+      use super::*;
 
-          #[test]
-          fn test_sort() {
-              let mut $collection = &mut vec![3, 2, 1];
-              $stat
-              let expected_collection = &vec![1, 2, 3];
-              assert_eq!($collection, expected_collection);
-          }
+      #[test]
+      fn test_sort() {
+        let mut $collection = &mut vec![3, 2, 1];
+        $stat
+        let expected_collection = &vec![1, 2, 3];
+        assert_eq!($collection, expected_collection);
       }
+    }
   };
 }
 
@@ -2817,7 +2887,7 @@ struct Registers {
     PC: u16,
 }
 
-impl Index<Register> for Registers {
+impl std::ops::Index<Register> for Registers {
     type Output = u16;
 
     fn index(&self, register: Register) -> &Self::Output {

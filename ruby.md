@@ -17,7 +17,7 @@
     - [Thread-safe data structures](#thread-safe-data-structures)
   - [APIs/Stdlib](#apisstdlib)
     - [Array](#array)
-    - [CGI/URI (encoding)](#cgiuri-encoding)
+    - [URL/HTML encoding](#urlhtml-encoding)
     - [Strings](#strings)
       - [Encoding](#encoding)
     - [Date/time](#datetime)
@@ -29,8 +29,10 @@
     - [open-uri](#open-uri)
     - [Dir/FileUtils](#dirfileutils)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
+    - [Flock](#flock)
     - [Etc](#etc)
     - [StringIO](#stringio)
+    - [GC (garbage collection)](#gc-garbage-collection)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
     - [Using `IO.popen3`](#using-iopopen3)
@@ -317,9 +319,16 @@ arr.fill(nil, arr.size...5)             # resize/extend (destructive) in arguabl
 arr[5] ||= nil                          # other resize/extend, in arguably less expressive form
 ```
 
-### CGI/URI (encoding)
+### URL/HTML encoding
 
-URI is already in scope.
+Rigorously encoding is not fully addressed by the Ruby STL; see https://stackoverflow.com/a/13059657.
+
+Conclusions:
+
+- Use `CGI::escape` if you only need form escape;
+- If you need to work with URIs, use [`Addressable`](https://rubygems.org/gems/addressable), it offers URL encoding, form encoding and normalizes URLs.
+
+Ruby examples:
 
 ```ruby
 CGI::escape("&&&")                            # URL-encode a string: "%26%26%26"
@@ -329,6 +338,14 @@ CGI::escapeHTML('"html"')       # escape HTML
 
 CGI.unescapeHTML("html")        # decode HTML entities; use only for basic cases, as it' not 100% complete (gem: https://github.com/threedaymonk/htmlentities)
 HTMLEntities.new.decode("html") # htmlentities gem
+```
+
+Addressable examples:
+
+```ruby
+Addressable::URI.form_encode(p1: "&&&", "p2" => "!!!") # "p1=%26%26%26&p2=%21%21%21"
+
+# Other APIs are provided for unencoding, parsing etc. (pubmeds `Addressable::URI`)
 ```
 
 ### Strings
@@ -657,6 +674,24 @@ require 'tmpdir'
 Dir.tmpdir
 ```
 
+### Flock
+
+Flags:
+
+- `LOCK_EX` - Exclusive
+- `LOCK_SH` - Shared lock
+- `LOCK_UN` - Unlock
+- `LOCK_NB` - Non-blocking acquisition; combine using logical or. Returns `0` (success) or `false` (failure).
+
+The lock is released on GC (/exit), so if one wants it to hang around, it must be assigned to global variable.
+
+```ruby
+# WATCH OUT: don't use `w` file mode. Default permissions: 0664.
+#
+$lock_file = File.open("/tmp/coverband-flock", File::RDWR | File::CREAT)
+$lock_file.flock(File::LOCK_EX | File::LOCK_NB)
+```
+
 ### Etc
 
 ```ruby
@@ -671,6 +706,15 @@ Etc.getpwuid.dir                		        # Get current user home dir
 #
 StringIO.new("start_string", "a")
 ```
+
+### GC (garbage collection)
+
+APIs:
+
+- `enable`/`disable`
+- `start`
+
+WATCH OUT! When profiling, the GC should be disabled, because profilers may not be able to recognize GC pauses.
 
 ## Handling processes
 

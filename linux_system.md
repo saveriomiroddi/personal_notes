@@ -20,6 +20,7 @@
   - [Configuring a unit](#configuring-a-unit)
   - [fstab](#fstab)
   - [Logging/syslog/tools](#loggingsyslogtools)
+    - [Logrotate](#logrotate)
   - [Terminal emulator](#terminal-emulator)
   - [Desktop Environment: windows](#desktop-environment-windows)
   - [Dconf/Gsettings](#dconfgsettings)
@@ -382,6 +383,7 @@ crontab -d   # delete
 ```sh
 systemctl enable $service             # execute on boot
 systemctl start $service              # start immediately
+systemctl reload-or-restart $service  # if reload is not defined (or has no effect), restart; WATCH OUT! don't define `ExecReload`
 systemctl daemon-reload               # invoke this after updating a unit
 systemctl daemon-reexec               # required to reload Sytemd's own configuration (e.g. changes to `/etc/systemd/system.conf`)
 
@@ -480,8 +482,24 @@ mount -fav
 
 ```sh
 logger [-t $tag] $message           # write to system logger; --[t]ag
+```
+
+### Logrotate
+
+```sh
 logrotate -d -f $config_file        # test configuration; --[d]ebug: dry run; --[f]orce: force file rotation
 ```
+
+Logrotate automatically sends the `HUP` signal to the processes, so that the files are reopened after move. If the service doesn't support it, either:
+
+- use the `copyrotate` option;
+- or manually perform the reload/restart:
+  ```
+  sharedscripts
+  postrotate
+      systemctl reload-or-restart nmon
+  endscript
+  ```
 
 ## Terminal emulator
 

@@ -1,3 +1,21 @@
+## Mon Nov/02
+
+- Articles
+  - [x] Research and fix nmon issue with reload (restart)
+  - [x] November #1: Chef run as alternate user
+
+- Extra
+  - Regexes
+    - Ask difference between lookarounds for specific case
+
+- Ray tracer challenge
+  - [ ] Chapter 3
+    - [ ] Implementation
+      - [x] Fight generate structs via macro
+      - [x] (Fix issue with existing code)
+      - [x] (Further) study uninitialized memory APIs
+      - [x] Other epsilon error
+
 ## Sun Nov/01
 
 - Ray tracer challenge

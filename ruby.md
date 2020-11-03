@@ -9,6 +9,7 @@
     - [Heredoc](#heredoc)
     - [Data type conversions](#data-type-conversions)
     - [Collections destructuring in blocks](#collections-destructuring-in-blocks)
+    - [Regular expression exceptions](#regular-expression-exceptions)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
   - [Reflection](#reflection)
     - [Pass a method as map block parameter](#pass-a-method-as-map-block-parameter)
@@ -17,6 +18,7 @@
     - [Thread-safe data structures](#thread-safe-data-structures)
   - [APIs/Stdlib](#apisstdlib)
     - [Array](#array)
+    - [Enumerable](#enumerable)
     - [URL/HTML encoding](#urlhtml-encoding)
     - [Strings](#strings)
       - [Encoding](#encoding)
@@ -214,6 +216,10 @@ Destructure an array in blocks ("unpacking" refers to arrays):
 end
 ```
 
+### Regular expression exceptions
+
+- the `/s` flag is not needed; additionally, it has a different meaning (just don't use it).
+
 ## Special variables/Built-in constants
 
 Updated up to: https://ruby-doc.org/stdlib-2.3.0/libdoc/English/rdoc/English.html
@@ -318,6 +324,11 @@ arr = [0, 1, 2]
 arr.fill(nil, arr.size...5)             # resize/extend (destructive) in arguably expressive form; returns the array; !!! watch out the `...` syntax !!!
 arr[5] ||= nil                          # other resize/extend, in arguably less expressive form
 ```
+
+### Enumerable
+
+enu.each_cons(n)                        # each overlapping subarray of `n` items; last non-exact subarrays are not included
+enu.each_slice(n)                       # each non overlapping subarray of `n` items; last non-exact subarray is included
 
 ### URL/HTML encoding
 
@@ -643,6 +654,8 @@ FileUtils.remove_dir(path, true)                # recursive
 
 FileUtils.touch(filename)
 FileUtils.chown(user[, group[, filename]])	    # change owner - File.chown needs the group/user id!!
+
+FileUtils.cp(src, dest, **options)              # copy file
 ```
 
 ### Tempfile, Tmpdir

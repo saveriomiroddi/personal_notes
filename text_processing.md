@@ -91,6 +91,8 @@ length $str                             # length of a string
 
 ### Search/replace
 
+(for the flags, see the `regexes.md` document)
+
 ```sh
 # Replace with code evaluation.
 #

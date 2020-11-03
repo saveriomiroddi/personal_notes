@@ -1,11 +1,19 @@
 # Regexes
 
 - [Regexes](#regexes)
+  - [PCRE flags](#pcre-flags)
   - [Complex cases](#complex-cases)
     - [Capturing sequences of N characters](#capturing-sequences-of-n-characters)
     - [Matching a pattern when it's not at the beginning](#matching-a-pattern-when-its-not-at-the-beginning)
   - [Language incompatibilities](#language-incompatibilities)
     - [Javascript](#javascript)
+
+## PCRE flags
+
+- `m`: match newlines with `.`
+  - `s`: match line beginning/end with `^`/`$` when `m` is used
+
+WATCH OUT! There are exceptions on some languages; see the specific language.
 
 ## Complex cases
 

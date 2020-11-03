@@ -1,3 +1,22 @@
+## Tue Nov/03
+
+- Extra
+  - Ask: comparsion between different macro implementations
+  - Write schedule maintenance script
+    - [x] Base design
+    - [x] First stage: fix dates
+    - [x] Second stage
+    - [x] Last stage, with restructurings
+    - [x] Refactor: make use of `find_preceding_or_existing_date`
+
+- Ray tracer challenge
+  - [ ] Chapter 3
+    - [ ] Implementation
+      - [x] Tuple: Add some convenient functions
+      - [x] Implement Matrix-Tuple multiplication
+      - [x] Implement identity matrix
+      - [x] Implement matrix transposition
+
 ## Mon Nov/02
 
 - Articles

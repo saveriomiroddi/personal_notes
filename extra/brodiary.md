@@ -1,3 +1,14 @@
+## Wed Nov/04
+
+- Extra
+  - [x] VSC: Fight find out [how to disable suggestions but leave snippets completion](https://code.visualstudio.com/docs/editor/intellisense#_tab-completion)
+
+- Ray tracer challenge
+  - [ ] Chapter 3
+    - [ ] Implementation
+      - [x] Search multiple supertraits, and support of generic `Self` type
+      - [x] Fight traits/boxed types/Self
+
 ## Tue Nov/03
 
 - Extra

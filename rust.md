@@ -1354,6 +1354,11 @@ trait BetterDisplay: fmt::Display {
         format!("Better!: {}", self.to_string())
     }
 }
+
+// - Multiple supertraits;
+// - Generic supertrait returning self -> requires Sized
+//
+trait Matrix: Sized + Mul<Self> { /* ... */ }
 ```
 
 ### Traits #3 (disambiguation)

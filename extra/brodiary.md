@@ -1,3 +1,20 @@
+## Thu Nov/05
+
+- Theory
+  - Rust
+    - [x] [Generics (Java <> Rust)](https://gist.github.com/Kimundi/8391398)
+    - [x] https://stackoverflow.com/questions/54465400/why-does-returning-self-in-trait-work-but-returning-optionself-requires
+
+- Ray tracer challenge
+  - [ ] Chapter 4
+    - [~] Theory
+  - [ ] Chapter 3
+    - [ ] Implementation
+      - [x] Merge Matrix multiple types into a single one, using Vec
+      - [x] Add root `describe!` scope, to workaround API's limitation
+      - [x] Submatrix
+      - [x] Minor
+
 ## Wed Nov/04
 
 - Extra

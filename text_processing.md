@@ -101,6 +101,13 @@ perl -pe 's/(@\S+)/" " x length($1)/e'
 # Regex matches print the groups.
 #
 echo 'a_b_c' | perl -lne 'print /(a)_(b)_(c)/' # `abc`
+
+# Assign regex captured groups to variables.
+# WATCH OUT! In the context of one or more variables, groups are interpreted as scalar; in order to
+# assign captured strings, assign to an array (use one variable for each group).
+#
+echo a_b_c | perl -lne '$a = /a_(b)_c/; print $a'   # `1`
+echo a_b_c | perl -lne '($a) = /a_(b)_c/; print $a' # `b`
 ```
 
 #### Regex extra backslash sequences

@@ -358,7 +358,7 @@ std::mem::swap(&mut a, &mut b); // !! swap two variables !!
 10_f64.powi(2);                 // exponentiation, float/int
 10_f64.sqrt();                  // square root
 10_f64.sin();                   // sine (in rad)
-10_f64.signum();                // positive: 1.0, negative: -1.0
+10_f64.signum();                // sign. float: (>= +0.0 -> 1.0), (<= -0.0 -> -1.0), (NaN -> NaN); int: (0 -> 0), (< 0 -> -1), (> 0 -> 1)
 
 std::f64::consts::PI;           // Pi
 
@@ -369,6 +369,7 @@ z, carry = x.overflowing_add(y); // adds and wraps around in case of overflow; <
 z, carry = x.overflowing_sub(y); // subtracts and wraps around, as above
                                  // WATCH OUT! For other `overflow_` operations, `carry` may not the intuitive value, eg. for bit shift
 z = x.rotate_left(y);
+z = x << y;                      // Shift; errors only if y is higher than the number of machine bits.
 (_, _) = x.overflowing_shl(y);   // WATCH OUT! This is not the intuitive 1-bit left shift - Rust doesn't have it predefined; for that,
                                  // manually compute the carry, then execute `wrapping_shl()`. Alternatively, override the shift operator.
 
@@ -488,7 +489,7 @@ map(|(x, y)| x + y)          // Tuples unpacking: useful for example, on the res
 fold(a, |a, x| a + x)        // Ruby :inject
 filter(|x| x % 2 == 0)       // Ruby :select
 find(|x| x % 2 == 0)         // find first element matching the condition
-flatten()                    // Ruby :flatten
+flatten()                    // Quasi-Ruby :flatten. WATCH OUT! flattens only one level.
 rev()                        // reverse. WATCH OUT, UNINTUITIVE: since it's not inclusive, it goes from 99 to 0.
 any(|x| x == 33)             // terminates on the first true
 all(|x| x % 2 == 0)          // terminates on the first false
@@ -502,6 +503,9 @@ sum()                        // WATCH OUT! Returns the same type, so conversion 
 chunks(n)                    // iterate in chunks of n elements; includes last chunk, if smaller
 chunks_exact(n)              // (preferred) iterate in chunks of n elements; does not include the last chunk, if smaller
 windows(n)                   // like chunks, but with overlapping slices
+
+// If an iterator is over &T, but T is needed, use copied(). Example, from [f64; _] to Vec<f64>:
+myarr_f64.iter().flatten().copied().collect::<Vec<_>>();
 
 // transform an iterator into a collection ("consume")
 collect()
@@ -557,16 +561,18 @@ impl Iterator for PhonyCounter {
 Arrays (immutable, so they're allocated on the stack):
 
 ```rust
-let my_list = [1, 2, 3];
-let my_list = [true; 4];                // 4 elements initialized as true; won't work with variable size (use a Vec)
-let my_list: [u32; 3] = [1, 2, 3];      // with data type annotation; ugly!
-let mut my_list: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
+let arr = [1, 2, 3];
+let arr = [true; 4];                     // 4 elements initialized as true; won't work with variable size (use a Vec)
+let arr: [u32; 3] = [1, 2, 3];           // with data type annotation; ugly!
+let mut arr: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
 
 // If a struct has an array, it's possible to initialize the array implicitly by using the [Default](#default) trait on the struct.
 
-my_list[512..512 + source.len()].copy_from_slice(&source) // memcpy (copy) from/to slices/vectors; source/dest size must be the same!
-my_list.fill(value)                     // memset; unstable as of Aug/2020
+arr[512..512 + source.len()].copy_from_slice(&source) // memcpy (copy) from/to slices/vectors; source/dest size must be the same!
+arr.fill(value)                         // memset; unstable as of Aug/2020
 [1, 2, 3] == [1, 2, 4]                  // arrays can be compared via `==`
+
+arr.to_vec()                            // convert array to vector
 
 // invocation: process_list(&my_list)
 //

@@ -1,3 +1,19 @@
+## Fri Nov/06
+
+- Ray tracer challenge
+  - [x] Chapter 3
+    - [x] Fight branchless cofactor
+    - [x] Implementation
+  - [ ] Chapter 4
+    - [x] Theory
+    - [x] Fight 2d arrays formatting and evaluate alternatives
+    - [ ] Implementation
+      - [x] Translation
+
+- Extra
+  - [x] Fight understand case where the negative lookahead workaround works with a `^` but not `x`
+  - [x] Report reader bug
+
 ## Thu Nov/05
 
 - Theory

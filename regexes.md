@@ -1,12 +1,25 @@
 # Regexes
 
 - [Regexes](#regexes)
+  - [Quantifiers](#quantifiers)
   - [PCRE flags](#pcre-flags)
   - [Complex cases](#complex-cases)
     - [Capturing sequences of N characters](#capturing-sequences-of-n-characters)
     - [Matching a pattern when it's not at the beginning](#matching-a-pattern-when-its-not-at-the-beginning)
   - [Language incompatibilities](#language-incompatibilities)
     - [Javascript](#javascript)
+
+## Quantifiers
+
+Form: `{M}`, `{M, N}`, `{M,}`.
+
+They're greedy by default! The non greedy form is `{M, N}}`.
+
+Don't forget that when used with a capturing group, the group will capture only the last occurrence:
+
+```ruby
+" 2 3 4".scan /( \d){2,}/ # => [[" 4"]]
+```
 
 ## PCRE flags
 

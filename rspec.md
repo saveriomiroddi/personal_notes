@@ -3,7 +3,8 @@
 - [RSpec](#rspec)
   - [Structure examples](#structure-examples)
   - [Mocks](#mocks)
-    - [??? SECTION ???](#-section-)
+    - [Matchers](#matchers)
+    - [Matching arguments](#matching-arguments)
     - [Arbitrary handling](#arbitrary-handling)
   - [Testing modules](#testing-modules)
 
@@ -44,11 +45,21 @@ describe MessagesController
 
 ## Mocks
 
-### ??? SECTION ???
+### Matchers
 
-```ruby
-`be_a`, `be_an`, `be_a_kind_of`, `be_an_instance_of`
-```
+See [reference](https://relishapp.com/rspec/rspec-expectations/docs/built-in-matchers/type-matchers).
+
+ | Target       | Methods                                              |
+ | ------------ | ---------------------------------------------------- |
+ | Class (type) | `be_a`, `be_an`, `be_a_kind_of`, `be_an_instance_of` |
+
+### Matching arguments
+
+See [reference](https://relishapp.com/rspec/rspec-mocks/docs/setting-constraints/matching-arguments).
+
+| Argument   | Methods      | Notes                                     |
+| ---------- | ------------ | ----------------------------------------- |
+| Regexp/=== | with(/expr/) | Anything supporting case equality (`===`) |
 
 ### Arbitrary handling
 

@@ -85,7 +85,7 @@
     - [Map literals (`maplit`)](#map-literals-maplit)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
     - [Unit testing](#unit-testing)
-    - [Allow initializing static constants with any function (`lazy_static`)](#allow-initializing-static-constants-with-any-function-lazy_static)
+    - [Static/global variables (`lazy_static`, `thread_local!`)](#staticglobal-variables-lazy_static-thread_local)
     - [Concurrency (multithreading) tools (`rayon`/`crossbeam`)](#concurrency-multithreading-tools-rayoncrossbeam)
     - [Enum utils, e.g. iterate (`strum`)](#enum-utils-eg-iterate-strum)
 
@@ -3263,7 +3263,9 @@ assert_float_absolute_eq!(3.0, 3.0);      # default epsilon = 1e-6
 assert_float_absolute_eq!(3.0, 3.9, 1.0);
 ```
 
-### Allow initializing static constants with any function (`lazy_static`)
+### Static/global variables (`lazy_static`, `thread_local!`)
+
+Global mutable variables; also, allows initializing static variables with any function:
 
 ```rust
 // Don't forget that access will required RG.lock().unwrap().
@@ -3271,6 +3273,24 @@ assert_float_absolute_eq!(3.0, 3.9, 1.0);
 lazy_static::lazy_static! {
   static ref RG: Mutex<RandGen> = Mutex::new(RandGen::new(34052));
 }
+```
+
+Thread-local variables:
+
+```rust
+// In stdlib.
+//
+thread_local!(static TL_VAR: RefCell<u32> = RefCell::new(123));
+
+TL_VAR.with(|tl_var_cell| {
+  let mut tl_var_ref = tl_var_cell.borrow_mut();
+  *tl_var_ref = 32;
+});
+
+TL_VAR.with(|tl_var_cell| {
+  let tl_value = tl_var_cell.borrow();
+  println!("TLV: {}", tl_value); // 32
+});
 ```
 
 ### Concurrency (multithreading) tools (`rayon`/`crossbeam`)

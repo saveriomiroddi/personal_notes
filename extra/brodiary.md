@@ -1,3 +1,16 @@
+## Sat Nov/07
+
+- Extra
+  - [x] Schedule maintenance script
+    - [x] Simplify: Remove previous_date
+    - [x] Add support for first date not being the current one
+
+- Ray tracer challenge
+  - [x] Chapter 4
+  - [x] Chapter 5
+    - [~] Theory
+      - Stumble on reason for normalization
+
 ## Fri Nov/06
 
 - Ray tracer challenge

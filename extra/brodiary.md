@@ -1,3 +1,28 @@
+## Sun Nov/08
+
+- Ray tracer challenge
+  - [x] Chapter 5
+    - [x] Theory
+      - Study normalization
+        - [x] https://docs.godotengine.org/en/2.1/learning/features/math/vector_math.html
+        - [x] https://stackoverflow.com/questions/10002918/what-is-the-need-for-normalizing-a-vector
+        - [x] https://stackoverflow.com/questions/6875055/raytracing-when-to-normalize-a-vector
+      - [x] Review the chapter
+    - [x] Implementation
+      - [x] Think intersections type(s) design
+        - postpone, given too little infos
+    - [x] Practice
+      - [x] Fight position, sphere size and transformations
+      - [x] Add convenience APIs
+      - [x] Experimentation
+    - [x] Post 2 erratas
+  - [ ] Chapter 6
+    - [x] Theory
+    - [~] Implementation
+      - [x] Fight errors caused by wrong test preset value
+    - [x] Practice
+  - [~] Convert owned function params to references, and remove `clone()` invocations
+
 ## Sat Nov/07
 
 - Extra

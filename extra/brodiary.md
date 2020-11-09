@@ -1,3 +1,27 @@
+## Mon Nov/09
+
+- Ray tracer challenge
+  - [x] Chapter 6
+    - [x] Implementation
+      - [x] Review lighting logic
+      - [x] Fight concurrency issue in Sphere's test suite
+  - [x] Convert all owned function params to references
+- Ray tracer challenge
+  - [ ] Chapter 7
+    - [x] Theory
+    - [ ] Implementation
+      - [x] Design intersections APIs
+      - [x] Fight Rust floats sorting
+
+- Theory
+  - Rust
+    - [x] Study [trait/references](https://stackoverflow.com/questions/28005134/how-do-i-implement-the-add-trait-for-a-reference-to-a-struct)
+      - See related question
+
+- Extra
+  - Rust
+    - [x] Review UT framework: https://crates.io/crates/spectral
+
 ## Sun Nov/08
 
 - Ray tracer challenge

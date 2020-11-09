@@ -18,6 +18,8 @@
       - [Internal representation (bytes/chars/graphemes)](#internal-representation-bytescharsgraphemes)
     - [For/while (/loop) loops](#forwhile-loop-loops)
     - [If (let)/then/else](#if-letthenelse)
+    - [Sorting](#sorting)
+    - [Sorting floats](#sorting-floats)
     - [Enums](#enums)
     - [Option<T>/Result<T, Error>](#optiontresultt-error)
     - [Pattern matching](#pattern-matching)
@@ -65,7 +67,9 @@
     - [Testing](#testing)
       - [Integration tests](#integration-tests)
     - [String/char-related (conversions)](#stringchar-related-conversions)
-    - [VecDeque: double-ended queue](#vecdeque-double-ended-queue)
+    - [Collections](#collections)
+      - [BTreeSet: sorted set](#btreeset-sorted-set)
+      - [VecDeque: double-ended queue](#vecdeque-double-ended-queue)
     - [TCP client/server](#tcp-clientserver)
     - [Commandline arguments (basic)](#commandline-arguments-basic)
     - [Processes](#processes)
@@ -88,6 +92,7 @@
     - [Static/global variables (`lazy_static`, `thread_local!`)](#staticglobal-variables-lazy_static-thread_local)
     - [Concurrency (multithreading) tools (`rayon`/`crossbeam`)](#concurrency-multithreading-tools-rayoncrossbeam)
     - [Enum utils, e.g. iterate (`strum`)](#enum-utils-eg-iterate-strum)
+    - [Convenience macros for operator overloading (`auto_ops`)](#convenience-macros-for-operator-overloading-auto_ops)
 
 ## Cargo
 
@@ -927,16 +932,86 @@ while let Some(Some(value)) = optional_values_vec.pop() {
 }
 ```
 
+### Sorting
+
+Definitions:
+
+- `PartialEq`: the type is a partial equality relation (floats isn't, because NaN != NaN); allows comparison with asserts.
+- `Eq`: the type is an equality relation; good practice to implement if applies.
+
+Watch out! The f64 doesn't support Ord (which is often required); only PartialOrd.
+
+```rust
+// Sort a slice of f64
+//
+v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+```
+
+### Sorting floats
+
+Required a wrapper class (and a truckload of boilerplate):
+
+```rust
+// Implementation that considers NaN as greater than the other floats, and equal to itself.
+// This doesn't conform to the standard.
+//
+pub struct SortableFloat(pub f64);
+
+// Implemented because very likely that this type is going to be printed in debug form.
+//
+impl Debug for SortableFloat {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}", self.0)
+  }
+}
+
+// This only informs the compiler that the type supports (full) equivalence.
+//
+impl Eq for SortableFloat {}
+
+impl PartialEq for SortableFloat {
+  fn eq(&self, other: &Self) -> bool {
+    if self.0.is_nan() {
+      other.0.is_nan()
+    } else {
+      self.0 == other.0
+    }
+  }
+}
+
+impl Ord for SortableFloat {
+  fn cmp(&self, other: &Self) -> Ordering {
+    let (lhs, rhs) = (self.0, other.0);
+
+    if let Some(result) = lhs.partial_cmp(&rhs) {
+      result
+    } else {
+      if lhs.is_nan() {
+        if rhs.is_nan() {
+          Ordering::Equal
+        } else {
+          Ordering::Greater
+        }
+      } else {
+        Ordering::Less
+      }
+    }
+  }
+}
+
+impl PartialOrd for SortableFloat {
+  fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+    Some(self.cmp(other))
+  }
+}
+```
+
 ### Enums
 
 Definition:
 
 ```rust
 // Each entry is called "variant".
-//
-// - `Debug`: allows printing (also required by asserts);
-// - `PartialEq`: allows comparison with asserts; floats implement this, because NaN != NaN.
-// - `Eq`: good practice to implement if applies.
 //
 #[derive(Debug, PartialEq, Eq)]
 enum IpAddrKind {
@@ -1409,12 +1484,14 @@ println!("{}", Flyer::mean());            // error!
 
 ### Operator overloading
 
+WATCH OUT! Think carefully about ownership - whether owned values (self/rhs) or references should be used.
+
 ```rust
 struct Point(i32);
 struct BigPoint(i32);
 
 impl Add for Point {
-  type Output = Point;
+  type Output = Self;
 
   // `rhs` stays for `Right Hand Side`
   //
@@ -1423,26 +1500,16 @@ impl Add for Point {
   }
 }
 
-impl Add<BigPoint> for Point {
-  type Output = Point;
+impl Add<&BigPoint> for Point {
+  type Output = Self;
 
-  fn add(self, rhs: BigPoint) -> Self::Output {
+  fn add(self, rhs: &BigPoint) -> Self::Output {
     Point(self.0 + 1000 * rhs.0)
   }
 }
 
 Point(10) + Point(20)
-Point(10) + BigPoint(1)
-
-// Overload operations.
-//
-impl Mul<f64> for Tuple {
-    type Output = Tuple;
-
-    fn mul(self, rhs: f64) -> Self::Output {
-        Tuple(self.0 * rhs, self.1 * rhs, self.2 * rhs, self.3 * rhs)
-    }
-}
+Point(10) + &BigPoint(1)
 ```
 
 Some operators:
@@ -2040,6 +2107,8 @@ for received in rx {
 ```
 
 #### Mutex<T>/Arc<T>
+
+WATCH OUT! The same thread can't acquire the same lock twice - it will lock on the second attempt.
 
 ```rust
 // We need to use an "Atomic Reference Counter" because the counter is shared between threads;
@@ -2649,7 +2718,7 @@ for more complex operations (ie. involving seek), can use [io::Cursor](https://d
 
 ### Testing
 
-Unit testing:
+WATCH OUT! UTs are run in parallel by default!! In order to run specific tests serially, must use the [serial_test crate](https://crates.io/crates/serial_test).
 
 ```rust
 fn my_method() -> u32 {
@@ -2696,7 +2765,7 @@ Cargo options:
 
 ```sh
 cargo test $test_name_substring      # no patterns/regexes supported
-cargo test -- --test=test-threads=1  # run serially (default is parallel)
+cargo test -- --test=test-threads=1  # run serially
 cargo test -- --nocapture            # don't steal stdout output
 cargo test -- --ignored              # include ignored tests
 ```
@@ -2775,7 +2844,34 @@ use std::char;
 let c = char::from_digit(4, 10);          // (number, radix)
 ```
 
-### VecDeque: double-ended queue
+### Collections
+
+#### BTreeSet: sorted set
+
+```rust
+let set = BTreeSet::new()
+
+set.insert(10);
+set.insert(4);
+set.insert(1981);
+
+set.contains(88); // false
+set.remove(123);  // false
+set.clear();
+
+set.first();      // 4
+set.last();       // 1981
+
+set.is_subset(&BTreeSet);
+set.is_superset(&BTreeSet);
+set.is_disjoint(&BTreeSet);  // disjoint: no elements in common
+set.intersection(&BTreeSet).clone().collect();
+set.union(&BTreeSet).clone().collect();
+```
+
+For sorting floats, see [sorting section](#sorting-floats).
+
+#### VecDeque: double-ended queue
 
 ```rust
 let mut mailbox = VecDeque::new();
@@ -3261,6 +3357,10 @@ demonstrate! {
 //
 assert_float_absolute_eq!(3.0, 3.0);      # default epsilon = 1e-6
 assert_float_absolute_eq!(3.0, 3.9, 1.0);
+
+// The [Spectral](https://github.com/cfrancia/spectral) create has fluent assertions
+//
+asserting(&"test condition").that(&1).is_equal_to(&2);
 ```
 
 ### Static/global variables (`lazy_static`, `thread_local!`)
@@ -3332,3 +3432,7 @@ use strum::IntoEnumIterator;
 
 for flag in Flag::iter() { /* ... */ }
 ```
+
+### Convenience macros for operator overloading (`auto_ops`)
+
+See [repository](https://github.com/carbotaniuman).

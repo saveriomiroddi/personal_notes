@@ -1,3 +1,27 @@
+## Tue Nov/10
+
+- ZFS
+  - [x] Close (develop) issue "c_boot_partition_size too small" #145
+  - [x] Review issue with Debian
+  - [x] Close (develop) issue "The EFI system partition and the boot pool partition share the same size"
+  - [x] Change default boot pool size
+  - [x] Release
+  - [x] Test Debian 10.6
+
+- Extra
+  - GitHub issues
+    - [x] Update description of `demonstrate` opened issue
+    - [x] Update description of `rust-sdl2` opened issue, add update, and close
+  - Rust
+    - [x] Check if the `serial_test` crate can be used with `demonstrate`
+    - [x] Think a generic solution for testing in isolation `Sphere::new()`
+  - Golang/Terraform: [Issue with Java decompression](https://github.com/saveriomiroddi/terraform-provider-archive-dev/issues/1)
+    - [x] Solve issue, and write discussion
+
+- Ray tracer challenge
+  - [x] Simplify `Sphere#hit()`
+    - [x] Review dot product context
+
 ## Mon Nov/09
 
 - Ray tracer challenge

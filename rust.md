@@ -1,6 +1,7 @@
 # Rust
 - [Rust](#rust)
   - [Cargo](#cargo)
+  - [Conditional build (ifdef-like)](#conditional-build-ifdef-like)
   - [Syntax/basics](#syntaxbasics)
     - [Basic structure/Printing/Input](#basic-structureprintinginput)
       - [Printing/formatting](#printingformatting)
@@ -158,6 +159,17 @@ Versioning is pessimistic by default.
 See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
+
+## Conditional build (ifdef-like)
+
+The `cfg` attribute performs a conditional build:
+
+```rust
+#[cfg(test)]        // Compile only in test builds.
+#[cfg(not(test))]   // Compile only in nont-test builds.
+```
+
+The attribute can be applied to methods, statements, etc.
 
 ## Syntax/basics
 
@@ -2725,7 +2737,7 @@ fn my_method() -> u32 {
   1
 }
 
-#[cfg(test)] // Comple and run only in test mode
+#[cfg(test)]
 mod tests {
   // If really required, since this is a child module, this allows private functions to be tested.
   //
@@ -3315,11 +3327,15 @@ thread::spawn(move || {
 
 ### Unit testing
 
+RSpec-style testing:
+
 ```rust
 use demonstrate::demonstrate;
 
 // If a single instance needs to be shared between UTs ("before all"), then trickery is needed.
 // The Mutex is required for mutability.
+//
+// A simpler approach to this is to use an empty mutex (`Mutex<()>`) and initialize on each UT.
 //
 use std::sync::Mutex;
 unsafe impl Send for Sdl2Interface {}
@@ -3352,7 +3368,17 @@ demonstrate! {
 }
 ```
 
+Utilities:
+
 ```rust
+// `serial_test` allows marked tests to be run serially; works with `demonstrate`!
+//
+#[serial]
+it "mytest" { /* ... */ }
+
+#[serial]
+it "mytest2" { /* ... */ }
+
 // assert_float_eq: nice, but doesn't support messages
 //
 assert_float_absolute_eq!(3.0, 3.0);      # default epsilon = 1e-6

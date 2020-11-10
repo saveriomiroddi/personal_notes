@@ -13,6 +13,7 @@
     - [Shell (initscripts)](#shell-initscripts)
       - [Example cases](#example-cases)
       - [sudo -i, login shell test, and bash](#sudo--i-login-shell-test-and-bash)
+  - [Update system time](#update-system-time)
   - [Cron](#cron)
   - [Systemd](#systemd)
     - [Systemctl](#systemctl)
@@ -360,6 +361,21 @@ Bash options:
 ```
 -i          : If the -i option is present, the shell is interactive.
 -l, --login : Make bash act as if it had been invoked as a login shell (see INVOCATION below).
+```
+
+## Update system time
+
+```sh
+# Modern approach (can take a few tens seconds).
+#
+systemctl start systemd-timesyncd
+
+# Old approach
+#
+apt-get install ntpdate
+ntp stop
+ntpdate ntp.ubuntu.com
+ntp start
 ```
 
 ## Cron

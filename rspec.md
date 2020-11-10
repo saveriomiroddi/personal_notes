@@ -2,6 +2,7 @@
 
 - [RSpec](#rspec)
   - [Structure examples](#structure-examples)
+  - [Setup](#setup)
   - [Mocks](#mocks)
     - [Matchers](#matchers)
     - [Matching arguments](#matching-arguments)
@@ -42,6 +43,10 @@ describe MessagesController
       it "assigns @message"
       it "renders the new template"
 ```
+
+## Setup
+
+On top of each test file, add `require 'rspec'`, which will load `spec/spec_helper.rb`.
 
 ## Mocks
 

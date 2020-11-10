@@ -34,6 +34,7 @@
     - [Flock](#flock)
     - [Etc](#etc)
     - [StringIO](#stringio)
+    - [ERB templates](#erb-templates)
     - [GC (garbage collection)](#gc-garbage-collection)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
@@ -718,6 +719,33 @@ Etc.getpwuid.dir                		        # Get current user home dir
 # Watch out! If the `a`ppend mode is not specified, the string passed is overwritten!
 #
 StringIO.new("start_string", "a")
+```
+
+### ERB templates
+
+Simple rendering logic example; keep in mind the binding considerations.
+
+```ruby
+template_content = IO.read(template_file)
+
+# WATCH OUT! Instance variables of the binding object are different from instance variables in the
+# binding - ie. using :instance_variable_set will not work as expected.
+# There are different approaches. This is st00pid simple; for a more sophisticated one, see
+# https://stackoverflow.com/a/41590728.
+#
+variables.each { |name, value| TOPLEVEL_BINDING.eval "@#{name} = #{value.inspect}" }
+
+# It's possible to render with a local context, and evaluate in the global one, however, it doesn't
+# have any particular advantage (at least, for the use case).
+#
+rendered_template = ERB.new(template_content).result(TOPLEVEL_BINDING)
+
+TOPLEVEL_BINDING.eval(rendered_template, template_file)
+
+# Since we're working on the top level binding (so that classes will be in the global namespace),
+# it's better to clean up :-)
+#
+variables.keys.each { |name| TOPLEVEL_BINDING.eval "remove_instance_variable '@#{name}'" }
 ```
 
 ### GC (garbage collection)

@@ -94,6 +94,7 @@
     - [Concurrency (multithreading) tools (`rayon`/`crossbeam`)](#concurrency-multithreading-tools-rayoncrossbeam)
     - [Enum utils, e.g. iterate (`strum`)](#enum-utils-eg-iterate-strum)
     - [Convenience macros for operator overloading (`auto_ops`)](#convenience-macros-for-operator-overloading-auto_ops)
+    - [Indented Heredoc-like strings (`indoc`)](#indented-heredoc-like-strings-indoc)
 
 ## Cargo
 
@@ -3462,3 +3463,17 @@ for flag in Flag::iter() { /* ... */ }
 ### Convenience macros for operator overloading (`auto_ops`)
 
 See [repository](https://github.com/carbotaniuman).
+
+### Indented Heredoc-like strings (`indoc`)
+
+```rust
+// Ruby squiggly heredoc-alike syntax.
+//
+let expected_string = indoc! {"
+    P3
+    5 3
+    255
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 255 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 255 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0
+"};
+```

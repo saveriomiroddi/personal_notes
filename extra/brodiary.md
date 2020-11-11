@@ -1,3 +1,19 @@
+## Wed Nov/11
+
+- Ray tracer challenge
+  - [ ] Chapter 7
+    - Refactorings
+      - [x] Add Sphere::from API
+      - [x] Test suites: Use `crate::**` instead of importing each type
+      - [x] Add convenience method Ray::new()
+      - [x] Convert World#objects to array of Sphere references
+      - [x] Fight issue with Vec<&> that unknowingly should have been Vec<&mut>
+        - Study borrowed references
+          - [x] https://stackoverflow.com/questions/28158738/cannot-move-out-of-borrowed-content-cannot-move-out-of-behind-a-shared-referen
+          - [x] https://stackoverflow.com/questions/38785744/iterating-through-a-vec-within-a-struct-cannot-move-out-of-borrowed-content
+      - [x] Fight mistaken reading of the intersection type specification
+    - [~] Implementation
+
 ## Tue Nov/10
 
 - ZFS
@@ -20,6 +36,7 @@
 
 - Ray tracer challenge
   - [x] Simplify `Sphere#hit()`
+    - [x] Make sure that Sphere#intersections() is in order (review context)
     - [x] Review dot product context
 
 ## Mon Nov/09

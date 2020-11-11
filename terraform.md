@@ -6,6 +6,7 @@
     - [Variables](#variables)
     - [Predefined variables](#predefined-variables)
     - [Strings](#strings)
+    - [Lists (arrays)](#lists-arrays)
     - [Maps](#maps)
     - [Functions](#functions)
     - [Iteration](#iteration)
@@ -135,6 +136,14 @@ path.module     # path of the current module
 
     echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
   EOF
+```
+
+### Lists (arrays)
+
+```hcl
+mylist = ["a", "b", "c", "d"]
+
+slice(mylist, 1, 3)  # ["b", "c"]
 ```
 
 ### Maps

@@ -1,3 +1,17 @@
+## Thu Nov/12
+
+- Blog
+  - [x] Reply blog request
+
+- Extra
+  - Admin
+    - [x] Fight issue with VPN provider
+
+- Ray tracer challenge
+  - [ ] Chapter 7
+    - [ ] Implementation
+      - [x] Add Matrix::view_transform UTs
+
 ## Wed Nov/11
 
 - Ray tracer challenge

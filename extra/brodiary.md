@@ -1,3 +1,19 @@
+## Fri Nov/13
+
+- Open source
+  - PIA manual connection scripts
+    - [x] Open fix PR: IPv6 check fails on configuration where IPv6 is disabled via kernel cmdline parameter
+    - [x] Open fix PR: Inappropriate permissions for the credentials file
+
+- Extra
+  - Admin
+    - [x] Test VPN provider new configuration
+  - Tooling
+    - Schedule maintenance script
+      - [x] Allow days without done/todo separator
+      - [x] Add day archival to `replan`
+        - Other minor improvements
+
 ## Thu Nov/12
 
 - Blog
@@ -61,7 +77,6 @@
       - [x] Review lighting logic
       - [x] Fight concurrency issue in Sphere's test suite
   - [x] Convert all owned function params to references
-- Ray tracer challenge
   - [ ] Chapter 7
     - [x] Theory
     - [ ] Implementation

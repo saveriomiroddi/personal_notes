@@ -9,6 +9,7 @@
     - [Heredoc](#heredoc)
     - [Data type conversions](#data-type-conversions)
     - [Collections destructuring in blocks](#collections-destructuring-in-blocks)
+    - [Modules](#modules)
     - [Regular expression exceptions](#regular-expression-exceptions)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
   - [Reflection](#reflection)
@@ -16,9 +17,11 @@
   - [Concurrency](#concurrency)
     - [Mutex](#mutex)
     - [Thread-safe data structures](#thread-safe-data-structures)
-  - [APIs/Stdlib](#apisstdlib)
+  - [Collections](#collections)
     - [Array](#array)
+      - [Useful operations](#useful-operations)
     - [Enumerable](#enumerable)
+  - [APIs/Stdlib](#apisstdlib)
     - [URL/HTML encoding](#urlhtml-encoding)
     - [Strings](#strings)
       - [Encoding](#encoding)
@@ -217,6 +220,43 @@ Destructure an array in blocks ("unpacking" refers to arrays):
 end
 ```
 
+### Modules
+
+```ruby
+module MyModule
+  # This is defined at module level; it won't be available to instance methods, only to class methods.
+  # The attr_accessor is a convenience.
+  #
+  @per_class = Mutex.new
+  class << self; attr_accessor :per_class; end
+
+  # Invocation: MyModule.my_class_method.
+  #
+  def self.my_class_method
+    puts per_class
+  end
+
+  # Invocation: MyClass.new.my_instance_method()
+  #
+  # Each MyClass instance will have their own @per_instance.
+  #
+  def my_instance_method
+    @per_instance = Mutex.new unless instance_variable_defined?(:@per_instance)
+    puts @per_instance.object_id
+  end
+end
+
+module MyModule
+  # Add invocation: MyModule.my_method()
+  #
+  extend self
+
+  def my_method; end
+end
+
+class MyClass; include MyModule; end
+```
+
 ### Regular expression exceptions
 
 - the `/s` flag is not needed; additionally, it has a different meaning (just don't use it).
@@ -315,7 +355,7 @@ end
 threads.each(&:join)
 ```
 
-## APIs/Stdlib
+## Collections
 
 ### Array
 
@@ -326,10 +366,22 @@ arr.fill(nil, arr.size...5)             # resize/extend (destructive) in arguabl
 arr[5] ||= nil                          # other resize/extend, in arguably less expressive form
 ```
 
+#### Useful operations
+
+Perform COUNT/GROUP BY on an array; Ruby 2.7 implements #tally:
+
+```ruby
+[a:, a:, :b, :c, :c: :c]
+  .group_by(&:itself)        # => {a: [:a, :a], b: [:b], c: [:c, :c, :c]}
+  .transform_values(&:count) # => {a: 2, b: 1, c: 3}
+```
+
 ### Enumerable
 
 enu.each_cons(n)                        # each overlapping subarray of `n` items; last non-exact subarrays are not included
 enu.each_slice(n)                       # each non overlapping subarray of `n` items; last non-exact subarray is included
+
+## APIs/Stdlib
 
 ### URL/HTML encoding
 
@@ -716,9 +768,16 @@ Etc.getpwuid.dir                		        # Get current user home dir
 ### StringIO
 
 ```ruby
-# Watch out! If the `a`ppend mode is not specified, the string passed is overwritten!
+# WATCH OUT! If the `a`ppend mode is not specified, the string passed is overwritten!
 #
 StringIO.new("start_string", "a")
+
+# WATCH OUT! :puts adds a newline, but chomps the parameter's last trailing newline
+#
+buffer.print "line\n"    # one trailing newline
+buffer.puts  "line\n"    # one trailing newline
+buffer.puts  "line\n\n"  # two trailing newlines
+buffer.puts  "line", ""  # two trailing newlines
 ```
 
 ### ERB templates

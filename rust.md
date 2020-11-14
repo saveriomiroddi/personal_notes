@@ -3430,6 +3430,8 @@ use rayon::prelude::*;
 array.par_iter()
      .map(|&i| i * i)
      .sum()
+
+range.into_par_iter().for_each(|v| { /* parallel operation */ });
 ```
 
 Both Rayon and [Crossbeam](https://github.com/crossbeam-rs/crossbeam) provide tools for concurrent programming:

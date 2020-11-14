@@ -1,3 +1,15 @@
+## Sat Nov/14
+
+- Open source
+  - PIA manual connection scripts
+    - [x] Update/test PIA PR
+
+- Ray tracer challenge
+  - [ ] Chapter 7
+    - [x] Debug commit 55151c3f04be077de1449c35dc10f0203d5cdaaa (`cargo run` -> image rendering wrong)
+      - [x] Two minor refactorings
+  - [x] Parallelize chapter 6 practice!!!
+
 ## Fri Nov/13
 
 - Open source

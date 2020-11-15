@@ -82,6 +82,7 @@
     - [From (/Into)](#from-into)
     - [Index[Mut]](#indexmut)
   - [Crates](#crates)
+    - [Partial/more flexible defaults (`smart-default`)](#partialmore-flexible-defaults-smart-default)
     - [Random (with and without `rand`)](#random-with-and-without-rand)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
     - [Date/times (standard)](#datetimes-standard)
@@ -2957,6 +2958,8 @@ struct SomeOptions {
 SomeOptions { bar: true, ..Default::default() };
 ```
 
+See [smart-default crate](#partialmore-flexible-defaults-smart-default) for partial/more flexible defaults.
+
 ### Copy, Clone, Drop and their relationships
 
 See:
@@ -3034,6 +3037,27 @@ self.registers[dst_register] = 0x21;
 ```
 
 ## Crates
+
+### Partial/more flexible defaults (`smart-default`)
+
+```rust
+#[derive(SmartDefault)]
+pub struct Sphere {
+  #[default(_code = "Self::new_id()")] // the method can be private
+  pub id: u32,
+  #[default(Matrix::identity(4))]
+  pub transformation: Matrix,
+  #[default(Material::default())]
+  pub material: Material,
+}
+
+let sphere1 = Sphere::default();
+
+let mut sphere2 = Sphere {
+  material: Material { /* .. */ },
+  ..Sphere::default()
+};
+```
 
 ### Random (with and without `rand`)
 

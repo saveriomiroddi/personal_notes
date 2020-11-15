@@ -1,3 +1,11 @@
+## Sun Nov/15
+
+- Ray tracer challenge
+  - [x] Rename (horrible) ExportToPixels to Image
+  - [x] Rename Sdl2Interface "center" concept to "origin"
+  - [x] Check out `smart-default` crate, implement in Sphere, if it benefits (-> done)
+  - [x] Investigate wall size crash; restrict to smallest test case, and ask question
+
 ## Sat Nov/14
 
 - Open source

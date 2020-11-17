@@ -1,3 +1,31 @@
+## Mon Nov/16
+
+- Open source
+  - Geet
+    - [x] Fix Merge PR branch auto deletion test suite
+    - [x] Implement Milestone close
+
+- Ray tracer challenge
+  - [x] Why doesn't the rayon implementation need move?
+  - [x] Several cleanups to Chapter 6 implementation
+  - [x] Sdl2Interface: exit only on Esc key
+  - [x] Implement a generic I/O Interface trait
+    - [x] Design the trait
+    - [x] Implement the virtual image type
+    - [x] Replace the type in ppm_encoder_test
+  - [x] Fight lifetimes
+  - [ ] Chapter 7
+    - [x] Implementation
+      - [x] Extend Image trait, and apply minor adjustments to Sdl2Interface.
+      - [x] Add VirtualImage, and put it to use in the PpmEncoder test suite
+      - [x] Implement Camera#render
+      - [x] Implement World::default(), which replaces new()
+    - [x] Practice
+      - [x] Chapter 7 practice preparation: create, as refactoring of the previous chapter
+      - [x] Parallelize Camera#render()
+      - [x] Chapter 7 practice
+      - [x] Sdl2Interface: Remove invert_y and origin logic from the default constructor
+
 ## Sun Nov/15
 
 - Ray tracer challenge

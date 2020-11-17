@@ -523,8 +523,10 @@ chunks(n)                    // iterate in chunks of n elements; includes last c
 chunks_exact(n)              // (preferred) iterate in chunks of n elements; does not include the last chunk, if smaller
 windows(n)                   // like chunks, but with overlapping slices
 
-// If an iterator is over &T, but T is needed, use copied(). Example, from [f64; _] to Vec<f64>:
+// If one wants to convert an iterator from borrowed (&T) to owned (T), use copied() or cloned().
+// Example, from [f64; _] to Vec<f64>:
 myarr_f64.iter().flatten().copied().collect::<Vec<_>>();
+myarr_f64.iter().flatten().cloned().collect::<Vec<_>>();
 
 // transform an iterator into a collection ("consume")
 collect()
@@ -599,6 +601,8 @@ fn process_list(list: &[i32]) {}
 
 // For unpacking, see `if let`
 ```
+
+Watch out!! Very large arrays will overflow the stack; use `Vec` in such cases.
 
 Vectors (mutable):
 
@@ -1080,7 +1084,10 @@ let absent_number: Option<i32> = None;
 //
 let value = method()?;
 
-// Convenient pattern
+// Convenient pattern. Companion APIs:
+//
+// - `unwrap_or`:         eagerly evaluated
+// - `unwrap_or_default`: invokes the `default()` (!!)
 //
 result.unwrap_or_else( |err | {
   println!("Problem parsing arguments: {}", err);
@@ -2068,6 +2075,7 @@ impl<T: Copy> LinkedList<T> {
 Base usage:
 
 ```rust
+use std::io::{self, Write};
 use std::thread;
 use std::time::Duration;
 
@@ -2076,7 +2084,8 @@ let message = "Hello";
 // `move` is required to access variable in the context, with move semantics.
 //
 let handle = thread::spawn(move || {
-  println!("{}", message);
+  // Thread-safe way of printing.
+  writeln!(&mut io::stdout().lock(), "{}", message).unwrap();
   thread::sleep(Duration::from_millis(1));
 });
 
@@ -2621,6 +2630,8 @@ name = "daemon"
 path = "src/daemon/bin/main.rs"
 ```
 
+The relative (to the project root) source file path can be found via `file!()`.
+
 ### Modules
 
 All items (including modules) and their children are private by default, but:
@@ -2698,9 +2709,9 @@ use std::collections::*; // useful for testing; unidiomatic for the rest
 ### Files/streams handling
 
 ```rust
-std::fs::read_to_string(filename) -> Result<String, Error>; // content must be valid UTF-8; filename can be relative.
-std::fs::read(game_rom_filename) -> Result<Vec<u8>, Error>; // read binary content
-std::fs::write(filename, data: AsRef<[u8]>) -> Result<()>   // write to file
+std::fs::read_to_string(filename) -> Result<String, Error>;    // content must be valid UTF-8; filename can be relative.
+std::fs::read(game_rom_filename) -> Result<Vec<u8>, Error>;    // read binary content
+std::fs::write_all(filename, data: AsRef<[u8]>) -> Result<()>  // write to file
 
 // Buffered read/write require the import below
 //
@@ -2717,7 +2728,7 @@ let len = reader.read_line(&mut line)?;
 for line in reader.lines() { println!("{}", line?); }
 let lines = reader.lines().collect::<Result<Vec<_>, _>>().unwrap();
 
-// Buffered write
+// Buffered write. Think about write() vs. write_all()
 let mut stream = BufWriter::new(TcpStream::connect("127.0.0.1:34254").unwrap());
 stream.write(&[666]).unwrap();
 ```
@@ -2725,7 +2736,8 @@ stream.write(&[666]).unwrap();
 Abstract operation traits:
 
 - `std::io::Read`
-- `std::io::Write`: `write(buf: &[u8])`
+- `std::io::Write`: `write_all(buf: &[u8])`, `write(buf: &[u8])`
+  - prefer `write_all()` to `write()`, since the latter doesn't guarantee that the whole buffer is written!
   - `Vec` implements it, so it can be trivially used!
 
 for more complex operations (ie. involving seek), can use [io::Cursor](https://doc.rust-lang.org/std/io/struct.Cursor.html).
@@ -3363,9 +3375,9 @@ use demonstrate::demonstrate;
 // A simpler approach to this is to use an empty mutex (`Mutex<()>`) and initialize on each UT.
 //
 use std::sync::Mutex;
-unsafe impl Send for Sdl2Interface {}
+unsafe impl Send for MyInterface {}
 lazy_static! {
-  static ref INTERFACE: Mutex<Sdl2Interface> = Mutex::new(Sdl2Interface::init("test"));
+  static ref INTERFACE: Mutex<MyInterface> = Mutex::new(MyInterface::init("test"));
 }
 
 demonstrate! {
@@ -3419,10 +3431,12 @@ asserting(&"test condition").that(&1).is_equal_to(&2);
 Global mutable variables; also, allows initializing static variables with any function:
 
 ```rust
-// Don't forget that access will required RG.lock().unwrap().
-//
 lazy_static::lazy_static! {
-  static ref RG: Mutex<RandGen> = Mutex::new(RandGen::new(34052));
+  static ref HASHMAP: HashMap<u32, &'static str> = {
+    let mut m = HashMap::new();
+    m.insert(0, "foo");
+    m
+  };
 }
 ```
 

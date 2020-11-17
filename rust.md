@@ -33,7 +33,7 @@
     - [Operator overloading](#operator-overloading)
     - [Method overloading (workaround)](#method-overloading-workaround)
     - [Static methods](#static-methods)
-    - [Partially emulate inheritance (composition) via Deref[Mut]](#partially-emulate-inheritance-composition-via-derefmut)
+    - [Inheritance emulation (private trait methods)](#inheritance-emulation-private-trait-methods)
     - [Ownership](#ownership)
       - [Move](#move)
       - [Borrowing](#borrowing)
@@ -396,6 +396,8 @@ z = x << y;                      // Shift; errors only if y is higher than the n
 0_u32.to_be_bytes();             // convert big endian u32 to array of bytes
 u32::from_le_bytes([u8; _])                   // convert big endian array of bytes to u32
 u32::from_le_bytes(&[u8].try_into().unwrap()) // same, from slice; requires `std::convert::TryInto`
+f64.to_bits()                    // transmute to u64 (for bit-wise ops)
+f64::from_bits(u64)              // transmute from u64 (for bit-wise ops)
 ```
 
 ### Closures/Functions
@@ -1595,31 +1597,52 @@ impl Rectangle {
 }
 ```
 
-### Partially emulate inheritance (composition) via Deref[Mut]
+### Inheritance emulation (private trait methods)
 
-It seems that this is considered an [antipattern](https://github.com/rust-unofficial/patterns/blob/master/anti_patterns/deref.md).
+The simplest way to (partially) emulate inheritance is to use private trait methods (implemented via modules privacy):
 
 ```rust
-struct Foo {}
-
-impl Foo {
-  fn m(&self) { /* ... */ }
-}
-
-struct Bar {
-  f: Foo
-}
-
-impl Deref for Bar {
-  type Target = Foo;
-  fn deref(&self) -> &Foo {
-    &self.f
+pub(crate) mod private {
+  pub trait SubInterface {
+    fn redefined(&self);
   }
 }
 
-let b = Bar { Foo {} };
-b.m();
+pub trait SuperClass: private::SubInterface {
+  fn virtuaz(&self) {
+    self.redefined()
+  }
+}
+
+struct SubClass {}
+
+impl private::SubInterface for SubClass {
+  fn redefined(&self) {}
+}
+
+// In order not to override the default `virtuaz()` method, just leave the impl block empty.
+//
+impl SuperClass for SubClass {
+  fn virtuaz(&self) {
+    // private::SubInterface::redefined(self);
+  }
+}
+
+let super_reference = SubClass {};
+super_reference.virtuaz();
 ```
+
+An ugly alternative is to pass a "sub interface" implementors a "base class" type:
+
+```rust
+impl BaseClass {
+  fn virtuaz<T: SubInterface>(&self, redefiner: T) {
+    redefiner.redefined();
+  }
+}
+```
+
+The other strategy is embedding; in order to avoid forwarding boilerplate, there is the [`delegate` crate](#inheritance-emulation-via-delegate-crate), or the [`Deref\[Mut\]` antipattern](https://github.com/rust-unofficial/patterns/blob/master/anti_patterns/deref.md)).
 
 ### Ownership
 

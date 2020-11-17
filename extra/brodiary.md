@@ -1,3 +1,21 @@
+## Tue Nov/17
+
+- Ray tracer challenge
+  - [x] Add convenience method `Image#from_pixels`
+  - [x] Chapter 7
+    - [x] Review chapter
+  - [x] Chapter 8
+    - [x] Theory
+    - [x] Implementation
+  - [x] Refactoring: convert `PointLight::new` to use tuples
+  - [x] Optimize World#is_shadowed(), by stopping at the first obstruction
+  - Fight inheritance/private trait methods
+    - Read sources
+      - [x] https://users.rust-lang.org/t/how-to-implement-inheritance-like-feature-for-rust/31159/13
+      - [x] https://stevedonovan.github.io/rust-gentle-intro/object-orientation.html
+      - [x] https://users.rust-lang.org/t/suggestion-for-making-rusts-trait-system-more-usable-for-generics/35155/50
+    - [x] Write down all the options
+
 ## Mon Nov/16
 
 - Open source

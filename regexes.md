@@ -1,6 +1,7 @@
 # Regexes
 
 - [Regexes](#regexes)
+  - [Character classes](#character-classes)
   - [Quantifiers](#quantifiers)
   - [PCRE flags](#pcre-flags)
   - [Complex cases](#complex-cases)
@@ -8,6 +9,13 @@
     - [Matching a pattern when it's not at the beginning](#matching-a-pattern-when-its-not-at-the-beginning)
   - [Language incompatibilities](#language-incompatibilities)
     - [Javascript](#javascript)
+
+## Character classes
+
+|   Class   | Extended form |
+| :-------: | :-----------: |
+| `:alnum:` |  `a-zA-Z0-9`  |
+| `:blank:` |     ` \t`     |
 
 ## Quantifiers
 

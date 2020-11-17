@@ -142,8 +142,6 @@ path.module     # path of the current module
 
 ```hcl
 mylist = ["a", "b", "c", "d"]
-
-slice(mylist, 1, 3)  # ["b", "c"]
 ```
 
 ### Maps
@@ -154,8 +152,7 @@ mymap = {
   "k2" = "v2"
 }
 
-mymap["k2"]               # "v2"
-lookup(mymap, "k3", "v3") # "v3"
+mymap["k2"] #                # "v2"
 ```
 
 ### Functions
@@ -164,6 +161,7 @@ lookup(mymap, "k3", "v3") # "v3"
 # Collections
 
 element(list, index)
+slice(mylist, start, end_NI)  # 0-based, end is not included!
 length(collection)
 split(separator, string)      # split a string into a list
 join(separator, list)         # join a list

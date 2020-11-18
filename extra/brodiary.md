@@ -1,3 +1,20 @@
+## Wed Nov/18
+
+- Theory
+  - Rust
+    - [x] Advanced review modules
+    - [x] Read: https://phaazon.net/blog/rust-traits-privacy
+    - [x] Ask design question
+    - [x] Study: https://dev.to/takaakifuruse/rust-lifetimes-a-high-wall-for-rust-newbies-3ap
+      - Simplify and mention
+  - CS
+    - [x] Ask terminology question
+
+- Extra
+  - [x] Check copyright STOV answers
+    - `cc-by-sa` -> https://stackoverflow.blog/2009/06/25/attribution-required
+  - [x] Fight how to set custom URL for Firefox search bar
+
 ## Tue Nov/17
 
 - Ray tracer challenge

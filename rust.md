@@ -1817,6 +1817,59 @@ fn method<'a, T>(var: &'a mut T) {
 }
 ```
 
+Complex example ([source](https://dev.to/takaakifuruse/rust-lifetimes-a-high-wall-for-rust-newbies-3ap)). It seems that this example is not proper - `parse_context()` should borrow the context, not own it. However, this is interesting for the sake of understanding lifetimes.
+
+```rust
+struct Context<'c> {
+  text: &'c str,
+}
+
+// The context outlives the parser.
+struct Parser<'p, 'c> {
+  context: &'p Context<'c>,
+}
+
+impl<'p, 'c> Parser<'p, 'c> {
+  // This makes clear the lifetimes.
+  fn new(context: &'p Context<'c>) -> Parser<'p, 'c> {
+    Parser { context }
+  }
+
+  // The return value has the lifetime of the context.
+  fn parse(&self) -> &'c str {
+    &self.context.text
+  }
+}
+
+// In order to make this possible, we need the two lifetimes. The `context` field of the `Parser` has
+// the lifetime of the parameter, which is used in the return value of the function `parse()`, so that
+// the `&str` is actually `&'c str`.
+fn parse_context(context: Context) -> &str {
+  Parser::new(&context).parse()
+}
+
+// The borrowed version doesn't need any special handling.
+
+struct Context<'a> {
+  text: &'a str,
+}
+
+struct Parser<'a> {
+  context: &'a Context<'a>,
+}
+
+// Constructor omitted for simplicity.
+impl<'a> Parser<'a> {
+  fn parse(&self) -> &'a str {
+    &self.context.text
+  }
+}
+
+fn parse_context<'a>(context: &'a Context) -> &'a str {
+  Parser { context }.parse()
+}
+```
+
 #### Slices
 
 Slices can refer to arrays and strings. They are immutable references, so the ownership needs to be considered:

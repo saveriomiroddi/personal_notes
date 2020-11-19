@@ -1,5 +1,6 @@
-# Ultimate AWS Certified Cloud Practitioner - 2020 (notes)
-- [Ultimate AWS Certified Cloud Practitioner - 2020 (notes)](#ultimate-aws-certified-cloud-practitioner---2020-notes)
+# Ultimate AWS Certified Cloud Practitioner - 2020
+
+- [Ultimate AWS Certified Cloud Practitioner - 2020](#ultimate-aws-certified-cloud-practitioner---2020)
   - [General notes](#general-notes)
   - [Section 3](#section-3)
   - [Section 4](#section-4)

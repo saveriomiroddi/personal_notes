@@ -1,3 +1,9 @@
+## Thu Nov/19
+
+- Extra
+  - [~] Move old notes into personal_notes
+  - [x] Reorganize archived resources
+
 ## Wed Nov/18
 
 - Theory

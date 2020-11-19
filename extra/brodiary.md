@@ -1,8 +1,15 @@
 ## Thu Nov/19
 
+- Theory
+  - Rust
+    - [x] Review MaybeUninit
+    - [x] Read: https://stackoverflow.com/questions/27791532/how-do-i-create-a-global-mutable-singleton
+    - [x] Review static vars (and update/extend notes)
+
 - Extra
   - [~] Move old notes into personal_notes
-  - [x] Reorganize archived resources
+    - [x] Reorganize archived resources
+  - [x] Fix scraper for incomplete data
 
 ## Wed Nov/18
 

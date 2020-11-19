@@ -29,6 +29,7 @@
     - [Adding and associating a new application](#adding-and-associating-a-new-application)
     - [Split MAFF association](#split-maff-association)
   - [Hardware](#hardware)
+    - [Disable mouse/keyboard](#disable-mousekeyboard)
 
 ## Filesystems/partitions
 
@@ -654,4 +655,25 @@ dmidecode -s \
   system-product-name   # (laptop) model
   bios-version
   chassis-serial-number # (dell) service tag
+```
+
+### Disable mouse/keyboard
+
+```sh
+xinput --list
+# ⎡ Virtual core pointer                    	id=2	[master pointer  (3)]
+# ⎜ [...]
+# ⎣ Virtual core keyboard                   	id=3	[master keyboard (2)]
+#     ↳ [...]
+
+xinput --list-props 3
+# Device 'Virtual core keyboard':
+# 	Device Enabled (156):	1
+# 	[...]
+
+# Enable
+xinput set-int-prop 3 "Device Enabled" 8 0
+
+# Disable
+xinput set-int-prop 3 "Device Enabled" 8 1
 ```

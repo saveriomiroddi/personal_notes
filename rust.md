@@ -91,7 +91,7 @@
     - [Map literals (`maplit`)](#map-literals-maplit)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
     - [Unit testing](#unit-testing)
-    - [Static/global variables (`lazy_static`, `thread_local!`)](#staticglobal-variables-lazy_static-thread_local)
+    - [Static/global variables (`lazy_static`, `once_cell`, `thread_local!`)](#staticglobal-variables-lazy_static-once_cell-thread_local)
     - [Concurrency (multithreading) tools (`rayon`/`crossbeam`)](#concurrency-multithreading-tools-rayoncrossbeam)
     - [Enum utils, e.g. iterate (`strum`)](#enum-utils-eg-iterate-strum)
     - [Convenience macros for operator overloading (`auto_ops`)](#convenience-macros-for-operator-overloading-auto_ops)
@@ -283,14 +283,14 @@ const MAX_PRIMES: u32 = 100000;     // constants; the data type is required
 
 ((1u128 << CONST_U64) - 1) as u64   // WATCH OUT the priorities! In this example, the brackets are all required!
 
-static HELLO_WORLD: u32 = 1000;     // static variable
-
 type Kilometers = i32;                     // type aliasing
 type Result<T> = Result<T, std::io:Error>; // library example: `std::io::Result`
 
 let bool_as_int = true as i32;      // true: 1, false: 0
 let int_as_bool = 1 as bool;        // 1: true, 0: false, other: !!undefined!!
 ```
+
+For static variables, see [static section](#staticglobal-variables-lazy_static-once_cell-thread_local)
 
 Numeric casts:
 
@@ -3502,9 +3502,17 @@ assert_float_absolute_eq!(3.0, 3.9, 1.0);
 asserting(&"test condition").that(&1).is_equal_to(&2);
 ```
 
-### Static/global variables (`lazy_static`, `thread_local!`)
+### Static/global variables (`lazy_static`, `once_cell`, `thread_local!`)
 
-Global mutable variables; also, allows initializing static variables with any function:
+Static variables can be defined inside a function (c-style) or at the root level; they need a constant expression/etc. They are unsafe when mutable.
+
+The difference from const is that they're associated only one memory location.
+
+```rust
+static HELLO_WORLD: u32 = 1000;
+```
+
+Global variables; also, allows initializing static variables with any function.
 
 ```rust
 lazy_static::lazy_static! {
@@ -3514,6 +3522,14 @@ lazy_static::lazy_static! {
     m
   };
 }
+```
+
+In order to mutably access, a `Mutex` (or `RWLock`) needs to be wrapped around.
+
+Same, with another crate, `once_cell` (also in unstable, as `SyncLazy`):
+
+```rust
+static ARRAY: Lazy<Mutex<Vec<u8>>> = Lazy::new(|| Mutex::new(vec![]));
 ```
 
 Thread-local variables:

@@ -1,3 +1,18 @@
+## Fri Nov/20
+
+- Extra
+  - [~] Move old notes into personal_notes
+
+- Blog
+  - [x] Article: Cleaning email subject prefixes via regexes
+
+- Ray tracer challenge
+  - [ ] Chapter 9
+    - [x] Create Shape trait
+      - [x] Fight PartialEq boxed traits
+      - [x] Lots of changes around
+      - [x] Try implementation seemingly unused saved_ray()
+
 ## Thu Nov/19
 
 - Theory

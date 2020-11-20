@@ -372,6 +372,7 @@ For strings, see the [Strings chapter](#strings).
 val += 1; val -= 1;             // increment/decrement value (no postfix)
 val <<= n; val >>= n;           // overflows are ignored
 std::mem::swap(&mut a, &mut b); // !! swap two variables !!
+std::mem::size_of_val(v)        // memory occupation of a variable !!
 
 10_u64.pow(2);                  // exponentiation (power), int/int
 10_f64.powi(2);                 // exponentiation, float/int

@@ -6,6 +6,7 @@
   - [PCRE flags](#pcre-flags)
   - [Complex cases](#complex-cases)
     - [Capturing sequences of N characters](#capturing-sequences-of-n-characters)
+    - [Not matching a line matching pattern](#not-matching-a-line-matching-pattern)
     - [Matching a pattern when it's not at the beginning](#matching-a-pattern-when-its-not-at-the-beginning)
   - [Language incompatibilities](#language-incompatibilities)
     - [Javascript](#javascript)
@@ -48,6 +49,10 @@ The characters in the lookahead need to be in a group, otherwise, they're not ca
 "01234".scan /(?=(\d{3}))/
 # [["012"], ["123"], ["234"]]
 ```
+
+### Not matching a line matching pattern
+
+Awesome! See https://stackoverflow.com/a/406408.
 
 ### Matching a pattern when it's not at the beginning
 

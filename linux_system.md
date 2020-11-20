@@ -17,7 +17,7 @@
   - [Cron](#cron)
   - [Systemd](#systemd)
     - [Systemctl](#systemctl)
-    - [sournalctl](#sournalctl)
+    - [journalctl](#journalctl)
   - [Configuring a unit](#configuring-a-unit)
   - [fstab](#fstab)
   - [Logging/syslog/tools](#loggingsyslogtools)
@@ -398,20 +398,27 @@ crontab -d   # delete
 ### Systemctl
 
 ```sh
-systemctl enable $service             # execute on boot
-systemctl start $service              # start immediately
+systemctl enable|disable $service     # enable/disable start on boot
+systemctl start|stop $service         # immediately start/stop
+systemctl reload $service             # reload; not always functional
 systemctl reload-or-restart $service  # if reload is not defined (or has no effect), restart; WATCH OUT! don't define `ExecReload`
+systemctl status $service
+systemctl cat $service                # print unit file
+systemctl edit --full $service        # edit unit file
+
 systemctl daemon-reload               # invoke this after updating a unit
 systemctl daemon-reexec               # required to reload Sytemd's own configuration (e.g. changes to `/etc/systemd/system.conf`)
 
-systemctl disable $service.service    # disable a systemd service autostart
+systemctl is-(active|enabled|failed) $service  # query status
+systemctl list-units                  # active loaded units
 systemctl --failed                    # show units that failed to start
 systemctl --all                       # list everything (with their states), including timers
 ```
 
-### sournalctl
+### journalctl
 
 ```sh
+journalctl -b [-k]                                 # view log for current Boot; only [k]ernel messages
 journalctl --pager-end --unit=$service.service     # show unit log; `page-end`: go to end
 journalctl --vacuum-time=1d                        # clean systemd journal (/var/log/journal)
 ```
@@ -422,6 +429,8 @@ See:
 
 - https://www.freedesktop.org/software/systemd/man/systemd.service.html
 - https://www.freedesktop.org/software/systemd/man/systemd.kill.html
+
+General location of systemd units (not the only one): `/lib/systemd/system/$name.service`.
 
 Almost all the entries are optional. Escaping is not standard; in order to escape, use `systemd-escape`.
 
@@ -434,7 +443,15 @@ cat > /etc/systemd/system/myservice.service <<UNIT
 [Unit]
 Description=My Service
 
+# `Requires` states only dependency; `After` mandates ordering.
+#
+Requires=network.target
 After=network.target
+
+# Example of waiting for a network device to be online.
+#
+# After=sys-subsystem-net-devices-wlan0.device
+# BindsTo=sys-subsystem-net-devices-wlan0.device
 
 [Service]
 # If ExecStart is specified (and `BusName` not specified), `simple` is implicit.

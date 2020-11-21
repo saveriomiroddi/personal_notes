@@ -1,3 +1,21 @@
+## Sat Nov/21
+
+- Ray tracer challenge
+  - [x] Split into modules
+  - [x] Chapter 9
+    - [x] Theory
+    - [x] Implementation
+      - [x] Study custom `derive` macros
+      - [x] implement `ShapeAccessors` and apply
+    - [x] Practice
+      - [x] Fight space translations
+  - [ ] Chapter 10
+    - [x] Theory
+    - [ ] Implementation
+      - [x] Brutal fight with addition of `dyn Pattern` to `Material`
+        - Tried lifetimes (hell)
+        - Removed some `Clone`s around
+
 ## Fri Nov/20
 
 - Extra

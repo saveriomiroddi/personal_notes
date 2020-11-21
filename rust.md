@@ -57,8 +57,10 @@
     - [Unsafe](#unsafe)
       - [Interoperability with other languages (C)](#interoperability-with-other-languages-c)
     - [Macros](#macros)
-      - [Rules and details](#rules-and-details)
-      - [Importing](#importing)
+      - [Function-like](#function-like)
+        - [Rules and details](#rules-and-details)
+        - [Importing](#importing)
+      - [Custom derive macros](#custom-derive-macros)
     - [Unions](#unions)
   - [Packaging](#packaging)
     - [Project structure](#project-structure)
@@ -2428,6 +2430,8 @@ pub extern "C" fn call_from_c() { }
 
 ### Macros
 
+#### Function-like
+
 Simple, fixed expressions:
 
 ```rust
@@ -2593,7 +2597,7 @@ macro_rules! test_sort {
 test_sort!(collection, bubble_sort(collection));
 ```
 
-#### Rules and details
+##### Rules and details
 
 There are some rules:
 
@@ -2619,7 +2623,7 @@ Interesting articles:
 - Tutorial: https://hub.packtpub.com/creating-macros-in-rust-tutorial
 - Case study: https://notes.iveselov.info/programming/time_it-a-case-study-in-rust-macros
 
-#### Importing
+##### Importing
 
 Sample of importing macros across files:
 
@@ -2640,6 +2644,78 @@ test_sort!(collection, bubble_sort(collection));
 ```
 
 Macros are pulled in the main scope, so the `use` must not be followed by the macro enclosing module (`helpers`).
+
+#### Custom derive macros
+
+Procedural macros must be defined in a crate with the crate type of proc-macro.
+
+```sh
+cargo new macros --lib
+
+# Convenience if in a workspace
+perl -i -pe 's/members = \[\K/"macros", /' Cargo.toml
+
+# Append straight below `[dependencies]`.
+#
+cat >> macros/Cargo.toml <<TOML
+quote = "1.0"
+syn = "1.0"
+
+[lib]
+proc-macro = true
+TOML
+```
+
+`lib.rs` content; macro definitions *must* reside in the root crate:
+
+```rust
+// stdlib compiler API that allows manipulating Rust code.
+extern crate proc_macro;
+
+// syn converts a string into a data structure to work on; quote does the reverse.
+use quote::quote;
+use syn;
+
+use proc_macro::TokenStream;
+
+#[proc_macro_derive(MyMacro)]
+pub fn my_macro_derive(input: TokenStream) -> TokenStream {
+    // Replace unwrap() with better error handling on production code.
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+
+    let name = &ast.ident;
+
+    // stringify() converts an expression to string literal (&str), not String!
+    let gen = quote! {
+        impl HelloMacro for #name {
+            fn my_macro() {
+                println!("{} my_macro() implementation via custom derive attribute!", stringify!(#name));
+            }
+        }
+    };
+
+    gen.into()
+}
+```
+
+Now, from the client crate, just add the dependency (assumed to be in the same workspace):
+
+```toml
+macros = {path = "../macros"}
+```
+
+include in the project:
+
+```rust
+use macros::MyMacro;
+
+// or (must be at the crate root)
+
+#[macro_use]
+extern crate macros;
+```
+
+then use!
 
 ### Unions
 
@@ -2743,15 +2819,12 @@ Modifiers (prefixes):
 - `super`: parent module
 - `self`
 
-Multiple files structure:
+Multiple files/directories structure:
 
 ```rust
-// Load the content, as a module.
+// This loads either `module.rs` or `module/mod.rs`.
 //
-// - if in the root crate, it will look into `<module_name>.rs`;
-// - otherwise, `<filename_without_prefix>/<module_name>.rs`
-//
-mod <module_name>;
+mod <module>;
 ```
 
 Importing:
@@ -2762,8 +2835,13 @@ Importing:
 //
 // It's unidiomatic to import functions, while it's idiomatic to import enums, structs, etc.
 //
-//
 use crate::front_of_house::hosting;
+
+// Import sibling modules in sibling files (shape.rs). The first assumes no reexport; the second assumes
+// a flattening reexport.
+//
+use super::shape::Shape;
+use super::Shape;
 
 // Solutions to clashing; both iditiomatic.
 //

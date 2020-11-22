@@ -659,6 +659,8 @@ vec.sort_by_key(|e| e.abs());           // stable, by key!
 vec.sort_unstable();                    // unstable (typically faster than stable)
 ```
 
+In order to pick a random element, see [rand crate](#random-with-and-without-rand).
+
 Arrays implement the `Debug` trait.
 
 Using an Enum to store different data types in an array!!:
@@ -3245,18 +3247,29 @@ unsafe {
 With crate:
 
 ```rust
-// Simplest way
+// Simplest way.
 //
 let rand_byte: u8 = rand::random();
-let rand_i = rand::thread_rng().gen_range(0, 10);
+
+// Ends: [low, high); requires `rand::Rng`.
+//
+let randval = match rand::thread_rng().gen_range(0, 2) {
+    0 => "0",
+    1 => "1",
+    _ => unreachable!(),
+};
+
+// Fetching a random element from an array (keep in mind that it returns a reference).
+//
+use rand::seq::SliceRandom;
+vec.choose(&mut rand::thread_rng());
 
 // Use thread_rng
 // `thread_rng()`: seeded by the O/S; local to the current thread.
 //
 use rand::prelude::*;
 let mut rng = rand::thread_rng();
-let myrnd: f64 = rng.gen();
-let myrnd: i32 = rng.gen_range(0, 2); // close,open ends.
+let randval: f64 = rng.gen();
 
 let mut data = [0u8; 32];
 rand::thread_rng().fill_bytes(&mut data);
@@ -3549,6 +3562,11 @@ demonstrate! {
 
     it "test subject" {
       assert_eq!(subject, 10);
+    }
+
+    #[should_panic]
+    it "should fail" {
+        None::<()>.unwrap();
     }
 
     context "context is 5" {

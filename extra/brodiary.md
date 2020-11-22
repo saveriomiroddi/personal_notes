@@ -1,3 +1,18 @@
+## Sun Nov/22
+
+- Ray tracer challenge
+  - [ ] Chapter 10
+    - [x] Implementation
+      - [x] Several refactorings
+      - [x] Implement pattern transform
+      - [x] Change design of the lighting APIs, compared to book
+      - [x] Brutal fight with pattern acne issues
+    - [ ] Practice
+      - [x] Add randomization to objects, and add some customizability
+      - [x] Fight formulas in order to get a better gradient
+      - [ ] Blended filters
+          - [x] Make it work
+
 ## Sat Nov/21
 
 - Ray tracer challenge

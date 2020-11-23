@@ -325,7 +325,7 @@ mutex.synchronize { }
 
 ### Thread-safe data structures
 
-`Queue`s are thread-safe, although very primitive.
+`Queue`s are thread-safe FIFO queues, although very primitive.
 
 It has a `empty?` method, which is useless, since the class doesn't provide an atomic way to atomically check and pop.
 

@@ -6,7 +6,8 @@
   - [Mocks](#mocks)
     - [Matchers](#matchers)
     - [Matching arguments](#matching-arguments)
-    - [Arbitrary handling](#arbitrary-handling)
+    - [Responses](#responses)
+      - [Arbitrary handling](#arbitrary-handling)
   - [Testing modules](#testing-modules)
 
 ## Structure examples
@@ -66,12 +67,17 @@ See [reference](https://relishapp.com/rspec/rspec-mocks/docs/setting-constraints
 | ---------- | ------------ | ----------------------------------------- |
 | Regexp/=== | with(/expr/) | Anything supporting case equality (`===`) |
 
-### Arbitrary handling
+### Responses
+
+See [reference](https://relishapp.com/rspec/rspec-mocks/v/3-10/docs/configuring-responses).
+
+#### Arbitrary handling
 
 References [README](https://github.com/rspec/rspec-mocks#arbitrary-handling) and [Rubydoc](https://rubydoc.info/gems/rspec-mocks#arbitrary-handling).
 
 ```ruby
 # WATCH OUT! When using :expect_any_instance_of, the first arg is the instance.
+# If a `with()` expectation is added, it's still verified.
 #
 expect(double).to receive(:msg) do |*args|
   expect(args.size).to eq(7)

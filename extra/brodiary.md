@@ -1,3 +1,22 @@
+## Mon Nov/23
+
+- Ray tracer challenge
+  - [x] Chapter 10
+    - [x] Practice
+        - [x] Complete blended filters
+        - [x] Review and think: nested filters, Perlin noise
+- Ray tracer challenge
+  - [ ] Chapter 11
+    - [ ] Theory
+
+- Theory
+  - Rust
+    - [x] Fight review attribute macros
+    - [x] Review again Cucumber
+      - [x] Check and report all issues with the setup procedure
+      - [x] Check alternative article, and report issues with it
+    - [x] Review Rust reference books for choosing next
+
 ## Sun Nov/22
 
 - Ray tracer challenge

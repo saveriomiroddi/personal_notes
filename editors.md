@@ -54,7 +54,7 @@ The VIM section requires some cleanup.
 - `Alt+R`                     Search box: Regex
 - `Alt+L`                     Search box: Switch to replace inside selection (after `Ctrl+H`); it doesn't support block selection↵
                               See option `Auto Find in Selection` (can be annoying).
-- `Ctrl+K, Ctrl+J`            Unfold all
+- `Ctrl+K, Ctrl+J`            Unfold all (expand)
 
 - `Ctrl+Space`                Variables autocompletion (at least in Shell script syntax)
 - `Ctrl+.`                    Quick fix(es) code

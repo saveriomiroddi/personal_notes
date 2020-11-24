@@ -1,3 +1,21 @@
+## Tue Nov/24
+
+- Theory
+  - Rust
+    - [x] Review ASM generated from a sample program
+    - [x] Discuss and solve Cucumber post issue
+
+- Ray tracer challenge
+  - [x] Chapter 11
+    - [x] Theory
+    - [ ] Implementation
+      - [x] Brutal fight with ultimately wrong test value
+      - [x] Fight with the over_point incorrectly computed
+    - [x] Easy solution to practice section
+
+- Extra
+  - [x] VSC: Fight find correct single-UT test configuration
+
 ## Mon Nov/23
 
 - Ray tracer challenge

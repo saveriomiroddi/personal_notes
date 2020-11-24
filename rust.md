@@ -1923,6 +1923,10 @@ Generic usage:
 
   // here the pointer and data are deallocated
 }
+
+// If the reference to the contained object is required, use:
+//
+let object_ref = Box::new(object).as_ref();
 ```
 
 Use in recursive structures:

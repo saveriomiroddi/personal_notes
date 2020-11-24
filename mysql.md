@@ -11,6 +11,10 @@
   - [Window functions](#window-functions)
     - [Define each window extent (`PARTITION BY`), and picking a row per window](#define-each-window-extent-partition-by-and-picking-a-row-per-window)
     - [Window function aggregates](#window-function-aggregates)
+  - [Stored procedures](#stored-procedures)
+    - [Cursors (with convenient example of looping)](#cursors-with-convenient-example-of-looping)
+  - [Optimizer](#optimizer)
+    - [Join order](#join-order)
 
 ## Privileges
 
@@ -248,4 +252,85 @@ ROW_NUMBER()                         # 1-based
 LAG(@expr[, @position[, @default]])  # value of @expr from the previous row of the frame
                                      # @position defaults to 1; @default defaults to NULL, and can be an expression (great to avoid the first NULL)
 FIRST_VALUE(@expr)                   # value of @expr from the first row of the frame
+```
+
+## Stored procedures
+
+### Cursors (with convenient example of looping)
+
+```sql
+# Script for iterating a block of queries through all the tenants.
+#
+# Each SELECT (in the SP) will output a result in tabular format (except when no rows are found).
+# If the client is run in very silent mode (-ss) only the result values will be shown, however,
+# by using column naming, a clear output can be achieved.
+#
+# ROW_COUNT() can be useful for logging.
+#
+# The SUBSTR is a workaround to avoid printing a confusing `0`.
+
+SET @sleep_time = 5;
+
+###################################################
+# Stored procedure definition
+###################################################
+
+DROP PROCEDURE IF EXISTS ALL_TENANTS_OPERATION;
+
+DELIMITER $$
+
+CREATE PROCEDURE ALL_TENANTS_OPERATION()
+MODIFIES SQL DATA
+BEGIN
+  DECLARE v_tenant_id   INT;
+  DECLARE v_cur_notfound BOOL;
+
+  # Cursors are closed automatically at the END of a SP, so there's no need to close them explicitly.
+  #
+  DECLARE cur_tenants CURSOR FOR SELECT id FROM tenants;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_cur_notfound := TRUE;
+
+  OPEN cur_tenants;
+  tenants_loop: LOOP
+    # The number of variables specified must match the number of columns selected by the cursor.
+    # For complex queries, where one wants to ignore selected fields, declared variables must be used;
+    # a workaround is to declare a phony variable with `VARCHAR(255)` type, and specify it for all the
+    # corresponding fields to ignore.
+    #
+    FETCH cur_tenants INTO v_tenant_id;
+    IF v_cur_notfound THEN
+      LEAVE tenants_loop;
+    END IF;
+
+    SELECT CONCAT(v_tenant_id, SUBSTR(SLEEP(@sleep_time), 0)) `Executing for tenant`,
+           COUNT(*) `Accounts remaining`
+    FROM tenants WHERE id > v_tenant_id;
+
+    UPDATE mytable
+    SET col_1_id = NULL
+    WHERE col_2_id IS NULL
+          AND tenant_id = v_tenant_id
+          AND col_1_id IS NOT NULL
+    ;
+  END LOOP tenants_loop;
+END$$
+
+DELIMITER ;
+
+###################################################
+# Execution and procedure drop
+###################################################
+
+CALL ALL_TENANTS_OPERATION(); DROP PROCEDURE ALL_TENANTS_OPERATION;
+```
+
+## Optimizer
+
+### Join order
+
+Reference: https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimizer-hints-join-order.
+
+```sql
+SELECT /*+ JOIN_ORDER(t2, t1) */ COUNT(*)
+FROM table_1 t1 JOIN table_2 t2
 ```

@@ -23,8 +23,11 @@
     - [modeline](#modeline)
     - [plugins](#plugins)
     - [Peepcode notes](#peepcode-notes)
+  - [Other program shortcuts](#other-program-shortcuts)
 
 ## Notes
+
+The document also includes shortcuts for non-editors.
 
 The VIM section requires some cleanup.
 
@@ -266,3 +269,13 @@ Upper case commands are generally "extended" versions of the correspective lower
 `o`                         Create a new line under the current, and switch to insert mode
 `c<cmd>`                    Change <command> (=> goes to insert). e.g. cw = change word
 `f<char>`                   Go to the next occurence of <char>
+
+## Other program shortcuts
+
+Firefox:
+
+- `Ctrl+., <number>`        Containers extension: display menu, and open new tab with given container
+
+Evince:
+
+- `Ctrl+L`                  Go to page

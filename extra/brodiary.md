@@ -1,3 +1,12 @@
+## Wed Nov/25
+
+- Ray tracer challenge
+  - [ ] Chapter 11
+    - [ ] Implementation
+      - [x] Brutal fight to find a simpler and faster implementation of refraction indexes search
+      - [x] Brutal fight with failing refraction test
+      - [ ] Fresnel effect
+
 ## Tue Nov/24
 
 - Theory

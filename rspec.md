@@ -63,9 +63,10 @@ See [reference](https://relishapp.com/rspec/rspec-expectations/docs/built-in-mat
 
 See [reference](https://relishapp.com/rspec/rspec-mocks/docs/setting-constraints/matching-arguments).
 
-| Argument   | Methods      | Notes                                     |
-| ---------- | ------------ | ----------------------------------------- |
-| Regexp/=== | with(/expr/) | Anything supporting case equality (`===`) |
+| Argument                   | Methods            | Notes                                     |
+| -------------------------- | ------------------ | ----------------------------------------- |
+| Regexp/===                 | with(/expr/)       | Anything supporting case equality (`===`) |
+| Instance of specific class | instance_of(klazz) |                                           |
 
 ### Responses
 

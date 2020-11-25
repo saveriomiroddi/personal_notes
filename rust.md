@@ -382,7 +382,8 @@ std::mem::size_of_val(v)        // memory occupation of a variable !!
 10_f64.sin();                   // sine (in rad)
 10_f64.signum();                // sign. float: (>= +0.0 -> 1.0), (<= -0.0 -> -1.0), (NaN -> NaN); int: (0 -> 0), (< 0 -> -1), (> 0 -> 1)
 
-std::f64::consts::PI;           // Pi
+std::f64::consts::PI;
+std::f64::INFINITY, NEG_INFINITY;
 
 u32::max(1, 2);                 // maximum between two numbers
 std::cmp::max(x, u);            // maximum between two numbers

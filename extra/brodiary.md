@@ -1,3 +1,17 @@
+## Thu Nov/26
+
+- Open source
+  - ZFS
+    - [x] Evaluate functionality requested on the tracker, and reply
+
+- Ray tracer challenge
+  - [x] Chapter 11
+    - [x] Implementation
+      - [x] Fresnel effect
+      - [x] Add sqrt() function (that takes both integers and floats) -> remove SQRT_TWO
+      - [x] Reimplement the refraction values computation, as in the book
+      - [x] Verify that intersections before t are necessary, and update intersections() API accordingly
+
 ## Wed Nov/25
 
 - Ray tracer challenge

@@ -385,7 +385,7 @@ std::mem::size_of_val(v)        // memory occupation of a variable !!
 std::f64::consts::PI;
 std::f64::INFINITY, NEG_INFINITY;
 
-u32::max(1, 2);                 // maximum between two numbers
+u32::min(1, 2);                 // minimum between two numbers
 std::cmp::max(x, u);            // maximum between two numbers
 
 z, carry = x.overflowing_add(y); // adds and wraps around in case of overflow; <carry> is bool.
@@ -641,6 +641,24 @@ fn process_list<T>(list: &[T]) {};
 process_list(&vec);
 ```
 
+Element inclusion test/removal:
+
+```rust
+// Remove one match; ignore if element not found.
+//
+if let Some(i) = vec.iter().position(|vec_item| *vec_item == remove_item) {
+  vec.remove(i);
+}
+
+// Fast removal (fills in with the last element); use when vec ordering is not a requirement.
+//
+vec.swap_remove(i);
+
+// Remove all matching elements
+//
+vec.retain(|vec_item| *vec_item != remove_item);
+```
+
 Common methods:
 
 ```rust
@@ -756,7 +774,7 @@ for (row, source_row) in values.iter_mut().zip(source_values.chunks($order)) {
 
 ### Hash maps
 
-The default hashing function is cryptographically secure!!. For faster versions, must use a crate.
+The default hashing function is cryptographically secure!!. For faster versions, must use a crate (common one: `fxhash`).
 
 WATCH OUT! In order to avoid BCK headaches when getting and setting in the same scope/function, use the [Entry API](https://stackoverflow.com/a/28512504/210029) (see below).
 

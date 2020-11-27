@@ -1,3 +1,26 @@
+## Fri Nov/27
+
+- Ray tracer challenge
+  - [x] Improvements
+    - [x] Refactoring: Remove dead field/accessor Shape#pattern
+    - [x] Refactoring: World: merge `max_reflections` and `max_refractions` into `max_recursions`
+    - [x] Refactoring: Remove old API `Ray#hit`
+    - [x] Refactoring: Include object in `Intersection#PartialEq`, and document the use case
+    - [x] Refactoring: Use Intersection type, rather than its params, in Ray#intersection_state API
+    - [x] Refactoring: Add Shape setters
+      - [x] Simplify test setups
+    - [x] Refactoring: Extend ApproximateFloat64Ops methods, and refactor related code
+    - [x] Refactoring: Simplify Color#u8_components formula
+  - [ ] Chapter 12
+    - [x] Theory
+    - [ ] Practice
+      - [x] Quiz
+        - [x] Think faster cube intersection
+        - [x] Review https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+  - [ ] Move Sphere builder patterns to Shape
+    - [x] Issue with trait object size
+    - [x] Read https://abronan.com/rust-trait-objects-box-and-rc/
+
 ## Thu Nov/26
 
 - Open source

@@ -1,3 +1,15 @@
+## Sat Nov/28
+
+- Ray tracer challenge
+  - [x] Chapter 11
+    - [x] Practice
+      - [x] Reorganize to make easier to quickly modify
+      - [x] Add refraction option; add another sphere; move light
+  - [ ] Chapter 12
+    - [ ] Implementation
+      - [x] Fight array with mixed entries type
+      - [x] Cube normal
+
 ## Fri Nov/27
 
 - Ray tracer challenge

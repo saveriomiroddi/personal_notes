@@ -582,7 +582,7 @@ Check if there is data in stdin (can't be done in Bash natively; see https://uni
 ```sh
 first_byte=$(dd bs=1 count=1 2>/dev/null | od -t o1 -A n | tr -dc 0-9)
 
-if [ -z "$first_byte" ]; then
+if [[ -z $first_byte ]]; then
   # stuff to do if the input is empty
 else
   {

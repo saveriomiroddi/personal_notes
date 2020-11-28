@@ -593,6 +593,13 @@ let arr = [true; 4];                     // 4 elements initialized as true; won'
 let arr: [u32; 3] = [1, 2, 3];           // with data type annotation; ugly!
 let mut arr: [Option<u32>; 3] = [None; 3];  // with Option<T>; super-ugly!
 
+// In order to store mixed types, use a tuple. Example of pseudo-bidimensional array:
+//
+let mtarr = [
+  ((1.0, 2.0), -1, "cde"),
+  // ...
+];
+
 // If a struct has an array, it's possible to initialize the array implicitly by using the [Default](#default) trait on the struct.
 
 arr[512..512 + source.len()].copy_from_slice(&source) // memcpy (copy) from/to slices/vectors; source/dest size must be the same!

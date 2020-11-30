@@ -20,6 +20,7 @@
   - [Collections](#collections)
     - [Array](#array)
       - [Useful operations](#useful-operations)
+    - [Hash](#hash)
     - [Enumerable](#enumerable)
   - [APIs/Stdlib](#apisstdlib)
     - [URL/HTML encoding](#urlhtml-encoding)
@@ -374,6 +375,33 @@ Perform COUNT/GROUP BY on an array; Ruby 2.7 implements #tally:
 [a:, a:, :b, :c, :c: :c]
   .group_by(&:itself)        # => {a: [:a, :a], b: [:b], c: [:c, :c, :c]}
   .transform_values(&:count) # => {a: 2, b: 1, c: 3}
+```
+
+### Hash
+
+```ruby
+Hash.new(default_value)                   # sets a default value when a key is not found; uses always the same instance, though
+Hash.new {|h, k| h[k] = default_value}    # same as previous, but generates new instances
+
+[[:a, 1], [:b, 2]].to_h                   # => {a: 1, b: 2} # !!! convert an array to hash !!!
+Hash[:a, 1, :b, 2]                        # => {a: 1, b: 2} # !!! convert an array to hash !!!
+Hash[*flat_array]                         # => same as previous
+
+hash.symbolize_keys                       # non-destructive
+{a: 1, b: 2, c: 3}.slice(:a, :b)          # => {a: 1, b: 2} # doesn't modify the source hash
+hash.values_at(:key1, :key2)
+hash.key?(:key)                           # check inclusion
+hash.clone                                # !!! shallow copy !!!
+hash.delete_if { |k, v| fx() }            # destructive; returns hash (not the deleted values)
+hash.merge!(hash) {|_, v| fx(v)}          # !!! transform the values of a hash !!! non-destructive (without `!`) version also works
+hash = hash.map {|k, v| [fx(k), v] }.to_h # !!! transform the keys of a hash !!!
+```
+
+ActiveSupport additions:
+
+```ruby
+{a: 1, b: 2}.extract!(:a)                 # => {a: 1} # destructive :slice
+{a: 1, b: 2, c: 3}.except(:a, :b)         # => {c: 3}
 ```
 
 ### Enumerable

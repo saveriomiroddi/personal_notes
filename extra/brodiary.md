@@ -1,3 +1,15 @@
+## Mon Nov/30
+
+- Blog
+  - [x] Article: Rust lulz: Branchless cofactor
+
+- Ray tracer challenge
+  - [ ] Chapter 13
+    - [ ] Theory
+      - [x] Cylinders
+    - [ ] Practice
+      - [x] Add Cylinder
+
 ## Sun Nov/29
 
 - Ray tracer challenge

@@ -3608,6 +3608,8 @@ demonstrate! {
 }
 ```
 
+There is a [Cucumber crate](https://github.com/bbqsrc/cucumber-rust). As of Nov/2020, the README tutorial [is broken](https://github.com/bbqsrc/cucumber-rust/issues/90), so see [another tutorial](https://www.florianreinhard.de/2020-10-05/cucumber-07-in-rust-beginners-tutorial).
+
 Utilities:
 
 ```rust

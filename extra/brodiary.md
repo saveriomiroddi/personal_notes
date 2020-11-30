@@ -1,3 +1,16 @@
+## Sun Nov/29
+
+- Ray tracer challenge
+  - [x] Chapter 12
+    - [x] Implementation
+      - [x] Implement normal with a simplified algorithm
+    - [x] Practice
+      - [x] Add cubes to program
+
+- Languages/Frameworks
+  - Rust
+    - [x] Review Cucumber (https://is.gd/lnycfx)
+
 ## Sat Nov/28
 
 - Ray tracer challenge
@@ -58,7 +71,7 @@
 
 ## Tue Nov/24
 
-- Theory
+- Languages/Frameworks
   - Rust
     - [x] Review ASM generated from a sample program
     - [x] Discuss and solve Cucumber post issue
@@ -85,7 +98,7 @@
   - [ ] Chapter 11
     - [ ] Theory
 
-- Theory
+- Languages/Frameworks
   - Rust
     - [x] Fight review attribute macros
     - [x] Review again Cucumber
@@ -143,7 +156,7 @@
 
 ## Thu Nov/19
 
-- Theory
+- Languages/Frameworks
   - Rust
     - [x] Review MaybeUninit
     - [x] Read: https://stackoverflow.com/questions/27791532/how-do-i-create-a-global-mutable-singleton
@@ -156,7 +169,7 @@
 
 ## Wed Nov/18
 
-- Theory
+- Languages/Frameworks
   - Rust
     - [x] Advanced review modules
     - [x] Read: https://phaazon.net/blog/rust-traits-privacy
@@ -322,7 +335,7 @@
       - [x] Design intersections APIs
       - [x] Fight Rust floats sorting
 
-- Theory
+- Languages/Frameworks
   - Rust
     - [x] Study [trait/references](https://stackoverflow.com/questions/28005134/how-do-i-implement-the-add-trait-for-a-reference-to-a-struct)
       - See related question
@@ -387,7 +400,7 @@
 
 ## Thu Nov/05
 
-- Theory
+- Languages/Frameworks
   - Rust
     - [x] [Generics (Java <> Rust)](https://gist.github.com/Kimundi/8391398)
     - [x] https://stackoverflow.com/questions/54465400/why-does-returning-self-in-trait-work-but-returning-optionself-requires
@@ -480,7 +493,7 @@
     - [x] Configure addon and regex for compacting multiple email title prefixes
       - [x] Help other user with other use case
 
-- Theory
+- Languages/Frameworks
   - Design
     - [x] https://technology.riotgames.com/news/future-leagues-engine
   - Rust
@@ -501,7 +514,7 @@
 
 ## Tue Oct/27
 
-- Theory
+- Languages/Frameworks
   - Rust
     - [x] [Method overloading](https://stackoverflow.com/q/24857831)
     - [x] Composition
@@ -536,7 +549,7 @@
 
 ## Sun Oct/25
 
-- Theory
+- Languages/Frameworks
   - C++/SWE
     - [x] Read C++ templates: http://people.cs.uchicago.edu/~jacobm/pubs/templates.html
       - [x] constexpr vs. templates metaprogramming: https://stackoverflow.com/questions/59538054/constexpr-vs-template-metaprogramming-performance-differences
@@ -726,7 +739,7 @@
         - [x] CCF
         - [x] SCF
 
-- Theory
+- Languages/Frameworks
   - Rust
     - [~] Understand BCK issue with linked list iterative traversal
       - [x] https://stackoverflow.com/questions/50251487/what-are-non-lexical-lifetimes

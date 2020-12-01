@@ -1,3 +1,23 @@
+## Tue Dec/01
+
+- [ ] Move old notes into personal_notes
+  - [x] rspec
+
+- Ray tracer challenge
+  - [x] Chapter 13
+    - [x] Theory+Implementation
+      - [x] Cones
+        - [x] Figure out if Shape#intersections needs to be ordered
+        - [x] Change Shape#intersections to return a vector
+    - [x] Practice
+      - [x] Add Cone
+  - [ ] Chapter 14
+    - [ ] Theory+Implementation
+      - [x] Brutal fight against thread-safe tree structure
+
+- [x] Fight search women in engineering coaching positions/groups
+  - [x] Contact/join a few
+
 ## Mon Nov/30
 
 - Blog
@@ -5,7 +25,7 @@
 
 - Ray tracer challenge
   - [ ] Chapter 13
-    - [ ] Theory
+    - [ ] Theory+Implementation
       - [x] Cylinders
     - [ ] Practice
       - [x] Add Cylinder

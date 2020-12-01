@@ -112,7 +112,7 @@ end
 ### `cron`
 
 ```ruby
-cron default["aws_monitoring"]["nmon_cron_filename"] do
+cron 'job_name' do
   command          String
 
   minute           Integer, String         # default value: "*"

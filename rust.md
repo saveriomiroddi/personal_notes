@@ -513,7 +513,7 @@ map(|x| x * 2)               // Ruby :map
 map(|(x, y)| x + y)          // Tuples unpacking: useful for example, on the result of zip()
 fold(a, |a, x| a + x)        // Ruby :inject
 filter(|x| x % 2 == 0)       // Ruby :select
-find(|x| x % 2 == 0)         // find first element matching the condition
+find(|x| x % 2 == 0)         // Ruby :find
 flatten()                    // Quasi-Ruby :flatten. WATCH OUT! flattens only one level.
 rev()                        // reverse. WATCH OUT, UNINTUITIVE: since it's not inclusive, it goes from 99 to 0.
 any(|x| x == 33)             // terminates on the first true
@@ -622,8 +622,8 @@ Vectors (mutable):
 ```rust
 let mut vec = Vec::new();               // Basic (untyped) instantiation (if the type can be inferred)
 let mut vec: Vec<i32> = Vec::new();     // Basic, if type can't be inferred
-let mut vec = vec![1, 2, 3];            // Macro to initialize a vector from a literal list
-let mut vec = vec![true; n];            // Same, with variable-specified length and initialization
+let mut vec = vec![1, 2, 3];            // Macro to initialize a vector from a literal list; allocates exact capacity
+let mut vec = vec![true; n];            // Same, with variable-specified length and initialization; ; allocates exact capacity
 Vec::with_capacity(cap);                // Preallocating version; WATCH OUT! The length is still 0 at start; use `vec![<val>, n]` if required
 
 vec[0] = 2;
@@ -1127,7 +1127,7 @@ result.unwrap_or_else( |err | {
   std::process::exit(1);
 });
 
-// Use this is one is sure that there can't be an error.
+// Use this if it's sure that there can't be an error.
 //
 result.ok();
 
@@ -1141,8 +1141,13 @@ y == Some(2);
 
 // replace(): extract a value and replace it with the value passed.
 //
-let mut x = Some(2);
+let mut x = Some(2);    // works also on None
 let old = x.replace(5);
+
+// Mappings borrowed <> owned
+//
+Some(12).as_ref()
+Some(&12).cloned()
 ```
 
 See next section for pattern matching.
@@ -1253,7 +1258,7 @@ let mut user = User {
 user.active = true
 
 // Destructuring a struct (!!)
-let User {username: a, active: b} = user;
+let User {username: a, active: b, ..} = user;
 println!("a:{}, b:{}", a, b); // "a:sav, b:false"
 
 // Hardcore destructuring
@@ -1990,7 +1995,8 @@ use std::rc::Rc;
 let value = Rc::new(1);
 *value = 32;
 
-// `Rc::clone()` is shallow; use `clone()` for deep copies.
+// `Rc::clone()` performs a shallow copy (as only the reference needs to be cloned); `clone()` is not
+// appropriate, since it makes a deep copy.
 //
 let a = Rc::new(Parent(Rc::new(Parent(Rc::new(Nil)))));
 {
@@ -2004,6 +2010,8 @@ println!("Count: {}", Rc::strong_count(&a)); // 1
 #### RefCell<T> and interior mutability
 
 `RefCell<T>` allows mutating the contained value, even if the variable itself is immutable, therefore bypassing the compiler; generally speaking, it allows multiple owners while retaining mutability. The rules are enforced at runtime though, so this has an overhead.
+
+Note that `RefCell` is not `Sync`; in multithreaded context, `Mutex`/`RwLock` must be used instead.
 
 ```rust
 enum Node {
@@ -2053,8 +2061,6 @@ let leaf = Rc::new(Node {
   children: RefCell::new(vec![]),
 });
 
-// It's possible to use `&ref.clone()` instead of `Rc::clone(&ref)`, but it's not idiomatic.
-//
 let branch = Rc::new(Node {
   value: 5,
   parent: RefCell::new(Weak::new()),
@@ -2089,6 +2095,11 @@ println!("leaf parent = {:?}", Weak::upgrade(leaf.parent.borrow()).unwrap());
 //
 if let Some(ref mut child_wk) = opt_weak_ref { /* */ };
 opt_weak_ref.clone().unwrap();
+
+// Finally, Weak<dyn Trait> must receive a phony type on new() (on structs, one can use Self).
+//
+let parent: Mutex<Weak<dyn Shape>> = Mutex::new(Weak::<Plane>::new());
+
 ```
 
 Counting functions:

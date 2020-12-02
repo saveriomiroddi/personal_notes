@@ -46,6 +46,7 @@
       - [RefCell<T> and interior mutability](#refcellt-and-interior-mutability)
       - [Weak<T> and reference cycles](#weakt-and-reference-cycles)
         - [`Rc<RefCell>` or `RefCell<Rc>`](#rcrefcell-or-refcellrc)
+        - [Real case of modeling a thread-safe tree with trait objects, with children addition](#real-case-of-modeling-a-thread-safe-tree-with-trait-objects-with-children-addition)
         - [Real complex case of iterating a recursive structure with Rc/RefCell](#real-complex-case-of-iterating-a-recursive-structure-with-rcrefcell)
     - [Multithreading](#multithreading)
       - [Channels: Multiple Producers Single Consumer](#channels-multiple-producers-single-consumer)
@@ -511,6 +512,7 @@ collection.into_iter()       // owned values
 ```rust
 map(|x| x * 2)               // Ruby :map
 map(|(x, y)| x + y)          // Tuples unpacking: useful for example, on the result of zip()
+flat_map(|x| x)              // Ruby :flat_map. WATCH OUT! flattens only one level.
 fold(a, |a, x| a + x)        // Ruby :inject
 filter(|x| x % 2 == 0)       // Ruby :select
 find(|x| x % 2 == 0)         // Ruby :find
@@ -683,6 +685,7 @@ vec.iter();                             // iterator
 vec.sort();                             // stable
 vec.sort_by_key(|e| e.abs());           // stable, by key!
 vec.sort_unstable();                    // unstable (typically faster than stable)
+vec.sort_by(|a, b| a.partial_cmp(b).unwrap()); // sort with closure 😍!
 ```
 
 In order to pick a random element, see [rand crate](#random-with-and-without-rand).
@@ -999,6 +1002,8 @@ v.sort_by(|a, b| a.partial_cmp(b).unwrap());
 ```
 
 ### Sorting floats
+
+This is the generic solution; as alternative, see `Vec#sort_by()`.
 
 Required a wrapper class (and a truckload of boilerplate):
 
@@ -2140,6 +2145,31 @@ Rc<Vec<RefCell<Node>>>
 // ??? -> When cloning, the list of nodes is shared, which is not what wanted.
 //
 Rc<RefCell<Vec<Node>>>
+```
+
+##### Real case of modeling a thread-safe tree with trait objects, with children addition
+
+In this structure, a Tree implements the Node trait.
+
+```rust
+#[derive(SmartDefault)]
+pub struct Tree {
+  #[default(Mutex::new(Weak::<Self>::new()))]  // Note the (st00pid) necessary Weak type
+  pub parent: Mutex<Weak<dyn Node>>,
+  #[default(Mutex::new(vec![]))]
+  pub children: Mutex<Vec<Arc<dyn Node>>>,
+}
+
+impl Tree {
+  // This can't be an associate method, because we can't create a smart pointer to the parent (which
+  // implies ownership), so we must pass a smart pointer with the parent, so that we can clone it.
+  //
+  pub fn add_child(parent: &Arc<dyn Node>, child: &Arc<dyn Node>) {
+    parent.children().lock().unwrap().push(Arc::clone(child));
+    let mut child_parent_ref = child.parent().lock().unwrap();
+    *child_parent_ref = Arc::downgrade(parent);
+  }
+}
 ```
 
 ##### Real complex case of iterating a recursive structure with Rc/RefCell

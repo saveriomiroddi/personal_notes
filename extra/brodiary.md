@@ -1,3 +1,12 @@
+## Wed Dec/02
+
+- Ray tracer challenge
+  - [ ] Chapter 14
+    - [ ] Theory+Implementation
+      - [x] Review usage one mutex, and if RwLock makes sense (and is more performant)
+      - [x] Complete child addition (with change to Shape API)
+      - [x] Implement Group#local_intersections
+
 ## Tue Dec/01
 
 - [ ] Move old notes into personal_notes

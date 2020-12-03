@@ -9,7 +9,7 @@
     - [Lists (arrays)](#lists-arrays)
     - [Maps](#maps)
     - [Functions](#functions)
-    - [Iteration](#iteration)
+    - [Iteration/dynamic blocks](#iterationdynamic-blocks)
   - [State operations](#state-operations)
     - [Move resources from one statefile to another](#move-resources-from-one-statefile-to-another)
   - [Resources](#resources)
@@ -46,6 +46,7 @@
     - [CloudTrail](#cloudtrail)
     - [RDS](#rds)
     - [EFS](#efs)
+    - [Billing (budgets)](#billing-budgets)
 
 ## Base configuration
 
@@ -166,6 +167,7 @@ length(collection)
 split(separator, string)      # split a string into a list
 join(separator, list)         # join a list
 lookup(map, "key", "default") # use a default value on map access
+formatlist("pattern", list)   # format a list using the pattern (e.g. "%s")
 
 # String
 
@@ -190,13 +192,23 @@ coalesce(v1, v2)         # IFNULL; blank string is treated as null
 coalesce(["", "v2"]...)  # unpack operator
 ```
 
-### Iteration
+### Iteration/dynamic blocks
 
 ```hcl
-# Inside a resource/module; the variable is a map
+# Inside a resource/module; the variable is a map. `for_each` is a bit picky; it requires a map or set
+# of strings, so a list of numbers will need to be converted.
 #
 for_each = var.project
 name     = "web-server-sg-${each.key}-${each.value.environment}"
+
+# Example with dynamic block, and source list of numbers.
+#.
+dynamic "notification" {
+  for_each = toset(formatlist("%s", local.billing_alarm_thresholds))
+
+  content {
+    threshold = notification.value
+  }
 ```
 
 ## State operations
@@ -1506,5 +1518,40 @@ resource "aws_security_group_rule" "network_file_server" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.network_file_server.id
   source_security_group_id = each.key
+}
+```
+
+### Billing (budgets)
+
+```hcl
+# Import ref.: account_id:budget_name
+#
+resource "aws_budgets_budget" "infrastructure" {
+  name              = "Infrastructure costs"
+  time_period_start = "2020-12-01_00:00"
+  budget_type       = "COST"
+  limit_amount      = "10000.0"
+  limit_unit        = "USD"
+  time_unit         = "MONTHLY"
+
+  cost_types {
+    include_credit = false
+    include_refund = false
+    use_amortized  = true
+  }
+
+  dynamic "notification" {
+    # Input: list of numbers.
+    for_each = toset(formatlist("%s", local.billing_alarm_thresholds))
+
+    content {
+      comparison_operator        = "GREATER_THAN"
+      notification_type          = "ACTUAL"
+      subscriber_email_addresses = ["system_admins@company.invalid"]
+      threshold                  = notification.value
+      threshold_type             = "PERCENTAGE"
+      subscriber_sns_topic_arns  = [aws_sns_topic.budgets.arn]
+    }
+  }
 }
 ```

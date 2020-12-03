@@ -1,3 +1,15 @@
+## Thu Dec/03
+
+- [ ] Move old notes into personal_notes
+  - [x] python
+
+- Ray tracer challenge
+  - [ ] Chapter 14
+    - [ ] Theory+Implementation
+      - [x] Implement group transformations and normal
+      - [x] Use world_to_object() in patterns
+      - [x] Make Shape#parent more convenient, and add sibling parent_mut()
+
 ## Wed Dec/02
 
 - Ray tracer challenge

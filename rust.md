@@ -20,7 +20,7 @@
     - [For/while (/loop) loops](#forwhile-loop-loops)
     - [If (let)/then/else](#if-letthenelse)
     - [Sorting](#sorting)
-    - [Sorting floats](#sorting-floats)
+      - [Sorting floats](#sorting-floats)
     - [Enums](#enums)
     - [Option<T>/Result<T, Error>](#optiontresultt-error)
     - [Pattern matching](#pattern-matching)
@@ -277,6 +277,16 @@ for byte in buffer {
 }
 ```
 
+Sample Debug implementation:
+
+```rust
+impl Debug for SortableFloat {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}", self.0)
+  }
+}
+```
+
 ### Variables/Data types/Casting
 
 ```rust
@@ -514,6 +524,7 @@ map(|x| x * 2)               // Ruby :map
 map(|(x, y)| x + y)          // Tuples unpacking: useful for example, on the result of zip()
 flat_map(|x| x)              // Ruby :flat_map. WATCH OUT! flattens only one level.
 fold(a, |a, x| a + x)        // Ruby :inject
+fold_first(|a, x| a + x)     // Like fold(), using the first element as initial value
 filter(|x| x % 2 == 0)       // Ruby :select
 find(|x| x % 2 == 0)         // Ruby :find
 flatten()                    // Quasi-Ruby :flatten. WATCH OUT! flattens only one level.
@@ -995,15 +1006,9 @@ Definitions:
 
 Watch out! The f64 doesn't support Ord (which is often required); only PartialOrd.
 
-```rust
-// Sort a slice of f64
-//
-v.sort_by(|a, b| a.partial_cmp(b).unwrap());
-```
+#### Sorting floats
 
-### Sorting floats
-
-This is the generic solution; as alternative, see `Vec#sort_by()`.
+This is the generic solution, supporting NaN. A collection without NaN can rely on `a.partial_cmp(b).unwrap()`.
 
 Required a wrapper class (and a truckload of boilerplate):
 
@@ -1012,14 +1017,6 @@ Required a wrapper class (and a truckload of boilerplate):
 // This doesn't conform to the standard.
 //
 pub struct SortableFloat(pub f64);
-
-// Implemented because very likely that this type is going to be printed in debug form.
-//
-impl Debug for SortableFloat {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    write!(f, "{}", self.0)
-  }
-}
 
 // This only informs the compiler that the type supports (full) equivalence.
 //

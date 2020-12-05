@@ -537,6 +537,7 @@ Execute a (explicit) command on exit; generally convenient to trap ERR and INT:
 LOCKFILE=/var/lock/makewhatis.lock
 
 # Explicit command form. WATCH OUT! Use single outer quotes, otherwise the content is interpolated!
+# Don't use `EXIT` when trapping only errors.
 #
 trap '{ rm -f $LOCKFILE; }' ERR INT EXIT
 

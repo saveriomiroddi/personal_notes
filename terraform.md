@@ -52,7 +52,7 @@
 
 Provider configuration (e.g. `terraform.tf`):
 
-```hcl
+```ruby
 terraform {
   required_version = "0.12.28"
 }
@@ -85,7 +85,7 @@ data "aws_region" "eu-west-2" {
 
 Input variables (e.g. `inputs.tf`):
 
-```hcl
+```ruby
 variable "aws_access_key_id" {
   type = string
 }
@@ -97,10 +97,11 @@ variable "aws_secret_access_key" {
 variable "aws_default_region" {
   type = string
 }
+```
 
 Create a resource in the alternate region:
 
-```hcl
+```ruby
 resource "aws_instance" "instance_london" {
   provider = aws.eu-west-2
   // [...]
@@ -117,13 +118,13 @@ Environment variables can be used by TF by prefixing them with `TF_VAR_`.
 
 ### Predefined variables
 
-```hcl
+```ruby
 path.module     # path of the current module
 ```
 
 ### Strings
 
-```hcl
+```ruby
   # Indented heredoc (`<<-`). The closing token doesn't need to be at the beginning of the line;
   # the left margin is automatically computed from the string.
   #
@@ -141,13 +142,13 @@ path.module     # path of the current module
 
 ### Lists (arrays)
 
-```hcl
+```ruby
 mylist = ["a", "b", "c", "d"]
 ```
 
 ### Maps
 
-```hcl
+```ruby
 mymap = {
   "k1" = "v1"
   "k2" = "v2"
@@ -158,7 +159,7 @@ mymap["k2"] #                # "v2"
 
 ### Functions
 
-```hcl
+```ruby
 # Collections
 
 element(list, index)
@@ -194,7 +195,7 @@ coalesce(["", "v2"]...)  # unpack operator
 
 ### Iteration/dynamic blocks
 
-```hcl
+```ruby
 # Inside a resource/module; the variable is a map. `for_each` is a bit picky; it requires a map or set
 # of strings, so a list of numbers will need to be converted.
 #
@@ -249,7 +250,7 @@ The import format is be `terraform $resource_type.$local_name $resource_referenc
 
 Key pairs are per-region!
 
-```hcl
+```ruby
 resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
   public_key = "ssh-rsa [...] email@example.com"
@@ -260,7 +261,7 @@ resource "aws_key_pair" "deployer" {
 
 #### `aws_iam_group`/`aws_iam_group_policy_attachment`
 
-```hcl
+```ruby
 # Import ref.: name
 #
 resource "aws_iam_group" "developers" {
@@ -279,7 +280,7 @@ resource "aws_iam_group_policy_attachment" "test-attach" {
 
 The membership is non-exclusive - a user can have multiple resources.
 
-```hcl
+```ruby
 # Import ref.: name
 #
 resource "aws_iam_user" "myuser" {
@@ -300,7 +301,7 @@ resource "aws_iam_user_group_membership" "example" {
 
 #### `aws_iam_account_password_policy`
 
-```hcl
+```ruby
 # Import ref.: `iam-account-password-policy`
 #
 resource "aws_iam_account_password_policy" "strict" {
@@ -319,7 +320,7 @@ The attachment is non-exclusive.
 
 Example, using predefined policy:
 
-```hcl
+```ruby
 # Import ref.: name
 #
 resource "aws_iam_role" "demo_role" {
@@ -353,7 +354,7 @@ resource "aws_iam_role_policy_attachment" "demo-attach" {
 
 Custom policy:
 
-```hcl
+```ruby
 # Import ref.: arn
 #
 resource "aws_iam_policy" "lambda_example_logging" {
@@ -392,7 +393,7 @@ resource "aws_iam_policy" "lambda_example_logging" {
 
 (Inline) Group policy:
 
-```hcl
+```ruby
 # Import ref.: group.name:group_policy.name
 #
 resource "aws_iam_group_policy" "audit_trusted_advisor" {
@@ -421,7 +422,7 @@ resource "aws_iam_group_policy" "audit_trusted_advisor" {
 
 Customer managed key:
 
-```hcl
+```ruby
 # Import ref.: key_id
 #
 resource "aws_kms_key" "ebs-test" {}
@@ -464,7 +465,7 @@ resource "aws_secretsmanager_secret_version" "my_secret" {
 
 #### `aws_budgets_budget`
 
-```hcl
+```ruby
 # Import ref.: "account_id:name"
 #
 resource "aws_budgets_budget" "ec2" {
@@ -501,7 +502,7 @@ Networks are per-region!
 
 #### `aws_vpc`/`aws_subnet`
 
-```hcl
+```ruby
 resource "aws_vpc" "main" {
   cidr_block = "123.456.0.0/16"
 }
@@ -547,7 +548,7 @@ resource "aws_main_route_table_association" "internet" {
 
 #### `aws_security_group`/`aws_security_group_rule`
 
-```hcl
+```ruby
 # import aws_security_group.main $sg_id
 
 resource "aws_security_group" "main" {
@@ -591,7 +592,7 @@ resource "aws_security_group_rule" "main-egress" {
 
 #### `aws_instance`
 
-```hcl
+```ruby
 # smterraform import aws_instance.first_instance $instance_id
 #
 resource "aws_instance" "first_instance" {
@@ -633,7 +634,7 @@ resource "aws_instance" "first_instance" {
 
 #### `aws_ebs_volume`/`aws_volume_attachment`/`aws_ebs_snapshot`
 
-```hcl
+```ruby
 # import aws_ebs_volume.first_instance_root $volume_id
 #
 resource "aws_ebs_volume" "first_instance_extra" {
@@ -669,7 +670,7 @@ resource "aws_ebs_snapshot" "first_instance_extra" {
 
 #### `aws_lb`/`aws_lb_target_group`/`aws_lb_target_group_attachment`
 
-```hcl
+```ruby
 # Import ref.: arn
 #
 resource "aws_lb" "lb" {
@@ -709,7 +710,7 @@ resource "aws_lb_target_group_attachment" "second_instance" {
 
 #### `aws_launch_template`/`aws_autoscaling_group`
 
-```hcl
+```ruby
 resource "aws_launch_template" "asg-template" {
   name                   = "ASGTemplate"
   update_default_version = false # don't bother with versioning
@@ -766,7 +767,7 @@ resource "aws_autoscaling_group" "asg" {
 
 See the notes - there's much going on.
 
-```hcl
+```ruby
 locals {
   base_bucket_name = "sav986" # used to avoid cycles
 }
@@ -778,7 +779,11 @@ data "aws_caller_identity" "current" {}
 # Current user id.
 #
 data "aws_canonical_user_id" "current" {}
+```
 
+Bucket:
+
+```ruby
 # https://www.terraform.io/docs/providers/aws/r/s3_bucket.html
 #
 # Import ref.: bucket
@@ -897,7 +902,7 @@ resource "aws_s3_bucket_policy" "sav-test-allow-get-objects" {
 
 #### Objects
 
-```hcl
+```ruby
 # Import currently not supported (see https://git.io/JJlhX)
 #
 resource "aws_s3_bucket_object" "coffee" {
@@ -937,7 +942,7 @@ resource "aws_s3_bucket_object" "beach" {
 
 ### Lambda
 
-```hcl
+```ruby
 # Required role.
 #
 resource "aws_iam_role" "lambda-example" {
@@ -994,7 +999,7 @@ def lambda_handler(event, context):
 
 ### Lightsail
 
-```hcl
+```ruby
 # Import ref: name (watch out the case!)
 #
 resource "aws_lightsail_instance" "wordpress-test" {
@@ -1014,7 +1019,7 @@ resource "aws_lightsail_instance" "wordpress-test" {
 
 When the DNS is managed by a 3rd party, create the zone, then set the DNS nameservers associated to the zone.
 
-```hcl
+```ruby
 resource "aws_route53_zone" "demo" {
   name = "64kram.systems"
 
@@ -1045,7 +1050,7 @@ resource "aws_route53_record" "www-eu-central-1" {
 
 Cloudfront distribution + OAI:
 
-```hcl
+```ruby
 # Workaround to avoid self-reference. See https://www.terraform.io/docs/providers/aws/r/cloudfront_origin_access_identity.html#using-with-cloudfront.
 #
 resource "aws_cloudfront_origin_access_identity" "sav-test" {}
@@ -1105,7 +1110,7 @@ resource "aws_cloudfront_distribution" "sav-test" {
 
 Bucket policy:
 
-```hcl
+```ruby
 # See https://www.terraform.io/docs/providers/aws/r/cloudfront_origin_access_identity.html#updating-your-bucket-policy.
 #
 # Import ref.: bucket
@@ -1137,7 +1142,7 @@ resource "aws_s3_bucket_policy" "sav-test-private-allow-cloudfront" {
 
 ### SNS
 
-```hcl
+```ruby
 # Import ref.: arn
 #
 resource "aws_sns_topic" "system_alarms" {
@@ -1160,7 +1165,7 @@ resource "aws_sns_topic_subscription" "system_alarms_email" {
 
 #### Alarms
 
-```hcl
+```ruby
 # Import ref.: <alarm_name>
 #
 resource "aws_cloudwatch_metric_alarm" "ec2_first_instance_cpu_utilization_alarm" {
@@ -1269,7 +1274,7 @@ resource "aws_cloudwatch_metric_alarm" "billing_alarm" {
 
 Log group:
 
-```hcl
+```ruby
 # Import ref.: name
 #
 resource "aws_cloudwatch_log_group" "lambda_example_log_group" {
@@ -1292,7 +1297,7 @@ resource "aws_cloudwatch_log_stream" "all_events_cloudtrail_log_stream" {
 
 Scheduled:
 
-```hcl
+```ruby
 # Import ref.: name
 #
 resource "aws_cloudwatch_event_rule" "execute_example_lambda_every_hour" {
@@ -1313,7 +1318,7 @@ resource "aws_cloudwatch_event_target" "execute_lambda" {
 
 With event pattern:
 
-```hcl
+```ruby
 resource "aws_cloudwatch_event_rule" "send_email_on_user_login" {
   name = "SendEmailOnUserLogin"
 
@@ -1336,7 +1341,7 @@ resource "aws_cloudwatch_event_target" "notify_on_login" {
 
 Example. For the bucket, see the related project.
 
-```hcl
+```ruby
 locals {
   cloudtrail_bucket_name = "cloudtrail-demo-s999"
 }
@@ -1351,7 +1356,7 @@ resource "aws_cloudtrail" "demo_trail" {
 
 ### RDS
 
-```hcl
+```ruby
 # When an instance is created, the default (readonly) option and parameter groups are created for
 # the major version, if they don't exist:
 #
@@ -1430,7 +1435,7 @@ resource "aws_db_subnet_group" "default" {
 
 ### EFS
 
-```hcl
+```ruby
 resource "aws_efs_file_system" "network_file_server" {}
 
 # Policy that disables root access.
@@ -1523,7 +1528,7 @@ resource "aws_security_group_rule" "network_file_server" {
 
 ### Billing (budgets)
 
-```hcl
+```ruby
 # Import ref.: account_id:budget_name
 #
 resource "aws_budgets_budget" "infrastructure" {

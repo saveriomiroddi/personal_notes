@@ -1,3 +1,23 @@
+## Fri Dec/04
+
+- Extra
+  - [x] Attempt to create VSC plugin for highlighting Terraform code blocks in Markdown
+    - Packaging: https://stackoverflow.com/a/54409592
+
+- Ray tracer challenge
+  - [ ] Chapter 14
+    - [x] Theory+Implementation
+      - [ ] Implement bounding boxes
+        - [x] Traits proliferation shock
+        - [x] Try to improve the logic
+        - [x] Find issue
+          - [x] Fix World and other stuff, to accept Arc
+    - [x] Practice
+  - [x] Minor refactoring: `Shape#children(&self)` -> return MutexGuard
+  - [x] Minor refactoring: Simplify Intersection ordering implementation (no need to handle NaN)
+  - [ ] Builder pattern implementation at trait level
+    - [x] Fight and find solution
+
 ## Thu Dec/03
 
 - [ ] Move old notes into personal_notes

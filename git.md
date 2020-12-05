@@ -11,7 +11,8 @@
   - [Export (`archive`)](#export-archive)
   - [Informations gathering](#informations-gathering)
   - [Ignoring](#ignoring)
-  - [Batch operations  (message/tree filtering)](#batch-operations-messagetree-filtering)
+  - [Batch operations  (message/tree filtering)](#batch-operations--messagetree-filtering)
+  - [Patching](#patching)
 
 ## General concepts
 
@@ -135,4 +136,25 @@ git filter-branch --force --tree-filter 'rm -f terraform/terraform.tfstate' mast
 
 # Delete a Ruby method.
 git filter-branch --force --tree-filter 'ag "def mymethod" -l | xargs -r perl -0777 -i -pe "s/^(\s+)def mymethod.*?^\g1end\n\n//sm"' master..HEAD
+```
+
+## Patching
+
+```sh
+# Create standard patch, to be applied with `am`. `diff` can be used, but the metadata (e.g. author) will be lost.
+#
+# - produce diff for $file only
+# - creates a series of patches starting from $start_commit until HEAD or $end_commit
+#
+git format-patch -1 $start_commit^[..$end_commit] [$file] [--stdout]
+
+# Apply a patch and commit.
+#
+am $infile
+
+# Apply without commit
+#
+# - [check] instead of apply
+#
+apply [--check] $infile
 ```

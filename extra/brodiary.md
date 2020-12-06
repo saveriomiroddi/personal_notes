@@ -1,3 +1,13 @@
+## Sat Dec/05
+
+- Ray tracer challenge
+  - [ ] Chapter 14
+      - [ ] Implement bounding boxes
+        - [x] Make World accept Group as object
+        - [x] Fix world_test
+        - [ ] Make `Shape#intersections()` return `Intersection` instead of f64
+          - [x] Brutal fight with lifetimes
+
 ## Fri Dec/04
 
 - Extra

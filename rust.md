@@ -2951,7 +2951,7 @@ let len = reader.read_line(&mut line)?;
 
 // Read whole lines (two ways: iteration, vector)
 for line in reader.lines() { println!("{}", line?); }
-let lines = reader.lines().collect::<Result<Vec<_>, _>>().unwrap();
+let lines = reader.lines().collect::<Result<Vec<_>, _>>()?;
 
 // Buffered write. Think about write() vs. write_all()
 let mut stream = BufWriter::new(TcpStream::connect("127.0.0.1:34254").unwrap());
@@ -2963,7 +2963,14 @@ Abstract operation traits:
 - `std::io::Read`
 - `std::io::Write`: `write_all(buf: &[u8])`, `write(buf: &[u8])`
   - prefer `write_all()` to `write()`, since the latter doesn't guarantee that the whole buffer is written!
-  - `Vec` implements it, so it can be trivially used!
+
+`Vec` can be trivially used as `StringIO` equivalent:
+
+```rust
+BufReader::new(&str.as_bytes());
+BufReader::new(vec.as_slice());
+BufWriter::new(vec);
+```
 
 for more complex operations (ie. involving seek), can use [io::Cursor](https://doc.rust-lang.org/std/io/struct.Cursor.html).
 
@@ -3044,8 +3051,12 @@ Conversions:
 
 ```rust
 integer.to_string();                      // integer to string
-let guess: u32 = string.parse().unwrap(); // string to numeric type
 String::from_utf8(bytes).unwrap();        // string from (valid) utf-8 bytes
+
+// parse string to numeric type; with any numeric implementing `FromString`
+// f64 will parse integer strings (e.g. `1`)
+//
+let guess: u32 = string.parse().unwrap();
 ```
 
 String APIs:
@@ -3068,6 +3079,7 @@ s.trim(); s.trim_end(); s.trim_start(); // trim/strip
 s.trim_end_matches("suffix");           // chomp suffix (but repeated)! also accepts a closure
 
 s.as_bytes();                           // byte slice (&[u8]) of the string contents
+s.into_bytes();                         // convert to Vec[u8]
 
 // splits; there is a `r`split* version for each.
 //
@@ -3286,6 +3298,9 @@ pub struct Sphere {
   pub transformation: Matrix,
   #[default(Material::default())]
   pub material: Material,
+
+  // All the fields need to have a default; the non-meaningful defaults can be overridden on an instantiation
+  // method, e.g. new().
 }
 
 let sphere1 = Sphere::default();
@@ -3351,8 +3366,28 @@ let text = "201203, 201301, 201407";
 
 re.is_match(text); // true
 
+// WATCH OUT!: the capture 0 is the whole string (as standard).
+
 for cap in re.captures_iter(text) {
     println!("Whole: '{}', $1: '{}', $2: '{}'", &cap[0], &cap[1], &cap[2]);
+}
+```
+
+Match multiple regexes:
+
+```rust
+lazy_static::lazy_static! {
+  static ref VERTEX_REGEX: Regex = Regex::new(r"^v (-?1(?:\.\d+)) (-?1(?:\.\d+)) (-?1(?:\.\d+))$").unwrap();
+  static ref FACE_REGEX: Regex = Regex::new(r"^f (\d+) (\d+) (\d+)$").unwrap();
+}
+
+if let Some(captures) = VERTEX_REGEX.captures(&line) {
+  let x: f64 = captures[1].parse().unwrap();
+  // ...
+} else if let Some(captures) = FACE_REGEX.captures(&line) {
+  // ...
+} else {
+  // ...
 }
 ```
 

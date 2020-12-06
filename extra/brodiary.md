@@ -1,3 +1,22 @@
+## Sun Dec/06
+
+- Ray tracer challenge
+  - [x] Chapter 14
+      - [x] Implement bounding boxes
+        - [x] Make `Shape#intersections()` return `Intersection` instead of f64
+          - [x] Fix all the previous practice exercises
+          - [x] Fix all the test suites
+        - [x] Fix local bounds for several shapes
+  - [x] Check and document why/when intersections need to be ordered
+  - [x] Think and reply on group
+  - [ ] Chapter 15
+    - [x] Theory
+    - [ ] Implementation
+      - [x] Triangle
+      - [ ] OBJ Parser
+        - [x] `v` and `f`
+        - [x] Try downcasting for testing
+
 ## Sat Dec/05
 
 - Ray tracer challenge

@@ -27,9 +27,11 @@
       - [Error handling](#error-handling)
     - [Structs](#structs)
     - [Generics](#generics)
-    - [Traits (and Generics #2)](#traits-and-generics-2)
-    - [Traits #2 (OO-approach and supertraits)](#traits-2-oo-approach-and-supertraits)
-    - [Traits #3 (disambiguation)](#traits-3-disambiguation)
+    - [Traits](#traits)
+      - [Basics (and Generics #2)](#basics-and-generics-2)
+      - [OO-approach and supertraits](#oo-approach-and-supertraits)
+      - [Disambiguation](#disambiguation)
+      - [Downcasting](#downcasting)
     - [Operator overloading](#operator-overloading)
     - [Method overloading (workaround)](#method-overloading-workaround)
     - [Static methods](#static-methods)
@@ -78,7 +80,7 @@
     - [Commandline arguments (basic)](#commandline-arguments-basic)
     - [Processes](#processes)
     - [Blackbox (nightly)](#blackbox-nightly)
-  - [Traits](#traits)
+  - [Traits](#traits-1)
     - [Default](#default)
     - [Copy, Clone, Drop and their relationships](#copy-clone-drop-and-their-relationships)
     - [Display](#display)
@@ -532,15 +534,18 @@ rev()                        // reverse. WATCH OUT, UNINTUITIVE: since it's not 
 any(|x| x == 33)             // terminates on the first true
 all(|x| x % 2 == 0)          // terminates on the first false
 nth(n)                       // nth element (0-based)
+skip(n)                      // skip n elements
 take(n)                      // iterator for the first n elements
 enumerate()                  // iterator (index, &value) (Ruby :each_with_index)
 join("str")                  // join using str
 zip(iter)                    // zip two arrays (iterators)!!!
 sum()                        // WATCH OUT! Returns the same type, so conversion is needed, e.g. `.map(|&x| x as u32).sum();`
 
+// Can't unpack directly in the `for` with these, since they're refutable patterns.
+//
 chunks(n)                    // iterate in chunks of n elements; includes last chunk, if smaller
 chunks_exact(n)              // (preferred) iterate in chunks of n elements; does not include the last chunk, if smaller
-windows(n)                   // like chunks, but with overlapping slices
+windows(n)                   // like chunks, but with overlapping slices (Ruby :each_cons)
 
 // If one wants to convert an iterator from borrowed (&T) to owned (T), use copied() or cloned().
 // Example, from [f64; _] to Vec<f64>:
@@ -1324,7 +1329,9 @@ impl<T, U> Point<T, U> {
 }
 ```
 
-### Traits (and Generics #2)
+### Traits
+
+#### Basics (and Generics #2)
 
 ```rust
 pub trait Summary {
@@ -1430,7 +1437,7 @@ impl<T: Display + Ord, U> Point<T, U> {
 }
 ```
 
-### Traits #2 (OO-approach and supertraits)
+#### OO-approach and supertraits
 
 ```rust
 pub trait Draw { fn draw(&self); }
@@ -1503,7 +1510,7 @@ trait BetterDisplay: fmt::Display {
 trait Matrix: Sized + Mul<Self> { /* ... */ }
 ```
 
-### Traits #3 (disambiguation)
+#### Disambiguation
 
 Specify which function to invoke, when there is overlapping with/between traits:
 
@@ -1541,6 +1548,38 @@ Flyer::fly(&person); // "Flying"
 println!("{}", Human::mean());            // "Arms, hopefully"
 println!("{}", <Human as Flyer>::mean()); // "Plan"
 println!("{}", Flyer::mean());            // error!
+```
+
+#### Downcasting
+
+Downcasting from trait object to the concrete class (reference); useful to enable it only in testing:
+
+```rust
+#[cfg(test)]
+use std::any::Any;
+
+trait Trait {
+  #[cfg(test)]
+  // In some (non useful) cases, it's possible to get away without implementing this.
+  fn as_any(&self) -> &dyn Any;
+}
+
+#[derive(Debug)]
+struct Concr {}
+
+impl Trait for Concr {
+  #[cfg(test)]
+  fn as_any(&self) -> &dyn Any {
+    self
+  }
+}
+
+#[test]
+fn my_test() {
+  let as_trait: Box<dyn Trait> = Box::new(Concr {});
+
+  let _concr: &Concr = as_trait.as_any().downcast_ref::<Concr>().unwrap();
+}
 ```
 
 ### Operator overloading
@@ -3081,7 +3120,8 @@ s.trim_end_matches("suffix");           // chomp suffix (but repeated)! also acc
 s.as_bytes();                           // byte slice (&[u8]) of the string contents
 s.into_bytes();                         // convert to Vec[u8]
 
-// splits; there is a `r`split* version for each.
+// splits; there is a `r`split* version for each
+// in order to use the slice methods, do `collect()`
 //
 s.split("sep")
 s.split(char::is_numeric);
@@ -3634,6 +3674,23 @@ thread::spawn(move || {
 ```
 
 ### Unit testing
+
+Standard testing:
+
+```rust
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_sort() {
+    let mut $collection = &mut vec![3, 2, 1];
+    $stat
+    let expected_collection = &vec![1, 2, 3];
+    assert_eq!($collection, expected_collection);
+  }
+}
+```
 
 RSpec-style testing:
 

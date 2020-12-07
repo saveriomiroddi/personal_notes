@@ -1,3 +1,22 @@
+## Mon Dec/07
+
+- [ ] Move old notes into personal_notes
+  - [x] vagrant.odt
+
+- Open source
+  - [x] Follow up discussion `demonstrate` before-all concept
+
+- Languages/Frameworks
+  - Rust
+    - [x] Review downcasting
+
+- Ray tracer challenge
+  - [ ] Chapter 15
+    - [ ] Implementation
+      - [ ] OBJ Parser
+        - [x] Implementation Obj parser (except groups)
+          - St00pid fight reges, iterators, slices
+
 ## Sun Dec/06
 
 - Ray tracer challenge

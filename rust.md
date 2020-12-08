@@ -1,4 +1,5 @@
 # Rust
+
 - [Rust](#rust)
   - [Cargo](#cargo)
   - [Conditional build (ifdef-like)](#conditional-build-ifdef-like)
@@ -26,6 +27,7 @@
     - [Pattern matching](#pattern-matching)
       - [Error handling](#error-handling)
     - [Structs](#structs)
+    - [`self` in associated methods](#self-in-associated-methods)
     - [Generics](#generics)
     - [Traits](#traits)
       - [Basics (and Generics #2)](#basics-and-generics-2)
@@ -69,7 +71,7 @@
     - [Project structure](#project-structure)
     - [Modules](#modules)
   - [Standard library](#standard-library)
-    - [Files/streams handling](#filesstreams-handling)
+    - [Files/paths/streams handling](#filespathsstreams-handling)
     - [Testing](#testing)
       - [Integration tests](#integration-tests)
     - [String/char-related (conversions)](#stringchar-related-conversions)
@@ -528,7 +530,7 @@ flat_map(|x| x)              // Ruby :flat_map. WATCH OUT! flattens only one lev
 fold(a, |a, x| a + x)        // Ruby :inject
 fold_first(|a, x| a + x)     // Like fold(), using the first element as initial value
 filter(|x| x % 2 == 0)       // Ruby :select
-find(|x| x % 2 == 0)         // Ruby :find
+find(|x| x % 2 == 0)         // Ruby :find/:detect
 flatten()                    // Quasi-Ruby :flatten. WATCH OUT! flattens only one level.
 rev()                        // reverse. WATCH OUT, UNINTUITIVE: since it's not inclusive, it goes from 99 to 0.
 any(|x| x == 33)             // terminates on the first true
@@ -807,19 +809,30 @@ WATCH OUT! In order to avoid BCK headaches when getting and setting in the same 
 ```rust
 use std::collections::HashMap;
 
+// When choosing between owned/borrowed, keeping in mind that if elements are created in a function
+// and returned, ownership is necessary.
+//
 let mut map = HashMap::new();
 
 map.insert("b", 10);
 map.insert("b", 10);            // Overwrites the existing value
 
 // Entry API: `entry()` gets the value for in-place modification.
-// `or_insert()` sets the given value if the key doesn't exist; its return value can be used to
-// modify the value in-place.
+// `or_insert()` sets the given value if the key doesn't exist; its return value can be used to modify
+// the value in-place.
+// or_insert() consumes the entry.
 //
-let entry = map.entry(key).or_insert(50);
-*entry = 100;
+let value_ref: &u32 = map.entry(key).or_insert(50);
+*value_ref = 100;
 
-// Getters use references.
+// Modify a map in a loop.
+//
+for triangle in triangles {
+  let group = groups.entry(current_group);
+  group.and_modify(|group| Group::add_child(group, &triangle));
+}
+
+// WATCH OUT!: Getters take and return references.
 //
 // There's no function for getting with a default, but `[cloned()].unwrap_or()` works well.
 //
@@ -835,17 +848,31 @@ println!("{}", key)
 // Iterate a map
 //
 for (book, review) in &book_reviews { /* ... */ };
+
+// Other APIs
+//
+map.keys();    // Iterator
+map.values();  // Iterator
 ```
 
 Conveniences:
 
 ```rust
-// Create a hashmap from multiple arrays.
+// Convert a map to owned vector
 //
-let scores: HashMap<_, _> = teams
-    .iter()
-    .zip(initial_scores.iter())
-    .collect();
+let vec = score_table
+  .into_iter()
+  .map(|(_k, v)| v)
+  .collect::<Vec<_>>();
+
+// Create a map from multiple arrays.
+//
+let scores = teams
+  .iter()
+  .zip(initial_scores.iter())
+  .collect::<HashMap<_, _>>();
+
+// Transform a map into another one (and pass ownership)
 ```
 
 In order to use enums as keys, annotate them with `#[derive(Eq, PartialEq, Hash)]`.
@@ -1302,6 +1329,20 @@ let mut user2 = User {
   ..user
 }
 ```
+
+### `self` in associated methods
+
+In associated methods, the `self` reference can be also a smart pointer:
+
+```rust
+struct MyStruct {
+  fn my_method(self: Arc<Self>, param: u32) { /* .. */ }
+}
+arc_ref = Arc::new(MyStruct {});
+arc_ref.my_method(123);
+```
+
+This is currently limited to `Box`/`Rc`/`Arc`.
 
 ### Generics
 
@@ -2173,24 +2214,29 @@ Second case:
 //
 RefCell<Vec<Rc<Node>>>
 
-// Vector is shared, but can't be itself modified; instead, the children can be modified.
-//
-Rc<Vec<RefCell<Node>>>
-
 // Vector is shared; it can be modified, and the children, too.
 // ??? -> When cloning, the list of nodes is shared, which is not what wanted.
 //
 Rc<RefCell<Vec<Node>>>
+
+// Vector is shared, but can't be itself modified; instead, each child can be individually modified.
+// This may not make much sense, since nodes can't be added/removed.
+//
+Rc<Vec<RefCell<Node>>>
 ```
 
+A way to look at this is that what is between `Rc` and `RefCell` _can't_ be modified.
+
 ##### Real case of modeling a thread-safe tree with trait objects, with children addition
+
+**to verify** - move the Mutex in; the version below should suffer from contention.
 
 In this structure, a Tree implements the Node trait.
 
 ```rust
 #[derive(SmartDefault)]
 pub struct Tree {
-  #[default(Mutex::new(Weak::<Self>::new()))]  // Note the (st00pid) necessary Weak type
+  #[default(Mutex::new(Weak::<Self>::new()))]  // Note the (st00pid) necessary generic
   pub parent: Mutex<Weak<dyn Node>>,
   #[default(Mutex::new(vec![]))]
   pub children: Mutex<Vec<Arc<dyn Node>>>,
@@ -2338,6 +2384,8 @@ for _ in 0..10 {
 
 // threads must be joined
 ```
+
+Note that `Arc<Mutex<T>>` can be safely cloned and move around; the mutex will work correctly.
 
 #### Atomic primitive type wrappers
 
@@ -2796,6 +2844,9 @@ pub fn my_macro_derive(input: TokenStream) -> TokenStream {
 
     // stringify() converts an expression to string literal (&str), not String!
     let gen = quote! {
+        // in order to import entities, rebind them
+        use std::sync::Mutex as HelloMacroMutex;
+
         impl HelloMacro for #name {
             fn my_macro() {
                 println!("{} my_macro() implementation via custom derive attribute!", stringify!(#name));
@@ -2970,7 +3021,7 @@ use std::collections::*; // useful for testing; unidiomatic for the rest
 
 ## Standard library
 
-### Files/streams handling
+### Files/paths/streams handling
 
 ```rust
 std::fs::read_to_string(filename) -> Result<String, Error>;    // content must be valid UTF-8; filename can be relative.
@@ -3012,6 +3063,12 @@ BufWriter::new(vec);
 ```
 
 for more complex operations (ie. involving seek), can use [io::Cursor](https://doc.rust-lang.org/std/io/struct.Cursor.html).
+
+For paths handling, use `std::path::Path`, with several conveniences:
+
+```rust
+let path: PathBuf = Path::new(ASSETS_PATH).join("triangles.obj");
+```
 
 ### Testing
 
@@ -3675,6 +3732,8 @@ thread::spawn(move || {
 
 ### Unit testing
 
+If files needs to be opened, the current path is the root of the current project (not workspace root!).
+
 Standard testing:
 
 ```rust
@@ -3695,6 +3754,7 @@ mod tests {
 RSpec-style testing:
 
 ```rust
+// Repository [here](https://github.com/austinsheep/demonstrate).
 use demonstrate::demonstrate;
 
 // If a single instance needs to be shared between UTs ("before all"), then trickery is needed.

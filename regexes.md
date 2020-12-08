@@ -2,7 +2,7 @@
 
 - [Regexes](#regexes)
   - [Character classes](#character-classes)
-  - [Quantifiers](#quantifiers)
+  - [Quantifiers (including `*`/`+`)](#quantifiers-including-)
   - [PCRE flags](#pcre-flags)
   - [Complex cases](#complex-cases)
     - [Capturing sequences of N characters](#capturing-sequences-of-n-characters)
@@ -18,7 +18,7 @@
 | `:alnum:` |  `a-zA-Z0-9`  |
 | `:blank:` |     ` \t`     |
 
-## Quantifiers
+## Quantifiers (including `*`/`+`)
 
 Form: `{M}`, `{M, N}`, `{M,}`.
 
@@ -28,6 +28,13 @@ Don't forget that when used with a capturing group, the group will capture only 
 
 ```ruby
 " 2 3 4".scan /( \d){2,}/ # => [[" 4"]]
+```
+
+WATCH OUT!! When there are group quantifiers, only the last occurrence is captured. Such cases must be transformed to single captures, and the language-specific finder must be used:
+
+```ruby
+" a b".match(/( \w)+/)[1..] # => [" b"]
+" a b".scan(/( \w)/)        # => [" a", " b"]
 ```
 
 ## PCRE flags

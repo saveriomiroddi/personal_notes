@@ -1,3 +1,22 @@
+## Tue Dec/08
+
+- [ ] Move old notes into personal_notes
+  - [x] gnuplot.odt
+
+- Ray tracer challenge
+  - [x] Refactoring: ShapeAccessors: Import the required types, by using rebinding
+  - [ ] Implementation
+    - [ ] OBJ Parser
+      - [x] Adjust not to borrow the parser when parsing a line
+      - [x] Fight hashmaps/looping/ownership
+      - [x] Fight testing file paths
+      - [x] Add groups parsing (and UT)
+      - [x] Add groups tree exporting
+
+- Languages/Frameworks
+  - Rust
+    - [x] First look at exercism.io mentoring and proposed solutions
+
 ## Mon Dec/07
 
 - [ ] Move old notes into personal_notes

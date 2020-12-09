@@ -1,3 +1,17 @@
+## Wed Dec/09
+
+- Open source
+  - Rust cucumber
+    - [x] Review and discuss the updates to the README
+  - ZFS
+    - [x] Setup discussions
+    - [x] Reply to closed issue
+
+- Ray tracer challenge
+  - [x] Chapter 15
+    - [x] Implementation
+      - [x] Fight vector try_into()/vector unpacking.
+
 ## Tue Dec/08
 
 - [ ] Move old notes into personal_notes

@@ -98,6 +98,9 @@
     - [Map literals (`maplit`)](#map-literals-maplit)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
     - [Unit testing](#unit-testing)
+      - [RSpec-style testing (`demonstrate`)](#rspec-style-testing-demonstrate)
+      - [Cucumber](#cucumber)
+      - [Utilities](#utilities)
     - [Static/global variables (`lazy_static`, `once_cell`, `thread_local!`)](#staticglobal-variables-lazy_static-once_cell-thread_local)
     - [Concurrency (multithreading) tools (`rayon`/`crossbeam`)](#concurrency-multithreading-tools-rayoncrossbeam)
     - [Enum utils, e.g. iterate (`strum`)](#enum-utils-eg-iterate-strum)
@@ -660,13 +663,18 @@ vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) an array
 vec.extend(&[1, 2, 3]);                 // Append (borrowing version)
 vec[range].copy_from_slice(&source);    // memcpy; see array example
 
-vec.as_slice().try_into().unwrap();      // Convert to array; requires TryInto
+// Convert to array; requires TryInto. If type annotations are required, use the second form:
+//
+vec.as_slice().try_into().unwrap();
+TryInto::<&[f64; 3]>::try_into(vec.as_slice());
 
 // Vectors can be received as array reference type (mutable, if required).
 //
 fn process_list<T>(list: &[T]) {};
 process_list(&vec);
 ```
+
+In order to unpack a vector, convert to slice and use if let (see [pattern matching](#pattern-matching)).
 
 Element inclusion test/removal:
 
@@ -1177,6 +1185,12 @@ y == Some(2);
 //
 let mut x = Some(2);    // works also on None
 let old = x.replace(5);
+
+// map(): map the content, only if it's Some.
+//
+let (with, without) = (Some(2), None::<i32>);
+with.map(|n| 2 * n); // Some(4)
+without.map(|n| 2 * n); // None
 
 // Mappings borrowed <> owned
 //
@@ -3468,6 +3482,20 @@ re.is_match(text); // true
 for cap in re.captures_iter(text) {
     println!("Whole: '{}', $1: '{}', $2: '{}'", &cap[0], &cap[1], &cap[2]);
 }
+
+// COOL!!!! Convert to Vec<_>, and pattern match.
+//
+let value = captures
+  .iter()
+  .skip(1)                       // skip global capture
+  .map(|c| c.unwrap().as_str())  // use `c.map(|m| m.as_str())` if the captures are NOT guaranteed
+  .collect::<Vec<_>>();
+
+// If the captures are not guaranteed, must handle the `Option<_>`
+//
+if let [v1, n1, v2, n2, v3, n3] = values.as_slice() {
+  FaceWithNormal((*v1, *n1), (*v2, *n2), (*v3, *n3))
+} else { unreachable!() }
 ```
 
 Match multiple regexes:
@@ -3751,10 +3779,11 @@ mod tests {
 }
 ```
 
-RSpec-style testing:
+#### RSpec-style testing (`demonstrate`)
+
+Repository [here](https://github.com/austinsheep/demonstrate).
 
 ```rust
-// Repository [here](https://github.com/austinsheep/demonstrate).
 use demonstrate::demonstrate;
 
 // If a single instance needs to be shared between UTs ("before all"), then trickery is needed.
@@ -3800,7 +3829,126 @@ demonstrate! {
 
 There is a [Cucumber crate](https://github.com/bbqsrc/cucumber-rust). As of Nov/2020, the README tutorial [is broken](https://github.com/bbqsrc/cucumber-rust/issues/90), so see [another tutorial](https://www.florianreinhard.de/2020-10-05/cucumber-07-in-rust-beginners-tutorial).
 
-Utilities:
+#### Cucumber
+
+There are two options - the stable version, and the master version, which has macros that make the test structure arguably more readable; this section uses the latter.
+
+Update the configuration:
+
+```sh
+cat >> Cargo.toml <<TOML
+async-trait = "0.1.42" # This is currently required to properly initialize the world in cucumber-rust
+futures = "0.3.8" # You can use a different executor if you wish
+
+[[test]]
+name = "cucumber"
+harness = false # Allows Cucumber to print output instead of libtest
+
+[dev-dependencies]
+cucumber_rust = { git = "https://github.com/bbqsrc/cucumber-rust", branch = "main", features = ["macros"] }
+TOML
+```
+
+Add the feature(s):
+
+```sh
+mkdir features
+
+cat > features/examples.feature <<CUCUMBER
+Feature: Example feature
+
+  Scenario: An example scenario
+    Given I am trying out Cucumber
+    When I consider what I am doing
+    Then I am interested in ATDD
+    And we can implement rules with regex
+CUCUMBER
+```
+
+and the test(s):
+
+```sh
+mkdir tests
+
+cat > tests/cucumber.rs <<'RUST'
+use std::{cell::RefCell, convert::Infallible};
+
+use async_trait::async_trait;
+use cucumber_rust::{given, then, when, World, WorldInit};
+
+#[derive(WorldInit)]
+pub struct MyWorld {
+    // You can use this struct for mutable context in scenarios.
+    foo: String,
+    bar: usize,
+    some_value: RefCell<u8>,
+}
+
+impl MyWorld {
+    async fn test_async_fn(&mut self) {
+        *self.some_value.borrow_mut() = 123u8;
+        self.bar = 123;
+    }
+}
+
+#[async_trait(?Send)]
+impl World for MyWorld {
+    type Error = Infallible;
+
+    async fn new() -> Result<Self, Infallible> {
+        Ok(Self {
+            foo: "wat".into(),
+            bar: 0,
+            some_value: RefCell::new(0),
+        })
+    }
+}
+
+#[given("a thing")]
+async fn a_thing(world: &mut MyWorld) {
+    world.foo = "elho".into();
+    world.test_async_fn().await;
+}
+
+#[when(regex = "something goes (.*)")]
+async fn something_goes(_: &mut MyWorld, _wrong: String) {}
+
+#[given("I am trying out Cucumber")]
+fn i_am_trying_out(world: &mut MyWorld) {
+    world.foo = "Some string".to_string();
+}
+
+#[when("I consider what I am doing")]
+fn i_consider(world: &mut MyWorld) {
+    let new_string = format!("{}.", &world.foo);
+    world.foo = new_string;
+}
+
+#[then("I am interested in ATDD")]
+fn i_am_interested(world: &mut MyWorld) {
+    assert_eq!(world.foo, "Some string.");
+}
+
+#[then(regex = r"^we can (.*) rules with regex$")]
+fn we_can_regex(_: &mut MyWorld, action: String) {
+    // `action` can be anything implementing `FromStr`.
+    assert_eq!(action, "implement");
+}
+
+fn main() {
+    let runner = MyWorld::init(&["./features"]);
+    futures::executor::block_on(runner.run_and_exit());
+}
+RUST
+```
+
+Fire!:
+
+```sh
+cargo test --test cucumber
+```
+
+#### Utilities
 
 ```rust
 // `serial_test` allows marked tests to be run serially; works with `demonstrate`!

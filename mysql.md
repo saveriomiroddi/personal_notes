@@ -11,6 +11,8 @@
   - [Window functions](#window-functions)
     - [Define each window extent (`PARTITION BY`), and picking a row per window](#define-each-window-extent-partition-by-and-picking-a-row-per-window)
     - [Window function aggregates](#window-function-aggregates)
+    - [Applications/examples](#applicationsexamples)
+      - [Replace spaced coordinates with monotonically increasing values](#replace-spaced-coordinates-with-monotonically-increasing-values)
   - [Stored procedures](#stored-procedures)
     - [Cursors (with convenient example of looping)](#cursors-with-convenient-example-of-looping)
   - [Optimizer](#optimizer)
@@ -252,6 +254,33 @@ ROW_NUMBER()                         # 1-based
 LAG(@expr[, @position[, @default]])  # value of @expr from the previous row of the frame
                                      # @position defaults to 1; @default defaults to NULL, and can be an expression (great to avoid the first NULL)
 FIRST_VALUE(@expr)                   # value of @expr from the first row of the frame
+```
+
+### Applications/examples
+
+#### Replace spaced coordinates with monotonically increasing values
+
+```sql
+WITH
+y_ords AS (
+  SELECT
+    y, ROW_NUMBER() OVER (ORDER BY y) - 1 `y_ord`
+  FROM {table}
+  WHERE {parent_fk} = ?
+  GROUP BY y
+),
+x_ords AS (
+  SELECT
+    x, ROW_NUMBER() OVER (ORDER BY x) - 1 `x_ord`
+  FROM {table}
+  WHERE {parent_fk} = ?
+  GROUP BY x
+)
+UPDATE {table} t
+        JOIN y_ords yo USING (y)
+        JOIN x_ords xo USING (x)
+SET t.y = yo.y_ord, t.x = xo.x_ord
+WHERE {parent_fk} = ?
 ```
 
 ## Stored procedures

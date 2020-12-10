@@ -1,3 +1,16 @@
+## Thu Dec/10
+
+- Study Programming Rust (1st ed.)
+  - [ ] Chapter 3
+
+- Open source
+  - QEMU 5.2 patch update
+    - [x] First review (conflicts)
+
+- Ray tracer challenge
+  - [ ] Chapter 16
+    - [ ] Theory
+
 ## Wed Dec/09
 
 - Open source

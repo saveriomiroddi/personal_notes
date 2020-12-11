@@ -1,3 +1,21 @@
+## Fri Dec/11
+
+- Ray tracer challenge
+  - [ ] Chapter 16
+    - [x] Theory
+    - [x] Cleanup/Refactoring: Remove unnecessary children concept from Shape, and made parent always a Group
+    - [x] Refactoring: Make Group::add_child an associated method
+    - [ ] Implementation
+      - [x] Revert parent to be dyn Shape, while still keeping Group#add_child as associated method
+      - [x] Basic implementation of Csg (struct and children addition only)
+
+- Languages/Frameworks
+  - Rust
+    - Programming Rust (1st ed.)
+      - [x] Chapter 3
+      - [x] Chapter 4
+      - [ ] Chapter 5
+
 ## Thu Dec/10
 
 - Study Programming Rust (1st ed.)

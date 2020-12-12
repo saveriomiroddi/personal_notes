@@ -1,4 +1,4 @@
-## Fri Dec/11
+## Fri 11/Dec/2020
 
 - Ray tracer challenge
   - [ ] Chapter 16
@@ -16,7 +16,7 @@
       - [x] Chapter 4
       - [ ] Chapter 5
 
-## Thu Dec/10
+## Thu 10/Dec/2020
 
 - Study Programming Rust (1st ed.)
   - [ ] Chapter 3
@@ -29,7 +29,7 @@
   - [ ] Chapter 16
     - [ ] Theory
 
-## Wed Dec/09
+## Wed 09/Dec/2020
 
 - Open source
   - Rust cucumber
@@ -43,7 +43,7 @@
     - [x] Implementation
       - [x] Fight vector try_into()/vector unpacking.
 
-## Tue Dec/08
+## Tue 08/Dec/2020
 
 - [ ] Move old notes into personal_notes
   - [x] gnuplot.odt
@@ -62,7 +62,7 @@
   - Rust
     - [x] First look at exercism.io mentoring and proposed solutions
 
-## Mon Dec/07
+## Mon 07/Dec/2020
 
 - [ ] Move old notes into personal_notes
   - [x] vagrant.odt
@@ -81,7 +81,7 @@
         - [x] Implementation Obj parser (except groups)
           - St00pid fight reges, iterators, slices
 
-## Sun Dec/06
+## Sun 06/Dec/2020
 
 - Ray tracer challenge
   - [x] Chapter 14
@@ -100,7 +100,7 @@
         - [x] `v` and `f`
         - [x] Try downcasting for testing
 
-## Sat Dec/05
+## Sat 05/Dec/2020
 
 - Ray tracer challenge
   - [ ] Chapter 14
@@ -110,7 +110,7 @@
         - [ ] Make `Shape#intersections()` return `Intersection` instead of f64
           - [x] Brutal fight with lifetimes
 
-## Fri Dec/04
+## Fri 04/Dec/2020
 
 - Extra
   - [x] Attempt to create VSC plugin for highlighting Terraform code blocks in Markdown
@@ -130,7 +130,7 @@
   - [ ] Builder pattern implementation at trait level
     - [x] Fight and find solution
 
-## Thu Dec/03
+## Thu 03/Dec/2020
 
 - [ ] Move old notes into personal_notes
   - [x] python
@@ -142,7 +142,7 @@
       - [x] Use world_to_object() in patterns
       - [x] Make Shape#parent more convenient, and add sibling parent_mut()
 
-## Wed Dec/02
+## Wed 02/Dec/2020
 
 - Ray tracer challenge
   - [ ] Chapter 14
@@ -151,7 +151,7 @@
       - [x] Complete child addition (with change to Shape API)
       - [x] Implement Group#local_intersections
 
-## Tue Dec/01
+## Tue 01/Dec/2020
 
 - [ ] Move old notes into personal_notes
   - [x] rspec
@@ -171,7 +171,7 @@
 - [x] Fight search women in engineering coaching positions/groups
   - [x] Contact/join a few
 
-## Mon Nov/30
+## Mon 30/Nov/2020
 
 - Blog
   - [x] Article: Rust lulz: Branchless cofactor
@@ -183,7 +183,7 @@
     - [ ] Practice
       - [x] Add Cylinder
 
-## Sun Nov/29
+## Sun 29/Nov/2020
 
 - Ray tracer challenge
   - [x] Chapter 12
@@ -196,7 +196,7 @@
   - Rust
     - [x] Review Cucumber (https://is.gd/lnycfx)
 
-## Sat Nov/28
+## Sat 28/Nov/2020
 
 - Ray tracer challenge
   - [x] Chapter 11
@@ -208,7 +208,7 @@
       - [x] Fight array with mixed entries type
       - [x] Cube normal
 
-## Fri Nov/27
+## Fri 27/Nov/2020
 
 - Ray tracer challenge
   - [x] Improvements
@@ -231,7 +231,7 @@
     - [x] Issue with trait object size
     - [x] Read https://abronan.com/rust-trait-objects-box-and-rc/
 
-## Thu Nov/26
+## Thu 26/Nov/2020
 
 - Open source
   - ZFS
@@ -245,7 +245,7 @@
       - [x] Reimplement the refraction values computation, as in the book
       - [x] Verify that intersections before t are necessary, and update intersections() API accordingly
 
-## Wed Nov/25
+## Wed 25/Nov/2020
 
 - Ray tracer challenge
   - [ ] Chapter 11
@@ -254,7 +254,7 @@
       - [x] Brutal fight with failing refraction test
       - [ ] Fresnel effect
 
-## Tue Nov/24
+## Tue 24/Nov/2020
 
 - Languages/Frameworks
   - Rust
@@ -272,7 +272,7 @@
 - Extra
   - [x] VSC: Fight find correct single-UT test configuration
 
-## Mon Nov/23
+## Mon 23/Nov/2020
 
 - Ray tracer challenge
   - [x] Chapter 10
@@ -291,7 +291,7 @@
       - [x] Check alternative article, and report issues with it
     - [x] Review Rust reference books for choosing next
 
-## Sun Nov/22
+## Sun 22/Nov/2020
 
 - Ray tracer challenge
   - [ ] Chapter 10
@@ -306,7 +306,7 @@
       - [ ] Blended filters
           - [x] Make it work
 
-## Sat Nov/21
+## Sat 21/Nov/2020
 
 - Ray tracer challenge
   - [x] Split into modules
@@ -324,7 +324,7 @@
         - Tried lifetimes (hell)
         - Removed some `Clone`s around
 
-## Fri Nov/20
+## Fri 20/Nov/2020
 
 - Extra
   - [~] Move old notes into personal_notes
@@ -339,7 +339,7 @@
       - [x] Lots of changes around
       - [x] Try implementation seemingly unused saved_ray()
 
-## Thu Nov/19
+## Thu 19/Nov/2020
 
 - Languages/Frameworks
   - Rust
@@ -352,7 +352,7 @@
     - [x] Reorganize archived resources
   - [x] Fix scraper for incomplete data
 
-## Wed Nov/18
+## Wed 18/Nov/2020
 
 - Languages/Frameworks
   - Rust
@@ -369,7 +369,7 @@
     - `cc-by-sa` -> https://stackoverflow.blog/2009/06/25/attribution-required
   - [x] Fight how to set custom URL for Firefox search bar
 
-## Tue Nov/17
+## Tue 17/Nov/2020
 
 - Ray tracer challenge
   - [x] Add convenience method `Image#from_pixels`
@@ -387,7 +387,7 @@
       - [x] https://users.rust-lang.org/t/suggestion-for-making-rusts-trait-system-more-usable-for-generics/35155/50
     - [x] Write down all the options
 
-## Mon Nov/16
+## Mon 16/Nov/2020
 
 - Open source
   - Geet
@@ -415,7 +415,7 @@
       - [x] Chapter 7 practice
       - [x] Sdl2Interface: Remove invert_y and origin logic from the default constructor
 
-## Sun Nov/15
+## Sun 15/Nov/2020
 
 - Ray tracer challenge
   - [x] Rename (horrible) ExportToPixels to Image
@@ -423,7 +423,7 @@
   - [x] Check out `smart-default` crate, implement in Sphere, if it benefits (-> done)
   - [x] Investigate wall size crash; restrict to smallest test case, and ask question
 
-## Sat Nov/14
+## Sat 14/Nov/2020
 
 - Open source
   - PIA manual connection scripts
@@ -435,7 +435,7 @@
       - [x] Two minor refactorings
   - [x] Parallelize chapter 6 practice!!!
 
-## Fri Nov/13
+## Fri 13/Nov/2020
 
 - Open source
   - PIA manual connection scripts
@@ -451,7 +451,7 @@
       - [x] Add day archival to `replan`
         - Other minor improvements
 
-## Thu Nov/12
+## Thu 12/Nov/2020
 
 - Blog
   - [x] Reply blog request
@@ -465,7 +465,7 @@
     - [ ] Implementation
       - [x] Add Matrix::view_transform UTs
 
-## Wed Nov/11
+## Wed 11/Nov/2020
 
 - Ray tracer challenge
   - [ ] Chapter 7
@@ -481,7 +481,7 @@
       - [x] Fight mistaken reading of the intersection type specification
     - [~] Implementation
 
-## Tue Nov/10
+## Tue 10/Nov/2020
 
 - ZFS
   - [x] Close (develop) issue "c_boot_partition_size too small" #145
@@ -506,7 +506,7 @@
     - [x] Make sure that Sphere#intersections() is in order (review context)
     - [x] Review dot product context
 
-## Mon Nov/09
+## Mon 09/Nov/2020
 
 - Ray tracer challenge
   - [x] Chapter 6
@@ -529,7 +529,7 @@
   - Rust
     - [x] Review UT framework: https://crates.io/crates/spectral
 
-## Sun Nov/08
+## Sun 08/Nov/2020
 
 - Ray tracer challenge
   - [x] Chapter 5
@@ -554,7 +554,7 @@
     - [x] Practice
   - [~] Convert owned function params to references, and remove `clone()` invocations
 
-## Sat Nov/07
+## Sat 07/Nov/2020
 
 - Extra
   - [x] Schedule maintenance script
@@ -567,7 +567,7 @@
     - [~] Theory
       - Stumble on reason for normalization
 
-## Fri Nov/06
+## Fri 06/Nov/2020
 
 - Ray tracer challenge
   - [x] Chapter 3
@@ -583,7 +583,7 @@
   - [x] Fight understand case where the negative lookahead workaround works with a `^` but not `x`
   - [x] Report reader bug
 
-## Thu Nov/05
+## Thu 05/Nov/2020
 
 - Languages/Frameworks
   - Rust
@@ -600,7 +600,7 @@
       - [x] Submatrix
       - [x] Minor
 
-## Wed Nov/04
+## Wed 04/Nov/2020
 
 - Extra
   - [x] VSC: Fight find out [how to disable suggestions but leave snippets completion](https://code.visualstudio.com/docs/editor/intellisense#_tab-completion)
@@ -611,7 +611,7 @@
       - [x] Search multiple supertraits, and support of generic `Self` type
       - [x] Fight traits/boxed types/Self
 
-## Tue Nov/03
+## Tue 03/Nov/2020
 
 - Extra
   - Ask: comparsion between different macro implementations
@@ -630,7 +630,7 @@
       - [x] Implement identity matrix
       - [x] Implement matrix transposition
 
-## Mon Nov/02
+## Mon 02/Nov/2020
 
 - Articles
   - [x] Research and fix nmon issue with reload (restart)
@@ -648,19 +648,19 @@
       - [x] (Further) study uninitialized memory APIs
       - [x] Other epsilon error
 
-## Sun Nov/01
+## Sun 01/Nov/2020
 
 - Ray tracer challenge
   - [ ] Chapter 3
     - [x] Theory
 
-## Fri Oct/30
+## Fri 30/Oct/2020
 
 - Ray tracer challenge
   - [ ] Chapter 3
     - [~] Theory
 
-## Thu Oct/29
+## Thu 29/Oct/2020
 
 - Extra
   - Regexes
@@ -671,7 +671,7 @@
       - [x] Sleepywifi
     - [x] Test battery
 
-## Wed Oct/28
+## Wed 28/Oct/2020
 
 - Extra
   - Regexes/Thunderbird
@@ -697,7 +697,7 @@
       - [x] Add Color#u8_components, and adjust to match the book's logic
       - [x] Fight correct mistakes due to allowed warnings -> disable warnings
 
-## Tue Oct/27
+## Tue 27/Oct/2020
 
 - Languages/Frameworks
   - Rust
@@ -722,7 +722,7 @@
       - [x] Other fight with pixel reading
       - [x] Implement overloaded `Color::new()`!
 
-## Mon Oct/26
+## Mon 26/Oct/2020
 
 - Ray tracer challenge
   - [ ] Chapter 2
@@ -732,7 +732,7 @@
         - extremely slow pixel read, integration with test suite, improper pixel read structure, read pixels not working stably
       - [x] Fight accidental omission of the screen update
 
-## Sun Oct/25
+## Sun 25/Oct/2020
 
 - Languages/Frameworks
   - C++/SWE
@@ -749,7 +749,7 @@
         - [x] Think binary trees printing algorithm
           - [x] Review established solutions (favorite: https://stackoverflow.com/a/8948691/210029)
 
-## Sat Oct/24
+## Sat 24/Oct/2020
 
 - Training/CS+Rust
   - Hands-On Data Structures and Algorithms in Rust
@@ -758,7 +758,7 @@
         - [x] Implement exercise: pop back
         - [x] Fight: implement iteration without deep clone of the `next` reference
 
-## Fri Oct/23
+## Fri 23/Oct/2020
 
 - Training/CS+Rust
   - Hands-On Data Structures and Algorithms in Rust
@@ -774,7 +774,7 @@
           - [x] Bloody fight with Rc/Weak references and unwrapping
         - [x] Study https://stackoverflow.com/questions/27687872/cannot-move-out-of-dereference-of-mut-pointer-when-calling-optionunwrap
 
-## Thu Oct/22
+## Thu 22/Oct/2020
 
 - Blog
   - [x] Article: Monitoring EC2 CPU Steal time on AWS instances
@@ -792,7 +792,7 @@
         - [ ] Extend test framework to accommodate interrupts testing (*expected*)
           - [x] Design
 
-## Wed Oct/21
+## Wed 21/Oct/2020
 
 - Blog
   - [~] Article: Monitoring EC2 CPU Steal time on AWS instances
@@ -808,7 +808,7 @@
         - [x] Deprecated trait objects
       - [x] Make conclusion
 
-## Tue Oct/20
+## Tue 20/Oct/2020
 
 - Ray tracer challenge
   - [ ] Chapter 1
@@ -826,7 +826,7 @@
         - [x] RST n
           - [x] Handle address not encoded as parameter, but in the opcode (*unexpected*)
 
-## Mon Oct/19
+## Mon 19/Oct/2020
 
 - Ray tracer challenge
   - [ ] Chapter 1
@@ -841,7 +841,7 @@
     - [x] Add `cucumber-rust` to Awesome Rust
     - [x] Report/fix `cubumber-rust` improper badge
 
-## Sun Oct/18
+## Sun 18/Oct/2020
 
 - Emulation/Rust
   - Game Boy
@@ -905,7 +905,7 @@
         - [x] Implement `push_front()`
         - [x] Massive fight against iterating the `Rc/RefCell` references
 
-## Sat Oct/17
+## Sat 17/Oct/2020
 
 - Training/CS+Rust
   - Hands-On Data Structures and Algorithms in Rust
@@ -939,7 +939,7 @@
               - [x] https://bluss.github.io/rust/fun/2015/10/11/stuff-the-identity-function-does/
           - [x] https://stackoverflow.com/questions/37986640/cannot-obtain-a-mutable-reference-when-iterating-a-recursive-structure-cannot-b
 
-## Fri Oct/16
+## Fri 16/Oct/2020
 
 - Training/CS+Rust
   - Hands-On Data Structures and Algorithms in Rust
@@ -949,7 +949,7 @@
           - [x] Ask on forum
       - [~] Viewing Data in Both Directions with Doubly Linked Lists
 
-## Thu Oct/15
+## Thu 15/Oct/2020
 
 - Emulation/Rust
   - Game Boy
@@ -991,7 +991,7 @@
         - [~] Exercise
         - [~] Fight borrow checker
 
-## Wed Oct/14
+## Wed 14/Oct/2020
 
 - Training/CS+Rust
   - Hands-On Data Structures and Algorithms in Rust
@@ -1010,7 +1010,7 @@
         - [x] SBC A, (HL)
           - Fight H flag semantic mistake in test
 
-## Tue Oct/13
+## Tue 13/Oct/2020
 
 - [x] Add `strum` to notes
 
@@ -1025,7 +1025,7 @@
         - Sad drop of implicit register expectations
       - [x] Implement forgotten: POP AF
 
-## Mon Oct/12
+## Mon 12/Oct/2020
 
 - Study macros: https://danielkeep.github.io/quick-intro-to-macros.html
   - [x] hygiene
@@ -1040,7 +1040,7 @@
         - [x] Add remaining registers, including `[A]F`
       - [¬] Implement forgotten: POP AF
 
-## Sun Oct/11
+## Sun 11/Oct/2020
 
 - [x] Extra: Test Ripcord
 
@@ -1061,7 +1061,7 @@
       - [x] Dynamic programming
       - [x] Test
 
-## Fri Oct/09
+## Fri 09/Oct/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1080,7 +1080,7 @@
         - [x] SUB A, (HL)
         - [x] SUB A, n
 
-## Thu Oct/08
+## Thu 08/Oct/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1092,7 +1092,7 @@
         - [~] ADD A, r
           - Fight bug with carry on the 8th bit with 8-bit operands
 
-## Wed Oct/07
+## Wed 07/Oct/2020
 
 - Extra
   - [x] Test workaround for VSC viewport jumping issue (https://git.io/JUxB1)
@@ -1103,7 +1103,7 @@
     - [ ] Implementation: basic CPU
       - [x] Further review algorithmic decoding
 
-## Tue Oct/06
+## Tue 06/Oct/2020
 
 - ZFS
   - [x] Test and release keyboard layout issue
@@ -1124,7 +1124,7 @@
       - [ ] Implement 16-bit loads
         - [x] `LDHL SP, n`
 
-## Mon Oct/05
+## Mon 05/Oct/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1151,7 +1151,7 @@
           - [x] `INC r`
           - [~] Correct existing implementations
 
-## Sun Oct/04
+## Sun 04/Oct/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1163,7 +1163,7 @@
         - [x] Allow multiple tests per testing flag type
         - [x] Allow tests skipping (*unexpected*)
 
-## Sat Oct/03
+## Sat 03/Oct/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1184,7 +1184,7 @@
           - [x] Add support for testing an array of memory to the testing APIs (*difficult*)
             - Fight macro/passing array reference
 
-## Fri Oct/02
+## Fri 02/Oct/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1197,7 +1197,7 @@
             - [x] Move flags data to the instruction level
           - [~] Repair templates generator
 
-## Thu Oct/01
+## Thu 01/Oct/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1207,7 +1207,7 @@
           - [x] Add the operand type to the instructions data (*unexpected*)
           - [x] Move docs to their own directory
 
-## Wed Sep/30
+## Wed 30/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1219,7 +1219,7 @@
           - [x] Pseudo-Manually copy all the instruction data into metadata
           - [x] Remove implied registers from the JSON
 
-## Tue Sep/29
+## Tue 29/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1233,7 +1233,7 @@
           - [~] New implementation with enums
             - [x] Inspect the number and nature of register
 
-## Mon Sep/28
+## Mon 28/Sep/2020
 
 - ZFS
   - [x] Review PR
@@ -1253,7 +1253,7 @@
           - [x] Copy all the commands
           - [x] Review alternatives to to current method design
 
-## Sun Sep/27
+## Sun 27/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1264,7 +1264,7 @@
       - [x] Implement `LD SP, HL`
       - [~] Implement `LDHL SP, n`
 
-## Sat Sep/26
+## Sat 26/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1275,13 +1275,13 @@
       - [ ] Simplify `FF00 + C` logic (can just compute inside the exec block!)
         - [x] Basic implementation
 
-## Wed Sep/23
+## Wed 23/Sep/2020
 
 - Extra
   - ZFS
     - [x] Discuss issue
 
-## Tue Sep/22
+## Tue 22/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1298,7 +1298,7 @@
       - [x] Implement `LD r, nn`
         - [x] Handle `SP` registers being split in two when passed (*unexpected*)
 
-## Sat Sep/19
+## Sat 19/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1306,7 +1306,7 @@
       - [ ] Study (overlapping) unions - wow!!
         - [x] understand why Copy+Clone are required
 
-## Fri Sep/18
+## Fri 18/Sep/2020
 
 - Extra
   - Passenger
@@ -1321,7 +1321,7 @@
       - [x] LD FF00 + C, A
       - [ ] Think architectural change for LDD
 
-## Thu Sep/17
+## Thu 17/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1333,7 +1333,7 @@
           - [x] Allow expressions for `mem` expectations
         - [x] Fixup commits
 
-## Wed Sep/16
+## Wed 16/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1347,7 +1347,7 @@
 - Extra
   - Fight setup new printer
 
-## Tue Sep/15
+## Tue 15/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1364,7 +1364,7 @@
   - [x] Archive past resources; update current/pool tasks
   - [x] Search other Ruby editor, out of VSC Ruby desperation
 
-## Tue Sep/15
+## Tue 15/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1374,7 +1374,7 @@
         - [x] Add memory testing support to assertion
         - [x] Allow replacing the templates multiple times
 
-## Mon Sep/14
+## Mon 14/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1396,7 +1396,7 @@
           - [x] Remaining changes to make the output valid
           - [x] Update document
 
-## Sat Sep/12
+## Sat 12/Sep/2020
 
 - Emulation/Rust
   - [x] Minor cleanups
@@ -1416,7 +1416,7 @@
 - Extra
   - [x] Investigate and report unnecessary warning on ruspec/demonstrate
 
-## Wed Sep/09
+## Wed 09/Sep/2020
 
 - ZFS
   - [x] Review  mount issue (deadline: 09/Sep)
@@ -1424,7 +1424,7 @@
       - 4.8b: /boot/efi
       - 5.7: /boot
 
-## Tue Sep/08
+## Tue 08/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1446,7 +1446,7 @@
             - [x] Fight find implementation of optional parameters along with the required style
             - [ ] Implement
 
-## Mon Sep/07
+## Mon 07/Sep/2020
 
 - Emulation/Rust
   - Game Boy
@@ -1459,13 +1459,13 @@
   - [ ] Review: https://simpleprogrammer.com/ultimate-list-developer-podcasts
   - [x] Pandocs project: test local run, to research the pdf export
 
-## Sat Sep/05
+## Sat 05/Sep/2020
 
 - Extra
   - [ ] Understand proper testing descriptions
     - [x] Quick look at the RSpec book
 
-## Fri Sep/04
+## Fri 04/Sep/2020
 
 - Emulation/Rust
   - [x] Extra
@@ -1476,7 +1476,7 @@
     - [ ] Theory
       - [x] Study [Emulation of Nintendo Game Boy](https://git.io/JUtp6)
 
-## Thu Sep/03
+## Thu 03/Sep/2020
 
 - ZFS
   - [x] Review issue/reply
@@ -1497,12 +1497,12 @@
       - [x] Write base struct + UT
       - [x] Write one decode + UT
 
-## Wed Sep/02
+## Wed 02/Sep/2020
 
 - Extra
   - [x] Switch to alternative Android sync service, after Dropbox disaster
 
-## Tue Sep/01
+## Tue 01/Sep/2020
 
 - Emulation/Rust
   - Scheduler
@@ -1510,7 +1510,7 @@
     - [ ] Readings
       - [ ] https://matklad.github.io/2020/01/02/spinlocks-considered-harmful.html
 
-## Mon Aug/31
+## Mon 31/Aug/2020
 
 - Emulation/Rust
   - Scheduler
@@ -1524,7 +1524,7 @@
     - [x] Review and merge playground
     - [x] Rename the CHIP-8 component to system
 
-## Sun Aug/30
+## Sun 30/Aug/2020
 
 - Extra
   - [x] Add missing testing resources to awesome_rust
@@ -1571,7 +1571,7 @@
       - [x] Review what to study, and dump to offline format
       - [ ] Study [Emulation of Nintendo Game Boy](https://git.io/JUtp6)
 
-## Sat Aug/29
+## Sat 29/Aug/2020
 
 - Emulation/Rust
   - [ ] Scheduler/Concurrency theory
@@ -1581,7 +1581,7 @@
     - [ ] Reads
       - [x] https://rust-lang.github.io/async-book
 
-## Fri Aug/28
+## Fri 28/Aug/2020
 
 - Emulation/Rust
   - Emulators design/concurrency theory
@@ -1606,7 +1606,7 @@
 - Extra
   - Method chaining challenge from colleague
 
-## Thu Aug/27
+## Thu 27/Aug/2020
 
 - Emulation/Rust
   - Inbetween tasks/cleanups
@@ -1631,7 +1631,7 @@
 - ZFS
   - [x] Review and reply encryption feature request
 
-## Wed Aug/26
+## Wed 26/Aug/2020
 
 - Emulation/Rust
   - [x] CHIP-8
@@ -1649,7 +1649,7 @@
   - Follow up RSpec issue investigation
   - Forward WxWidgets technical explanation
 
-## Tue Aug/25
+## Tue 25/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1672,7 +1672,7 @@
     - [x] Configure multiple launch configurations
     - [x] Fight launch specific target keyboard shortcut
 
-## Mon Aug/24
+## Mon 24/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1684,7 +1684,7 @@
       - [x] Implement
       - [x] Wire
 
-## Sat Aug/22
+## Sat 22/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1694,7 +1694,7 @@
     - [ ] Final cleanups
       - [x] Experiment: Pixel tuple struct
 
-## Fri Aug/21
+## Fri 21/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1703,7 +1703,7 @@
     - [ ] Final cleanups
       - [x] move `set_keys` after `emulate_cycle`
 
-## Thu Aug/20
+## Thu 20/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1726,7 +1726,7 @@
     - [x] fix refactoring bug
       - [x] tombstone keys are not correct
 
-## Wed Aug/19
+## Wed 19/Aug/2020
 
 - Extra
   - [x] Blog
@@ -1751,7 +1751,7 @@
           - due to screen capping
           - [x] think solution
 
-## Tue Aug/18
+## Tue 18/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1768,7 +1768,7 @@
     - [x] Refactor IoInterface: remove draw_pixel
     - [x] Fight Texture/Creator lifetime
 
-## Mon Aug/17
+## Mon 17/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1783,7 +1783,7 @@
     - [ ] Test ROMs/fix bugs
       - [x] flightrunner (crashes after a few runs) -> confirmed rom bug
 
-## Sun Aug/16
+## Sun 16/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1809,7 +1809,7 @@
         - [x] base implementation
     - Quick look at wasm, and source code of related project
 
-## Sat Aug/15
+## Sat 15/Aug/2020
 
 - Extra
   - Scripting
@@ -1834,7 +1834,7 @@
       - [x] Implement debug logs (ASM symbols: http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
       - [ ] Test via step-in into easy roms, in size order
 
-## Fri Aug/14
+## Fri 14/Aug/2020
 
 - Extra
   - QEMU: build 5.1
@@ -1847,7 +1847,7 @@
     - [x] think/implement video/key interface
     - [ ] implement SDL video/key interface
 
-## Thu Aug/13
+## Thu 13/Aug/2020
 
 - Emulation/Rust
   - [ ] review SDL
@@ -1855,7 +1855,7 @@
     - [x] fight compiler red herring
     - [x] write improved base program
 
-## Wed Aug/12
+## Wed 12/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1869,7 +1869,7 @@
 - Extra
   - [x] Upgrade Libreoffice; test boot time and check how to improve it
 
-## Tue Aug/11
+## Tue 11/Aug/2020
 
 - Emulation/Rust
   - CHIP-8
@@ -1877,7 +1877,7 @@
       - [x] research Rust time handling
       - [x] main loop
 
-## Mon Aug/10
+## Mon 10/Aug/2020
 
 - Emulation/Rust
   - [ ] CHIP-8 implementation
@@ -1886,23 +1886,23 @@
     - [Gameloop](https://dewitters.com/dewitters-gameloop) + clock speed
       - [ ] implement clock (~500 Hz; can set no instantiation) + timers
 
-## Sun Aug/09
+## Sun 09/Aug/2020
 
 - Rust: Study
   - Hands-On Data Structures and Algorithms in Rust
     - [ ] Section 2
       - Merge sort (alternative implementations)
 
-## Fri Aug/07
+## Fri 07/Aug/2020
 
 ?
 
-## Thu Aug/06
+## Thu 06/Aug/2020
 
 - Emulation/Rust
   - [ ] CHIP-8 implementation
 
-## Wed Aug/05
+## Wed 05/Aug/2020
 
 - Emulation/Rust
   - [ ] Start CHIP-8 implementation
@@ -1915,7 +1915,7 @@
 - Extra
   - Find/Review Gitlens extension
 
-## Tue Aug/04
+## Tue 04/Aug/2020
 
 - Rust: Study
   - The Rust Programming Language (completed)
@@ -1932,7 +1932,7 @@
   - [ ] http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter
     - [x] http://en.wikipedia.org/wiki/CHIP-8#Virtual_machine_description
 
-## Mon Aug/03
+## Mon 03/Aug/2020
 
 - Rust: Study
   - The Rust Programming Language
@@ -1941,7 +1941,7 @@
     - [x] Copy #17: OO Programming
     - [x] Copy #18: Patterns
 
-## Sun Aug/02
+## Sun 02/Aug/2020
 
 - Rust: Study
   - The Rust Programming Language
@@ -1958,7 +1958,7 @@
   - Blog
     - Add AWS course to bookshelf
 
-## Fri Jul/31
+## Fri 31/Jul/2020
 
 - Rust: Study
   - The Rust Programming Language
@@ -1973,12 +1973,12 @@
     - Closing; not interested in the other two exercises
     - Review/copy exercise interesting APIs (if any)
 
-## Thu Jul/30
+## Thu 30/Jul/2020
 
 - Rust: Practice
     - [x] [Connected mailbox](https://ferrous-systems.github.io/teaching-material/assignments/connected-mailbox.html)
 
-## Wed Jul/29
+## Wed 29/Jul/2020
 
 - Rust: Practice
   - [Ferrous systems teaching exercises](https://ferrous-systems.github.io/teaching-material)
@@ -1987,7 +1987,7 @@
   - The Rust Programming Language
     - [ ] Copy notes #10: Generics, lifetimes
 
-## Tue Jul/28
+## Tue 28/Jul/2020
 
 - Rust
   - Practice
@@ -2000,7 +2000,7 @@
   - Study
     - [x] Copy notes #7: Packaging
 
-## Mon Jul/27
+## Mon 27/Jul/2020
 
 - Rust
   - Practice
@@ -2013,33 +2013,33 @@
 
 - Work: Fight Ubuntu keyserver
 
-## Sun Jul/26
+## Sun 26/Jul/2020
 
 - Work: AWS
   - Ultimate AWS Certified Cloud Practitioner - 2020
     - [x] Completed remaining sections
     - [x] Completed test exam
 
-## Sat Jul/25
+## Sat 25/Jul/2020
 
 - Work: AWS
   - Ultimate AWS Certified Cloud Practitioner - 2020
     - [x] Sections: 20
 
-## Fri Jul/24
+## Fri 24/Jul/2020
 
 - Work: AWS
   - Ultimate AWS Certified Cloud Practitioner - 2020
     - [x] Sections: 12, 13, 15, 16
 
-## Thu Jul/23
+## Thu 23/Jul/2020
 
 - Work: AWS
   - Ultimate AWS Certified Cloud Practitioner - 2020
     - [x] Section 08-09, 17, 19, 21, 10-11
     - [x] Register and setup certification account
 
-## Wed Jul/22
+## Wed 22/Jul/2020
 
 - Work: AWS
   - Ultimate AWS Certified Cloud Practitioner - 2020
@@ -2052,7 +2052,7 @@
 - Extra
   - File VSC search/replace bug
 
-## Tue Jul/21
+## Tue 21/Jul/2020
 
 - Rust
   - Study
@@ -2067,7 +2067,7 @@
   - openscripts
     - `encode_to_m4a`: Add support for (file) symlinks
 
-## Mon Jul/20
+## Mon 20/Jul/2020
 
 - Rust
   - Study
@@ -2078,12 +2078,12 @@
 - Extra
   - Reset Dropbox shares
 
-## Sun Jul/19
+## Sun 19/Jul/2020
 
 - Extra
   - Scripting
 
-## Sat Jul/18
+## Sat 18/Jul/2020
 
 - Blog: Add Jekyll support for MySQL filtered RSS (2)
 
@@ -2102,7 +2102,7 @@
   - [x] teamdrive.com (2gb): terrible android app
   - [x] mega.nz
 
-## Fri Jul/17
+## Fri 17/Jul/2020
 
 - Rust
   - Study
@@ -2121,7 +2121,7 @@
 - Extra
   - Find temporary Dropbox alternative (-> pCloud) for desktop/tablet
 
-## Thu Jul/16
+## Thu 16/Jul/2020
 
 - Rust
   - Study
@@ -2137,7 +2137,7 @@
   - Rust
     - Fight nightly strip binaries
 
-## Wed Jul/15
+## Wed 15/Jul/2020
 
 - ZFS
   - Review fork (limit: Wed/15)
@@ -2153,7 +2153,7 @@
 - Extra
   - Find out usable books to use for Rust game development
 
-## Tue Jul/14
+## Tue 14/Jul/2020
 
 - Rust
   - Study
@@ -2163,20 +2163,20 @@
   - Practice
     - Rustlings
 
-## Mon Jul/13
+## Mon 13/Jul/2020
 
 - Rust
   - Study
     - The Rust Programming Language
       - Complete #7: Packaging
 
-## Sun Jul/12
+## Sun 12/Jul/2020
 
 - Emulation
   - Coursera: Build a Modern Computer from First Principles: From Nand to Tetris (I)
     - Project #6: Complete -> Course completed
 
-## Sat Jul/11
+## Sat 11/Jul/2020
 
 - Emulation
   - Coursera: Build a Modern Computer from First Principles: From Nand to Tetris (I)
@@ -2185,20 +2185,20 @@
 - Extra
   - Review Rust study/practice plans
 
-## Fri Jul/10
+## Fri 10/Jul/2020
 
 - Emulation
   - Coursera: Build a Modern Computer from First Principles: From Nand to Tetris (I)
     - Study #6
 
-## Thu Jul/09
+## Thu 09/Jul/2020
 
 - Emulation
   - Coursera: Build a Modern Computer from First Principles: From Nand to Tetris (I)
     - Complete #5
     - Project #5
 
-## Wed Jul/08
+## Wed 08/Jul/2020
 
 - Emulation
   - Coursera: Build a Modern Computer from First Principles: From Nand to Tetris (I)
@@ -2209,7 +2209,7 @@
 - ZFS installer
   - Review and discuss proposed feature(s)
 
-## Tue Jul/07
+## Tue 07/Jul/2020
 
 - Emulation
   - Coursera: Build a Modern Computer from First Principles: From Nand to Tetris (I)
@@ -2219,14 +2219,14 @@
   - Replace defective RAM module
   - Review/ask further hardware books
 
-## Mon Jul/06
+## Mon 06/Jul/2020
 
 - Extra
   - New phone
     - Signal test
     - Investigate O/S and rooting
 
-## Sun Jul/05
+## Sun 05/Jul/2020
 
 - Emulation
   - Coursera: Build a Modern Computer from First Principles: From Nand to Tetris (I)
@@ -2237,7 +2237,7 @@
 - Extra
   - Some Perl
 
-## Sat Jul/04
+## Sat 04/Jul/2020
 
 - Emulation
   - Coursera: Build a Modern Computer from First Principles: From Nand to Tetris (I)
@@ -2248,7 +2248,7 @@
   - Solve dependency issues LLVM repository and i386 packages
   - Try Firefox containers
 
-## Fri Jul/03
+## Fri 03/Jul/2020
 
 - Emulation
   - Coursera: Build a Modern Computer from First Principles: From Nand to Tetris (I)
@@ -2259,7 +2259,7 @@
   - Review and reply blog comment
   - Coursera whole setup for studying
 
-## Thu Jul/02
+## Thu 02/Jul/2020
 
 - Rust
   - Practice
@@ -2273,14 +2273,14 @@
     - Start #2
   - Extra: find new book, current is not fit for the purpose
 
-## Wed Jul/01
+## Wed 01/Jul/2020
 
 - Rust
   - The Rust Programming Language
     - Complete #9 (error handling)
     - Start #10
 
-## Tue Jun/30
+## Tue 30/Jun/2020
 
 - Rust
   - The Rust Programming Language
@@ -2292,29 +2292,29 @@
 - Extra
   - Port QEMU patch to 4.2.1
 
-## Sun Jun/28
+## Sun 28/Jun/2020
 
 - Emulation
   - Computer Architecture: A Quantitative Approach
 
-## Sat Jun/27
+## Sat 27/Jun/2020
 
 - Rust
   - fork, clean, and submit Rust programming by example source code
 
-## Fri Jun/26
+## Fri 26/Jun/2020
 
 - Rust
   - Rust programming by example
     - Follow up #3
 
-## Mon Jun/22
+## Mon 22/Jun/2020
 
 - Rust
   - Scripting
     - Completed hours compute script
 
-## Sun Jun/21
+## Sun 21/Jun/2020
 
 - Rust
   - Rust programming by example
@@ -2327,13 +2327,13 @@
 - Extra
   - Test vivaldi (https://help.vivaldi.com/article/manual-setup-vivaldi-linux-repositories)
 
-## Mon Jun/15
+## Mon 15/Jun/2020
 
 - Extra
   - Blog
     - Completed article on WFs/CTEs; took also few days during last week
 
-## Sun Jun/07
+## Sun 07/Jun/2020
 
 - Rust
   - Study #8
@@ -2346,7 +2346,7 @@
   - Think future article about apt/snaps/ppas
   - Read index dives article
 
-## Sat Jun/06
+## Sat 06/Jun/2020
 
 - Golang
   - Powerful Command-Line...
@@ -2356,24 +2356,24 @@
 - Extra
   - Scripting: Fix tomatoes script
 
-## Fri Jun/05
+## Fri 05/Jun/2020
 
 - Extra
   - Blog
     - Whole day research on user-defined variables problem
 
-## Tue Jun/02
+## Tue 02/Jun/2020
 
 - Golang
   - Powerful Command-Line...: Complete the remaining chapters -> ?
 
-## Fri May/29
+## Fri 29/May/2020
 
 - Golang
   - Read article on (XKCD) CLI application
   - Powerful Command-Line...: (Finish) study #4
 
-## Thu May/28
+## Thu 28/May/2020
 
 - Golang
   - Powerful Command-Line Applications in Go: Copy and review #3
@@ -2389,7 +2389,7 @@
   - delete_in_batches
     - review, and send analysis to project
 
-## Wed May/27
+## Wed 27/May/2020
 
 - Golang
   - Powerful Command-Line Applications in Go: Copy and review #2
@@ -2401,25 +2401,25 @@
   - ZFS: Investigate pool corruption issue and propose solution
   - Desktop: Correct MIME types association
 
-## Tue May/26
+## Tue 26/May/2020
 
 - Extra
   - PPA: Push scripts to new repository
   - Blog: Complete and release PPA article
   - PPA: Minor tweaks to published scripts
 
-## Mon May/25
+## Mon 25/May/2020
 
 - Extra
   - PPA: Complete scripting infrastructure
 
-## Sun May/24
+## Sun 24/May/2020
 
 - Golang
   - Review gccgo (+alias)
   - Study Study: Powerful Command-Line Applications in Go, until Chapter 3
 
-## Sat May/23
+## Sat 23/May/2020
 
 - Golang
   - Re-read chapter 16
@@ -2434,14 +2434,14 @@
   - Fight display sleep on laptop
   - Write article on display sleep
 
-## Fri May/22
+## Fri 22/May/2020
 
 - Extra
   - PPA
     - Expand and prepare tooling for internal production usage
     - Add cowbuild option
 
-## Thu May/21
+## Thu 21/May/2020
 
 - Rust
   - Review/copy notes chapter 6/beginning 8
@@ -2454,7 +2454,7 @@
   - Scripting
     - Write daily notes template script
 
-## Wed May/20
+## Wed 20/May/2020
 
 - Rust
   - Review/copy notes chapter 5
@@ -2462,19 +2462,19 @@
 - Extra
   - Exercism discussion
 
-## Tue May/19
+## Tue 19/May/2020
 
 - Extra
   - (Mad) PPA Ruby packaging
 
-## Mon May/18
+## Mon 18/May/2020
 
 - Extra
   - ZFS
     - Reply email
   - (Mad) PPA Ruby packaging
 
-## Sat May/16
+## Sat 16/May/2020
 
 - Rust
   - Review notes chapter 4
@@ -2484,7 +2484,7 @@
     - Correct xbacklight support on laptop
     - Finally solve issue with backlight
 
-## Fri May/15
+## Fri 15/May/2020
 
 - Rust
   - Several Rustlings exercises
@@ -2493,7 +2493,7 @@
   - ZFS installer
     - Review and fix issue
 
-## Thu May/14
+## Thu 14/May/2020
 
 - Rust
   - Several exercism exercises
@@ -2502,7 +2502,7 @@
 - Extra
   - Fix/extract repositories sync script
 
-## Wed May/13
+## Wed 13/May/2020
 
 - Rust
   - One Exercism exercise (~1h)
@@ -2512,7 +2512,7 @@
     - Workaround submission "playgrounded" scripts
     - Automatically patch Rust test file(s)
 
-## Tue May/12
+## Tue 12/May/2020
 
 - Rust
   - Resume studies
@@ -2521,7 +2521,7 @@
   - Update exercism management script (~1.5h)
     - Fight bash inherit_errexit
 
-## Mon May/11
+## Mon 11/May/2020
 
 - Rust
   - Resume studies
@@ -2535,18 +2535,18 @@
   - Bash
     - Nightmare bash RC files
 
-## Sun May/10
+## Sun 10/May/2020
 
 - Extra
   - Review/copy Git notes (`log`)
 
-## Sun May/09
+## Sun 09/May/2020
 
 - Extra
   - System
     - Solve permanently screen turning off spontaneously after issuing `xset dpms force off` 
 
-## Sat May/08
+## Sat 08/May/2020
 
 - Extra
   - System
@@ -2554,14 +2554,14 @@
     - Handle VFIO on 20.04
     - Update vga-passthrought project to 20.04
 
-## Fri May/07
+## Fri 07/May/2020
 
 - Extra
   - System
     - Move to new password manager
     - Fight NxServer issue; report
 
-## Wed May/06
+## Wed 06/May/2020
 
 - Extra
   - ZFS
@@ -2571,7 +2571,7 @@
   - Firefox scripting
     - Add support for slack:// protocol
 
-## Tue May/05
+## Tue 05/May/2020
 
 - Extra
   - ZFS
@@ -2580,7 +2580,7 @@
     - Reorganize pools creation/custom script execution
     - Add script for fast O/S installation via partition snapshot
 
-## Mon May/04
+## Mon 04/May/2020
 
 - Extra
   - Dconf/Gsettings review
@@ -2588,12 +2588,12 @@
     - Manage RAIDZ contribution
   - Find strategy for capturing video and encoding it, with skips
 
-## Sat May/02
+## Sat 02/May/2020
 
 - Extra
   - Minor shell scripting
 
-## Thu Apr/30
+## Thu 30/Apr/2020
 
 - Extra
   - Finalize Firefox launcher script
@@ -2602,13 +2602,13 @@
     - Fight video crashing
     - Fight set default/preferred application
 
-## Wed Apr/29
+## Wed 29/Apr/2020
 
 - Extra
   - Upgrade laptop to Ubuntu 20.04
   - Write super-annoying Firefox launcher script
 
-## Tue Apr/28
+## Tue 28/Apr/2020
 
 - Extra
   - ZFS installer
@@ -2620,7 +2620,7 @@
   - QEMU pinning
     - Updated patch; required updates (needs testing)
 
-## Mon Apr/27
+## Mon 27/Apr/2020
 
 - Extra
   - Ruby (notes/review): ampersand prefix operator
@@ -2628,7 +2628,7 @@
   - System: move passwords to new password manager
   - System: big update email client
 
-## Sun Apr/26
+## Sun 26/Apr/2020
 
 - Extra
   - ZFS installer
@@ -2637,12 +2637,12 @@
     - Insane amount of overall work, including final support for Ubuntu Desktop/Server 20.04
 - Copy some linux notes; experiment with resizing/partitions
 
-## Sat Apr/25
+## Sat 25/Apr/2020
 
 - Extra
   - ZFS installer: lots of work, mostly related to Ubuntu 20.04
 
-## Fri Apr/24
+## Fri 24/Apr/2020
 
 - Extra
   - Ubuntu 20.04 preparation, part 2
@@ -2654,12 +2654,12 @@
     - PRs management/review
   - Copy some Linux system notes, reviewing Apt stuff
 
-## Thu Apr/23
+## Thu 23/Apr/2020
 
 - Mentoring
   - 1 iteration
 
-## Tue Apr/21
+## Tue 21/Apr/2020
 
 - Rust
   - Study chapters 5, 6
@@ -2668,7 +2668,7 @@
   - 3 iterations
   - 1 solution
 
-## Mon Apr/20
+## Mon 20/Apr/2020
 
 - Golang
   - Experiment/copy notes remaining chapter 16 (Concurrency)
@@ -2680,7 +2680,7 @@
   - Several reviews on the Goby project
   - Review clever regex for finding sequences
 
-## Sun Apr/19
+## Sun 19/Apr/2020
 
 - Golang
   - Re-read chapter 16
@@ -2690,7 +2690,7 @@
 - Extra
   - Tweaks to broser script + test multiple windows matching behavior with xdotool
 
-## Fri Apr/17
+## Fri 17/Apr/2020
 
 - Golang
   - Review and copy notes chapters 7, 9
@@ -2699,7 +2699,7 @@
 - Extra
   - Ruby: review process execution strategies
 
-## Thu Apr/16
+## Thu 16/Apr/2020
 
 - Golang study
   - Study chapters 5, 6, 7
@@ -2715,7 +2715,7 @@
   - Review Golang exercise website options
     - Register gophercises
 
-## Wed Apr/15
+## Wed 15/Apr/2020
 
 - Golang study
   - Copied/reviewed chapter 4
@@ -2728,7 +2728,7 @@
   - checked out the Zeus source code for signals/restart support
   - tested spring in explicit mode
 
-## Tue Apr/14
+## Tue 14/Apr/2020
 
 - Extra
   - MySQL `REGEXP_SUBSTR()` and review regex capabilities
@@ -2738,7 +2738,7 @@
 - Mentoring
   - Around 15 iterations (≈1h)
 
-## Mon Apr/13
+## Mon 13/Apr/2020
 
 - Golang study
   - Complete chapters 2,3
@@ -2749,7 +2749,7 @@
 - Extra
   - Preparation installation Ubuntu 20.04 (#1)
 
-## Sun Apr/12
+## Sun 12/Apr/2020
 
 - Rust study
   - Complete chapter 4
@@ -2763,7 +2763,7 @@
 - Extra
   - Big refactoring and extension of the Exercism script
 
-## Sat Apr/11
+## Sat 11/Apr/2020
 
 - Rust study
   - New APIs, from exercises
@@ -2776,13 +2776,13 @@
 - Extra
   - Expand Exercism script: open and submit
 
-## Fri Apr/10
+## Fri 10/Apr/2020
 
 - Rust study
   - Little study
   - Exercise: fight `&str` vs. `to_string()`
 
-## Thu Apr/09
+## Thu 09/Apr/2020
 
 - Rust study
   - Copy book notes
@@ -2796,7 +2796,7 @@
   - ≈5 Ruby iterations
   - 1 Bash iteration
 
-## Wed Apr/08
+## Wed 08/Apr/2020
 
 - Rust study
   - put book concepts into small program
@@ -2810,7 +2810,7 @@
   - Blog post about Unf#cking Slack email links (part 1)
     - Minor review of Bash regexes
 
-## Tue Apr/07
+## Tue 07/Apr/2020
 
 - Mentoring
   - 7/8 Ruby iterations
@@ -2819,7 +2819,7 @@
   - copy/review some Bash subjects, mainly process substitution
   - copy minor Linux tools/Ruby subjects
 
-## Mon Apr/06
+## Mon 06/Apr/2020
 
 - General notes
   - copy/reorganize several Linux subjects
@@ -2834,7 +2834,7 @@
   - Make browser scripts put Firefox window in front when launching from Thunderbird
   - Add custom browser desktop application, and associate it
 
-## Sun Apr/05
+## Sun 05/Apr/2020
 
 - Exercises: Golang
   - Many exercism exercises
@@ -2847,7 +2847,7 @@
 - Extra
   - Discussions on Exercism Slack channels
 
-## Sat Apr/04
+## Sat 04/Apr/2020
 
 - Mentoring
   - Review several solutions
@@ -2857,7 +2857,7 @@
     - Move from Chromium to Firefox (lots of work)
   - VSC snippets
 
-## Fri Apr/03
+## Fri 03/Apr/2020
 
 - Study
   - Golang: several codewars kata
@@ -2866,7 +2866,7 @@
 - Mentoring
   - Several solutions (with an interesting concept found in one)
 
-## Thu Apr/02
+## Thu 02/Apr/2020
 
 - Study
   - Golang: 3 codewars kata
@@ -2876,7 +2876,7 @@
 - https://www.tiger-algebra.com/drill/n~2_n-200=0
   - `An2+Bn+C = 0 -> (-B ± sqrt(B²-4AC)) / 2A`
 
-## Wed Apr/01
+## Wed 01/Apr/2020
 
 - Extra
   - think plan Exercism; review Codewars
@@ -2884,7 +2884,7 @@
 - Waste
   - 15' wiki lino banfi/franco e ciccio
 
-## Tue Mar/31
+## Tue 31/Mar/2020
 
 - Mentoring
   - Five solutions/iterations
@@ -2898,7 +2898,7 @@
   - Copy notes: generic
     - tested and reorganized Linux parallel tools
 
-## Mon Mar/30
+## Mon 30/Mar/2020
 
 - Mentoring
   - Some solutions
@@ -2919,7 +2919,7 @@
   - Many minor distractions over the day
   - HN 30' reply
 
-## Sun Mar/29
+## Sun 29/Mar/2020
 
 - Study
   - Golang: a couple of exercisms
@@ -2929,7 +2929,7 @@
   - Written script for managing exercism
   - Bash: a couple of exercisms
 
-## Sat Mar/28
+## Sat 28/Mar/2020
 
 - Study
   - Golang: 1 chapter
@@ -2937,7 +2937,7 @@
 - Mentoring
   - A complex and long-standing solution
 
-## Fri Mar/27
+## Fri 27/Mar/2020
 
 - Scripting
   - Trello/notify_travis_builds

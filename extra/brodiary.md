@@ -1,3 +1,27 @@
+## Mon 14/Dec/2020
+
+- Ray tracer challenge
+  - [x] Cleanups/improvements
+    - [x] Complete mutexes removal
+    - [x] Simplify some UTs in the ObjParser test suite
+    - [x] Centralize local bounds computation, and implement for Csg
+    - [x] shape_test.rs: Remove unnecessary as_ref() calls when downcasting to Group
+    - [x] Refactoring: Remove parameter name prefixes, that indicated the space
+    - [x] Some comment extensions to container initializers
+    - [x] Check if there are optional values, and convert them to `Option`
+    - [x] Consider making Matrix/Tuple overridden ops owned rather than borrowed
+    - [x] Review `ShapeAccessors` macro - can split?
+    - [x] Review and comment `Shape` design
+    - [x] Review and remove chainable transformation methods from Sphere
+    - [x] Complete README
+
+- [ ] Move old notes into personal_notes
+  - [x] iptables.odt
+
+- Languages/Frameworks
+  - Rust
+    - [x] Review and ask question about Mutex-free read-only trees
+
 ## Sun 13/Dec/2020
 
 - Ray tracer challenge

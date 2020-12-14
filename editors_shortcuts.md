@@ -279,3 +279,7 @@ Firefox:
 Evince:
 
 - `Ctrl+L`                  Go to page
+
+Caja:
+
+- `F6`                      Switch between side-to-side panels

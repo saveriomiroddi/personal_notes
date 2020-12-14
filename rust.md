@@ -47,7 +47,8 @@
     - [Smart pointers](#smart-pointers)
       - [Box<T>](#boxt)
       - [RC<T>](#rct)
-      - [RefCell<T> and interior mutability](#refcellt-and-interior-mutability)
+      - [RefCell<T>/Mutex<T> and interior mutability](#refcelltmutext-and-interior-mutability)
+      - [Modifying Rc/Arc without inner mutable types (and conversion Box -> RC type)](#modifying-rcarc-without-inner-mutable-types-and-conversion-box---rc-type)
       - [Weak<T> and reference cycles](#weakt-and-reference-cycles)
         - [`Rc<RefCell>` or `RefCell<Rc>`](#rcrefcell-or-refcellrc)
         - [Real case of modeling a thread-safe tree with trait objects, with children addition](#real-case-of-modeling-a-thread-safe-tree-with-trait-objects-with-children-addition)
@@ -1634,6 +1635,8 @@ impl Trait for Concr {
 fn my_test() {
   let as_trait: Box<dyn Trait> = Box::new(Concr {});
 
+  // Note the implicit Box dereferencing.
+  //
   let _concr: &Concr = as_trait.as_any().downcast_ref::<Concr>().unwrap();
 }
 ```
@@ -2104,11 +2107,11 @@ let a = Rc::new(Parent(Rc::new(Parent(Rc::new(Nil)))));
 println!("Count: {}", Rc::strong_count(&a)); // 1
 ```
 
-#### RefCell<T> and interior mutability
+#### RefCell<T>/Mutex<T> and interior mutability
 
 `RefCell<T>` allows mutating the contained value, even if the variable itself is immutable, therefore bypassing the compiler; generally speaking, it allows multiple owners while retaining mutability. The rules are enforced at runtime though, so this has an overhead.
 
-Note that `RefCell` is not `Sync`; in multithreaded context, `Mutex`/`RwLock` must be used instead.
+`RefCell` is not `Sync`; in multithreaded context, `Mutex`/`RwLock` must be used instead.
 
 ```rust
 enum Node {
@@ -2127,6 +2130,39 @@ let _b = Parent(Rc::new(RefCell::new(2)), Rc::clone(&a));
 let _c = Parent(Rc::new(RefCell::new(3)), Rc::clone(&a));
 
 *value.borrow_mut() += 10;
+```
+
+#### Modifying Rc/Arc without inner mutable types (and conversion Box -> RC type)
+
+If one wants to modify an RC type before sharing it, without inner mutable types, there is `get_mut()` (and unsafe/nightly `get_mut_unchecked()`). Example using the unchecked version and `Arc`:
+
+```rust
+pub fn new(mut children: Vec<Arc<Self>>) -> Arc<Self> {
+  let mut parent = Arc::new(Self {
+      parent: Weak::<Self>::new(),
+      children: vec![],
+  });
+
+  for child in children.iter_mut() {
+    let child_parent_ref = &mut unsafe { Arc::get_mut_unchecked(child) }.parent;
+    *child_parent_ref = Arc::downgrade(&parent);
+}
+
+  let parent_mut = unsafe { Arc::get_mut_unchecked(&mut parent) };
+  parent_mut.children = children;
+
+  parent
+}
+```
+
+Another option is to convert a `Box` to an RC type:
+
+```rust
+let mut boxed = Box::new(MyType { field: 64 });
+boxed.field = 128;
+
+let pizza = Into::<Arc<MyType>>::into(boxed);
+let pizza: Arc<MyType> = boxed.into();
 ```
 
 #### Weak<T> and reference cycles
@@ -2244,9 +2280,9 @@ A way to look at this is that what is between `Rc` and `RefCell` _can't_ be modi
 
 ##### Real case of modeling a thread-safe tree with trait objects, with children addition
 
-**to verify** - move the Mutex in; the version below should suffer from contention.
+Example, with Tree implementing the Node trait. This is a **slow** implementation, since it will cause locking on the vector.
 
-In this structure, a Tree implements the Node trait.
+Read-only trees better do without locking at all (only Arc).
 
 ```rust
 #[derive(SmartDefault)]
@@ -2380,7 +2416,9 @@ for received in rx {
 
 #### Mutex<T>/Arc<T>
 
-WATCH OUT! The same thread can't acquire the same lock twice - it will lock on the second attempt.
+WATCH OUT! Mutex is not reentrant, so multiple calls by the same thread (unless in the same function) will deadlock.
+
+Note that an Arc can be safely modified if there is only one reference; see [the interior mutability section](#refcellt-and-interior-mutability).
 
 ```rust
 // We need to use an "Atomic Reference Counter" because the counter is shared between threads;
@@ -2400,7 +2438,9 @@ for _ in 0..10 {
 // threads must be joined
 ```
 
-Note that `Arc<Mutex<T>>` can be safely cloned and move around; the mutex will work correctly.
+Note that `Arc<Mutex<T>>` can be cloned and move around, but must be extremely careful, because it's very easy to deadlock.
+
+The ownership of an instance in a mutex can be released, if there are no other threads holding the lock: `mutex_instance.into_inner().unwrap()`.
 
 #### Atomic primitive type wrappers
 
@@ -3061,6 +3101,10 @@ let lines = reader.lines().collect::<Result<Vec<_>, _>>()?;
 // Buffered write. Think about write() vs. write_all()
 let mut stream = BufWriter::new(TcpStream::connect("127.0.0.1:34254").unwrap());
 stream.write(&[666]).unwrap();
+
+// Open file for writing.
+//
+let mut f = File::create("log.txt")
 ```
 
 Abstract operation traits:

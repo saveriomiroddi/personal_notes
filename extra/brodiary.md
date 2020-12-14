@@ -1,3 +1,38 @@
+## Sun 13/Dec/2020
+
+- Ray tracer challenge
+  - [ ] Cleanups/improvements
+    - [x] Minor refactoring to ObjParser extraction/export, and update comments
+    - [x] ObjParser refactoring: Don't build the groups tree until the export
+    - [ ] Epic fight with mutexes removal
+
+## Sat 12/Dec/2020
+
+- Other
+  - [x] `brody`: add year to script, and to existing entries
+  - [x] set login sound to dial-up internet; cut and normalize
+
+- Languages/Frameworks
+  - Rust
+    - [x] Search Pathbuf/OsString, and why they exist
+      - [x] https://doc.rust-lang.org/std/ffi/struct.OsString.html
+      - [x] https://news.ycombinator.com/item?id=10520569
+
+- Ray tracer challenge
+  - [x] Chapter 16
+    - [x] Implementation
+      - [x] Convert owned `self: Arc<Self>` to borrowed, where possible
+      - [x] Replace Arc<Csg>#set_children with Csg::new()
+      - [x] ObjParser: Fix bug, where vertex values had 2 or more digits in the integer part
+      - [x] ObjParser: Add support for "Face with texture" definition
+      - [x] Chapter 15 practice (with Nasa astronaut model)
+      - [x] Implement triangles bounding box
+      - [x] Centralize the Bounds update (comparisons) in Bounds helper methods
+      - [x] Add optimization comment about precomputing group local bounds
+    - [x] Practice (simple, not without shadows)
+  - [ ] Cleanups/improvements
+    - [x] Brutal fight for pushing down the Mutex in the Group children
+
 ## Fri 11/Dec/2020
 
 - Ray tracer challenge

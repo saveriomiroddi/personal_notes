@@ -521,7 +521,7 @@ Iterator getting methods:
 ```rust
 collection.iter()            // immutable references
 collection.iter_mut()        // mutable references
-collection.into_iter()       // owned values
+collection.into_iter()       // owned values (arrays still return references)
 ```
 
 `std::iter::Iterator` methods, implemented by Range:
@@ -535,6 +535,7 @@ fold_first(|a, x| a + x)     // Like fold(), using the first element as initial 
 filter(|x| x % 2 == 0)       // Ruby :select
 find(|x| x % 2 == 0)         // Ruby :find/:detect
 flatten()                    // Quasi-Ruby :flatten. WATCH OUT! flattens only one level.
+dedup()                      // Ruby :uniq
 rev()                        // reverse. WATCH OUT, UNINTUITIVE: since it's not inclusive, it goes from 99 to 0.
 any(|x| x == 33)             // terminates on the first true
 all(|x| x % 2 == 0)          // terminates on the first false
@@ -3521,7 +3522,7 @@ if let Some(captures) = VERTEX_REGEX.captures(&line) {
 ```rust
 // Compute time elapsed.
 //
-let current_time: SystemTime = SystemTime::now();
+let current_time = SystemTime::now();
 current_time.elapsed();
 
 // Get current time in seconds

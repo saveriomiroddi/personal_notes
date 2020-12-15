@@ -274,6 +274,7 @@ Upper case commands are generally "extended" versions of the correspective lower
 
 Firefox:
 
+- `Ctrl+Shift+O`            Bookmarks editor
 - `Ctrl+., <number>`        Containers extension: display menu, and open new tab with given container
 
 Evince:

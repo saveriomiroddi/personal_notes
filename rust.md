@@ -2,11 +2,14 @@
 
 - [Rust](#rust)
   - [Cargo](#cargo)
-  - [Conditional build (ifdef-like)](#conditional-build-ifdef-like)
+  - [Rustfmt](#rustfmt)
   - [Syntax/basics](#syntaxbasics)
     - [Basic structure/Printing/Input](#basic-structureprintinginput)
       - [Printing/formatting](#printingformatting)
-    - [Variables/Data types/Casting](#variablesdata-typescasting)
+    - [Conditional build (ifdef-like)](#conditional-build-ifdef-like)
+    - [Data types](#data-types)
+    - [Casting](#casting)
+      - [Into<T>](#intot)
     - [Basic operators/operations/arithmetic/math](#basic-operatorsoperationsarithmeticmath)
     - [Closures/Functions](#closuresfunctions)
     - [Ranges and `std::iter::Iterator` methods](#ranges-and-stditeriterator-methods)
@@ -173,16 +176,16 @@ See more keys and their definitions at https://doc.rust-lang.org/cargo/reference
 
 At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
 
-## Conditional build (ifdef-like)
+## Rustfmt
 
-The `cfg` attribute performs a conditional build:
+Add a `rustfmt.toml` to the project root. See: https://rust-lang.github.io/rustfmt (don't forget to consider the channel).
 
-```rust
-#[cfg(test)]        // Compile only in test builds.
-#[cfg(not(test))]   // Compile only in nont-test builds.
+```toml
+unstable_features = true
+
+blank_lines_upper_bound = 10             # unstable
+preserve_block_start_blank_lines = true  # unstable
 ```
-
-The attribute can be applied to methods, statements, etc.
 
 ## Syntax/basics
 
@@ -242,6 +245,14 @@ fn main() -> std::result::Result<(), Box<dyn Error>> {
 }
 ```
 
+"Divergent" functions are functions that never return, marked with `!` return type; exiting from them is considered an error:
+
+```rust
+fn cycle_forever() -> ! {
+  loop { /* ... */ }
+}
+```
+
 #### Printing/formatting
 
 ```rust
@@ -295,33 +306,18 @@ impl Debug for SortableFloat {
 }
 ```
 
-### Variables/Data types/Casting
+### Conditional build (ifdef-like)
+
+The `cfg` attribute performs a conditional build:
 
 ```rust
-let int_as_float = (10 as f64);     // type casting
-
-const MAX_PRIMES: u32 = 100000;     // constants; the data type is required
-
-((1u128 << CONST_U64) - 1) as u64   // WATCH OUT the priorities! In this example, the brackets are all required!
-
-type Kilometers = i32;                     // type aliasing
-type Result<T> = Result<T, std::io:Error>; // library example: `std::io::Result`
-
-let bool_as_int = true as i32;      // true: 1, false: 0
-let int_as_bool = 1 as bool;        // 1: true, 0: false, other: !!undefined!!
+#[cfg(test)]        // Compile only in test builds.
+#[cfg(not(test))]   // Compile only in nont-test builds.
 ```
 
-For static variables, see [static section](#staticglobal-variables-lazy_static-once_cell-thread_local)
+The attribute can be applied to methods, statements, etc.
 
-Numeric casts:
-
-```rust
-0xFF_u8 as u16;          // 0x00FF ("zero-extend")
-  -1_i8 as u16;          // 0xFFFF ("signed-extend")
-
-0xFF_u8 as i16;          // WATCH OUT!!: 0x00FF
-(0xFF_u8 as i8) as i16;  // 0xFFFF
-```
+### Data types
 
 SVs differ from constants:
 
@@ -386,6 +382,54 @@ multiply(&(2, 3));
 ```
 
 For strings, see the [Strings chapter](#strings).
+
+### Casting
+
+```rust
+let int_as_float = (10 as f64);     // type casting
+
+const MAX_PRIMES: u32 = 100000;     // constants; the data type is required
+
+((1u128 << CONST_U64) - 1) as u64   // WATCH OUT the priorities! In this example, the brackets are all required!
+
+type Kilometers = i32;                     // type aliasing
+type Result<T> = Result<T, std::io:Error>; // library example: `std::io::Result`
+
+let bool_as_int = true as i32;      // true: 1, false: 0
+let int_as_bool = 1 as bool;        // 1: true, 0: false, other: !!undefined!!
+```
+
+For static variables, see [static section](#staticglobal-variables-lazy_static-once_cell-thread_local)
+
+Numeric casts:
+
+```rust
+0xFF_u8 as u16;          // 0x00FF ("zero-extend")
+  -1_i8 as u16;          // 0xFFFF ("signed-extend")
+
+0xFF_u8 as i16;          // WATCH OUT!!: 0x00FF
+(0xFF_u8 as i8) as i16;  // 0xFFFF
+```
+
+Automatic casting, for types supporting the `Deref` trait:
+
+- `&String` -> `&str`
+- `&Vec<T>` -> `&[T]`
+- `&Box<T>` -> `&T`
+
+#### Into<T>
+
+In order to implement arbitrary casting, implement the `Into<T>` trait:
+
+```rust
+// Allows `GamePiece { color: BLACK } as i32`
+//
+impl Into<i32> for GamePiece {
+  fn into(self) -> i32 {
+    if self.color == BLACK { 0 } else { 1 }
+  }
+}
+```
 
 ### Basic operators/operations/arithmetic/math
 
@@ -997,9 +1041,12 @@ while n > 0 {
 Loop (infinite):
 
 ```rust
+// The `external` lifetime is an (optional) example.
+//
+'external
 loop {
   if true {
-    break;    // can return a value
+    break 'external;    // can return a value
   }
 };
 ```
@@ -1204,6 +1251,8 @@ See next section for pattern matching.
 
 ### Pattern matching
 
+`let` can be used to destructure (e.g. a struct) even without being an `if let`!
+
 (for testing a value directly, one can use `value.is_none()`/`value.is_some()`).
 
 ```rust
@@ -1244,7 +1293,7 @@ if let [r, g, b] = &raw_pixels[..] { /* .. */ } else { panic!() }
 
 // Match Option<T>
 //
-let y = 10;
+let x = Some(10);
 match x {
   None              => None,
   Some(i)           => Some(i + 1),

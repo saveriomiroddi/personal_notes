@@ -1,3 +1,32 @@
+## Tue 15/Dec/2020
+
+- Languages/Frameworks
+  - Rust
+    - Programming Rust (1st ed.)
+      - [x] Chapter 5
+      - [x] Chapter 6
+    - Programming WebAssembly with Rust
+      - [x] Chapter 1
+      - [x] Chapter 2
+      - [x] Chapter 3
+      - [ ] Chapter 4
+    - Individual articles
+      - [x] WASM: https://blog.scottlogic.com/2017/12/13/chip8-emulator-webassembly-rust.html
+      - [x] https://medium.com/hackernoon/why-im-dropping-rust-fd1c32986c88
+
+- Extra
+  - [ ] Move old notes into personal_notes
+    - [x] Makefile
+  - [x] VSC: Per-folder exclusion
+  - [x] Planning
+    - [x] Review advanced books (https://github.com/sger/RustBooks#advanced-books)
+    - [x] Find companion subject to the current book
+    - [x] Update brogramming docs
+  - Blog admin
+    - [x] Add Ray tracer challenge
+    - [x] Update bio
+      - [x] Fight HTML centering
+
 ## Mon 14/Dec/2020
 
 - Ray tracer challenge

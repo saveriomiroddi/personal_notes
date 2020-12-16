@@ -36,7 +36,7 @@
       - [Basics (and Generics #2)](#basics-and-generics-2)
       - [OO-approach and supertraits](#oo-approach-and-supertraits)
       - [Disambiguation](#disambiguation)
-      - [Downcasting](#downcasting)
+      - [Downcasting/Upcasting](#downcastingupcasting)
     - [Operator overloading](#operator-overloading)
     - [Method overloading (workaround)](#method-overloading-workaround)
     - [Static methods](#static-methods)
@@ -1656,7 +1656,7 @@ println!("{}", <Human as Flyer>::mean()); // "Plan"
 println!("{}", Flyer::mean());            // error!
 ```
 
-#### Downcasting
+#### Downcasting/Upcasting
 
 Downcasting from trait object to the concrete class (reference); useful to enable it only in testing:
 
@@ -1688,6 +1688,18 @@ fn my_test() {
   //
   let _concr: &Concr = as_trait.as_any().downcast_ref::<Concr>().unwrap();
 }
+```
+
+A reference to a trait **can't** be converted directly to a reference of a supertrait (upcasting):
+
+```rust
+// See https://stackoverflow.com/q/28632968.
+//
+let super_ref = &my_better_display as &fmt::Display;
+
+// Basic workaround; for a more elaborate solution, see https://stackoverflow.com/a/28664881.
+//
+let super_ref = &(my_better_display as fmt::Display);
 ```
 
 ### Operator overloading

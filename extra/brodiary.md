@@ -1,3 +1,24 @@
+## Wed 16/Dec/2020
+
+- Open source
+  - ZFS
+    - [x] Review the issue reported, and think of solutions
+  - QEMU-pinning
+    - [x] 5.2 patch update
+      - [x] Complete (required some redesign)
+    - [x] 5.0.1 patch update
+
+- Languages/Frameworks
+  - Rust
+    - Individual topics
+      - [x] Trait reference upcast: https://stackoverflow.com/questions/28632968/why-doesnt-rust-support-trait-object-upcasting
+      - [x] Examine the solutions to the bidirectional tree problem
+        - [x] Implement and discuss the Slab solution
+    - Programming Rust (1st ed.)
+      - [x] Chapter 7
+      - [x] Chapter 9
+      - [x] Chapter 10
+
 ## Tue 15/Dec/2020
 
 - Languages/Frameworks

@@ -23,6 +23,7 @@
     - [Imagemagick](#imagemagick)
     - [Raw to JPEG conversion](#raw-to-jpeg-conversion)
   - [SSH](#ssh)
+  - [SSL/Certificates](#sslcertificates)
   - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
     - [Key servers](#key-servers)
   - [Formatting tools](#formatting-tools)
@@ -390,7 +391,51 @@ for f in *.ORF; do darktable-cli "$f" "$f".jpg; done
 ## SSH
 
 ```sh
-ssh-keyscan -H $address > ~/.ssh/known_hosts         # Programmatically add fingerprints to known_hosts
+openssl rsa -in $private_key -pubout   # Generate a public key from private
+ssh-keygen -e [-f $private_key]        # Generate a public key from private, for SSH usage
+ssh-keygen -y                          # Same as previous, but requires user input
+
+ssh-add -D                             # Delete cached keys. Useful if there are problems in authenticating!
+ssh-add                                # adds the ssh key password to the authentication agent (e.g. gnome-keyring)
+
+<RETURN><RETURN>~.                     # terminate an ssh session
+
+openssl rsa -in $private_key -out $private_key_dec # decrypt a key
+ssh-keygen -p -f $private_key                      # encrypt a key (or change passphrase)
+ssh-keygen -t rsa                                  # generate ssh key pair
+
+ssh-keyscan -H $address > ~/.ssh/known_hosts                                     # Programmatically add fingerprints to known_hosts
+ssh-keygen -E md5 -lf $public_key                                                # Print public keys fingerprint
+openssl pkey -in $private_key -pubout -outform DER | openssl md5 -c              # !!! Print fingerprint, for EC2 !!!
+
+openssl s_client -connect $url:$port < /dev/null | openssl x509  -noout -enddate # Get the expiry of an ssl certificate
+
+# Run a program in the primary display, from an SSH section
+DISPLAY=:0 teamviewer
+```
+
+## SSL/Certificates
+
+For an automatic (and locally trusted) solution, see [mkcert](https://github.com/FiloSottile/mkcert).
+
+Create a self-signed certificate, manual procedure:
+
+```sh
+# Generate a key (insert a 4-letters password; it will be discarded in subsequent steps)
+openssl genrsa -des3 -out server.key 2048
+
+# Remove the password
+openssl rsa -in server.key -out server.key.insecure
+mv -f server.key.insecure server.key
+
+# Create the CSR; use `*.$domain.com` as Common Name.
+openssl req -new -key server.key -out server.csr
+
+# Create the certificate
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+
+# Display informations
+openssl x509 -in server.crt -noout -text
 ```
 
 ## PGP (GnuPG/gpg)

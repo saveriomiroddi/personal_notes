@@ -367,9 +367,9 @@ Bash options:
 ## Update system time
 
 ```sh
-# Modern approach (can take a few tens seconds).
+# Modern approach.
 #
-systemctl start systemd-timesyncd
+systemctl restart systemd-timesyncd
 
 # Old approach
 #

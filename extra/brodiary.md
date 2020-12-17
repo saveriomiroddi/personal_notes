@@ -1,3 +1,22 @@
+## Thu 17/Dec/2020
+
+- [ ] Move old notes into personal_notes
+  - [x] chef.odt
+
+- Open source
+  - ZFS
+    - [x] Attempt workaround/fix for corruption issue on certain machines
+
+- Languages/Frameworks
+  - Rust
+    - Individual subjects
+      - [x] Weak+trait objects: https://users.rust-lang.org/t/why-cant-weak-new-be-used-with-a-trait-object
+
+- Extra
+  - Admin
+    - [ ] VPN
+      - [x] Review scripts, and make the connection work without token
+
 ## Wed 16/Dec/2020
 
 - Open source

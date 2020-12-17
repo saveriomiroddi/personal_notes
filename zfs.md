@@ -57,16 +57,19 @@ Enable all the supported features in a pool.
 zpool upgrade <pool>
 ```
 
-Import a pool existing in the given path.
+Import a pool:
 
 ```sh
-zpool import -d <path> <pool>
-```
+# Import in the given path.
+zpool import -d $path $pool
 
-Import pool using \<alt_root\> as temporary root.
+# Import pool using $alt_root as temporary root.
+zpool import -R $alt_root $pool
 
-```sh
-zpool import -R <alt_root> <pool>
+# Import an encrypted pool. IMPORTANT!:
+# - if `-l` is not specified, and the pool is encrypted, it will be imported, with successful exit status (!), and with empty content (!!)
+# - if `-l` is specified, and the pool is not encrypted, it will be imported, without prompt
+zpool import -l $pool
 ```
 
 Rename a pool (permanently).

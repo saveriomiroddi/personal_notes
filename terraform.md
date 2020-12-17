@@ -1291,6 +1291,31 @@ resource "aws_cloudwatch_log_stream" "all_events_cloudtrail_log_stream" {
   name           = "${data.aws_caller_identity.current.account_id}_CloudTrail_${data.aws_region.main.name}"
   log_group_name = aws_cloudwatch_log_group.all_events_cloudtrail_group.name
 }
+
+# Import ref.: policy_name
+#
+resource "aws_cloudwatch_log_resource_policy" "es_index_logs" {
+  policy_name = "AES-${domain_name}-Index-logs"
+
+  policy_document = <<CONFIG
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "es.amazonaws.com"
+      },
+      "Action": [
+        "logs:PutLogEvents",
+        "logs:CreateLogStream"
+      ],
+      "Resource": "arn:aws:logs:${region}:${account_id}:log-group:/aws/aes/domains/${domain_name}/index-logs:*"
+    }
+  ]
+}
+CONFIG
+}
 ```
 
 #### Events

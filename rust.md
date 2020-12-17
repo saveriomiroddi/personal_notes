@@ -2291,6 +2291,7 @@ if let Some(ref mut child_wk) = opt_weak_ref { /* */ };
 opt_weak_ref.clone().unwrap();
 
 // Finally, Weak<dyn Trait> must receive a phony type on new() (on structs, one can use Self).
+// See https://users.rust-lang.org/t/why-cant-weak-new-be-used-with-a-trait-object.
 //
 let parent: Mutex<Weak<dyn Shape>> = Mutex::new(Weak::<Plane>::new());
 

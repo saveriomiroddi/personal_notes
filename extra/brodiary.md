@@ -1,3 +1,22 @@
+## Fri 18/Dec/2020
+
+- Extra
+  - Admin
+    - [x] VPN
+      - [x] Review server VPN configuration(s)
+      - [x] Restructure all the VPN systemd units
+    - [ ] Move old notes into personal_notes
+      - [x] linux_administration.odt
+
+- Languages/Frameworks
+  - Rust
+    - Individual subjects
+      - [x] Cow (clone-on-write): https://doc.rust-lang.org/std/borrow/enum.Cow.html
+    - Programming Rust (1st ed.)
+      - [x] Chapter 11
+        - [x] Experiments with traits
+      - [x] Chapter 12
+
 ## Thu 17/Dec/2020
 
 - [ ] Move old notes into personal_notes

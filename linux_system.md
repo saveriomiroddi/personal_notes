@@ -18,18 +18,32 @@
   - [Systemd](#systemd)
     - [Systemctl](#systemctl)
     - [journalctl](#journalctl)
-  - [Configuring a unit](#configuring-a-unit)
+    - [Configuring a unit](#configuring-a-unit)
+    - [Event triggers](#event-triggers)
+  - [Apparmor](#apparmor)
+  - [Networking](#networking)
+    - [NetworkManager](#networkmanager)
+      - [Changing Network manager DNS (18.04+)](#changing-network-manager-dns-1804)
   - [fstab](#fstab)
+  - [Install grub from live cd (or perform chrooted operations)](#install-grub-from-live-cd-or-perform-chrooted-operations)
   - [Logging/syslog/tools](#loggingsyslogtools)
     - [Logrotate](#logrotate)
   - [Terminal emulator](#terminal-emulator)
   - [Desktop Environment: windows](#desktop-environment-windows)
-  - [Dconf/Gsettings](#dconfgsettings)
+  - [Gnome stuff](#gnome-stuff)
+    - [Distro info](#distro-info)
+    - [Dconf/Gsettings](#dconfgsettings)
   - [MIME (extensions) (file associations) handling](#mime-extensions-file-associations-handling)
     - [Adding and associating a new application](#adding-and-associating-a-new-application)
     - [Split MAFF association](#split-maff-association)
+  - [Mount encrypted (.ecryptfs) home](#mount-encrypted-ecryptfs-home)
   - [Hardware](#hardware)
     - [Disable mouse/keyboard](#disable-mousekeyboard)
+    - [Screen stuff](#screen-stuff)
+      - [Add new resolution (HiDPI problem)](#add-new-resolution-hidpi-problem)
+    - [Audio](#audio)
+    - [Disconnect and power off a device](#disconnect-and-power-off-a-device)
+    - [Keyboard](#keyboard)
 
 ## Filesystems/partitions
 
@@ -423,7 +437,7 @@ journalctl --pager-end --unit=$service.service     # show unit log; `page-end`: 
 journalctl --vacuum-time=1d                        # clean systemd journal (/var/log/journal)
 ```
 
-## Configuring a unit
+### Configuring a unit
 
 See:
 
@@ -494,6 +508,97 @@ UNIT
 # now enable and start
 ```
 
+### Event triggers
+
+Run a script on suspend/hibernate/thaw/resume (the change applies immediately):
+
+```sh
+cat > /lib/systemd/system-sleep/50_myscript << 'SH'
+#!/bin/bash
+set -o errexit
+
+case "$1" in
+  pre)
+    # ACTION BEFORE SUSPEND/HIBERNATE
+    ;;
+  post)
+    # ACTION AFTER THAW/RESUME
+    ;;
+esac
+SH
+
+chmod +x /lib/systemd/system-sleep/50_myscript
+```
+
+Run a script on screen lock/unlock:
+
+```sh
+dbus-monitor --session "type='signal',interface='org.gnome.ScreenSaver'" |
+  while true; do
+    read X;
+    if echo $X | grep "boolean true" &> /dev/null;
+      then echo locked >> /tmp/pizza.txt;
+    elif echo $X | grep "boolean false" &> /dev/null;
+      then echo unlocked >> /tmp/pizza.txt;
+    fi
+  done
+```
+
+## Apparmor
+
+Source: https://www.digitalocean.com/community/tutorials/how-to-create-an-apparmor-profile-for-nginx-on-ubuntu-14-04.
+
+```sh
+# apparmor log: `grep audit /var/log/kern.log`
+
+aptitude install apparmor-utils
+
+# create empty profile and set complain mode
+# restart from here, with --force, if it's needed to update the profile with aa-logprof
+#
+aa-autodep --force /opt/nginx_app_server/sbin/nginx
+aa-complain /opt/nginx_app_server/sbin/nginx
+
+# restart nginx
+#
+/opt/nginx_app_server/sbin/nginx               # start (or restart if necessary)
+
+# go through all the entries and authorize them, then save.
+# if the profile file is not specified, all profiles are examined.
+#
+aa-logprof -f /etc/apparmor.d/opt.nginx_app_server.sbin.nginx
+```
+
+## Networking
+
+Show all the interfaces, even if unconfigured:
+
+```sh
+ip link show
+```
+
+Sample configuration for static IP (`/etc/network/interfaces`):
+
+```
+auto eth0
+iface eth0 inet (dhcp|static
+        address   192.168.56.103
+        netmask   255.255.255.0
+        network   192.168.56.0
+        broadcast 192.168.56.255
+        gateway   192.168.1.1)
+```
+
+Remove when changing the mac/card for an interface, otherwise the new one won't be recognized (SIOCSIFADDR error): `/etc/udev/rules.d/70-persistent-net.rules`
+
+### NetworkManager
+
+When adding hooks, the scripts must be executable!
+
+#### Changing Network manager DNS (18.04+)
+
+On 18.04 Desktop, one needs to modify the Network manager connection; see https://askubuntu.com/a/1104305/46091.
+
 ## fstab
 
 Columns:
@@ -510,6 +615,21 @@ Test the content of fstab (not reliable for actual mounting; for example, doesn'
 ```sh
 # [f]ake, [a]ll, [v]erbose
 mount -fav
+```
+
+## Install grub from live cd (or perform chrooted operations)
+
+```sh
+sudo su
+mount -o subvol=@ /dev/sda1 /mnt	# use '-o subvol=@' for btrfs
+mount --bind /dev /mnt/dev		    # mirror dev etc. (see https://unix.stackexchange.com/questions/198590/what-is-a-bind-mount)
+mount --bind /sys /mnt/sys
+mount --bind /proc /mnt/proc
+mount /dev/sda1 /mnt/boot		      # only if there is a separate boot partition
+chroot /mnt
+grub-install /dev/sda
+exit
+umount -R /mnt				            # `R`ecursively
 ```
 
 ## Logging/syslog/tools
@@ -575,7 +695,21 @@ window_id=$(xdotool search --all --desktop "$desktop_id" --name 'Mozilla Firefox
 xdotool windowactivate "$window_id"
 ```
 
-## Dconf/Gsettings
+## Gnome stuff
+
+```sh
+mate-session-properties                        configure mate (gnome) autostart applications
+```
+
+### Distro info
+
+Get distro infos (multiple options):
+
+- `lsb_release -a`
+- `cat /etc/*release`
+- `cat /etc/debian_version`: Complete version; specific for debian
+
+### Dconf/Gsettings
 
 ```sh
 # Dump the whole tree.
@@ -661,6 +795,16 @@ XML
 update-mime-database /usr/share/mime
 ```
 
+## Mount encrypted (.ecryptfs) home
+
+Obsolete, but kept for reference. Requires `ecryptfs-utils` package.
+
+```sh
+ecryptfs-unwrap-passphrase /mnt/home/.ecryptfs/saverio/.ecryptfs/wrapped-passphrase # mount passphrase
+ecryptfs-add-passphrase --fnek                                                      # use mount PP; store the second signature
+mount -t ecryptfs /mnt/home/.ecryptfs/saverio/.Private /mnt                         # use mount PP; enable filename encryption; use signature
+```
+
 ## Hardware
 
 Get hardware information:
@@ -693,4 +837,66 @@ xinput set-int-prop 3 "Device Enabled" 8 0
 
 # Disable
 xinput set-int-prop 3 "Device Enabled" 8 1
+```
+
+### Screen stuff
+
+```sh
+# disable screen blanking
+setterm -blank 0 -powersave off -powerdown 0 => xset s off
+```
+
+#### Add new resolution (HiDPI problem)
+
+Create resolution mode:
+
+    cvt 1500 1000 60
+
+    # 1504x1000 59.85 Hz (CVT) hsync: 62.12 kHz; pclk: 124.25 MHz
+    Modeline "1504x1000_60.00"  124.25  1504 1600 1752 2000  1000 1003 1013 1038 -hsync +vsync
+
+Declare it (using the `Modeline` data):
+
+    xrandr --newmode "1500x1000_60.00" 124.25  1504 1600 1752 2000  1000 1003 1013 1038 -hsync +vsync
+
+Find the screen name:
+
+    xrandr
+
+    eDP1 connected 1504x1000+0+0 (normal left inverted right x axis y axis) 290mm x 190mm
+       3000x2000     59.99 +
+       2560x1600     59.99
+    [...]
+
+Add the resolution to the device:
+
+    sudo xrandr --addmode eDP1 1500x1000_60.00
+
+Now it can be chosen in the `Displays` desktop environment settings.
+
+For setting it at startup, create a shell script $HOME/.xprofile, and assign executable permissions.
+
+### Audio
+
+```sh
+# Create remapped mono sink (downmix stereo to mono)
+#
+pacmd list-sinks | grep name:
+pacmd load-module module-remap-sink sink_name=mono master=THE_NAME_FROM_THE_PREVIOUS_COMMAND channels=2 channel_map=mono,mono
+```
+
+### Disconnect and power off a device
+
+```sh
+udisksctl dump                  # check disks with "\bRemovable: +true"
+udisksctl unmount -b /dev/sdb1  # unmount parts from dump which have "MountPoints: +$"
+udisksctl power-off -b /dev/sdb # yay!
+```
+
+### Keyboard
+
+Reconfigure keyboard:
+
+```sh
+dpkg-reconfigure console-data
 ```

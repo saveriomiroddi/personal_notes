@@ -1,3 +1,10 @@
+## Sat 19/Dec/2020
+
+- Languages/Frameworks
+  - Rust
+    - Programming Rust (1st ed.)
+      - [ ] Chapter 13
+
 ## Fri 18/Dec/2020
 
 - Extra

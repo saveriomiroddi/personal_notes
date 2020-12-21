@@ -35,6 +35,7 @@
     - [Traits](#traits)
       - [Basics (and Generics #2)](#basics-and-generics-2)
       - [OO-approach and supertraits](#oo-approach-and-supertraits)
+      - [Limitations of returning Self](#limitations-of-returning-self)
       - [Disambiguation](#disambiguation)
       - [Downcasting/Upcasting](#downcastingupcasting)
     - [Operator overloading](#operator-overloading)
@@ -1614,6 +1615,26 @@ trait BetterDisplay: fmt::Display {
 // - Generic supertrait returning self -> requires Sized
 //
 trait Matrix: Sized + Mul<Self> { /* ... */ }
+```
+
+#### Limitations of returning Self
+
+See https://stackoverflow.com/q/30938499.
+
+```rust
+trait MyTrait {
+  // This can return Self, which is ?Sized (not necessarily sized), because the Sized responsibility
+  // is down to the implementor.
+  //
+  fn new() -> Self;
+
+  // In this case, the responsibility in the trait, therefore, Self needs to be Sized.
+  // either add `where Self: Sized` to the method, or add the `Sized` bound to the trait.
+  //
+  fn default_new() -> Self {
+    Self::new()
+  }
+}
 ```
 
 #### Disambiguation

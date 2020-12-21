@@ -1,3 +1,17 @@
+## Mon 21/Dec/2020
+
+- Extra
+  - Admin
+    - [ ] Move old notes into personal_notes
+      - [ ] git.odt
+    - [x] Fight issue with waiting on `qemu-nbd` devices to be ready
+
+- Languages/Frameworks
+  - Rust
+    - Individual subjects
+      - [x] Sized in traits: https://stackoverflow.com/questions/30938499/why-is-the-sized-bound-necessary-in-this-trait
+        - [x] Experiment with the RT project
+
 ## Sun 20/Dec/2020
 
 - Languages/Frameworks

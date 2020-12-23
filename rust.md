@@ -1219,11 +1219,17 @@ result.unwrap_or_else( |err | {
   std::process::exit(1);
 });
 
+// Extract a value, raising an error if None. Since `expect()` consumes the value, use `as_ref()`/
+// `as_mut()` in order to borrow.
+//
+let value = result.expect("it shouldn't be None!");
+let &mut value = result.as_mut().expect("it shouldn't be None!");
+
 // Use this if it's sure that there can't be an error.
 //
 result.ok();
 
-// take(): extract a value and replace with None.
+// take(): extract a value and replace with None (no errors raised if invoked on None).
 // This is useful when we want to move out an instance that doesn't implement Copy.
 //
 let mut x = Some(2);
@@ -3312,6 +3318,7 @@ s.push('c');
 s.to_lowercase(); s.to_uppercase();
 s.replace("a", "b");                    // gsub
 s.clear();                              // blank a string
+s.repeat(8);                            // string repeat (multiplication)
 
 s.trim(); s.trim_end(); s.trim_start(); // trim/strip
 s.trim_end_matches("suffix");           // chomp suffix (but repeated)! also accepts a closure
@@ -4194,6 +4201,8 @@ See [repository](https://github.com/carbotaniuman).
 ### Indented Heredoc-like strings (`indoc`)
 
 ```rust
+use indoc::indoc;
+
 // Ruby squiggly heredoc-alike syntax.
 //
 let expected_string = indoc! {"

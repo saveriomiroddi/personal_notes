@@ -1,3 +1,29 @@
+## Tue 22/Dec/2020
+
+- Extra
+  - Admin
+    - [ ] Move old notes into personal_notes
+      - [ ] git.odt
+
+- Languages/Frameworks
+  - Rust
+    - Individual subjects
+      - [x] Fat pointers/vtables: https://iandouglasscott.com/2018/05/28/exploring-rust-fat-pointers
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 3
+        - [x] 21. Binary trees
+        - [x] 22. Balanced binary trees
+          - [x] Brutal fight to improve author's algorithm
+          - [x] Report redundant logic in the code
+          - [x] Make `Copy` bound unnecessary, by using references
+            - [x] Fight find informations about lifetimes based on other lifetimes
+        - [ ] 23. Skip lists
+    - Ray tracer challenge
+      - [ ] Other batch of cleanups
+        - [ ] Change "view" objects from ref counting to lifetimes
+          - [x] IntersectionState
+          - [x] Intersection, with massive cascading changes
+
 ## Mon 21/Dec/2020
 
 - Extra

@@ -7,18 +7,18 @@
     - [Aliases](#aliases)
     - [Ignore commands/Gitignore](#ignore-commandsgitignore)
   - [Repository](#repository)
-  - [Log](#log)
-    - [Prettifications](#prettifications)
-    - [More complex examples](#more-complex-examples)
-  - [Format](#format)
+  - [Log/Blame](#logblame)
+    - [Formatting/Prettifications](#formattingprettifications)
+    - [Finding](#finding)
+  - [Metadata](#metadata)
   - [Merging](#merging)
   - [Rebase](#rebase)
+  - [Remotes](#remotes)
   - [Stash](#stash)
   - [Bisect](#bisect)
   - [Export (`archive`)](#export-archive)
-  - [Informations gathering](#informations-gathering)
   - [Batch operations  (message/tree filtering)](#batch-operations--messagetree-filtering)
-  - [Patching](#patching)
+  - [Diffing/Patching](#diffingpatching)
   - [Useful operations](#useful-operations)
     - [Correct whitespaces problems](#correct-whitespaces-problems)
 
@@ -109,7 +109,7 @@ init       # init a repository
 clone $url # clone a remote repos
 ```
 
-## Log
+## Log/Blame
 
 ```sh
 log --branches=$branch $file        # search in another branch
@@ -132,22 +132,64 @@ log -G $regex [$path]               # search $regex in the diff
 log -S $string [$path]              # search the deletions for $string
 ```
 
-### Prettifications
+Blaming format:
 
-- `--pretty='%h %s'`   : `%h`: abbreviated hash, %s: subject (first line)
+```sh
+blame [$branch] $file
+```
+
+### Formatting/Prettifications
+
+`--format` and `--pretty` are the same.
+
+- `--pretty='%h %s'`   : `%h`: abbreviated hash, `%s`: subject first line
 - `--pretty="format:"` : empty format, to avoid the cruft at the beginning of logs
 - `--oneline`          : same as `--pretty='%h %s'`
 
-### More complex examples
+### Finding
 
 ```sh
-log --merges v0.1.8...v0.1.9        # search merges between two tags
+merge-base $A $B                                       # find common ancestor
+show :/$regex                                          # show the last commit matching a regex in the message
+branch --contains $commit                              # shows which branches contains the given commit
+name-rev --name-only $commit                           # shows which tag the commit was in. '~N' indicates how many commits (N) before the tag
+git rev-list --pretty=oneline --before="%F %R" $branch # show commits before/at given datetime
+log --merges v0.1.8...v0.1.9                           # search merges between two tags
+
+[[ $(git cat-file -t $object 2> /dev/null) ]] && echo exists # check if a branch/commit/etc exists
 ```
 
-## Format
+## Metadata
 
 ```sh
---format="%h %b"        # $commit $body; if a body has more body lines, they will be shown, so some trickery is required
+# Reference to upstream (remote) branch of HEAD. Returns a blank line if there isn't one.
+#
+for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD)
+
+# Repository name
+#
+ls-remote --get-url origin | ruby -ne 'print $_[/(\w+)\.git/, 1]'
+
+# Repository root path
+#
+rev-parse --show-toplevel
+
+# Name of the current branch
+#
+rev-parse --abbrev-ref HEAD   # on non named branches (including remote ones) prints `HEAD`
+symbolic-ref --short -q HEAD  # on non named branches prints nothing
+```
+
+Porcelain (low(er) level information, intended to be programmatically parsed); can be used to find the remote branch:
+
+```sh
+# The output listed is exact. Show [b]ranch info.
+
+status -b --porcelain
+## test...origin/test [gone]
+
+status -b --porcelain
+## master...origin/master
 ```
 
 ## Merging
@@ -156,21 +198,53 @@ log --merges v0.1.8...v0.1.9        # search merges between two tags
 checkout (--ours|--theirs) $files   # resolve conflict using ours/theirs version
 ```
 
-## Rebase
-
-Add a root (initial) commit:
+Examples:
 
 ```sh
-git add --allow-empty -m "Initial (empty) commit"
-git rebase -i --root                               # now reorder the commits
+# Solve conflicts using always the local/remote copy (assumes no spaces in filenames).
+# Use `--ours` (local) or `--theirs` (remote):
+#
+git st | awk '/both modified:/ { print $3 }' | xargs sh -c 'git checkout --theirs {} && git add {}'
 ```
 
-Programmatically run an interactive rebase:
+## Rebase
 
 ```sh
-# Edit all the commits of a branch!
+rebase -i $parent_commit                               # interactive rebase from parent of given commit
+rebase --onto $dest_branch $feat_branch_parent_commit
+
+# Add a root (initial) commit
+#
+git add --allow-empty -m "Initial (empty) commit"
+git rebase -i --root
+
+# Programmatically run an interactive rebase. Example: edit all the commits of a branch:
 #
 GIT_SEQUENCE_EDITOR="sed -i -re 's/^pick /e /'" git rebase -i "$(git merge-base HEAD master)"
+```
+
+## Remotes
+
+```sh
+fetch [--all]                                            # fetch remote changes; [all] remotes
+pull [--rebase]                                          # fetch+merge; do [rebase] instead of merging
+
+remote                                                   # list the remotes; a remote is a label for a remote repos url
+remote add $name $remote_url                             # add a remote (eg. for forks (upstream))
+push [-u] [$remote [$branch[$rem_branch]]] --tags        # push changes; optionally only for a [branch] - if it's a branch, a remote branch is created; push
+                                                         # set [u]pstream; set [rem_branch] if name differs from local; push [tags] information
+
+push $remote :$branch                                    # delete a remote branch
+push $remote :heads/$branch                              # delete a remote branch
+push $remote :refs/tags/$tag                             # delete a remote tag
+```
+
+Examples:
+
+```sh
+# List status of all the local branches.
+#
+for-each-ref --format="%(refname:short) %(upstream:track)" refs/heads
 ```
 
 ## Stash
@@ -182,6 +256,14 @@ stash (pop|apply)             # restore with/out clearing the entry
 stash list
 stash clear
 stash show -p $stash_entry    # shows a stash entry content
+```
+
+Examples:
+
+```sh
+# Recover dropped stashes
+#
+gitk --all $(git fsck --no-reflog | awk '/dangling commit/ {print $3}')
 ```
 
 ## Bisect
@@ -203,20 +285,6 @@ archive $rev           # export a rev to stdout (defaults to tar format)
 archive master Gemfile Gemfile.lock gems_dir | tar x -f - -C /export
 ```
 
-## Informations gathering
-
-Low(er) level branch information; can be used to find the remote branch
-
-```sh
-# The output listed is exact.
-
-status -b --porcelain
-## test...origin/test [gone]
-
-status -b --porcelain
-## master...origin/master
-```
-
 ## Batch operations  (message/tree filtering)
 
 Mass-change all the messages in the current branch.
@@ -236,9 +304,24 @@ git filter-branch --force --tree-filter 'rm -f terraform/terraform.tfstate' mast
 git filter-branch --force --tree-filter 'ag "def mymethod" -l | xargs -r perl -0777 -i -pe "s/^(\s+)def mymethod.*?^\g1end\n\n//sm"' master..HEAD
 ```
 
-## Patching
+## Diffing/Patching
 
 ```sh
+show --name-[only|status] rev[:file]            # diff rev^..rev; show name only [--name-only] or status only [--name-status]
+
+diff [--cached]                                 # non committed files; [--cached] files in the index
+diff --stat                                     # only filenames
+difftool                                        # GUI version of diff
+git difftool --extcmd='vim -d -c "windo set wrap" $5'    # Convenient vimdiff usage; requires `diffchar` plugin, otherwise, it's ugly
+
+status -sb                            more compact version of the status (show [b]ranch; first column: in index
+```
+
+```sh
+# Suitable for standard patch import; if [--no-prefix] is not specified, import using "patch -p1"
+#
+diff --no-prefix
+
 # Create standard patch, to be applied with `am`. `diff` can be used, but the metadata (e.g. author) will be lost.
 #
 # - produce diff for $file only

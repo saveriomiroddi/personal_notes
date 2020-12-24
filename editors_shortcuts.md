@@ -284,3 +284,8 @@ Evince:
 Caja:
 
 - `F6`                      Switch between side-to-side panels
+
+htop:
+
+- `h`: help
+- `H`: show/hide process threads

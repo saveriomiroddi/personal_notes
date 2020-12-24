@@ -1,3 +1,32 @@
+## Wed 23/Dec/2020
+
+- Languages/Frameworks
+  - Rust
+    - Individual subjects
+      - [x] Lifetimes/traits: https://stackoverflow.com/questions/44872584/am-i-missing-something-when-it-comes-to-lifetimes
+      - [x] Test Cranelift
+    - Ray tracer challenge
+      - [ ] Other batch of cleanups
+        - [x] Change "view" objects from ref counting to lifetimes
+          - [x] Check performance against master
+          - [x] Test suites
+      - [x] Prepare test case and reply https://forum.raytracerchallenge.com/thread/204/avoid-noise-checkers-pattern-planes
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 3
+        - [x] 23. Skip lists
+        - [ ] 24. Skip lists height
+          - [x] Implementation/testing
+          - [x] Fight custom default generator for `rand::random()`
+          - [ ] Fight BCK+RNG, for deterministic testing
+    - Programming Rust (1st ed.)
+      - [x] Chapter 14 (closures)
+      - [ ] Chapter 15 (iterators)
+
+- Extra
+  - Admin
+    - [ ] Move old notes into personal_notes
+      - [x] git.odt
+
 ## Tue 22/Dec/2020
 
 - Extra

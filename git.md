@@ -6,8 +6,10 @@
   - [Configuration](#configuration)
     - [Aliases](#aliases)
     - [Ignore commands/Gitignore](#ignore-commandsgitignore)
+  - [Commit](#commit)
+  - [Index operations](#index-operations)
   - [Repository](#repository)
-  - [Log/Blame](#logblame)
+  - [Log/Blame/Tree comparison](#logblametree-comparison)
     - [Formatting/Prettifications](#formattingprettifications)
     - [Finding](#finding)
   - [Metadata](#metadata)
@@ -18,9 +20,11 @@
   - [Bisect](#bisect)
   - [Export (`archive`)](#export-archive)
   - [Batch operations  (message/tree filtering)](#batch-operations--messagetree-filtering)
-  - [Diffing/Patching](#diffingpatching)
+  - [Diffing/Patching/Status](#diffingpatchingstatus)
   - [Useful operations](#useful-operations)
+    - [Shell prompt](#shell-prompt)
     - [Correct whitespaces problems](#correct-whitespaces-problems)
+    - [Revert common mistakes](#revert-common-mistakes)
 
 ## Document notes
 
@@ -102,6 +106,39 @@ For one level, it's easier:
 !/terraform/**/.terraform/plugins/*/terraform-provider-archive_v*
 ```
 
+## Commit
+
+```sh
+--no-commit                     	# doesn't commit for operations that does so by default (e.g. merge)
+
+commit --amend [-m <newMessage>]  # amend the last commit; content of the index are added to the last commit; only [m]essage 
+
+# Set the message/authorship/timestamp of a commit as another [retain timestamp on squash].
+# Will also copy the message; [-c] prompts for the new message.
+#
+commit --amend -C $reference_commit
+```
+
+## Index operations
+
+```sh
+add -i                          	# interactive adding
+rm --cache					              # remove from the index (without deleting the file)
+
+reset --(soft|hard) $commit     	# move the head pointer to the commit. if hard, the index is reset; if soft, the index will
+                                  # contain the diff with the old data
+
+git reset --soft $commit; git commit -c ORIG_HEAD    # amend a commit for more complex cases
+
+clean [-d] [-f]                 	# remove untracked files; [d]irectories as well; [f]orce if option `clean.requireForce` is set
+
+# perform reset HEAD and checkout of a file in staging; '--' is optional.
+#
+checkout HEAD -- $path
+
+checkout -b $name $commit         # create branch from commit
+```
+
 ## Repository
 
 ```sh
@@ -109,9 +146,11 @@ init       # init a repository
 clone $url # clone a remote repos
 ```
 
-## Log/Blame
+## Log/Blame/Tree comparison
 
 ```sh
+log --oneline --date-order --graph --all --decorate   # !! graph/diagram of the commits !!
+
 log --branches=$branch $file        # search in another branch
 
 log --merges --first-parent         # search only [merges] commits, only in the [first-parent] (eg. master when run from master)
@@ -136,6 +175,15 @@ Blaming format:
 
 ```sh
 blame [$branch] $file
+
+git show $(git blame example.js -L 4,4 | awk '{print $1}') # show the commit of a certain line
+```
+
+Tree comparison:
+
+```sh
+cherry [-v] $upstream [$head]     # changes against tree (useful for rebasing: cherry master); [v]iew commit subjects
+                                  # example commits in branch and not in master: cherry master branch
 ```
 
 ### Formatting/Prettifications
@@ -178,6 +226,10 @@ rev-parse --show-toplevel
 #
 rev-parse --abbrev-ref HEAD   # on non named branches (including remote ones) prints `HEAD`
 symbolic-ref --short -q HEAD  # on non named branches prints nothing
+
+# Git path relative to repository, from an absolute path. Note that the file must be in HEAD.
+#
+ls-tree --full-name --name-only HEAD $filename
 ```
 
 Porcelain (low(er) level information, intended to be programmatically parsed); can be used to find the remote branch:
@@ -304,7 +356,7 @@ git filter-branch --force --tree-filter 'rm -f terraform/terraform.tfstate' mast
 git filter-branch --force --tree-filter 'ag "def mymethod" -l | xargs -r perl -0777 -i -pe "s/^(\s+)def mymethod.*?^\g1end\n\n//sm"' master..HEAD
 ```
 
-## Diffing/Patching
+## Diffing/Patching/Status
 
 ```sh
 show --name-[only|status] rev[:file]            # diff rev^..rev; show name only [--name-only] or status only [--name-status]
@@ -314,8 +366,14 @@ diff --stat                                     # only filenames
 difftool                                        # GUI version of diff
 git difftool --extcmd='vim -d -c "windo set wrap" $5'    # Convenient vimdiff usage; requires `diffchar` plugin, otherwise, it's ugly
 
-status -sb                            more compact version of the status (show [b]ranch; first column: in index
+status -sb                                      # more compact version of the status (show [b]ranch; first column: in index
+
+# Run a certain operation for each modified file.
+#
+git status -s | awk '{print $2}' | xargs -I {} scp {} myserver:mypath/{}
 ```
+
+Diff/Patching:
 
 ```sh
 # Suitable for standard patch import; if [--no-prefix] is not specified, import using "patch -p1"
@@ -342,6 +400,14 @@ apply [--check] $infile
 
 ## Useful operations
 
+### Shell prompt
+
+```sh
+# Shows branch in the terminal
+#
+export PS1="\h:\W:\$(git branch 2>/dev/null | grep '^*' | colrm 1 2)\$ "
+```
+
 ### Correct whitespaces problems
 
 ```sh
@@ -356,3 +422,7 @@ Update git history, cleaning whitespace problems!:
 ```sh
 rebase $base_commit --whitespace=fix
 ```
+
+### Revert common mistakes
+
+See: https://sethrobertson.github.io/GitFixUm/fixup.html

@@ -27,7 +27,7 @@
   - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
     - [Key servers](#key-servers)
   - [Formatting tools](#formatting-tools)
-  - [htop](#htop)
+  - [Mounting images (`qemu-utils`)](#mounting-images-qemu-utils)
 
 ## ls
 
@@ -498,7 +498,33 @@ Table (columns) formatting:
 column [-s "$separators"] -t
 ```
 
-## htop
+## Mounting images (`qemu-utils`)
 
-- `h`: help
-- `H`: show/hide process threads
+```sh
+# Use `-f vpc` for vhd images.
+#
+qemu-nbd --connect=/dev/nbd0 [-f vpc] $image
+
+# Inform the kernel of the changes.
+#
+partprobe /dev/nbd0
+
+# List the partitions (optional); doesn't need any wait (only partprobe).
+#
+fdisk /dev/nbd0 -l
+
+# Complete clusterduck. Even waiting via:
+#
+#     while [[ ! -b /dev/nbd0p4 ]]; do sleep 0.1; done
+#
+# will cause:
+#
+#     ls -l /dev/nbd0p4
+#     ls: cannot access '/dev/nbd0p4': No such file or directory
+#
+# Therefore, we use `ls` instead.
+#
+while ! ls -l $partition_device > /dev/null 2>&1; do sleep 0.1 done
+
+mount "$partition_device" /mnt
+```

@@ -72,6 +72,7 @@
         - [Importing](#importing)
       - [Custom derive macros](#custom-derive-macros)
     - [Unions](#unions)
+    - [Assorted insanity](#assorted-insanity)
   - [Packaging](#packaging)
     - [Project structure](#project-structure)
     - [Modules](#modules)
@@ -265,7 +266,7 @@ eprintln!("Error!");                    // print on stderr!
 format!("The number is {}", 1);                          // the template *must* be a literal (!)
 format!("The number is {0}, again {0}, not {1}!", 1, 2); // numbered placeholders!
 
-writeln!("{}", writer, 123);            // write formatted data into a Write implementor; `write()` also available
+writeln!(writer, "{}", 123).unwrap();   // write formatted data into a Write implementor; `write()` also available
 ```
 
 Formatting (see https://doc.rust-lang.org/std/fmt):
@@ -705,6 +706,8 @@ vec.last();
 
 vec.push(1);                            // Push at the end
 vec.pop();                              // Pop from the end
+let old = vec.swap_remove(i);           // Fast removal (fills in with the last element)
+std::mem::swap(&mut new, &mut vec[0])   // Replace an entry with another
 
 vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) an array
 vec.extend(&[1, 2, 3]);                 // Append (borrowing version)
@@ -723,7 +726,7 @@ process_list(&vec);
 
 In order to unpack a vector, convert to slice and use if let (see [pattern matching](#pattern-matching)).
 
-Element inclusion test/removal:
+Element(s) conditional removal:
 
 ```rust
 // Remove one match; ignore if element not found.
@@ -731,10 +734,6 @@ Element inclusion test/removal:
 if let Some(i) = vec.iter().position(|vec_item| *vec_item == remove_item) {
   vec.remove(i);
 }
-
-// Fast removal (fills in with the last element); use when vec ordering is not a requirement.
-//
-vec.swap_remove(i);
 
 // Remove all matching elements
 //
@@ -1225,7 +1224,7 @@ result.unwrap_or_else( |err | {
 let value = result.expect("it shouldn't be None!");
 let &mut value = result.as_mut().expect("it shouldn't be None!");
 
-// Use this if it's sure that there can't be an error.
+// Converts to Option, and discards the error (use this if it's sure that there can't be an error)
 //
 result.ok();
 
@@ -3062,6 +3061,10 @@ See [reference](https://doc.rust-lang.org/reference/items/unions.html#pattern-ma
 
 A proposal for ["unnamed" fields](https://rust-lang.github.io/rfcs/2102-unnamed-fields.html) has been approved, but not yet implemented.
 
+### Assorted insanity
+
+- Complex behavior of traits <> lifetimes (now obsolete; using `&Self` as argument is enough): https://stackoverflow.com/questions/54329200/mysterious-lifetime-issue-while-implementing-trait-for-dyn-object.
+
 ## Packaging
 
 ### Project structure
@@ -3206,7 +3209,7 @@ Abstract operation traits:
 
 ```rust
 BufReader::new(&str.as_bytes());
-BufReader::new(vec.as_slice());
+BufReader::new(vec.as_slice()); // don't forget that Read requires slices!
 BufWriter::new(vec);
 ```
 
@@ -3576,13 +3579,13 @@ unsafe {
 With crate:
 
 ```rust
-// Simplest way.
+// Shortcut API; invokes `thread_rng().gen()`.
 //
 let rand_byte: u8 = rand::random();
 
 // Ends: [low, high); requires `rand::Rng`.
 //
-let randval = match rand::thread_rng().gen_range(0, 2) {
+let randval = match rand::thread_rng().gen_range(0..2) {
     0 => "0",
     1 => "1",
     _ => unreachable!(),
@@ -3602,6 +3605,22 @@ let randval: f64 = rng.gen();
 
 let mut data = [0u8; 32];
 rand::thread_rng().fill_bytes(&mut data);
+```
+
+Use a deterministic generator, for testing purposes:
+
+```rust
+// Bools are converted from (little endian) i32 (4 bytes); the highest bit determines the value.
+
+use rand::{rngs::adapter::ReadRng, Rng, RngCore};
+
+let data = [true, false, true, true, false, false, true]
+    .iter()
+    .flat_map(|f| vec![0, 0, 0, (*f as u8) << 7])
+    .collect::<Vec<_>>();
+
+let mut rng: Box<dyn RngCore> = Box::new(ReadRng::new(data.as_slice()));
+let rand_bool = rng.gen::<bool>();
 ```
 
 ### Regular expressions (`regex`)

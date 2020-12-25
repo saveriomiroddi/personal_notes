@@ -1,14 +1,17 @@
 # Bash
 
 - [Bash](#bash)
+  - [Shell key bindings](#shell-key-bindings)
   - [Shellopts](#shellopts)
+  - [Special variables](#special-variables)
   - [Variables](#variables)
   - [Strings](#strings)
   - [Herestrings/Heredocs (+stdin handling)](#herestringsheredocs-stdin-handling)
-  - [Switch/case](#switchcase)
+  - [Flow control](#flow-control)
   - [Test conditions](#test-conditions)
     - [Regular expressions](#regular-expressions)
     - [Applications](#applications)
+  - [Functions](#functions)
   - [Jobs management](#jobs-management)
   - [Cycle a string tokens based on separator (IFS)](#cycle-a-string-tokens-based-on-separator-ifs)
   - [String functions](#string-functions)
@@ -22,7 +25,7 @@
   - [Arrays](#arrays)
     - [Snippets](#snippets)
   - [Associative arrays](#associative-arrays)
-  - [Script operational concepts](#script-operational-concepts)
+  - [Script operational concepts/Useful scripts](#script-operational-conceptsuseful-scripts)
     - [Ask for input (keypress)](#ask-for-input-keypress)
     - [Trapping errors](#trapping-errors)
     - [Log a script output/Enable debugging [log]](#log-a-script-outputenable-debugging-log)
@@ -30,9 +33,18 @@
     - [Check if there's data in stdin](#check-if-theres-data-in-stdin)
     - [Check if a script is `source`d](#check-if-a-script-is-sourced)
     - [Workaround sudo expiry during a long-running script](#workaround-sudo-expiry-during-a-long-running-script)
-    - [Interesting/useful time-related functionalities](#interestinguseful-time-related-functionalities)
+    - [Time-related functionalities](#time-related-functionalities)
+    - [Parse commandline options (`getopt`)](#parse-commandline-options-getopt)
     - [Poor man's configfile parser](#poor-mans-configfile-parser)
+    - [Variables printing function](#variables-printing-function)
   - [Shell colors](#shell-colors)
+
+## Shell key bindings
+
+- `Ctrl+U` delete line before cursor  `Ctrl+K`  delete line after cursor
+- `Ctrl+A` go to BOL                  `Ctrl+E`  go to EOL
+- `Ctrl+W` delete word before cursor  `Alt+D`   delete word after cursor
+- `Ctrl+L` clear
 
 ## Shellopts
 
@@ -56,6 +68,18 @@ shopt -s nocasematch      # case insensitive matches
 ```
 
 See http://linuxcommand.org/lc3_man_pages/seth.html.
+
+## Special variables
+
+- `$?`       exit code of last executed process
+- `!$`       last argument of last statement
+- `$$`       current pid
+
+Parameter variables; WATCH OUT!! When inside a function, they refer to the function:
+
+- `$<n>`     parameters passed; n in [0...9], 0 = command; also valid in alias!
+- `$@`       or $* all parameters; preferrable to use the $@, which handles spaced params
+- `$#`       number of params, excluding #0
 
 ## Variables
 
@@ -144,10 +168,20 @@ read -r -d '' body <<STR
 STR
 ```
 
-## Switch/case
+## Flow control
 
 ```sh
-# switch/case. Double semicolon is required (can be put at the end of a statement); space before `)` isn't.
+# If/else
+#
+if $condition; then
+  $commands
+elif $condition; then                   # don't forget to follow with `then` !!
+  $command
+else
+  :                                     # denotes an empty block
+fi
+
+# Switch/case. Double semicolon is required (can be put at the end of a statement); space before `)` isn't.
 #
 case $env_number in
 *[0-9][0-9][0-9]*r )
@@ -163,39 +197,68 @@ case $env_number in
   boom
   ;;
 esac
+
+# For loop
+#
+for s in host1 host2; do
+  echo "$s"
+  continue                    # skip current iteration
+  break                       # break the loop
+done
+
+# !!! C-style for loop !!!
+#
+for ((job = 1; job <= MAX_JOBS; job++)); do $command; done
+
+# Until loop
+#
+until (( $VGAPT_MEMORY < $(free -m | sed '2q;d' | awk '{print $NF}') )); do $command; done
 ```
 
 ## Test conditions
 
+
+```sh
+test $expr                              # test an expression
+
+if [[ ( $expr1 ) || ( $expr2 ) ]]       # complex conditionals; parenthesis denote priority
+if { $commands; } || { $commands; }     # conditional with commands
+if (( lhs < rhs ))                      # arithmetic comparison (dollars are not required)
+```
+
 Note that the left side of a condition (or the only one on prefix operators) doesn't need to be escaped.
 
-Operators:
+Prefix Operators:
 
-```
--z string                 string is empty
--n string                 string is not empty
+- `!`                   not
 
--v var_no_dollar          for scalars: test if variable has been declared; WATCH OUT: don't prefix with the dollar!
+- `-z $string`          string is empty
+- `-n $string`          string is not empty
 
--e <filename>             file/directory/symlink exists; symlink is followed before checking!
--f <filename>             file exists
--x filename               file exists and it's executable
--d <dirname>              directory exists
--L <filename>             file/directory is a symlink
--b <filename>             file is a block device
+- `-v var_no_dollar`    for scalars: test if variable has been declared; WATCH OUT: don't prefix with the dollar!
 
-! -s <filename>           file is empty
+- `-e $filename`        file/directory/symlink exists; symlink is followed before checking!
+- `-f $filename`        file exists
+- `-x $filename`        file exists and it's executable
+- `-d $dirname`         directory exists
+- `-L $filename`        file/directory is a symlink
+- `-b $filename`        file is a block device
 
--t 0                      input is terminal (false if stdin)
-```
+- `! -s $filename`      file is empty
+
+- `-t 0`                input is terminal (false if stdin)
+
+Infix operators:
+
+- `-a`, `-o`                           boolean and/or
+- `$string == *"substring"*`           substring matching; strings can have spaces; use this exact syntax!
+- `-eq`,`-ne`,`-lt`,`-le`,`-ge`,`-gt`  arithmetic operators; !! DON'T USE FOR STRINGS !!
+- `==`, `!=`, `<`, `>`                 string operators - !! DON'T USE FOR ARITHMETIC !!
 
 Note that functions can return a condition result!!:
 
 ```sh
-function myTest {
-  [[ "$1" == "foo" ]]
-}
-
+function myTest { [[ "$1" == "foo" ]]; }
 myTest "foo" && echo "bar"      # prints `bar`!
 ```
 
@@ -246,6 +309,30 @@ Execute a command if a process is not running:
 ```sh
 ! pgrep -fa mysqld && (mysqld &)                       # Zsh doesn't need brackets for this semantics
 if [[ -z "$(pgrep -fa mysqld)" ]]; then mysqld & fi
+```
+
+## Functions
+
+```sh
+# When writing a function on a single line, the command must end with a semicolon (';')
+#
+function myfx() {
+  # Params are passed as $n (1-based)
+  #
+  echo "${1}"
+
+  # WATCH OUT! `declare` inside a function is local! must use `-g` if not.
+  #
+  declare -g myvar=123
+
+  # Print the function names in the stack (0-based)
+  #
+  echo ${FUNCNAME[0]} # `myfx`
+
+  # Pseudo-return value (!!!)
+  #
+  { myvalue=$(myfunction 3>&1 1>&4); } 4>&1
+}
 ```
 
 ## Jobs management
@@ -519,7 +606,7 @@ for key in ${!MYHASH[@]}; do echo "$key => ${MYHASH[$key]}"; done
 [[ "$(declare -p MYHASH 2> /dev/null)" == "declare -A"* ]] && echo "is associative array"
 ```
 
-## Script operational concepts
+## Script operational concepts/Useful scripts
 
 ### Ask for input (keypress)
 
@@ -615,7 +702,7 @@ while true; do
 done 2>/dev/null &
 ```
 
-### Interesting/useful time-related functionalities
+### Time-related functionalities
 
 ```sh
 # Check time passed.
@@ -624,6 +711,44 @@ SECONDS=0; while [[ $SECONDS -lt 10 ]]; do sleep 1; done
 # Wait until next beginning of second
 sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))
 ```
+
+### Parse commandline options (`getopt`)
+
+See http://www.bahmanm.com/blogs/command-line-options-how-to-parse-in-bash-using-getopt for further help (eg. optional args).
+
+Note that when using this getopt (GNU) inside a function, all the processing should be performed inside the function - `$@/$#` are not as expected after returning.
+
+```sh
+# Options (case sensitive): [-h|--help], [-s|--shared-folders], [-c|--cd1-image MANDATORY_ARGUMENT]
+# `--name` is the name of the program printed when an error is reported.
+# Note the external double quotes; without them, messy things happen!
+#
+eval set -- "$(getopt --options hsc: --long help,shared-folders,cd1-image: --name "$(basename "$0")" -- "$@")"
+
+# DON'T FORGET THE `shift` commands and the `--` case. The `*` case is not required.
+#
+while true ; do
+  case "$1" in
+    -h|--help)
+      echo 'usage: qemu_gaming.sh [-h|--help] [-s|--shared-folders] [-c|--cd1-image ISO_FILE]'
+      exit 0 ;;
+    -s|--shared-folders)
+      USE_SHARED_FOLDERS=1
+      shift ;;
+    -c|--cd1-image)
+      CD1_IMAGE="$2"
+      shift 2 ;;
+    --)
+      shift
+      break ;;
+    *)
+      echo "Internal error: '$1'"
+      exit 1 ;;
+  esac
+done
+```
+
+Non-option params are available, after the `while` block, from `$1`.
 
 ### Poor man's configfile parser
 
@@ -647,6 +772,40 @@ A useful functionality is to interpret all values starting with `$`:
     else
       declare -g $key="$value"
     fi
+```
+
+### Variables printing function
+
+Invoke as `print_variables varname1 varname2 ...`.
+
+```sh
+function print_variables {
+  for variable_name in "$@"; do
+    declare -n variable_reference="$variable_name"
+
+    echo -n "$variable_name:"
+
+    case "$(declare -p "$variable_name")" in
+    "declare -a"* )
+      for entry in "${variable_reference[@]}"; do
+        echo -n " \"$entry\""
+      done
+      ;;
+    "declare -A"* )
+      for key in "${!variable_reference[@]}"; do
+        echo -n " $key=\"${variable_reference[$key]}\""
+      done
+      ;;
+    * )
+      echo -n " $variable_reference"
+      ;;
+    esac
+
+    echo
+  done
+
+  echo
+}
 ```
 
 ## Shell colors

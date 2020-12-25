@@ -1,3 +1,29 @@
+## Thu 24/Dec/2020
+
+- Languages/Frameworks
+  - Rust
+    - Individual subjects
+      - [x] Other RNG-related question
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 3
+        - [x] 24. Skip lists height
+          - [x] Implement deterministic testing
+          - No exercise
+        - [ ] 25. Huffman coding
+          - [x] Implementation
+    - Programming Rust (1st ed.)
+      - [x] Chapter 15 (iterators)
+    - Ray tracer challenge
+      - [ ] Other batch of cleanups
+        - [x] Convert `HasFloat64Value` to `Into<f64>`
+
+- Extra
+  - [x] Organize current resources
+  - [x] Search Javascript books
+  - Admin
+    - [ ] Move old notes into personal_notes
+      - [ ] bash.odt
+
 ## Wed 23/Dec/2020
 
 - Languages/Frameworks

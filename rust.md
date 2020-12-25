@@ -183,6 +183,8 @@ At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
 Add a `rustfmt.toml` to the project root. See: https://rust-lang.github.io/rustfmt (don't forget to consider the channel).
 
 ```toml
+# Unstable features work only on nightly!
+#
 unstable_features = true
 
 blank_lines_upper_bound = 10             # unstable
@@ -590,7 +592,7 @@ nth(n)                       // nth element (0-based)
 skip(n)                      // skip n elements
 take(n)                      // iterator for the first n elements
 enumerate()                  // iterator (index, &value) (Ruby :each_with_index)
-join("str")                  // join using str
+join("str")                  // join using str; doesn't join `char` collections
 zip(iter)                    // zip two arrays (iterators)!!!
 sum()                        // WATCH OUT! Returns the same type, so conversion is needed, e.g. `.map(|&x| x as u32).sum();`
 
@@ -1204,7 +1206,8 @@ enum Option<T> {
 let some_number = Some(5);
 let absent_number: Option<i32> = None;
 
-// Convenient syntax for decoding a Result and returning the Err, if any.
+// Question mark ('?') operator: convenient syntax for decoding a Result and returning the Err, if any.
+// It also works with functions returning `Option<T>`.
 //
 let value = method()?;
 
@@ -1271,6 +1274,11 @@ let xxx = match val {
     "other"
   }
 };
+
+// Convenient macro.
+// When implementing on PartialCmp, import `std::cmp::Ordering::{Equal, Greater, Less}`.
+//
+matches!(self.partial_cmp(other), Some(Less) | Some(Equal))
 
 // Match enum; all the entries must be exhausted (or the `_` placeholder must be used).
 // The second case is a variant with an associated value!
@@ -3318,6 +3326,8 @@ s.start_with("pref");
 s += &s2;                               // concatenate via overloaded operator; can take &str or &String
 s.push_str(&str);                       // concatenate (append) strings
 s.push('c');
+s.insert(pos, 'c');                     // insert; use also as Ruby unshift()
+s.replace_range(range, "s");            // replace a string range (!)
 s.to_lowercase(); s.to_uppercase();
 s.replace("a", "b");                    // gsub
 s.clear();                              // blank a string
@@ -3621,6 +3631,18 @@ let data = [true, false, true, true, false, false, true]
 
 let mut rng: Box<dyn RngCore> = Box::new(ReadRng::new(data.as_slice()));
 let rand_bool = rng.gen::<bool>();
+
+// Sample type with user-definable RNG.
+//
+struct MyRng<'a> {
+  rng: Box<dyn RngCore + 'a>,
+}
+impl<'a> MyRng<'a> {
+  pub fn new(rng: Option<Box<dyn RngCore + 'a>>) -> Self {
+    let rng = rng.unwrap_or_else(|| Box::new(thread_rng()));
+    MyRng { rng }
+  }
+}
 ```
 
 ### Regular expressions (`regex`)

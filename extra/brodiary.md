@@ -1,3 +1,23 @@
+## Fri 25/Dec/2020
+
+- Languages/Frameworks
+  - Rust
+    - Articles/Smaller topics
+      - [x] https://medium.com/nearprotocol/understanding-rust-lifetimes-e813bcd405fa
+- Extra
+  - Move old notes into personal_notes
+    - [x] bash.odt
+  - Scripting
+    - [x] Brody: Add structure section to new day
+
+- Languages/Frameworks
+  - Rust
+    - Hands-On Data Structures and Algorithms in Rust
+      - [x] Section 3
+        - [x] 25. Huffman coding
+          - [x] Exercise
+      - [ ] Section 4: Graphs
+
 ## Thu 24/Dec/2020
 
 - Languages/Frameworks

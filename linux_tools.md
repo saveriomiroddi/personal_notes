@@ -111,7 +111,7 @@ find . -name 1.txt -not -path ./skipdir/* -not -path '*/internal_dir/*'
 Cycle filenames, with whitespace support.
 
 ```sh
-# !! "<<<" won't work, because Bash parameter substitution doesn't support null bytes !!
+# WATCH OUT! "<<<" won't work, because Bash parameter substitution doesn't support null bytes
 #
 find . -name "*.txt" -print0 | while read -rd $'\0' filename; do
   echo "<$filename>"
@@ -136,6 +136,21 @@ function myfunc() {
     return
   # etc.etc.
 }
+```
+
+Test if a directory contains directories:
+
+```sh
+! find -mindepth 1 -type d -exec false {} +
+```
+
+Execute a command for the content of a directory.
+Using `for f in $dir/*` works, however, if there are no files, it raises an error.
+
+```sh
+find $dir -name $glob -exec bash -c '
+  zpool labelclear -f "$1" 2> /dev/null || true
+' _ {} \;
 ```
 
 #### Search text inside multiple PDFs

@@ -3,20 +3,24 @@
 - [Bash](#bash)
   - [Shell key bindings](#shell-key-bindings)
   - [Shellopts](#shellopts)
+    - [Related operations](#related-operations)
   - [Special variables](#special-variables)
   - [Variables](#variables)
   - [Strings](#strings)
   - [Herestrings/Heredocs (+stdin handling)](#herestringsheredocs-stdin-handling)
+  - [Special functions](#special-functions)
   - [Flow control](#flow-control)
   - [Test conditions](#test-conditions)
     - [Regular expressions](#regular-expressions)
+    - [`expr` tool (also for regular expressions)](#expr-tool-also-for-regular-expressions)
     - [Applications](#applications)
   - [Functions](#functions)
   - [Jobs management](#jobs-management)
   - [Cycle a string tokens based on separator (IFS)](#cycle-a-string-tokens-based-on-separator-ifs)
   - [String functions](#string-functions)
     - [Examples](#examples)
-  - [printf/escaping](#printfescaping)
+  - [Paths](#paths)
+  - [printf (escaping/formatting)](#printf-escapingformatting)
   - [Arithmetic operations](#arithmetic-operations)
   - [Date operations](#date-operations)
   - [Redirections](#redirections)
@@ -69,10 +73,20 @@ shopt -s nocasematch      # case insensitive matches
 
 See http://linuxcommand.org/lc3_man_pages/seth.html.
 
+### Related operations
+
+```sh
+set +o shellopt                           # disables a shellopt
+[[ $SHELLOPTS =~ $(echo '\bnounset\b') ]] # clean/easy way to test shellopts
+export SHELLOPTS                          # pass the shell options to subshells!
+```
+
 ## Special variables
 
-- `$?`       exit code of last executed process
-- `!$`       last argument of last statement
+- `$?`       exit code of last executed process; must test in a separate (via `;`) command
+- `!!`       last command
+- `!$`       last argument of last command
+- `!<n>`     executes the `<n>`th command
 - `$$`       current pid
 
 Parameter variables; WATCH OUT!! When inside a function, they refer to the function:
@@ -166,6 +180,23 @@ read -r -d '' body <<STR
   "base": "master"
 }
 STR
+```
+
+## Special functions
+
+```sh
+# Brace expansion:
+#
+cp file{,.bak}
+
+# !!! Sequence (range) !!!
+#
+for i in {1..10}; do :; done
+
+# Expand a files content into parameters. !!! Don't use if escaping is required (e.g. spaces) !!!
+# This works because redirection without an input process (`< $filename`) prints the file content.
+#
+rubocop --auto-gen-config "$(< "/tmp/files_list.txt")"
 ```
 
 ## Flow control
@@ -294,6 +325,25 @@ Examples:
 [[ 192.168.1.2 =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]] && echo MATCHES
 re='\bword\b'; [[ ' word ' =~ $re ]] && echo MATCHES
 [[ ' word ' =~ $(echo '\bword\b') ]] && echo MATCHES
+```
+
+### `expr` tool (also for regular expressions)
+
+Substring extraction:
+
+```sh
+# Via regexp:
+#
+# - the expression must match from the beginning
+# - the expression must be in a group
+# - escaping is not clear; parentheses must be escaped
+#
+expr match "ab1b2" '.*\(b.\)'     # `b2`
+expr match "ab1b2" '.\*\?\(b.\)'  # `b1`
+
+# Via position:
+#
+expr substr $input $position_1_based $length
 ```
 
 ### Applications
@@ -426,10 +476,21 @@ ${str:1}                          # substring: remove the first charater
 ${str::-1}                        # substring: remove the last character
 ```
 
-## printf/escaping
+## Paths
+
+Unix tools (not bash functions):
+
+```sh
+realpath $filename  # File.expand_path
+basename $filename  # extract basename!
+dirname $filename   # parent dir name. works with dirs, but *must* expand path if filename equals `.`/`..`
+```
+
+## printf (escaping/formatting)
 
 ```sh
 printf "%q" "$str"                # escape a string
+printf %02d "$i"                  # pad number with zeros
 ```
 
 ## Arithmetic operations

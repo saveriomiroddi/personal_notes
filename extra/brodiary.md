@@ -1,3 +1,10 @@
+## Sun 27/Dec/2020
+
+- Languages/Frameworks
+  - Rust
+    - Programming Rust (1st ed.)
+      - [ ] Chapter 16 (collections)
+
 ## Fri 25/Dec/2020
 
 - Languages/Frameworks

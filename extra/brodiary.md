@@ -1,3 +1,22 @@
+## Mon 28/Dec/2020
+
+- Languages/Frameworks
+  - Rust
+    - Programming Rust (1st ed.)
+      - [x] Chapter 16 (collections)
+      - [ ] Chapter 17 (text)
+    - Articles/Smaller topics
+      - [x] https://learning-rust.github.io/docs/c3.lifetimes.html
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 4: Graphs
+
+- Extra
+  - [ ] Move old notes into personal_notes
+    - [ ] text_processing.odt
+  - [ ] Review backup solutions (open/close), including possible contributions
+    - [x] Big review
+    - [ ] Review `fanotify`
+
 ## Sun 27/Dec/2020
 
 - Languages/Frameworks

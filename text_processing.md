@@ -1,41 +1,57 @@
 # Text processing
 
 - [Text processing](#text-processing)
+  - [Grep](#grep)
   - [Perl](#perl)
-    - [Syntax](#syntax)
+    - [Flow control/Operators](#flow-controloperators)
     - [Commandline args](#commandline-args)
     - [Line numbers/Position-based operations](#line-numbersposition-based-operations)
     - [Priority](#priority)
     - [Data types and conversions](#data-types-and-conversions)
-    - [Predefined functions](#predefined-functions)
+      - [Arrays](#arrays)
+    - [Functions/APIs](#functionsapis)
     - [Search/replace](#searchreplace)
       - [Regex extra backslash sequences](#regex-extra-backslash-sequences)
-    - [Arrays](#arrays)
-    - [Mathematical operations](#mathematical-operations)
     - [Formatting/printing](#formattingprinting)
     - [Useful examples](#useful-examples)
   - [Sed](#sed)
-    - [Useful examples](#useful-examples-1)
+    - [Syntax](#syntax)
+    - [Regexes](#regexes)
+    - [Operators](#operators)
+    - [Operations](#operations)
     - [Special characters](#special-characters)
+
+## Grep
+
+```sh
+# -P: [P]erl regexes
+# -z: process the entire file as a single file
+# -o: print only match (in this case, if not specified, the entire file will be printed, due to `-z`
+#
+grep -Pzo 'void\srb_backtrace.*\b' -r . --include="*.h"
+
+# `(?s)`: match newlines with `.` ("PCRE_DOTALL")
+#
+grep -Pzo '(?s)void\srb_backtrace\(.*?\n\}' --include="*.c" -r .
+```
 
 ## Perl
 
-### Syntax
+### Flow control/Operators
 
 ```perl
-# True/false: !! there are no `true`/`false` keywords !!
-# False values (everything else is true)
-0
-'0'
-''
-"()" # empty list
-"undef"
-
 # If (and blocks)
 if (CONDITION) { TRUE_BRANCH } else { ELSE_BRANCH }
 
 # Ternary operator
 CONDITION ? TRUE_BRANCH : FALSE_BRANCH
+
+# Flip-flop
+print if /DELIMITER ;;$/ .. /DELIMITER ;$/
+
+# String operators (!!! DON'T USE == !!!)
+'a' eq 'a' # 1
+'a' ne 'b' # 1
 ```
 
 ### Commandline args
@@ -78,15 +94,40 @@ printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line
 ### Data types and conversions
 
 ```sh
+# True/false: !! there are no `true`/`false` keywords !!
+# False values (everything else is true)
+0
+'0'
+''
+"()" # empty list
+"undef"
+
 # Regex matches and boolean true conditions, evaluate to 1
 $counter += /matching_line/
 $counter += ($match != "1")
 ```
 
-### Predefined functions
+#### Arrays
 
 ```perl
-length $str                             # length of a string
+(1, 2, 3)                             # array literal
+(1..3)                                # array literal, as range; inclusive
+
+push(@array, item)                    # append an item to an array
+item = pop(@array)                    # pop an item from an array
+
+$elements_sum / @elements             # in a scalar context (the division, in this case), an array yields its length
+
+foreach (@Array) { SubRoutine($_); }  # iterate an array
+map { SubRoutine($_) } @Array;        # map an array
+List::Util qw/sum/ -> sum(@Array)     # sum the elements of an array
+```
+
+### Functions/APIs
+
+```perl
+length $str                          # length of a string
+Math::Complex->sqrt($value)          # square root (but `$value ** 0.5` works as well)
 ```
 
 ### Search/replace
@@ -128,32 +169,10 @@ Apply operations inside regexes (see https://perldoc.perl.org/perlrebackslash.ht
 perl -i -pe 's/- (\w)/- \u$1/'
 ```
 
-### Arrays
-
-```perl
-(1, 2, 3)                             # array literal
-(1..3)                                # array literal, as range; inclusive
-
-push(@array, item)                    # append an item to an array
-item = pop(@array)                    # pop an item from an array
-
-$elements_sum / @elements             # in a scalar context (the division, in this case), an array yields its length
-
-foreach (@Array) { SubRoutine($_); }  # iterate an array
-map { SubRoutine($_) } @Array;        # map an array
-List::Util qw/sum/ -> sum(@Array)     # sum the elements of an array
-```
-
-### Mathematical operations
-
-```perl
-Math::Complex -> sqrt($value)         # square root (but `$value ** 0.5` works as well)
-```
-
 ### Formatting/printing
 
 ```perl
-printf "DB: $db, TOTAL: $total, \%:%.1f\n", 100*$db/$total  # printf formatting (`sprintf` also supported)
+printf "DB: $db %.1f\%\n", 100*$db/$total  # string interpolation + (float) formatting (`sprintf` also supported)
 ```
 
 ### Useful examples
@@ -180,7 +199,19 @@ print /^Host: (.*)/
 
 ## Sed
 
-Must use `-E` to support extended regular expressions!
+Cmdline params:
+
+- `-i` : in-place editing
+
+### Syntax
+
+- `<n><operation>[<param>]` : execute `operation` on line `n`, optionally with operation `params`
+- `<pattern> <operation>`   : execute `operation` when `pattern` matches
+- `/pattern/[modifier]`     : pattern with modifier(s)
+
+### Regexes
+
+Must use `-E`/`-r` to support extended regular expressions; !!! BETTER, BUT NOT CLEAR/COMPLETE !!!
 
 Basic support:
 
@@ -194,21 +225,29 @@ Some supported by `-E`:
 
 Capturing groups are not supported.
 
-### Useful examples
+### Operators
+
+`/from/,/to/p` : flip flop
+
+### Operations
+
+General:
+
+- `p`: print
+- `q`: quit
 
 Operations on numbered lines (1-based):
 
-- insert : `<n>i<content>` (includes newline)
-- delete : `<n>d`.
-- replace : `<n>c<content>`.
-
-- search/replace on a given line: `<n>s/<search>/<replace>/[g]`
+- insert : `i<content>` (includes newline)
+- delete : `d`.
+- replace : `c<content>`.
+- search/replace: `s/<search>/<replace>/[g]`
 
 Operations with matches:
 
-- delete: `/<pattern>/d`
-- insert (add before) `/<pattern>/i newstring` # in order to add leading spaces, must escape them
-- add (add after) `/<pattern>/a newstring`
+- delete: `/<pattern>/ d`
+- insert (add before): `/<pattern>/ i newstring` (in order to add leading spaces, must escape the first)
+- add (add after): `/<pattern>/ a newstring`
 
 ### Special characters
 

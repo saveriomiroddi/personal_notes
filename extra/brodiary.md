@@ -1,3 +1,26 @@
+## Tue 29/Dec/2020
+
+- Extra
+  - [ ] Review backup solutions (open/close), including possible contributions
+    - [x] Follow-up review of open solutions
+
+- Languages/Frameworks
+  - Rust
+    - Articles/Smaller topics
+      - [x] https://theta.eu.org/2016/04/16/lyar-lifetimes.html
+    - Ray tracer challenge
+      - [ ] Other batch of cleanups
+        - [x] Design/implement builder-style methods (for transforms)
+    - Search/contact mentor (https://rustbeginners.github.io/awesome-rust-mentors)
+      - [x] Review/note mentors list
+      - [x] Plan/write
+    - Programming Rust (1st ed.)
+      - [x] Chapter 17 (text)
+
+- Extra
+  - [ ] Move old notes into personal_notes
+    - [x] text_processing.odt (1 page)
+
 ## Mon 28/Dec/2020
 
 - Languages/Frameworks
@@ -16,6 +39,7 @@
   - [ ] Review backup solutions (open/close), including possible contributions
     - [x] Big review
     - [ ] Review `fanotify`
+      - [ ] Plan implementation
 
 ## Sun 27/Dec/2020
 

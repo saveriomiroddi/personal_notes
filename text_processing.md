@@ -20,6 +20,8 @@
     - [Operators](#operators)
     - [Operations](#operations)
     - [Special characters](#special-characters)
+  - [tr (translate tokens)](#tr-translate-tokens)
+  - [Silver searcher (ag)](#silver-searcher-ag)
 
 ## Grep
 
@@ -256,4 +258,34 @@ In order to handle tabs (`\t`), either use `$` quoting or parameter substitution
 ```sh
 sed $'s/\t/ /'
 sed "s/$(printf '\t')/ /"
+```
+
+## tr (translate tokens)
+
+```sh
+tr -s ' '   		    # [s]queeze all ' '
+tr -d ' '   		    # [d]elete all ' '
+tr ab cd    		    # translate a..c → b..d
+```
+
+Examples:
+
+```
+tr -cd '\0' | wc -c	# count zero chars (example with `\0`)
+```
+
+## Silver searcher (ag)
+
+WATCH OUT!: `.git` directory and `.log` files are ignored by default
+
+```sh
+# Ignore a file/directory.
+# WATCH OUT: The pattern is not implicitly surrounded with `.*`
+#
+ag --ignore=$glob
+
+# [-G] Filter in filenames matching the specified regex.
+# WATCH OUT: The pattern is implicitly surrounded with `.*`
+#
+ag -G '_spec.rb$' <pattern> [directory]
 ```

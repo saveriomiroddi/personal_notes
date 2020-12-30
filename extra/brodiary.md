@@ -1,3 +1,20 @@
+## Wed 30/Dec/2020
+
+- Extra
+  - Admin
+    - [x] Review job scheduling
+      - Fight mail issue with `at`
+
+- Open source
+  - F/S notification system for backups
+    - [ ] Review `fanotify`
+      - [x] Check name and gather documentation/projects to review
+
+- Languages/Frameworks
+  - Rust
+    - Programming Rust (1st ed.)
+      - [x] Chapter 18 (i/o)
+
 ## Tue 29/Dec/2020
 
 - Extra

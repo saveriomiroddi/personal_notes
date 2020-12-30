@@ -16,6 +16,7 @@
   - [Networking](#networking)
     - [curl](#curl)
     - [Netcat (nc)](#netcat-nc)
+  - [Sleep](#sleep)
   - [Dates](#dates)
     - [Formatting](#formatting)
     - [Operations](#operations)
@@ -322,6 +323,17 @@ mkfifo loop.pipe && cat loop.pipe | nc -l -p 3000 | nc localhost 3001 > loop.pip
 # Wait until a port is open.
 #
 while ! nc -z localhost 9200; do sleep 0.5; done
+```
+
+## Sleep
+
+Sleeping works for decimals, and multiple times!
+
+```sh
+# Sleep for 1.5 hours. Valid suffixes: `s`, `m`, `h`, `d`
+#
+sleep 1.5h
+sleep 1h 30m
 ```
 
 ## Dates

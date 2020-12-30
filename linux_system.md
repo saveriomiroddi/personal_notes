@@ -14,7 +14,9 @@
       - [Example cases](#example-cases)
       - [sudo -i, login shell test, and bash](#sudo--i-login-shell-test-and-bash)
   - [Update system time](#update-system-time)
-  - [Cron](#cron)
+  - [Job scheduling](#job-scheduling)
+    - [Cron](#cron)
+    - [At](#at)
   - [Systemd](#systemd)
     - [Systemctl](#systemctl)
     - [journalctl](#journalctl)
@@ -393,7 +395,9 @@ ntpdate ntp.ubuntu.com
 ntp start
 ```
 
-## Cron
+## Job scheduling
+
+### Cron
 
 Cron doesn't need to be restarted when files are changed.
 
@@ -405,6 +409,30 @@ User operation:
 crontab -l   # list
 crontab -e   # edit
 crontab -d   # delete
+```
+
+### At
+
+WATCH OUT! On Ubuntu, it requires at least `sendmail` (otherwise the syslog reports a confusing `mail missing` error).
+
+Don't forget that commands like `systemctl suspend` needs permissions trickery, since they are allowed for the current user, but not in an `at` context.
+
+```sh
+# General format add job (uses `/bin/sh`; no path!).
+#
+at 22:20 <<< 'echo abc'
+
+at now + 1 hour                       # minute, week; plural also accepted
+at 10:00 Sun
+at 10:00 July 25
+at 10:00 6/22/2015                    # WATCH OUT! mm/dd/YYYY; doesn't accept month literal
+at next month                         # same date on next month
+at (tomorrow|midnight)
+
+atq                                   # list job
+at -c 5                               # show job content
+
+atrm $jobnum                          # remove job (use number from `atq` output)
 ```
 
 ## Systemd
@@ -487,6 +515,10 @@ WorkingDirectory=/path/to/base_dir
 Environment=BUNDLE_GEMFILE=/path/to/Gemfile
 Environment=RAILS_ENV=my_rail_env
 
+# In other to extend $PATH, use something like:
+#
+#     ExecStart=/bin/bash -c 'PATH=/new/path:$PATH exec /bin/mycmd'
+#
 ExecStart=/usr/bin/bundle exec my_command
 ExecReload=/bin/kill -HUP $MAINPID
 

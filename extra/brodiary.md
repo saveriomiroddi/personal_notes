@@ -1,3 +1,10 @@
+## Thu 31/Dec/2020
+
+- Languages/Frameworks
+  - Rust
+    - [x] Programming Rust (1st ed.)
+      - [x] Chapter 19 (concurrency)
+
 ## Wed 30/Dec/2020
 
 - Extra

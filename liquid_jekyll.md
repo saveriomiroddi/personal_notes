@@ -1,29 +1,22 @@
-- [Liquid](#liquid)
-  - [Syntax](#syntax)
-  - [Filters](#filters)
-  - [Collections](#collections)
-  - [General functions](#general-functions)
-- [Jekyll](#jekyll)
-  - [(Some) Metadata](#some-metadata)
-  - [Define site-wide collections](#define-site-wide-collections)
+# Liquid/Jekyll
 
-## Table of contents
-
-- [Liquid](#liquid)
-  - [Syntax](#syntax)
-  - [Filters](#filters)
-  - [Collections](#collections)
-  - [General functions](#general-functions)
-- [Jekyll](#jekyll)
-  - [(Some) Metadata](#some-metadata)
-  - [Define site-wide collections](#define-site-wide-collections)
+- [Liquid/Jekyll](#liquidjekyll)
+  - [Liquid](#liquid)
+    - [Syntax](#syntax)
+    - [Strings](#strings)
+    - [Timestamps](#timestamps)
+    - [Collections (Array)](#collections-array)
+    - [General functions](#general-functions)
+  - [Jekyll](#jekyll)
+    - [(Some) Metadata](#some-metadata)
+    - [Define site-wide collections](#define-site-wide-collections)
 
 ## Liquid
 
 ### Syntax
 
 Object (show content): `{{ <content> }}`
-Tags (execute logic):  `{% <logic> %}`
+Tags (execute logic); one statement per tag:  `{% <logic> %}`
 
 Filters (process an object):
 
@@ -31,14 +24,14 @@ Filters (process an object):
 
 For cycle:
 
-    {% for post in site.posts %}
-    {% endfor %}
+    for post in site.posts
+    endfor
 
 [Control flow](https://help.shopify.com/en/themes/liquid/tags/control-flow-tags):
 
-    {% if post.tags contains page.slug %}
-    {% elif tagsList != "" %}
-    {% endif %}
+    if post.tags contains page.slug
+    elif tagsList != ""
+    endif
 
 [Operators](https://help.shopify.com/en/themes/liquid/basics/operators):
 
@@ -56,32 +49,41 @@ Comment out content:
     assign myStatement = "frontend development"
     {% capture myStatement %}{{ myStatement }} sucks {% endcapture %}     # compose strings
 
-### Filters
+### Strings
 
 String operations:
 
     capitalize
+    split: <string>
     append: <string>
     prepend: <string>
 
-Format a date (example):
+### Timestamps
+
+Format a timestamp (example):
 
     date: "%B %e, %Y"
 
-### Collections
+### Collections (Array)
 
-Create an array (!):
+Array handling is quite awkward. Don't split via empty string!
 
-    assign myArray = 'a,b,c' | split: ','
+    assign myArray = 'a,b,c' | split: ','        # create
+    assign newEntry = 'd' | split: ','           # new entry for append
+    assign myArray = myArray | concat: newEntry  # append a new entry
 
-Access
+Access:
 
     myArray[0]
+    myArray.last
 
-Concatenate/append:
+Useful operations:
 
-    assign otherArray = 'd,e,f' | split:','
-    assign sumArray = myArray | concat: otherArray
+    join: "concatenator"
+    map: "myField"
+    concat: otherArray
+    sort: "myField"
+    uniq
 
 ### General functions
 

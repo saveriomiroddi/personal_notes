@@ -22,6 +22,7 @@
     - [journalctl](#journalctl)
     - [Configuring a unit](#configuring-a-unit)
     - [Event triggers](#event-triggers)
+    - [Timers (scheduled events)](#timers-scheduled-events)
   - [Apparmor](#apparmor)
   - [Networking](#networking)
     - [NetworkManager](#networkmanager)
@@ -415,8 +416,6 @@ crontab -d   # delete
 
 WATCH OUT! On Ubuntu, it requires at least `sendmail` (otherwise the syslog reports a confusing `mail missing` error).
 
-Don't forget that commands like `systemctl suspend` needs permissions trickery, since they are allowed for the current user, but not in an `at` context.
-
 ```sh
 # General format add job (uses `/bin/sh`; no path!).
 #
@@ -434,6 +433,8 @@ at -c 5                               # show job content
 
 atrm $jobnum                          # remove job (use number from `atq` output)
 ```
+
+Some programs/systems won't work out of the box, due to the `at` context. For systemd suspend, see [Systemd timers](#timers-scheduled-events).
 
 ## Systemd
 
@@ -574,6 +575,22 @@ dbus-monitor --session "type='signal',interface='org.gnome.ScreenSaver'" |
       then echo unlocked >> /tmp/pizza.txt;
     fi
   done
+```
+
+### Timers (scheduled events)
+
+Once-off events can be scheduled; mind that they're not second-accurate.
+
+```sh
+# Execute after certain interval, with output.
+#
+$ systemd-run --user --on-active=10min /bin/systemctl suspend
+Running timer as unit: run-r4eeea4bc49524bb8b40f609cb183db48.timer
+Will run service as unit: run-r4eeea4bc49524bb8b40f609cb183db48.service
+
+# Execute at given time
+#
+$ systemd-run --user --on-calendar=09:12 /bin/systemctl suspend
 ```
 
 ## Apparmor

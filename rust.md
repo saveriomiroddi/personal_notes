@@ -874,12 +874,16 @@ map.insert("b", 10);
 map.insert("b", 10);            // Overwrites the existing value
 
 // Entry API: `entry()` gets the value for in-place modification.
+//
 // `or_insert()` sets the given value if the key doesn't exist; its return value can be used to modify
-// the value in-place.
-// or_insert() consumes the entry.
+// the value in-place; consumes the entry.
+//
+// If the value to insert is a function (or relatively expensive), use `or_insert_with(Fn)`, which executes
+// only if the value is going to be inserted.
 //
 let value_ref: &u32 = map.entry(key).or_insert(50);
 *value_ref = 100;
+map.entry(key).or_insert_with(Vec::new);
 
 // Modify a map in a loop.
 //
@@ -2565,14 +2569,22 @@ let current_cycle = Arc::new(AtomicU32::new(0));
 for cycle_i in 0..cycles {
   current_cycle.store(cycle_i, Ordering::Relaxed);
 }
+
+// Atomics can be globals!!!
+//
+static NEXT_ID: AtomicU32 = AtomicU32::new(1);
+
+pub(crate) fn new_shape_id() -> u32 {
+  NEXT_ID.fetch_add(1, Ordering::SeqCst)
+}
 ```
 
 Some APIs (return the previous value):
 
-- `fetch_add(value, ordering)`:                add
+- `fetch_add(value, ordering)`:                add to the current value, and return the previous
 - `compare_and_swap(current, value, ordering`: if the existing value equals `current`, set to `value`
 
-**WATCH OUT**: Check out the [CPP reference](https://en.cppreference.com/w/cpp/atomic/memory_order) to understand memory orderings.
+**WATCH OUT**: Check out the [CPP reference](https://en.cppreference.com/w/cpp/atomic/memory_order) to understand memory orderings. The most conservative ordering, `Ordering::SeqCst` has still performance good enough to be used as default, according to Programming Rust 1st ed.
 
 #### Barrier
 

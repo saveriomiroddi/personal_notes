@@ -1,3 +1,40 @@
+## Sun 03/Jan/2021
+
+- Admin/tools
+  - [x] Journal entry script: automate subjects index processing
+
+- Studies
+  - Rust
+    - Ray tracer challenge
+      - [ ] Further cleanups
+        - [x] Apply new clippy version cleanup
+        - [x] Try `weight_max()` Rayon optimization
+          - Doesn't exist anymore
+          - [x] Remove practically unnecessary overloading &Tuple - &Tuple
+        - [x] Use atomic data type for shape IDs, instead of mutex+lazy_static
+
+- Blog admin
+  - Consultancy
+    - [ ] Group by year + fix shadows and layout
+      - [x] Discuss specs
+      - [x] Reply other devs
+
+- Projects/Open source
+  - `fanotify`-based notification system for backups
+    - Test implementation
+      - [x] Fight basic fanotify implementation
+        - [x] Further fix(es) to the manpage example
+        - [x] Prepare and submit test case
+        - [x] Fight find systematic location of different linux version man pages
+          - [x] Correct bug, using 5.8 version
+        - [x] Brutal debug fight
+          - Traced back to issue with ZFS
+  - ZFS installer
+    - [x] Review and redirect support request; update, lock, and pin welcome thread
+  - Drunken tomatoes
+    - [ ] Upgrade Rails
+      - [x] 5.2
+
 ## Sat 02/Jan/2021
 
 - Admin/tools

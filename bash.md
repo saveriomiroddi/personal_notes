@@ -101,7 +101,7 @@ Parameter variables; WATCH OUT!! When inside a function, they refer to the funct
 myvar=value                         # no spaces around equal; if value includes spaces, it must be quoted
 myvar=$myvar2                       # $myvar2 doesn't require quotes
 unset myvar                         # delete myvar
-export myvar=value                  # makes available to subshells. `local export` is allowed, but doesn't work as intended
+export myvar=value                  # makes available to subshells (also applies to local vars). `local export` is allowed, but doesn't work as intended
 ((var+=1))                          # increment variable value
 ((var++)) || true                   # increment variable value. WATCH OUT!!! `|| true` is required if var=0 before the increment/decrement!!!!
 
@@ -521,6 +521,8 @@ timestamp_in_secs=`date -d "2015-12-12 13:13:28" +"%s"`
 seconds_to_subtract=90
 formatted_result=`date '+%Y-%m-%d %H:%M:%S' --date="@$((timestamp_in_secs – seconds_to_subtract))"`
 ```
+
+`date -d $date` can also be used to check if a date is valid!
 
 ## Redirections
 

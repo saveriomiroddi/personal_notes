@@ -1,3 +1,34 @@
+## Mon 04/Jan/2021
+
+- Blog admin
+  - Consultancy
+    - [x] Group by year + fix shadows and layout
+      - [x] Integrate updated page
+        - [x] Fight code not integrating
+        - [x] Integrate revision
+        - Close order
+  - [x] Remove article-specific meta/data from bookshelf page
+
+- Projects/Open source
+  - openscripts
+    - [x] Extend and open source `bedtime`
+  - Drunken tomatoes
+    - [x] Upgrade Rails
+      - [x] 6.0
+      - [x] 6.1
+      - [x] Remove rubocop stuff
+  - PPA Packaging
+    - [x] Skip non-release Ruby versions (which cause issues with the release version upload)
+
+- Studies
+  - Javascript/WASM
+    - [x] Check out content of the candidate JS books
+    - [ ] Building JavaScript Games
+      - [ ] Chapter 1
+
+- Blog articles
+  - [ ] Linux: Associating file types to applications
+
 ## Sun 03/Jan/2021
 
 - Admin/tools

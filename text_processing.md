@@ -48,8 +48,10 @@ if (CONDITION) { TRUE_BRANCH } else { ELSE_BRANCH }
 # Ternary operator
 CONDITION ? TRUE_BRANCH : FALSE_BRANCH
 
-# Flip-flop
+# Flip-flop; works also with line numbers (!!!!!!)
+#
 print if /DELIMITER ;;$/ .. /DELIMITER ;$/
+print if /match/ .. -1                       # print all the lines after /match/ (included)
 
 # String operators (!!! DON'T USE == !!!)
 'a' eq 'a' # 1

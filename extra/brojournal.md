@@ -1,3 +1,26 @@
+## Tue 05/Jan/2021
+
+- Blog admin
+  [x] Manage permissions
+
+- Studies
+  - Javascript/WASM
+    - Building JavaScript Games
+      - [x] Chapter 1
+      - [x] Chapter 2
+      - [x] Chapter 3
+  - Articles/Smaller topics
+    - Rust
+      - [x] This week in rust #365
+      - [x] This week in rust #366
+        - [x] https://medium.com/centrality/why-work-in-blockchain-journey-from-c-to-rust-developer-eddbc9ccdc3d
+      - [x] https://doc.rust-lang.org/nomicon/ownership.html
+    - SWE
+      - [x] [What is move semantics?](https://stackoverflow.com/questions/3106110/what-is-move-semantics)
+
+- Blog articles
+  - [ ] Linux: Associating file types to applications
+
 ## Mon 04/Jan/2021
 
 - Blog admin

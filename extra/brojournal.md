@@ -1,3 +1,36 @@
+## Wed 06/Jan/2021
+
+- Blog articles
+  - [x] Linux: Associating file types to applications
+
+- Studies
+  - Rust
+    - Articles/Smaller topics
+      - [x] https://stackoverflow.com/questions/25339603/how-to-test-for-equality-between-trait-objects
+      - [ ] https://stackoverflow.com/questions/48952627/implementing-partialeq-on-a-boxed-trait
+    - Larger topics
+      - [ ] [Attribute macros](https://github.com/dtolnay/proc-macro-workshop)
+        - [ ] Study
+          - [ ] `derive(Builder)`
+            - [ ] 01-parse
+              - [x] Implement
+  - Javascript/WASM
+    - Building JavaScript Games
+      - [ ] Chapter 4
+
+- Projects/Open source
+  - [x] Analyze research paper, and reply
+
+- Admin/tools
+  - [ ] Notes: move old ones/write pending
+    - [ ] text_processing.odt
+
+- Projects/Open source
+  - ZFS installer
+    - [x] Support-related documentation updates
+      - [x] GitHub discussions: Add reference to README
+      - [x] Update discussion pinned post
+
 ## Tue 05/Jan/2021
 
 - Blog admin

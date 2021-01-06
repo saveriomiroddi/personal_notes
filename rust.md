@@ -1776,32 +1776,40 @@ Some operators:
 - `PartialEq`: `&self.eq`
 - `std::ops::Neg`: `self.neg` -> `Output` (unary negation)
 
+In order to overload on a trait, use the following syntax:
+
+```rust
+impl PartialEq for dyn Shape + '_ {
+    fn eq(&self, rhs: &Self) -> bool {
+        self.id() == rhs.id()
+    }
+}
+```
+
 ### Method overloading (workaround)
+
+Silly example. For basic data types, `Into<T>` has blanket implementations
 
 ```rust
 struct Foo {
-  value: uint
-}
-
-trait HasUIntValue {
-  fn as_uint(self) -> uint;
+  value: Monster
 }
 
 impl Foo {
-  fn add<T:HasUIntValue>(&mut self, value: T) {
+  fn set<T:Into<Monster>>(&mut self, value: T) {
     self.value += value.as_uint();
   }
 }
 
-impl HasUIntValue for int {
-  fn as_uint(self) -> uint {
-    self
+impl Into<Monster> for Foo {
+  fn into(self) -> Monster {
+    self.monster
   }
 }
 
-impl HasUIntValue for f64 {
-  fn as_uint(self) -> uint {
-    self as uint
+impl Into<Monster> for Bar {
+  fn into(self) -> Monster {
+    self.monster
   }
 }
 ```

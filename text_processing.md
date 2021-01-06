@@ -20,6 +20,10 @@
     - [Operators](#operators)
     - [Operations](#operations)
     - [Special characters](#special-characters)
+  - [Snippets](#snippets)
+    - [Extract difference between two files](#extract-difference-between-two-files)
+    - [Compute aggregates on a text/log file](#compute-aggregates-on-a-textlog-file)
+  - [cut](#cut)
   - [tr (translate tokens)](#tr-translate-tokens)
   - [Silver searcher (ag)](#silver-searcher-ag)
 
@@ -260,6 +264,59 @@ In order to handle tabs (`\t`), either use `$` quoting or parameter substitution
 ```sh
 sed $'s/\t/ /'
 sed "s/$(printf '\t')/ /"
+```
+
+## Snippets
+
+### Extract difference between two files
+
+Find the difference file2 - file1 (lines in file2 but not in file1):
+
+```sh
+grep -Fxvf file1 file2
+```
+
+### Compute aggregates on a text/log file
+
+Unkeyed:
+
+```sh
+awk '{total += $4} END {print total / 2**20}' $filename
+perl -a -ne '{$total += @F[3]} END {print $total / 2**20}' $filename   # `@F` is 0-based!
+```
+
+Keyed:
+
+```sh
+# Perl+SQLite version.
+# There are different approaches to this (e.g. Perl-only via BEGIN+END), but this is arguably clean.
+#
+cat $filename |
+  perl -ne 'print "INSERT INTO log_values VALUES (\"$2\", $1);" if /Completed in ([0-9.]+)ms - (\w+)/;' |
+  (echo "CREATE TABLE log_values(key TEXT, value REAL); $(cat); SELECT key, SUM(value) FROM log_values GROUP BY key;") |
+  sqlite3
+
+# GAWK version
+#
+gawk '
+{if (match($0, /Completed in ([[:digit:].]+)ms - ([[:alnum:]]+)/, m)) totals[m[2]] += m[1]}
+END {for (key in totals) {print key, totals[key]}}
+' $filename
+
+# Perl version.
+#
+perl -ne '
+$totals{$2} += $1 if /Completed in ([\d+.]+)ms - (\w+)/;
+END {for $key (keys %totals) {print "$key $totals{$key}\n"}}
+' $filename
+```
+
+## cut
+
+```sh
+cut -d' ' -f3						                      # extract a field from a string; [d]elimiter (default: TAB)
+git st | tail -n 12 | cut -c -14 | sort		    # cut first N chars of each line
+xz -dc dump.sql.xz | cut -c 64- | head -n 10	# cut after N chars of each line
 ```
 
 ## tr (translate tokens)

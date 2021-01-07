@@ -1,3 +1,14 @@
+## Thu 07/Jan/2021
+
+- Admin/tools
+  - [ ] Notes: move old ones/write pending
+    - [ ] rails.odt
+
+- Projects/Open source
+  - [ ] Follow up research paper
+    - [x] Find good candidates for perfect scaling test
+    - [x] Investigate supposed mistake
+
 ## Wed 06/Jan/2021
 
 - Blog articles

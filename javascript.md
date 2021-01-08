@@ -8,6 +8,8 @@
   - [Base APIs](#base-apis)
   - [Events](#events)
   - [Canvas](#canvas)
+    - [Image (sprites)](#image-sprites)
+    - [Audio](#audio)
   - [Snippets](#snippets)
     - [Random (color)](#random-color)
 
@@ -132,6 +134,37 @@ changeCanvasColor = function () {
 }
 
 document.addEventListener('DOMContentLoaded', changeCanvasColor);
+```
+
+### Image (sprites)
+
+```js
+var sprite = new Image();
+
+// Starts loading immediately (best to wait with events). Dimensions are set automatically.
+//
+sprite.src = "spring.png";
+
+// There is no background/foreground concept; any new sprite overwrites the previous ones.
+//
+function drawImage(sprite, x, y) {
+  // First, save the context; the transformations are applied to the images drawn before restore().
+  //
+  canvasContext.save();
+  canvasContext.translate(x, y);
+  canvasContext.drawImage(sprite, 0, 0, sprite.width, sprite.height, 0, 0, sprite.width, sprite.height);
+  canvasContext.restore();
+};
+```
+
+### Audio
+
+```js
+music = new Audio();
+music.src = "snd_music.mp3";
+music.volume = 0.4;
+
+music.play();
 ```
 
 ## Snippets

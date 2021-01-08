@@ -1,3 +1,12 @@
+## Fri 08/Jan/2021
+
+- Studies
+  - Javascript/WASM
+    - Building JavaScript Games
+      - [x] Chapter 4
+      - [ ] Chapter 5 (theory)
+      - [ ] Chapter 6
+
 ## Thu 07/Jan/2021
 
 - Admin/tools

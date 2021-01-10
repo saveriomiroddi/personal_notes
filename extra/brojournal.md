@@ -1,3 +1,18 @@
+## Sat 09/Jan/2021
+
+- Projects/Open source
+  - QEMU-pinning (for research paper)
+    - [x] Build script improvements/extensions
+      - [x] Add standard safety shopts
+      - [x] Split into functions
+      - [x] Add option to specify target arch
+      - [x] Add --yes
+      - [x] Add option to disable GUI modules
+      - [x] General cosmetic cleanups
+  - RISC-V cross-compiling of pigz
+    - [x] Cross-compile
+    - [ ] Fight setup riscv-tools
+
 ## Fri 08/Jan/2021
 
 - Studies

@@ -1,5 +1,6 @@
 ## Table of contents
 
+- [Table of contents](#table-of-contents)
 - [Virtual disks](#virtual-disks)
   - [VirtualBox-specific](#virtualbox-specific)
 
@@ -24,7 +25,21 @@ vboxmanage modifymedium --compact /path/to/disk.vdi
 Compact a VDI (automated, via `libguestfs-tools` package):
 
 ```sh
+# May require sudo.
+#
 virt-sparsify --tmp /path/to /path/to/disk.vdi{,.sparse}
+```
+
+Compress (/compact) a qcow image:
+
+```sh
+# Options: [p]rogress, [O]utput format, [c]ompress
+#
+qemu-img convert -p -c -O qcow2 source.qcow2 compressed.qcow2
+
+# This also compacts it!
+#
+virt-sparsify --convert qcow2 --compress source.raw dest.qcow2
 ```
 
 Convert a VMDK disk to VDI:

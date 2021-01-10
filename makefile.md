@@ -15,7 +15,7 @@ This makefile assumes the file `main.c` and the dependencies `module.c`/`module.
 
 ### Variables
 
-Variables are conventonally upper case, and can be referenced with curly braces; they are referenced with `${VAR_NAME}`; missing vars produce an empty string.
+Variables are conventionally upper case, and can be referenced with curly braces; they are referenced with `${VAR_NAME}`; missing vars produce an empty string.
 
 - `:=` : "simple assignment"; it's evaluated only once;
 - `=`  : "recursive assigment"; it's re-evaluated every time (so changing the value is recognized);
@@ -29,6 +29,12 @@ CC := gcc
 OPTIONS := -O2 -g -Wall
 INCLUDES := -I .
 LIST_FILES := ls -l
+```
+
+Variables can be overriden from the commandline by passing them as `make` params:
+
+```sh
+make CC="riscv64-unknown-linux-gnu-gcc -I/path/to/riscv-gnu-toolchain/riscv-gcc/zlib -L/path/to/riscv-gnu-toolchain/riscv-gcc/zlib"
 ```
 
 ### Targets/Symbols

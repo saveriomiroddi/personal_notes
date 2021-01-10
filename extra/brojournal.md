@@ -1,3 +1,12 @@
+## Sun 10/Jan/2021
+
+- Projects/Open source
+  - RISC-V cross-compiling of pigz
+    - [x] Test run fedora risc-v and compile(d) pigz
+
+- Blog articles
+  - [ ] Quick RISC-V cross compilation and emulation
+
 ## Sat 09/Jan/2021
 
 - Projects/Open source

@@ -1,3 +1,15 @@
+## Mon 11/Jan/2021
+
+- Blog articles
+  - [x] Quick RISC-V cross compilation and emulation
+
+- Projects/Open source
+  - QEMU research paper
+    - pigz
+      - [x] Review source code
+      - [x] test scaling
+    - [x] Reply, including gathered info
+
 ## Sun 10/Jan/2021
 
 - Projects/Open source

@@ -3,21 +3,29 @@
 - [Text processing](#text-processing)
   - [Grep](#grep)
   - [Perl](#perl)
-    - [Flow control/Operators](#flow-controloperators)
     - [Commandline args](#commandline-args)
-    - [Line numbers/Position-based operations](#line-numbersposition-based-operations)
-    - [Priority](#priority)
+    - [Operators](#operators)
     - [Data types and conversions](#data-types-and-conversions)
       - [Arrays](#arrays)
+      - [Hashes](#hashes)
+    - [Flow control](#flow-control)
     - [Functions/APIs](#functionsapis)
     - [Search/replace](#searchreplace)
       - [Regex extra backslash sequences](#regex-extra-backslash-sequences)
     - [Formatting/printing](#formattingprinting)
+    - [Line numbers/Position-based operations](#line-numbersposition-based-operations)
+    - [Priority](#priority)
     - [Useful examples](#useful-examples)
-  - [Sed](#sed)
+  - [Awk](#awk)
+    - [Commandline args](#commandline-args-1)
     - [Syntax](#syntax)
+    - [Base commands](#base-commands)
+    - [APIs](#apis)
+    - [Useful examples](#useful-examples-1)
+  - [Sed](#sed)
+    - [Syntax](#syntax-1)
     - [Regexes](#regexes)
-    - [Operators](#operators)
+    - [Operators](#operators-1)
     - [Operations](#operations)
     - [Special characters](#special-characters)
   - [Snippets](#snippets)
@@ -43,12 +51,13 @@ grep -Pzo '(?s)void\srb_backtrace\(.*?\n\}' --include="*.c" -r .
 
 ## Perl
 
-### Flow control/Operators
+### Commandline args
+
+- `-0`: use null character as line separator
+
+### Operators
 
 ```perl
-# If (and blocks)
-if (CONDITION) { TRUE_BRANCH } else { ELSE_BRANCH }
-
 # Ternary operator
 CONDITION ? TRUE_BRANCH : FALSE_BRANCH
 
@@ -61,47 +70,13 @@ print if /match/ .. -1                       # print all the lines after /match/
 'a' eq 'a' # 1
 'a' ne 'b' # 1
 ```
-
-### Commandline args
-
-- `-0`: use null character as line separator
-
-### Line numbers/Position-based operations
-
-```sh
-# Insert at specific positions (line number):
-#
-# - `$.` is 1-based!; it's also valid in the END block
-# - `S_` → current line (can be modified)
-# - `.=` → append
-# - `.`  → concatenation
-#
-printf "0\n1\n2" | perl -lpe 'BEGIN { print "abc" }'      # !! doesn't work inplace !!
-printf "0\n1\n2" | perl -lpe 'END { print "abc" }'        # !! doesn't work inplace !!
-printf "0\n1\n2" | perl -ne 'eof && print'                # match and print last line
-
-printf "0\n1\n2" | perl -lpe '$. == 2 && print "abc"'     # print before a numbered line => `0 abc 1 2`
-printf "0\n1\n2" | perl -pe '$_ .= "abc\n" if /1/'        # print after a match; !! `/regex/ && ...` doesn't work! !!
-
-printf "0\n0\n0" | perl -pe '$_ .= "abc\n" if /0/ && ++$cnt == 2'  # 2nd occurrence of the pattern (!!) => 0 0 abc 0
-```
-
-### Priority
-
-Watch out the priority!!!
-
-```sh
-# Prints only "Line 1" and an empty line
-printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline && print $line'
-
-# Prints "Line 1" and "Line 2"
-printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline and print $line'
-printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line'
-```
-
 ### Data types and conversions
 
 ```sh
+# Strings can be single- or double-quoted
+#
+'abc' eq "abc"
+
 # True/false: !! there are no `true`/`false` keywords !!
 # False values (everything else is true)
 0
@@ -126,9 +101,25 @@ item = pop(@array)                    # pop an item from an array
 
 $elements_sum / @elements             # in a scalar context (the division, in this case), an array yields its length
 
-foreach (@Array) { SubRoutine($_); }  # iterate an array
 map { SubRoutine($_) } @Array;        # map an array
 List::Util qw/sum/ -> sum(@Array)     # sum the elements of an array
+```
+
+#### Hashes
+
+```perl
+# Don't need to instantiate hashes!
+$totals{'foo'} = 12;
+print $totals{'foo'};
+```
+
+### Flow control
+
+```perl
+if (CONDITION) { TRUE_BRANCH } else { ELSE_BRANCH }
+
+foreach (@Array) { SubRoutine($_); }           # iterate an array
+for (key in totals) { print key, totals[key] } # iterate a hash
 ```
 
 ### Functions/APIs
@@ -183,7 +174,46 @@ perl -i -pe 's/- (\w)/- \u$1/'
 printf "DB: $db %.1f\%\n", 100*$db/$total  # string interpolation + (float) formatting (`sprintf` also supported)
 ```
 
+### Line numbers/Position-based operations
+
+```sh
+# Insert at specific positions (line number):
+#
+# - `$.` is 1-based!; it's also valid in the END block
+# - `S_` → current line (can be modified)
+# - `.=` → append
+# - `.`  → concatenation
+#
+printf "0\n1\n2" | perl -lpe 'BEGIN { print "abc" }'      # !! doesn't work inplace !!
+printf "0\n1\n2" | perl -lpe 'END { print "abc" }'        # !! doesn't work inplace !!
+printf "0\n1\n2" | perl -ne 'eof && print'                # match and print last line
+
+printf "0\n1\n2" | perl -lpe '$. == 2 && print "abc"'     # print before a numbered line => `0 abc 1 2`
+printf "0\n1\n2" | perl -pe '$_ .= "abc\n" if /1/'        # print after a match; !! `/regex/ && ...` doesn't work! !!
+
+printf "0\n0\n0" | perl -pe '$_ .= "abc\n" if /0/ && ++$cnt == 2'  # 2nd occurrence of the pattern (!!) => 0 0 abc 0
+```
+
+### Priority
+
+Watch out the priority!!!
+
+```sh
+# Prints only "Line 1" and an empty line
+printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline && print $line'
+
+# Prints "Line 1" and "Line 2"
+printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline and print $line'
+printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line'
+```
+
 ### Useful examples
+
+Replace only the first occurrence in a file:
+
+```sh
+perl -pe '!$found && s/.../.../ && ($found=1)'
+```
 
 Strip trailing file spaces:
 
@@ -203,6 +233,73 @@ print $1 if /^Host: (.*)/
 # capturing group. Since this is a print, without newline, lines not matching don't print anything!
 #
 print /^Host: (.*)/
+```
+
+## Awk
+
+### Commandline args
+
+- `-i inplace` : edits the file in-place
+- `-v RS='\r'` : set a variable (see syntax section below for NR)
+
+### Syntax
+
+```awk
+$<N>                  # numbered token; 1-based
+$NF                   # last token
+NR                    # line number (1-based)
+RS                    # separator
+
+==                    # string comparison
+=~                    # regex comparison
+!~                    # negative regex comparison
+
+/regex/               # regular expression
+
+expr { statement }    # execute `statement` if `expr` is true
+```
+
+Expressions apply by default to the current string:
+
+```
+/^pizza / { print $1 } # print the first token if the line starts with "pizza "
+```
+
+### Base commands
+
+```awk
+print expr
+getline           # consume one line
+exit
+```
+
+### APIs
+
+```sh
+# match(string, regex[, captures]): gawk-only; `captures` is a standard-structured capturing array
+
+echo 'a 8 9' | gawk '{match($0, /a ([0-9]) ([0-9])/, a); print a[1], "-", a[2]}'  # `8 - 9`
+echo 'a 8 9' | gawk '{match($0, /a ([0-9]) ([0-9])/, a); print length(a)}'        # `9` ????
+echo 'a 8 x' | gawk '{match($0, /a ([0-9]) ([0-9])/, a); print a[1], "-", a[2]}'  # ` - `
+echo 'a 8 x' | gawk '{print match($0, /a ([0-9]) ([0-9])/, a)}'                   # 0 (equals to false in conditionals)
+echo 'a 8 9' | gawk '{print match($0, /a ([0-9]) ([0-9])/, a)}'                   # 1
+
+# substr(string, start[, number]): returns `number` chars from `string``, starting at `start` (1-based!!):
+
+echo "Every good boy. " | awk '{print substr($1, 1, 1)}'   # `E` (first char)
+echo "Every good boy. " | awk '{print substr($1, 3)}'      # `ery`
+```
+
+### Useful examples
+
+```sh
+# Print a line after a match
+#
+echo $'1\n2' | awk '/1/ { getline; print }' # 2
+
+# Add a line to Nth line (0-based)
+#
+awk -i inplace 'NR==1{print; print "export LD_LIBRARY_PATH=/usr/local/mysql/lib:$LD_LIBRARY_PATH"} NR!=1' /etc/init/mysql.server
 ```
 
 ## Sed
@@ -315,6 +412,7 @@ END {for $key (keys %totals) {print "$key $totals{$key}\n"}}
 
 ```sh
 cut -d' ' -f3						                      # extract a field from a string; [d]elimiter (default: TAB)
+cut -d' ' -fM-                                # Print last N tokens (1-based, M=total-N+1): in awk, this is not trivial; cut is cleaner
 git st | tail -n 12 | cut -c -14 | sort		    # cut first N chars of each line
 xz -dc dump.sql.xz | cut -c 64- | head -n 10	# cut after N chars of each line
 ```

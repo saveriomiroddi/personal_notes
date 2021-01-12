@@ -1,3 +1,32 @@
+## Tue 12/Jan/2021
+
+- Blog admin
+  - [x] Fight latest post not updating on Google, and outdated index
+    - [x] Rename incorrect post filenames
+
+- Projects/Open source
+  - Geet
+    - [x] Clean Ruby 2.7 keyword argument warnings
+      - [x] Make Ruby 2.6- compatible
+    - [x] Add ruby 3.0 to build
+  - QEMU research paper
+    - [x] Review scripts
+    - [ ] Reproduce paper system
+      - [ ] Fight/research max limit of QEMU RISC-V cpus
+
+- Studies
+  - Rust
+    - Articles/Smaller topics
+      - [x] https://stackoverflow.com/questions/45116984/the-trait-cannot-be-made-into-an-object
+      - [x] https://stackoverflow.com/questions/38215753/how-do-i-implement-copy-and-clone-for-a-type-that-contains-a-string-or-any-type
+  - Javascript/WASM
+    - Building JavaScript Games
+      - [x] Chapter 5: notes
+
+- Admin/tools
+  - [ ] Notes: move old ones/write pending
+    - [ ] text_processing.odt (2 pag.)
+
 ## Mon 11/Jan/2021
 
 - Blog articles

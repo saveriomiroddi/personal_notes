@@ -19,9 +19,11 @@ Create:
 #
 virt-make-fs --verbose --format=qcow2 --type=ntfs $input_dir $dest.qcow2
 
-# Create a diff ("backing") image.
+# Create a diff image of a "backing" one.
+# If the diff exists, it will be overwritten.
+# WATCH OUT! The backing image path is relative to the diff one.
 #
-qemu-img create -f qcow2 -b $source.qcow2 $source.diff.qcow2
+qemu-img create -f qcow2 -b $backing.qcow2 $diff.qcow2
 ```
 
 Copy:

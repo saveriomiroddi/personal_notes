@@ -1,3 +1,14 @@
+## Wed 13/Jan/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Test over-limit RISC-V cpus on all systems
+
+- Studies
+  - Javascript/WASM
+    - Building JavaScript Games
+      - [ ] Chapter 6
+
 ## Tue 12/Jan/2021
 
 - Blog admin

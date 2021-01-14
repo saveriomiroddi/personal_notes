@@ -1,3 +1,10 @@
+## Thu 14/Jan/2021
+
+- Studies
+  - Javascript/WASM
+    - Building JavaScript Games
+      - [ ] Chapter 7
+
 ## Wed 13/Jan/2021
 
 - Projects/Open source

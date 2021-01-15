@@ -180,6 +180,8 @@ At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
 
 ## Rustfmt
 
+Use the attribute macro `#[rustfmt::skip]` in order to disable automatic formatting.
+
 Add a `rustfmt.toml` to the project root. See: https://rust-lang.github.io/rustfmt (don't forget to consider the channel).
 
 ```toml

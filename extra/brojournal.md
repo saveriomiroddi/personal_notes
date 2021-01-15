@@ -1,3 +1,11 @@
+## Fri 15/Jan/2021
+
+- Studies
+  - Rust
+    - Articles/Smaller topics/Answers
+      - [x] Review a few StackOverflow answers
+        - [x] Test and reply to one
+
 ## Thu 14/Jan/2021
 
 - Studies

@@ -1,3 +1,19 @@
+## Sat 16/Jan/2021
+
+- Projects/Open source
+  - ZFS installer
+    - [Space reclamation issue](https://github.com/saveriomiroddi/zfs-installer/issues/157)
+      - [x] Try to reproduce it
+      - [x] Think and implement workaround
+      - [x] Write wiki page
+    - [x] Investigate odd name resolution issue inside jail
+      - Cause: VPN provider on the host
+
+- Studies
+  - Rust
+    - Articles/Smaller topics/Answers
+      - [x] Review a few StackOverflow answers
+
 ## Fri 15/Jan/2021
 
 - Studies

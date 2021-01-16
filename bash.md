@@ -286,6 +286,12 @@ Infix operators:
 - `-eq`,`-ne`,`-lt`,`-le`,`-ge`,`-gt`  arithmetic operators; !! DON'T USE FOR STRINGS !!
 - `==`, `!=`, `<`, `>`                 string operators - !! DON'T USE FOR ARITHMETIC !!
 
+Ternary operator (!!); work only in an arithmetic context:
+
+```sh
+a < b ? c : d
+```
+
 Note that functions can return a condition result!!:
 
 ```sh

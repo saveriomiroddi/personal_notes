@@ -1,3 +1,41 @@
+## Sun 17/Jan/2021
+
+- Admin/tools
+  - [x] Run interactive+background firefox on a headless machine
+
+- Studies
+  - Rust
+    - Articles/Smaller topics/Answers
+      - [x] Review answers: 1
+    - Ray tracer challenge
+      - [ ] Further cleanups
+        - [x] Evaluate parallel performance
+          - 86% of theoretical max on 8 threads; SMT performance tanks
+        - [x] Implement Slab/vector for bidirectional trees
+          - Abandoned: very pervasive and time-consuming change
+          - For the purpose of optimizing parallelization, the current version is already reasonably efficient
+        - [x] Significant refactoring of the ObjParser
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Perfectly parallel test cases
+      - [x] prepare ray tracer
+        - [x] Prepare project
+          - [x] Research RISC-V build
+          - [x] Extract sdl interface to separate crate, in order to remove sdl dependency from the library
+          - [x] headless_astronaut_rendering: Add commandline arguments
+          - [x] headless_astronaut_rendering: Add conveniences for RISC-V build
+      - [x] Further scripts tweaking and preliminary testing
+        - [x] Prepare base scripts and smoke test
+        - [x] headless_astronaut_rendering: Specify number of threads
+        - [x] prepare image with ready files
+      - [x] Run first pass guest tests
+        - [x] run both tests
+        - [x] verify `pig` host scalability on the same data
+  - QEMU-pinning
+    - [x] Add capstone requirement
+    - [x] fix bug in vcpu computation and error message
+
 ## Sat 16/Jan/2021
 
 - Projects/Open source

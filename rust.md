@@ -915,6 +915,15 @@ for (book, review) in &book_reviews { /* ... */ };
 //
 map.keys();    // Iterator
 map.values();  // Iterator
+
+// Keys may need a bit of treatment in order to be collected. For example, if the map has String keys,
+// the &String references will need to be converted to slices:
+//
+map
+  .keys()
+  .map(|k| k.as_str())
+  .collect::<Vec<_>>()
+  .as_slice();
 ```
 
 Conveniences:
@@ -3203,7 +3212,7 @@ use std::collections::*; // useful for testing; unidiomatic for the rest
 ```rust
 std::fs::read_to_string(filename) -> Result<String, Error>;    // content must be valid UTF-8; filename can be relative.
 std::fs::read(game_rom_filename) -> Result<Vec<u8>, Error>;    // read binary content
-std::fs::write_all(filename, data: AsRef<[u8]>) -> Result<()>  // write to file
+writer.write_all(data: AsRef<[u8]>) -> Result<()>              // write to a writer (e.g. File)
 
 // Buffered read/write require the import below
 //
@@ -3248,7 +3257,24 @@ for more complex operations (ie. involving seek), can use [io::Cursor](https://d
 For paths handling, use `std::path::Path`, with several conveniences:
 
 ```rust
-let path: PathBuf = Path::new(ASSETS_PATH).join("triangles.obj");
+let path = PathBuf::from("/path/to/file");
+let path: PathBuf = Path::new(ASSETS_PATH).join("triangles.obj");   // Path#join() return a PathBuf
+
+path.file_name();            // Ruby basename(); for the poor man's version, use String#split
+
+// Watch out! PathBuf conversion to String is quite ugly.
+//
+pathbuf
+  .into_os_string() // OsString
+  .into_string()    // Result<String, OsString>
+  .unwrap();
+
+pathbuf
+  .file_name()      // Option<&OsStr>
+  .unwrap()         // &OsStr
+  .to_owned()       // OsString
+  .into_string()
+  .unwrap();
 ```
 
 ### Testing
@@ -3361,7 +3387,7 @@ s.trim_end_matches("suffix");           // chomp suffix (but repeated)! also acc
 s.as_bytes();                           // byte slice (&[u8]) of the string contents
 s.into_bytes();                         // convert to Vec[u8]
 
-// splits; there is a `r`split* version for each
+// splits; there is a `rsplit*` version for each
 // in order to use the slice methods, do `collect()`
 //
 s.split("sep")
@@ -3447,8 +3473,10 @@ for stream in listener.incoming() { handle_client(stream?) } // Watch out (Resul
 
 ### Commandline arguments (basic)
 
+Don't forget that the first is the binary filename.
+
 ```rust
-std::env::args();     // only valid Unicode
+std::env::args();     // only valid Unicode; can collect to Vec<String>
 std::env::args_os();  // returns `OsString`s, which are not restricted to Unicode
 ```
 
@@ -4221,6 +4249,14 @@ Easy parallel iteration!!!:
 
 ```rust
 use rayon::prelude::*;
+
+// Use this in order to limit the used threads (or use the `RAYON_NUM_THREADS` env var); by default,
+// all the hw threads are used.
+//
+rayon::ThreadPoolBuilder::new()
+    .num_threads(8)
+    .build_global()
+    .unwrap();
 
 array.par_iter()
      .map(|&i| i * i)

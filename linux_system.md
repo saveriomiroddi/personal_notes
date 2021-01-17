@@ -41,6 +41,7 @@
     - [Split MAFF association](#split-maff-association)
   - [Mount encrypted (.ecryptfs) home](#mount-encrypted-ecryptfs-home)
   - [Hardware](#hardware)
+    - [Disable SMT (hyperthreading)](#disable-smt-hyperthreading)
     - [Disable mouse/keyboard](#disable-mousekeyboard)
     - [Screen stuff](#screen-stuff)
       - [Add new resolution (HiDPI problem)](#add-new-resolution-hidpi-problem)
@@ -865,6 +866,12 @@ dmidecode -s \
   system-product-name   # (laptop) model
   bios-version
   chassis-serial-number # (dell) service tag
+```
+
+### Disable SMT (hyperthreading)
+
+```sh
+sudo tee /sys/devices/system/cpu/smt/control <<< "off"
 ```
 
 ### Disable mouse/keyboard

@@ -78,6 +78,11 @@ rename_table :old_table_name, :new_table_name
 drop_table :table_name
 change_column :table, :column, :type, **column_options # see options above
 change_column_default :table, :column, :default
+
+# Foreign keys
+#
+add_foreign_key :articles, :authors
+remove_foreign_key :articles, [:authors | column: author_id | name: fk_abc123]
 ```
 
 Irreversible migration error:

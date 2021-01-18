@@ -103,6 +103,10 @@ dpkg --get-selections | grep '^trash-cli ' # interactive
 #
 aptitude search -F %p 'suld-driver2-[0-9.]+$~rnative'
 
+# Better use this than `apt search`; the latter is undocumented and has an atrocious output.
+#
+apt-cache search '^linux-image-unsigned-5.4.[[:digit:]-]+-generic'
+
 # Show dependencies of a package
 #
 aptitude why -v $package

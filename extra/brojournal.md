@@ -1,7 +1,28 @@
+## Mon 18/Jan/2021
+
+- Blog articles
+  - [x] Prepare QEMU user emulation
+    - [x] Fight missing library
+  - [x] Article RISC-V: Improve the tooling options section
+
+- Projects/Open source
+  - geet
+    - [x] Fixes related to keyword arguments
+  - QEMU-pinning
+    - [x] Build script: add capstone dev library dependency #29
+    - [x] Structure the repo so that build script/patch changes are recorded #26
+    - [x] Build script: point directly to binaries #27
+    - [x] Build script: add user space emulation support to build #28
+  - QEMU research paper
+    - [x] Improved tests preparation
+      - [x] Fight install kernel with 100 Hz timer
+      - [x] Test RISC-V QEMU with 16 cores
+
 ## Sun 17/Jan/2021
 
 - Admin/tools
   - [x] Run interactive+background firefox on a headless machine
+    - [x] Fight include missing library
 
 - Studies
   - Rust

@@ -64,5 +64,3 @@ or suggested include path (maybe should be `/usr/lib/x86_64-linux-gnu/glib-2.0/i
 ```
 ${workspaceFolder}/** /usr/include/glib-2.0/**
 ```
-
-

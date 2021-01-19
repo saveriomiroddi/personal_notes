@@ -28,6 +28,7 @@
     - [NetworkManager](#networkmanager)
       - [Changing Network manager DNS (18.04+)](#changing-network-manager-dns-1804)
   - [fstab](#fstab)
+  - [Modules](#modules)
   - [Install grub from live cd (or perform chrooted operations)](#install-grub-from-live-cd-or-perform-chrooted-operations)
   - [Logging/syslog/tools](#loggingsyslogtools)
     - [Logrotate](#logrotate)
@@ -90,10 +91,9 @@ Informations:
 #
 apt show $package
 
-# Check if a package is installed (**with pipefail**), in the most standard way possible
+# Check if a package is installed, in the most standard way possible.
 #
-if grep -qP "^trash-cli\s+install$" <<< $(dpkg --get-selections); then echo installed; fi
-dpkg --get-selections | grep '^trash-cli ' # interactive
+if dpkg --get-selections | grep -qP '^trash-cli\s$'; then echo installed; fi
 
 # Advanced filtering with aptitude.
 #
@@ -669,6 +669,18 @@ Test the content of fstab (not reliable for actual mounting; for example, doesn'
 ```sh
 # [f]ake, [a]ll, [v]erbose
 mount -fav
+```
+
+## Modules
+
+```sh
+# Find if a module is loaded.
+#
+if lsmod | grep -qP '^zfs\s'; then echo loaded; fi
+
+# Find if a module is _installed_ on the rootfs (different from loaded!).
+#
+if modinfo zfs > /dev/null 2>&1; then echo installed; fi
 ```
 
 ## Install grub from live cd (or perform chrooted operations)

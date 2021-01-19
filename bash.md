@@ -506,7 +506,8 @@ printf %02d "$i"                  # pad number with zeros
 let param=<expr>                  # alternative
 
 a=$((a++))                        # numerical values don't need `$`
-((a+=1))                          # `+=` for numbers
+((a += 1))                        # `+=` for numbers
+((a *= 2))                        # supported
 a+=1                              # WRONG!!! this is a string operation
 ```
 

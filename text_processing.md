@@ -33,7 +33,11 @@
     - [Compute aggregates on a text/log file](#compute-aggregates-on-a-textlog-file)
   - [cut](#cut)
   - [tr (translate tokens)](#tr-translate-tokens)
+  - [sort](#sort)
   - [Silver searcher (ag)](#silver-searcher-ag)
+  - [Generic snippets](#generic-snippets)
+    - [Sorting versions](#sorting-versions)
+    - [Sum/average/etc. values extracted from a textfile](#sumaverageetc-values-extracted-from-a-textfile)
 
 ## Grep
 
@@ -431,6 +435,12 @@ Examples:
 tr -cd '\0' | wc -c	# count zero chars (example with `\0`)
 ```
 
+## sort
+
+```sh
+sort -V           # compare by versions! WATCH OUT! '5.8' is sorted before '5.8.0'
+```
+
 ## Silver searcher (ag)
 
 WATCH OUT!: `.git` directory and `.log` files are ignored by default
@@ -445,4 +455,35 @@ ag --ignore=$glob
 # WATCH OUT: The pattern is implicitly surrounded with `.*`
 #
 ag -G '_spec.rb$' <pattern> [directory]
+```
+
+## Generic snippets
+
+### Sorting versions
+
+Options:
+
+- `dpkg --compare-versions $v1 $op $v2`
+  - operators: `lt`, `ge`, etc
+  - there are alternative operators, e.g `ge-nl`, that treat "empty versions" (e.g. `5.8` <> `5.8.0`) differently
+- `sort -V`
+  - see [sort](#sort) section
+
+Dpkg has more complex rules for comparing empty versions, so they should be avoided if possible.
+
+### Sum/average/etc. values extracted from a textfile
+
+Standard Perl, if there can be non-matching lines:
+
+```sh
+perl -ne 'if (/WALLTIME:(\S+)/) { $total += $1 }; END { print $total }' $file
+```
+
+Insane version, if all the lines match:
+
+```sh
+# paste: `-s`: puts all values on a single line; `-d+`: use `+` as separator
+# bc: is a calculator (!)
+#
+$(perl -lne 'print /WALLTIME:(\S+)/' $file | paste -sd+ | bc)
 ```

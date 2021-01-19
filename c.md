@@ -6,7 +6,8 @@
   - [Conveniences](#conveniences)
     - [Print a struct instances's bytes](#print-a-struct-instancess-bytes)
   - [Library issues](#library-issues)
-    - [Fix error `glibconfig.h: No such file or directory`](#fix-error-glibconfigh-no-such-file-or-directory)
+    - [Error `glibconfig.h: No such file or directory`](#error-glibconfigh-no-such-file-or-directory)
+    - [Error `cannot find install-sh, install.sh, or shtool in ...`](#error-cannot-find-install-sh-installsh-or-shtool-in-)
 
 ## Basics
 
@@ -45,7 +46,7 @@ printf("\n");
 
 ## Library issues
 
-### Fix error `glibconfig.h: No such file or directory`
+### Error `glibconfig.h: No such file or directory`
 
 See https://github.com/dusty-nv/jetson-inference/issues/6:
 
@@ -63,4 +64,13 @@ or suggested include path (maybe should be `/usr/lib/x86_64-linux-gnu/glib-2.0/i
 
 ```
 ${workspaceFolder}/** /usr/include/glib-2.0/**
+```
+
+### Error `cannot find install-sh, install.sh, or shtool in ...`
+
+Execute:
+
+```sh
+autoreconf -vif
+# follow up with ./configure etc.
 ```

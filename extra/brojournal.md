@@ -1,3 +1,17 @@
+## Tue 19/Jan/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Discuss my pigz/ray tracer preliminary test results
+    - [ ] Execute improved tests
+      - [x] Review cores pinning mapping
+        - [x] Fight hwloc/source for skipping bridges
+          - `hwloc`; `lstopo --of console --no-io --no-caches`
+      - [ ] Write test scripts
+
+- Blog articles
+  - [x] Quickly building a custom Linux (Ubuntu) kernel, with modified configuration (kernel timer frequency)
+
 ## Mon 18/Jan/2021
 
 - Blog articles

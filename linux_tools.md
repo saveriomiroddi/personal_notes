@@ -14,6 +14,7 @@
       - [Using GNU Parallel](#using-gnu-parallel)
       - [Using xargs](#using-xargs)
   - [Networking](#networking)
+    - [wget](#wget)
     - [curl](#curl)
     - [Netcat (nc)](#netcat-nc)
   - [Sleep](#sleep)
@@ -269,6 +270,18 @@ seq 4 | xargs -I {} -P 0 sh -c 'aws ec2 delete-snapshot --snapshot-id {} || true
 ```
 
 ## Networking
+
+Find process listening on port:
+
+```sh
+sudo lsof -i :4000
+```
+
+### wget
+
+Options:
+
+- `-P|--directory-prefix $dir`: download to a specific directory (`P`refix)
 
 ### curl
 

@@ -239,7 +239,7 @@ done
 
 # !!! C-style for loop !!!
 #
-for ((job = 1; job <= MAX_JOBS; job++)); do $command; done
+for ((job = 1, othervar = 0; job <= MAX_JOBS; job++)); do $command; done
 
 # Until loop
 #
@@ -354,10 +354,10 @@ expr substr $input $position_1_based $length
 
 ### Applications
 
-Check if a binary/executable is in PATH/exists (**don't** use which):
+Most standard way to test if a binary/executable is in PATH/exists (dash-compatible):
 
 ```sh
-[[ -x "$(command -v <command>)" ]]
+if ! [ -x $(command -v $binary) ]; then error...
 ```
 
 Execute a command if a process is not running:
@@ -469,7 +469,7 @@ ${str,,}                          # down case (single `^` applies only once)
 ```sh
 ${filename%<.ext>}                # strip specific <ext>ension; `*` can be used [replace suffix]
 ${filename%%.*}                   # strip any extension (anything after the first dot)
-${filename##*.}                   # extract (last) extension [replace prefix]
+${filename##*.}                   # extract (last) extension, without the dot [replace prefix]
 ${filename##*/}                   # extract basename, eg. `"${PWD##*/}"`
 
 ${filename%/*/*}                  # parent dir of a file (watch out - requires at least two slashes!)
@@ -508,7 +508,14 @@ let param=<expr>                  # alternative
 a=$((a++))                        # numerical values don't need `$`
 ((a += 1))                        # `+=` for numbers
 ((a *= 2))                        # supported
-a+=1                              # WRONG!!! this is a string operation
+((a ** 2))                        # power
+((a || b && c))                   # boolean operators supported
+((a & b | c))                     # bitwise operators supported
+
+`true`/`false`                    # not supported in arithmetic...
+! ((a))                           # ... however, 0/'' are evaluated as false, and everything else as true.
+
+a+=1                              # WRONG!!! this is a string operation (if not an arithmetic expression)
 ```
 
 WATCH OUT: arithmetic operations will cause exit if they evaluate to 0 and the `errexit` shellopt is set (also applies to `let`):

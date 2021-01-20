@@ -1,3 +1,41 @@
+## Thu 21/Jan/2021
+
+- Projects/Open source
+  - Investigate Busybear issues
+    - [x] Test again
+      - [x] check start-qemu.sh
+      - [x] dump config
+      - [x] fight bridge interface
+      - [x] fight SSH connection
+    - [x] Open other PR
+  - QEMU research paper
+    - [ ] Execute improved tests
+      - [ ] Write test scripts
+        - [x] Integrate password in cmdline
+        - [x] Minor refactoring
+        - [ ] Test/fixes
+
+- Studies
+  - Rust
+    - [x] Join (part) Rust meetup
+
+## Wed 20/Jan/2021
+
+- Studies
+  - Other
+    - Gnuplot
+      - [x] Review and reorganize existing notes
+      - [x] Brutal fight find clean way to print multiple lines from research dataset
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Execute improved tests
+      - [ ] Write test scripts
+        - [x] Fight configure SSH on Busybear
+          - [x] Open Issue+PR
+        - [x] Use gnuplot
+        - [ ] Test
+
 ## Tue 19/Jan/2021
 
 - Projects/Open source

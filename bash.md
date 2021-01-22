@@ -275,7 +275,7 @@ Prefix Operators:
 - `-L $filename`        file/directory is a symlink
 - `-b $filename`        file is a block device
 
-- `! -s $filename`      file is empty
+- `! -s $filename`      file is empty (or doesn't exit); any character makes the file not empty
 
 - `-t 0`                input is terminal (false if stdin)
 
@@ -501,6 +501,12 @@ printf %02d "$i"                  # pad number with zeros
 
 ## Arithmetic operations
 
+Watch out!!:
+
+- bash arithmetic handles only integers (use `bc` for that)
+- empty string equals to 0
+- operations will cause exit if they evaluate to 0 and the `errexit` shellopt is set (also applies to `let`)
+
 ```sh
 (( <expr> ))                      # preferred form
 let param=<expr>                  # alternative
@@ -518,7 +524,7 @@ a=$((a++))                        # numerical values don't need `$`
 a+=1                              # WRONG!!! this is a string operation (if not an arithmetic expression)
 ```
 
-WATCH OUT: arithmetic operations will cause exit if they evaluate to 0 and the `errexit` shellopt is set (also applies to `let`):
+Exit status:
 
 ```sh
 (( val ))                         # exits if `val` is 0

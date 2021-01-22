@@ -29,7 +29,7 @@ The `pl` language is used (Perl), which is not correct, but close enough.
 Commandline:
 
 ```sh
-# Batch mode: displays the diagram and exits.
+# Batch mode: displays the diagram and exits. WATCH OUT! No effect if the output if a file.
 #
 gnuplot --persist $file
 
@@ -46,8 +46,11 @@ Language:
 set datafile separator ','
 
 # Write output to image file; format available: `svg`,`png`, ...
+# Enhanced has better text output.
 #
-set term $format
+# For svg, append `background rgb 'white'` for a white background (default is transparent).
+#
+set terminal $format enhanced
 set output 'output.$format'
 
 # Show the diagram, and wait for close before exit; requires return to be tapped - this can be worked around by

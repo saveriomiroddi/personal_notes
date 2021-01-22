@@ -2,12 +2,20 @@
 
 - [Science](#science)
   - [Math](#math)
+    - [Trigonometry](#trigonometry)
+    - [Statistics](#statistics)
     - [Convenient stuff](#convenient-stuff)
 
 ## Math
 
+### Trigonometry
+
 - tan(θ) = opposite/adjacent
 - θ = arctan(opposite/adjacent)
+
+### Statistics
+
+Stddev: sqrt( Ε( (xᵢ-avg)² ) / n) )
 
 ### Convenient stuff
 

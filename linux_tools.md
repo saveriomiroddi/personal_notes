@@ -29,6 +29,7 @@
   - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
     - [Key servers](#key-servers)
   - [Formatting tools](#formatting-tools)
+  - [Benchmarking](#benchmarking)
   - [Mounting images (`qemu-utils`)](#mounting-images-qemu-utils)
 
 ## ls
@@ -537,6 +538,18 @@ Table (columns) formatting:
 # `-t`: automatically determine columns based on whitespace
 #
 column [-s "$separators"] -t
+```
+
+## Benchmarking
+
+The `time` program is built-in in modern shells. For more userful functionality, use `/usr/bin/time`.
+
+```sh
+# %e: walltime
+#
+# The output goes to stderr!
+#
+/usr/bin/time --format ">>> WALLTIME:%e"
 ```
 
 ## Mounting images (`qemu-utils`)

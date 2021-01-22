@@ -1,3 +1,17 @@
+## Fri 22/Jan/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Execute improved tests
+      - [ ] Write test scripts
+        - [x] Fixes, base test, minor improvements
+        - [x] Review standard deviation
+        - [x] Improve directory layout
+
+- Studies
+  - Gnuplot
+    - [ ] Fight gnuplot tics
+
 ## Thu 21/Jan/2021
 
 - Projects/Open source

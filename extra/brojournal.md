@@ -1,3 +1,12 @@
+## Sat 23/Jan/2021
+
+- Admin/tools
+  - [x] Fight issue with BIOS upgrade
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Plan AWS performance testing
+
 ## Fri 22/Jan/2021
 
 - Projects/Open source

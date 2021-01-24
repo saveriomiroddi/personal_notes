@@ -1,3 +1,19 @@
+## Sun 24/Jan/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] AWS Metal
+      - [x] Review instances
+    - [ ] Write test scripts
+      - [x] Bug: `results.data` has int time values
+
+- Studies
+  - Gnuplot
+    - [x] Simplify project logic, by using stats
+    - [x] Improve X tics
+    - [x] Minor cleanups
+    - [x] Investigate possible bug
+
 ## Sat 23/Jan/2021
 
 - Admin/tools

@@ -205,6 +205,7 @@ gnuplot --persist -e "plot for [i=0:$(( datasets_count - 1 ))] '$processed_file'
 
 ```pl
 # Stats (min, max, etc.)
+#
 # It's possible to use (using) two columns, which yields stats in the format *_max_x and *_max_y
 # Without nooutput, stats are also printed.
 
@@ -219,6 +220,21 @@ set y2range [STATS_min - y_padding:STATS_max + y2_padding]
 
 ## Aesthetics
 
+Axis/margins:
+
+```pl
+# Set margins in percentage (doesn't work with two y scales)
+#
+set offsets graph 0, 0, 0.05, 0.05                     # absolute
+set offsets graph 0.1, graph 0.1, graph 0.1, graph 0.1 # relative
+
+# Print tics only for the dataset values; best to `set offset graph` (see relative above)
+#
+plot 'results.dat' using 2:3:xtic(2):ytic(3) with linespoints
+```
+
+Line:
+
 ```pl
 # Smoothen
 
@@ -230,7 +246,11 @@ plot 'test.txt' using 1:2 smooth sbezier with linespoints
 
 plot 'test.txt' index 0 using 1:2 with lines linewidth 2,\
      'test.txt' index 0:1 using 1:2 with lines linewidth 4
+```
 
+Filling:
+
+```pl
 # Fill below line
 
 plot 'test.txt' using 1:2 with filledcurves x1
@@ -253,10 +273,6 @@ set timefmt '%Y-%m-%d'
 filter(x, min) = (x > strptime('%Y-%m-%d', min)) ? x : 1/0
 plot 'test.txt' using (filter(timecolumn(1), '2019-01-10')):2 with filledcurves x1,\
      'test.txt' using 1:2 with lines linewidth 3
-
-# Set margins in percentage (doesn't work with two y scales)
-#
-set offsets graph 0, 0, 0.05, 0.05
 ```
 
 ## More complex cases

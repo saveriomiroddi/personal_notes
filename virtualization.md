@@ -90,11 +90,38 @@ sudo virt-sparsify --convert qcow2 --compress $source.raw $dest.qcow2
 Mount:
 
 ```sh
-PARTITION_NUMBER=4                          # 1-based
 modprobe nbd max_part=8
-qemu-nbd --connect=/dev/nbd0 $image.qcow2   # wait a second after this
+
+if [[ $image == *.vhd ]]; then
+  format_option=(-f vpc)
+fi
+
+qemu-nbd --connect=/dev/nbd0 "${format_option[@]}" "$1"
+
+# Complete clusterduck. Even waiting via:
+#
+#     while [[ ! -b /dev/nbd0p4 ]]; do sleep 0.1; done
+#
+# will cause:
+#
+#     ls -l /dev/nbd0p4
+#     ls: cannot access '/dev/nbd0p4': No such file or directory
+#
+# if there is no sleep.
+#
+# Therefore, we use `ls` instead.
+#
+# Fdisk doesn't need to wait (in case one wants to present a list via `fdisk /dev/nbd0 -l`).
+
 partprobe /dev/nbd0
-mount "/dev/nbd0p"$PARTITION_NUMBER" /mnt
+
+partition_device=/dev/nbd0p$partition_number
+
+while ! ls -l "$partition_device" > /dev/null 2>&1; do
+  sleep 0.1
+done
+
+mount "$partition_device" /mnt
 ```
 
 Unmount:

@@ -2,9 +2,9 @@
 
 - [gnuplot](#gnuplot)
   - [Notes](#notes)
-  - [General options](#general-options)
-  - [Syntax/Basic use cases](#syntaxbasic-use-cases)
-    - [Important syntax](#important-syntax)
+  - [Basics](#basics)
+    - [Commandline options](#commandline-options)
+    - [Basic syntax/functionalities](#basic-syntaxfunctionalities)
     - [Single line, with dates](#single-line-with-dates)
     - [Multiple lines, with data `x, line₁y, line₂y, ...`](#multiple-lines-with-data-x-liney-liney-)
     - [Multiple lines](#multiple-lines)
@@ -12,7 +12,7 @@
       - [with data `lineN, x, y`, simple but less pretty](#with-data-linen-x-y-simple-but-less-pretty)
       - [with data `lineN, x, y`, prettier but more complex (requires Perl), with conveniences](#with-data-linen-x-y-prettier-but-more-complex-requires-perl-with-conveniences)
   - [Maths](#maths)
-  - [Aesthetics](#aesthetics)
+  - [Cosmetic](#cosmetic)
   - [More complex cases](#more-complex-cases)
     - [Two lines, with different scales](#two-lines-with-different-scales)
   - [Ready scripts](#ready-scripts)
@@ -24,7 +24,9 @@
 
 The `pl` language is used (Perl), which is not correct, but close enough.
 
-## General options
+## Basics
+
+### Commandline options
 
 Commandline:
 
@@ -34,24 +36,41 @@ Commandline:
 gnuplot --persist $file
 
 # Execute. !! the command must be semicolon-separated !!
+# It's better to pass commands via stdin; in one case, `-e` was not reporting errors.
 #
-gnuplot -e "commands..."
+gnuplot -e "$commands"
+echo "$commands" | gnuplot
 ```
 
-Language:
+### Basic syntax/functionalities
+
+A datafile can be divided in "data blocks", separated by two blank lines. Blank lines before the first dataset are ignored.
+
+In order to read data from stdin, just use `-` as filename. WATCH OUT!! Doesn't work with for loop, since they read the input multiple times.
+
+Basic syntax:
 
 ```pl
+# Comments are prefixed by the hash symbol.
+
 # Accept a CSV data file
 #
 set datafile separator ','
 
+# Assign a variable; can be used e.g. for data file name.
+#
+variable_name = 'value'
+
 # Write output to image file; format available: `svg`,`png`, ...
-# Enhanced has better text output.
 #
 # For svg, append `background rgb 'white'` for a white background (default is transparent).
 #
-set terminal $format enhanced
+set terminal $format
 set output 'output.$format'
+
+# Don't interpret titles (e.g. `_text_` -> italic)
+#
+set key noenhanced
 
 # Show the diagram, and wait for close before exit; requires return to be tapped - this can be worked around by
 # `echo`ing a newline to stdin.
@@ -63,14 +82,6 @@ pause mouse close
 set print '-'
 print ...
 ```
-
-## Syntax/Basic use cases
-
-### Important syntax
-
-A datafile can be divided in datasets, separated by two blank lines. Blank lines before the first dataset are ignored.
-
-In order to read data from stdin, just use `-` as filename. WATCH OUT!! Doesn't work with for loop, since they read the input multiple times.
 
 ### Single line, with dates
 
@@ -108,7 +119,8 @@ plot for [i=2:4] 'data.txt' \      # for: each column (1-based) from 2 to 4
 
 ### Multiple lines
 
-The `columnheader` is used to get the title, but the problem is that consumes the row, so it can't be gathered from a data row.
+The `columnheader(N)` is used to get the title, but the problem is that consumes the row, so it can't be gathered from a data row.  
+It doesn't need all the columns to be present, as long as the one indexed is there.
 
 #### with dataset header and data `x, y`
 
@@ -127,7 +139,14 @@ line2
 ```
 
 ```pl
-plot for [i=0:1] 'data.txt' \    # for: each index (0-based) from 0 to 1
+# Compute `STATS_blocks`. The `::2` skips the headers; since the headers are skipped, they can be "invalid"
+# (from the stats perspective).
+#
+stats 'data.txt' using 1:2 every ::2
+
+# for: each index (0-based) from 0 to 1
+#
+plot for [i=0:STATS_blocks-1] 'data.txt' \
   index i \
   using 1:2 \
   with linespoints \
@@ -218,7 +237,7 @@ y2_padding = (STATS_max - STATS_min) * 0.04
 set y2range [STATS_min - y_padding:STATS_max + y2_padding]
 ```
 
-## Aesthetics
+## Cosmetic
 
 Axis/margins:
 

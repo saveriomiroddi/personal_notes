@@ -2,8 +2,9 @@
 
 - [RSpec](#rspec)
   - [Structure examples](#structure-examples)
+    - [Before](#before)
   - [Setup](#setup)
-    - [Add helpers to describes](#add-helpers-to-describes)
+    - [Add helpers to example groups (`describe`)](#add-helpers-to-example-groups-describe)
   - [Mocks](#mocks)
     - [Matchers](#matchers)
     - [Matching arguments](#matching-arguments)
@@ -12,6 +13,8 @@
   - [Custom matcher](#custom-matcher)
 
 ## Structure examples
+
+- `describe`: example group (/suite).
 
 ```ruby
 describe Game
@@ -46,11 +49,19 @@ describe MessagesController
       it "renders the new template"
 ```
 
+### Before
+
+```ruby
+# Appends the block at the beginning of the `before` list in the same scope, rather than appending.
+#
+prepend_before { }
+```
+
 ## Setup
 
 On top of each test file, add `require 'rspec'`, which will load `spec/spec_helper.rb`.
 
-### Add helpers to describes
+### Add helpers to example groups (`describe`)
 
 ```ruby
 RSpec.configure do |config|
@@ -136,6 +147,12 @@ allow(repository).to receive(:remote).with('upstream').and_return('git@github.co
 # Better for modifying the way the method is called, rather than selective stubbing
 #
 allow(API).to receive(:solve_for).and_wrap_original { |m, *args| m.call(*args).first(5) }
+```
+
+In order to disable a method, just `allow` it:
+
+```ruby
+allow_any_instance_of(MyModule::MyClass).to receive(:my_method)
 ```
 
 Return different values for each invocation:

@@ -1,3 +1,29 @@
+## Mon 25/Jan/2021
+
+- Studies
+  - Rust
+    - [x] Review 3 StackOverflow questions
+      - [x] Answer 1
+  - GNU Screen
+    - [x] First review/test of commands sending
+    - [ ] Think strategy for sending commands and waiting
+      - [x] Check `tail -f` (source) for inotify
+
+- Admin/tools
+  - [x] Planning script
+    - [x] Add support for next occurrence period (replan X in Y)
+    - [x] Add --compare option
+    - [x] Add support for "fixed" time (replan f X)
+
+- Projects/Open source
+  - [x] QEMU-pinning
+    - [x] Revamp README examples/structure
+    - [x] Review and integrate pinning patch
+  - QEMU research paper
+    - [x] Write test scripts: base version (SSH)
+      - [x] End-to-end performance script test
+      - [x] Add status messages
+
 ## Sun 24/Jan/2021
 
 - Projects/Open source

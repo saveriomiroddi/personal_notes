@@ -17,6 +17,7 @@
     - [wget](#wget)
     - [curl](#curl)
     - [Netcat (nc)](#netcat-nc)
+  - [GNU Screen](#gnu-screen)
   - [Sleep](#sleep)
   - [Dates](#dates)
     - [Formatting](#formatting)
@@ -338,6 +339,54 @@ mkfifo loop.pipe && cat loop.pipe | nc -l -p 3000 | nc localhost 3001 > loop.pip
 # Wait until a port is open.
 #
 while ! nc -z localhost 9200; do sleep 0.5; done
+```
+
+## GNU Screen
+
+Commandline params:
+
+- `-r`                 : resume screen session
+- `-ls`                : list session
+- `-x $name`           : join named session
+- `-h $scrollback`     : size of scrollback buffer
+- `-dm`                : (special) start session in detached mode
+- `-S $name`           : session name
+- `-X $command`        : execute a command in the session (see example below)
+- `-L`                 : enable logging (flushes every 10" by default); doesn't overwrite existing files
+- `-Logfile $filename` : set logfile (does _not_ imply `-L`)
+
+Commands:
+
+```
+Ctrl+a                             function shortcut
+  0..9                             go to window
+  A                                set name
+  K                                kill
+  c                                create new
+  C (:clear)                       clear screen. NOTE: in order to clear the scrollback buffer, one needs to set it to zero, then back to the original size
+  d                                detach
+  "                                list of windows
+  h (:hardcopy)                    dump (hardcopy) screen in file
+    -h $filename                   dump entire buffer, not only visible screen
+  :                                command mode
+
+Copy-related:
+  [                                copy mode; lets the user scroll (Shift+PgUp/Down) and mark paste buffer start/end (using space)
+  scrollback lines                 set the scrollback buffer; default=5000
+  >                                output paste buffer to file
+
+defscrollback $lines               set scrollback buffer in .screenrc
+logfile flush $seconds             change the flush period (nonnegative integer; defaults to 10)
+```
+
+Execute commands in a detached session:
+
+```sh
+# `stuff` is the command; the terminating newline is necessary.
+#
+screen -dmS $session_name
+screen -r $session_name -X logfile flush 0
+screen -r $session_name -X stuff 'ls^M' # ^M is enter
 ```
 
 ## Sleep

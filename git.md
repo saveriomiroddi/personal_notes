@@ -19,7 +19,7 @@
   - [Stash](#stash)
   - [Bisect](#bisect)
   - [Export (`archive`)](#export-archive)
-  - [Batch operations  (message/tree filtering)](#batch-operations--messagetree-filtering)
+  - [Batch operations (message/tree filtering, files removal)](#batch-operations-messagetree-filtering-files-removal)
   - [Diffing/Patching/Status](#diffingpatchingstatus)
   - [Useful operations](#useful-operations)
     - [Shell prompt](#shell-prompt)
@@ -337,7 +337,7 @@ archive $rev           # export a rev to stdout (defaults to tar format)
 archive master Gemfile Gemfile.lock gems_dir | tar x -f - -C /export
 ```
 
-## Batch operations  (message/tree filtering)
+## Batch operations (message/tree filtering, files removal)
 
 Mass-change all the messages in the current branch.
 
@@ -355,6 +355,8 @@ git filter-branch --force --tree-filter 'rm -f terraform/terraform.tfstate' mast
 # Delete a Ruby method.
 git filter-branch --force --tree-filter 'ag "def mymethod" -l | xargs -r perl -0777 -i -pe "s/^(\s+)def mymethod.*?^\g1end\n\n//sm"' master..HEAD
 ```
+
+In order to remove a file from the entire repository, it's easier to use the [BFG Repo-Cleaner](https://rtyley.github.io/bfg-repo-cleaner).
 
 ## Diffing/Patching/Status
 

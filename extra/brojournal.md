@@ -1,3 +1,21 @@
+## Tue 26/Jan/2021
+
+- Studies
+  - Busybear/QEMU
+    - [x] Finally produce a working network configuration
+
+- QEMU research paper
+  - [x] Review providers
+    - [x] Verify AWS models and availability
+    - [x] Search all bare metal providers
+  - [x] Review technical infos for custom kernels/params
+  - [x] Prepare/test boot on Ubuntu server
+  - [x] Reproduce setup
+    - [x] Fix incompatibility with AMD (turned out: OpenSBI bug)
+    - [x] Fix issue with emulated smp > 8 not allowed (turned out: kernel used was patched)
+    - [ ] Prepare separate environment to use as host
+      - [x] Install
+
 ## Mon 25/Jan/2021
 
 - Studies

@@ -485,6 +485,7 @@ for f in *.ORF; do darktable-cli "$f" "$f".jpg; done
 openssl rsa -in $private_key -pubout   # Generate a public key from private
 ssh-keygen -e [-f $private_key]        # Generate a public key from private, for SSH usage
 ssh-keygen -y                          # Same as previous, but requires user input
+ssh-copy-id -i $private_key $user@$host # Authorize a user (key) on a host!
 
 ssh-add -D                             # Delete cached keys. Useful if there are problems in authenticating!
 ssh-add                                # adds the ssh key password to the authentication agent (e.g. gnome-keyring)

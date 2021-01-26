@@ -1,6 +1,7 @@
 # Linux system
 
 - [Linux system](#linux-system)
+  - [Security](#security)
   - [Filesystems/partitions](#filesystemspartitions)
   - [Packages](#packages)
     - [Apt/dpkg installation hooks (`etc/apt/apt.conf.d`)](#aptdpkg-installation-hooks-etcaptaptconfd)
@@ -49,6 +50,25 @@
     - [Audio](#audio)
     - [Disconnect and power off a device](#disconnect-and-power-off-a-device)
     - [Keyboard](#keyboard)
+
+## Security
+
+```sh
+chown $name $file...                        # change owner
+chgrp $name $file...                        # change group
+chmod [ugoa][-+][rwx] $file...              # change permissions; [u]ser [g]group [o]thers [a]ll
+
+chage [-m $min] [-M $max] [-W $warn] [-I $inactive_days] $login # change password properties
+chage -l $login                             # show info
+```
+
+Snippets:
+
+```sh
+chmod -R go-rx .ssh                         # setup SSH permissions
+chage -d $(date +%Y-%m-%d) myuser           # set the change date to today!
+chage -I 0 myuser                           # expire password
+```
 
 ## Filesystems/partitions
 

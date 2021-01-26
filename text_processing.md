@@ -27,6 +27,7 @@
     - [Regexes](#regexes)
     - [Operators](#operators-1)
     - [Operations](#operations)
+    - [Concatenate operations](#concatenate-operations)
     - [Special characters](#special-characters)
   - [Snippets](#snippets)
     - [Extract difference between two files](#extract-difference-between-two-files)
@@ -357,6 +358,12 @@ Operations with matches:
 - delete: `/<pattern>/ d`
 - insert (add before): `/<pattern>/ i newstring` (in order to add leading spaces, must escape the first)
 - add (add after): `/<pattern>/ a newstring`
+
+### Concatenate operations
+
+Examples:
+
+- `/ntp/ s/^/# /` : comment out a line matching `ntp`
 
 ### Special characters
 

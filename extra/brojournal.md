@@ -1,3 +1,12 @@
+## Wed 27/Jan/2021
+
+- Projects/Open source
+  - Busybear/QEMU
+    - [x] Open issue with details about improved/working network configuration
+
+- Admin/tools
+  - [x] Build new workstation
+
 ## Tue 26/Jan/2021
 
 - Studies

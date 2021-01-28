@@ -18,7 +18,7 @@
   - [Job scheduling](#job-scheduling)
     - [Cron](#cron)
     - [At](#at)
-  - [Systemd](#systemd)
+  - [Systemd/SystemV](#systemdsystemv)
     - [Systemctl](#systemctl)
     - [journalctl](#journalctl)
     - [Configuring a unit](#configuring-a-unit)
@@ -461,7 +461,9 @@ atrm $jobnum                          # remove job (use number from `atq` output
 
 Some programs/systems won't work out of the box, due to the `at` context. For systemd suspend, see [Systemd timers](#timers-scheduled-events).
 
-## Systemd
+## Systemd/SystemV
+
+List all the services, and their running status: `service --status-all`. Great for disabling unnecessary services!!
 
 ### Systemctl
 

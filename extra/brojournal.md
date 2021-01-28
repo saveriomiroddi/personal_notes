@@ -1,3 +1,22 @@
+## Thu 28/Jan/2021
+
+- Studies
+  - Kernel (development)
+    - [x] Read paper [Choosing the right timer interrupt frequency on Linux](http://repository.gunadarma.ac.id/313/1/Choosing%20The%20Right%20Timer_UG.pdf)
+    - [x] Review all make config options
+    - [x] Detail diff with 100Hz, and recompile
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Understand details of the interrupt frequency, and update the environment
+
+- Admin/tools
+  - Scripting
+    - [x] Brogramming: Automated handling of personal notes HEAD commit
+  - O/S
+    - [x] Prepare a clean ubuntu-server local to an USB key
+      - [x] Fight Clonezilla breakages all over
+
 ## Wed 27/Jan/2021
 
 - Projects/Open source

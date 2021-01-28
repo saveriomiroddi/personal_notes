@@ -11,6 +11,7 @@
   - [Repository](#repository)
   - [Log/Blame/Tree comparison](#logblametree-comparison)
     - [Formatting/Prettifications](#formattingprettifications)
+    - [Pretty formats](#pretty-formats)
     - [Finding](#finding)
   - [Metadata](#metadata)
   - [Merging](#merging)
@@ -155,6 +156,8 @@ log --branches=$branch $file        # search in another branch
 
 log --merges --first-parent         # search only [merges] commits, only in the [first-parent] (eg. master when run from master)
 
+log -$n                             # show the latest $n commits, e.g. -1 for the last
+
 # commits reachable by $r2 but not by $r1
 # alias: `^$r1 $r2`
 log $r1..$r2
@@ -190,9 +193,13 @@ cherry [-v] $upstream [$head]     # changes against tree (useful for rebasing: c
 
 `--format` and `--pretty` are the same.
 
-- `--pretty='%h %s'`   : `%h`: abbreviated hash, `%s`: subject first line
 - `--pretty="format:"` : empty format, to avoid the cruft at the beginning of logs
 - `--oneline`          : same as `--pretty='%h %s'`
+
+### Pretty formats
+
+- `%h` : abbreviated hash
+- `%s` : subject first line (title)
 
 ### Finding
 

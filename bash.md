@@ -774,15 +774,20 @@ fi
 
 ### Workaround sudo expiry during a long-running script
 
-`$$` is the parent script, which is the script running this snippet.
+Source: https://serverfault.com/a/702019.
 
 ```sh
 sudo -v
 
 while true; do
-    sudo -n true
-    sleep 60
-    kill -0 "$$" || exit
+  sleep 60
+  # `kill -0`: doesn't send any actual signal - used (here) to check if the process exists
+  # `$$`: parent script (script running this snippet)
+
+  kill -0 "$$" || exit
+
+  # `-n`: non-interactive
+  sudo -nv
 done 2>/dev/null &
 ```
 

@@ -28,6 +28,7 @@
   - [Networking](#networking)
     - [NetworkManager](#networkmanager)
       - [Changing Network manager DNS (18.04+)](#changing-network-manager-dns-1804)
+    - [iproute2 (`ip` tool)](#iproute2-ip-tool)
   - [fstab](#fstab)
   - [Modules](#modules)
   - [Install grub from live cd (or perform chrooted operations)](#install-grub-from-live-cd-or-perform-chrooted-operations)
@@ -50,6 +51,7 @@
     - [Audio](#audio)
     - [Disconnect and power off a device](#disconnect-and-power-off-a-device)
     - [Keyboard](#keyboard)
+    - [Topology](#topology)
 
 ## Security
 
@@ -647,25 +649,24 @@ aa-logprof -f /etc/apparmor.d/opt.nginx_app_server.sbin.nginx
 
 ## Networking
 
-Show all the interfaces, even if unconfigured:
-
-```sh
-ip link show
-```
-
-Sample configuration for static IP (`/etc/network/interfaces`):
+Sample system network configuration (`/etc/network/interfaces`):
 
 ```
-auto eth0
-iface eth0 inet (dhcp|static
-        address   192.168.56.103
-        netmask   255.255.255.0
-        network   192.168.56.0
-        broadcast 192.168.56.255
-        gateway   192.168.1.1)
+auto lo
+iface lo inet loopback
+
+auto enp42s0
+iface enp42s0 inet static
+        address   192.168.0.1/24
+        gateway   192.168.0.1
+
+auto enp43s0
+iface enp43s0 inet dhcp
 ```
 
-Remove when changing the mac/card for an interface, otherwise the new one won't be recognized (SIOCSIFADDR error): `/etc/udev/rules.d/70-persistent-net.rules`
+For USB network interfaces, use [`allow-hotplug`](https://lists.debian.org/debian-user/2017/09/msg00911.html).
+
+Recent Linux distros have persistent names; in the past, udev rules were used (`70-local-persistent-net.rules`).
 
 ### NetworkManager
 
@@ -674,6 +675,25 @@ When adding hooks, the scripts must be executable!
 #### Changing Network manager DNS (18.04+)
 
 On 18.04 Desktop, one needs to modify the Network manager connection; see https://askubuntu.com/a/1104305/46091.
+
+### iproute2 (`ip` tool)
+
+Show all the interfaces, even if unconfigured:
+
+```sh
+ip link show
+```
+
+Manually setup an ethernet card on Ubuntu server:
+
+```sh
+ip addr add 192.168.0.2/24 dev enp42s0
+ip link set enp42s0 up
+ip route add default via 192.168.0.1
+echo 'nameserver 8.8.8.8' > /etc/resolv.conf
+```
+
+For a permanent configuration, use Netplan.
 
 ## fstab
 
@@ -993,4 +1013,11 @@ Reconfigure keyboard:
 
 ```sh
 dpkg-reconfigure console-data
+```
+
+### Topology
+
+```sh
+lstopo --of console --no-io --no-caches # ubuntu
+hwloc-ls -v --no-io                     # fedora
 ```

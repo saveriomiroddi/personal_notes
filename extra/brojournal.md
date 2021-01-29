@@ -1,3 +1,24 @@
+## Fri 29/Jan/2021
+
+- Admin/tools
+  - O/S
+    - [x] Clonezilla: Workaround USB port issue
+
+- Projects/Open source
+  - QEMU research paper
+    - Scripts: Full environment preparation
+      - [x] Assume a standard busybear running locally
+      - [x] New directories layout
+        - [x] QEMU: can move firmware to a separate dir (`-bios`)?
+      - [x] Split projects download/build into a separate script
+      - [x] Run QEMU from the benchmark script
+        - [x] Fight find snippet for caching sudo permissions
+      - [x] Busybear: create empty disk with plenty of space (or extend existing)
+      - [x] Linux repo: git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+      - [x] Add projects download and patch
+      - [ ] Add projects compiling/copy
+        - [x] All except pigz/RISC-V toolchain
+
 ## Thu 28/Jan/2021
 
 - Studies

@@ -385,6 +385,8 @@ git status -s | awk '{print $2}' | xargs -I {} scp {} myserver:mypath/{}
 Diff/Patching:
 
 ```sh
+# WATCH OUT! Better to configure `diff.noprefix true` rather than run this, for those not using prefixes.
+#
 # Suitable for standard patch import; if [--no-prefix] is not specified, import using "patch -p1"
 #
 diff --no-prefix

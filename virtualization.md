@@ -19,6 +19,20 @@ Create:
 #
 virt-make-fs --verbose --format=qcow2 --type=ntfs $input_dir $dest.qcow2
 
+# Create a raw file, with a partition, with standard linux tools
+# 8300: Partition type: native Linux FS
+#
+dd if=/dev/zero bs=1M count=10240 of=disk.img
+sgdisk -n1:0:0 -t1:8300 disk.img
+loop_device=$(sudo losetup --show --find --partscan disk.img)
+sudo mkfs.ext4 ${loop_device}p1
+sudo mount ${loop_device}p1 /mnt
+# ...copy stuff etc...
+sudo umount /mnt
+sudo losetup -d $loop_device
+
+# now, use losetup (see below)
+
 # Create a diff image of a "backing" one.
 # If the diff exists, it will be overwritten.
 # WATCH OUT! The backing image path is relative to the diff one.

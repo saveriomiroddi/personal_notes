@@ -31,7 +31,7 @@
     - [Key servers](#key-servers)
   - [Formatting tools](#formatting-tools)
   - [Benchmarking](#benchmarking)
-  - [Mounting images (`qemu-utils`)](#mounting-images-qemu-utils)
+  - [Mounting images](#mounting-images)
 
 ## ls
 
@@ -602,7 +602,32 @@ The `time` program is built-in in modern shells. For more userful functionality,
 /usr/bin/time --format ">>> WALLTIME:%e"
 ```
 
-## Mounting images (`qemu-utils`)
+## Mounting images
+
+Mount raw dumps:
+
+```sh
+# Attach the image to a loop device (**this is not mounting**)
+#
+loop_device=$(sudo losetup --show --find --partscan $image)
+
+# List attached devices
+#
+losetup -l
+#
+# NAME       SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE                                               DIO LOG-SEC
+# /dev/loop0         0      0         0  0 /home/saverio/code/riscv_images/components/busybear.bin   0     512
+
+# Now we can mount
+#
+sudo mount $loop_device /mnt
+
+# Detach the loop device
+#
+sudo losetup -d $loop_device
+```
+
+Mount any image type, via `qemu-utils`:
 
 ```sh
 # Use `-f vpc` for vhd images.
@@ -614,8 +639,9 @@ qemu-nbd --connect=/dev/nbd0 [-f vpc] $image
 partprobe /dev/nbd0
 
 # List the partitions (optional); doesn't need any wait (only partprobe).
+# Can also read a raw image!
 #
-fdisk /dev/nbd0 -l
+fdisk -l /dev/nbd0
 
 # Complete clusterduck. Even waiting via:
 #

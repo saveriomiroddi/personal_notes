@@ -605,7 +605,7 @@ coordinates=(${1//./ })             # split by `.` (bash) !!! use only for unspa
 # `-t`: remove trailing delimiter
 #
 # in order to make the variable local, declare it as local before executing `mapfile`
-# When using this pattern, don't forget `-n` on the echo!!
+# When using this pattern, **WATCH OUT!! Don't forget `-n` on the echo!!**
 # here-string appends a newline, so it can be used only when mapfile has a newline delimiter.
 #
 mapfile -td. coordinates < <(echo -n "$1")
@@ -643,7 +643,7 @@ Sort an array (/keys of an associative array):
 ```sh
 # For entries with newlinews, `sort -z` and mapfile `-d ''` should be used.
 #
-mapfile -t sorted_keys < <(printf '%s\n' "${!my_ass[@]}" | sort)
+mapfile -t sorted_keys < <(printf '%s\n' "${!my_arr[@]}" | sort)
 ```
 
 Iterate a multiple lines output, assigning it to an array:
@@ -814,12 +814,12 @@ Note that when using this getopt (GNU) inside a function, all the processing sho
 #
 eval set -- "$(getopt --options hsc: --long help,shared-folders,cd1-image: --name "$(basename "$0")" -- "$@")"
 
-# DON'T FORGET THE `shift` commands and the `--` case. The `*` case is not required.
+# DON'T FORGET THE `shift` commands and the `--` case.
 #
 while true ; do
   case "$1" in
     -h|--help)
-      echo 'usage: qemu_gaming.sh [-h|--help] [-s|--shared-folders] [-c|--cd1-image ISO_FILE]'
+      echo "$c_help"
       exit 0 ;;
     -s|--shared-folders)
       USE_SHARED_FOLDERS=1
@@ -830,11 +830,15 @@ while true ; do
     --)
       shift
       break ;;
-    *)
-      echo "Internal error: '$1'"
-      exit 1 ;;
   esac
 done
+
+# Rigorously, one should add the following case, but it's not required.
+#
+*)
+  echo "Internal error: '$1'"
+  exit 1 ;;
+
 ```
 
 Non-option params are available, after the `while` block, from `$1`.

@@ -124,7 +124,22 @@ print $totals{'foo'};
 if (CONDITION) { TRUE_BRANCH } else { ELSE_BRANCH }
 
 foreach (@Array) { SubRoutine($_); }           # iterate an array
-for (key in totals) { print key, totals[key] } # iterate a hash
+```
+
+Hash iteration is tricky:
+
+```perl
+# keys and value needed
+# reset the internal iterator so a prior each() doesn't affect the loop; can ignore in a simple script.
+#
+keys %hash;
+while(my($k, $v) = each %hash) { ... }
+
+# only keys needed
+foreach my $val (keys %hash) { ... }
+
+# only values needed
+foreach my $val (values %hash) { ... }
 ```
 
 ### Functions/APIs
@@ -446,6 +461,19 @@ tr -cd '\0' | wc -c	# count zero chars (example with `\0`)
 
 ```sh
 sort -V           # compare by versions! WATCH OUT! '5.8' is sorted before '5.8.0'
+
+# `-t/--field-separator`: separator
+# `-n/--numeric-sort`: interpret as number
+# `-k/--key <start,end>`: specify sorting column number (1-based); if specifying only <start>, <end>
+#                         is assumed to be the last field (can be acceptable, for simplification)
+#
+sort -t, -n -k1
+
+# Sort by multiple fields; in this case, it's important to use the <start,end> format.
+#
+# `-u/--unique`: distinct
+#
+sort -t, -n -k 1,1 -k 2,2 -k 3,3 -u
 ```
 
 ## Silver searcher (ag)

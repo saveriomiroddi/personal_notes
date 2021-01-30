@@ -595,11 +595,13 @@ column [-s "$separators"] -t
 The `time` program is built-in in modern shells. For more userful functionality, use `/usr/bin/time`.
 
 ```sh
+# `-f`/`--format`: better use `-f`, which is more portable.
+#
 # %e: walltime
 #
 # The output goes to stderr!
 #
-/usr/bin/time --format ">>> WALLTIME:%e"
+/usr/bin/time -f ">>> WALLTIME:%e"
 ```
 
 ## Mounting images

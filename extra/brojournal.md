@@ -1,3 +1,23 @@
+## Sat 30/Jan/2021
+
+- Studies
+  - Linux
+    - [x] Check sudo behavior, and ask
+
+- Blog articles
+  - [x] Minor updates/fixes to some articles
+
+- QEMU research paper
+  - Scripting: Full environment preparation
+    - [x] Add projects compiling/copy
+    - [x] Split generated CSV files
+    - [x] Test/clean/fix `prepare_components.sh`
+    - [x] Set the `performance` frequency governor
+    - [x] Test/clean/fix `benchmark_pigz.sh`
+    - [x] Split diagram creation into separate script (see stash)
+  - [ ] Test on bare Ubuntu Server
+    - [x] Preparation
+
 ## Fri 29/Jan/2021
 
 - Admin/tools

@@ -657,12 +657,16 @@ iface lo inet loopback
 
 auto enp42s0
 iface enp42s0 inet static
-        address   192.168.0.1/24
-        gateway   192.168.0.1
+        address 10.0.2.15
+        netmask 255.255.255.0
+        broadcast 10.0.2.255
+        gateway 10.0.2.2
 
 auto enp43s0
 iface enp43s0 inet dhcp
 ```
+
+Simpler static parameters could be used (`address .../24` and `gateway ...` only), but they may not be compatible with all the systems.
 
 For USB network interfaces, use [`allow-hotplug`](https://lists.debian.org/debian-user/2017/09/msg00911.html).
 

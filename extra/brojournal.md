@@ -1,3 +1,24 @@
+## Mon 01/Feb/2021
+
+- Admin/tools
+  - [x] Clonezilla: manual run (restore) via tools, without boot
+    - [x] Fix issue with dumps to be restored by the Focal clonezilla version
+  - [x] Git
+    - Fight `format-patch` accidental misconfiguration
+
+- Projects/Open source
+  - QEMU research paper
+    - Scripts
+      - [x] Add SMT support
+      - [x] Create `run_all.sh` script
+      - [x] Rename plotter `--compare` to `--scale`
+    - [x] Test on bare Ubuntu Server
+      - [x] Minor fixes
+      - [x] Review results
+    - [ ] Dive into the QEMU RISC-V implementation
+      - [x] Find out if there is a core/hw_thread concept
+      - [x] Summarize and send
+
 ## Sun 31/Jan/2021
 
 - Studies

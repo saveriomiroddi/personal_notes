@@ -52,6 +52,7 @@
     - [Disconnect and power off a device](#disconnect-and-power-off-a-device)
     - [Keyboard](#keyboard)
     - [Topology](#topology)
+    - [Isolating processors](#isolating-processors)
 
 ## Security
 
@@ -1025,3 +1026,21 @@ dpkg-reconfigure console-data
 lstopo --of console --no-io --no-caches # ubuntu
 hwloc-ls -v --no-io                     # fedora
 ```
+
+### Isolating processors
+
+In order to isolate processors from the kernel scheduling, add `isolcpus=isolcpus=1-4,5,666` to the kernel commandline.
+
+Isolated processors can be inspected via `/sys/devices/system/cpu/isolated`.
+
+Then, one can use `taskset -c 1-4,5,666 -p $vcpu_task_pid` . Not all `taskset` support `-c`; example to exclude processor 0: `taskset 0xFFFFFFFE` (bitmask; bits for non-existing processors are ignored).
+
+WATCH OUT! Processes associated via `taskset` do not load balance, therefore, one will, for example, observe that the associated process (tree) runs on a single processor:
+
+```sh
+$ ps -aLo comm,psr | grep qemu
+qemu-system-x86 1
+qemu-system-x86 1
+```
+
+For a softer isolation (that is, with the kernel still being scheduled on the desired processors), use `cpuset` (see https://www.codeblueprint.co.uk/2019/10/08/isolcpus-is-deprecated-kinda.html).

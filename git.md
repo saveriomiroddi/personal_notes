@@ -43,13 +43,17 @@ Conventions:
 
 - `$branch~[$n]` : reference to `$branch` minus `$n` (0 is also valid, and it refers to `$branch`)
 - `branch^`      : `$branch` - 1
+- `-$n`          : !!! HEAD - `$n` !!!
 - `HEAD`         : head of the current branch (current commit)
 - `ORIG_HEAD`    : last value of HEAD before dangerous operations
 - `$ref@{-$n}`   : nth checkout previous to the last one; eg. checkout master => checkout feature => now `@{-1}` refers to master
 
 ## Configuration
 
-`git config [--global]`: stores config in `.git/config`; [global] stores in `~/.gitconfig`
+```sh
+config [--global]   # stores config in `.git/config`; [global] stores in `~/.gitconfig`
+help -c             # list all possible configuration keys
+```
 
 | Parameter                 |    Value    | Comment                                            |
 | ------------------------- | :---------: | -------------------------------------------------- |
@@ -385,28 +389,30 @@ git status -s | awk '{print $2}' | xargs -I {} scp {} myserver:mypath/{}
 Diff/Patching:
 
 ```sh
-# WATCH OUT! Better to configure `diff.noprefix true` rather than run this, for those not using prefixes.
+# Patch with metadata retain (and commit)
 #
-# Suitable for standard patch import; if [--no-prefix] is not specified, import using "patch -p1"
+# When specifying $start_commit/$end_commit, several patches will be created.
+#
+format-patch [--stdout] [$start_commit^[..$end_commit]]
+am $patchfile
+
+# "Transfer" commit between two repositories:
+#
+git -C ~/code/riscv_images format-patch --stdout -1 |
+  sed 's/guest_benchmark_pigz/altscripts\/guest_benchmark_pigz/g' |
+  git am
+
+# Patch with metadata loss (and no commit)
+#
+# WATCH OUT! One can configure `diff.noprefix true`, however, `format-patch` will need the prefixes
+# to be specified in one way or another (since they're mandatory, and `format-patch` has no configuration
+# entries).
+#
+# - diff: suitable for standard patch import; with prefix, import using "patch -p1"
+# - apply: [check] instead of apply
 #
 diff --no-prefix
-
-# Create standard patch, to be applied with `am`. `diff` can be used, but the metadata (e.g. author) will be lost.
-#
-# - produce diff for $file only
-# - creates a series of patches starting from $start_commit until HEAD or $end_commit
-#
-format-patch -1 $start_commit^[..$end_commit] [$file] [--stdout]
-
-# Apply a patch and commit.
-#
-am $infile
-
-# Apply without commit
-#
-# - [check] instead of apply
-#
-apply [--check] $infile
+apply [--check] $patchfile
 ```
 
 ## Useful operations

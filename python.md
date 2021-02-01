@@ -2,6 +2,8 @@
 
 - [Python](#python)
   - [General syntax](#general-syntax)
+    - [Strings/Printing](#stringsprinting)
+    - [Data types](#data-types)
     - [Classes](#classes)
     - [Collections](#collections)
       - [Lists](#lists)
@@ -14,8 +16,26 @@
     - [logging (import)](#logging-import)
     - [pprint (pretty printing) (import)](#pprint-pretty-printing-import)
     - [Debugging](#debugging)
+    - [I/O](#io)
+  - [Snippets](#snippets)
+    - [Read a CSV from stdin, and compute averages](#read-a-csv-from-stdin-and-compute-averages)
 
 ## General syntax
+
+### Strings/Printing
+
+```python
+f'{threads},{sum(run_times) / len(run_times)}' # interpolate strings ("f-strings", v3.6+)
+```
+
+### Data types
+
+Parse strings:
+
+```python
+int(str)
+float(str)
+```
 
 ### Classes
 
@@ -25,6 +45,15 @@ isinstance(instance, class)  # check instance class
 ```
 
 ### Collections
+
+```python
+a, _, c = collections       # unpack tuple/list
+
+sorted(iterable)            # return a sorted collection
+sorted(dict.items())        # iteratable (k, v) of a dict, sorted by key
+
+next(iterable)              # return the next entry; can be used to skip one
+```
 
 #### Lists
 
@@ -44,6 +73,7 @@ regions = [(r.a, r.b) for r in folded_regions]    # example
 
 ```python
 dict[key]                 # perform a lookup; if the key doesn't exist, an error is raised
+dict.setdefault(key, default)  # return a value, setting the given default if not present
 key in dict               # check if dict contains key
 dict.get(key[, default])  # perform a lookup; if default is not provided and the key doesn't exist, an error is raised
 dict.pop(key[, default])  # delete a key; if default is not provided and the key doesn't exist, an error is raised
@@ -90,6 +120,8 @@ os.path.exists(filename) and os.path.isfile(fiename)    # check if a file exists
 with open(filename, 'w') as file:                       # open file; no mode will open for read
   data = file.read()
   file.write(new_data)
+
+content = open(filename, 'r').read()                    # one-liner; relies on exit to close the handle
 ```
 
 ### logging (import)
@@ -113,4 +145,45 @@ Add to any line:
 
 ```python
 import pdb; pdb.set_trace()
+```
+
+### I/O
+
+Access and iterate sys.stding
+
+```python
+import sys
+next(sys.stdin)                          # skip line
+for line in map(str.rstrip, sys.stdin):  # strip the trailing whitespace
+```
+
+## Snippets
+
+### Read a CSV from stdin, and compute averages
+
+Doesn't use the `csv` api, for simplicity. Requires v3.5+.
+
+Sample input:
+
+```csv
+theads,run_number,run_time
+4,0,2.22
+4,1,2.33
+8,0,1.11
+```
+
+```python
+import sys
+
+all_run_times={}
+
+next(sys.stdin)
+
+for run_data in map(str.rstrip, sys.stdin):
+  threads, _, run_time = run_data.split(',')
+  threads_run_times = all_run_times.setdefault(int(threads), [])
+  threads_run_times.append(float(run_time))
+
+for threads, run_times in sorted(all_run_times.items()):
+  print(f'{threads},{sum(run_times) / len(run_times)}')
 ```

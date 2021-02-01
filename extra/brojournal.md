@@ -1,3 +1,33 @@
+## Sun 31/Jan/2021
+
+- Studies
+  - Other
+    - [x] Python for text processing, instead of Perl
+    - [x] Patch/diff, instead of Perl
+  - Gnuplot
+    - [x] Multiplots
+      - [x] Handling diagrams with different x ranges
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Scripting/features
+      - [x] Quick cleanups/refactorings
+      - [x] Informal HT local tests
+      - [x] Add SMT disabling
+      - [x] Add support for local (host testing)
+      - [x] Add support for normalized/comparison diagram
+    - [x] Personal workstation testing (host+guest)
+      - [x] Base testing
+      - [x] Pinning testing
+        - [x] Review taskset+isolcpu
+          - [x] Read resources
+            - [x] https://stackoverflow.com/questions/14512197/what-does-taskset-in-linux-exactly-do
+            - [x] https://www.codeblueprint.co.uk/2019/10/08/isolcpus-is-deprecated-kinda.html
+          - [x] Think how to setup isolated setups so that they fit the non-isolated ones
+            - [x] Implement
+        - [x] Test isolcpu+pinning
+    - [x] First look at Parsec
+
 ## Sat 30/Jan/2021
 
 - Studies

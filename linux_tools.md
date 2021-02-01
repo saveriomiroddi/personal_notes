@@ -32,6 +32,7 @@
   - [Formatting tools](#formatting-tools)
   - [Benchmarking](#benchmarking)
   - [Mounting images](#mounting-images)
+  - [Create patches (diff)/restore them](#create-patches-diffrestore-them)
 
 ## ls
 
@@ -660,3 +661,21 @@ while ! ls -l $partition_device > /dev/null 2>&1; do sleep 0.1 done
 
 mount "$partition_device" /mnt
 ```
+
+## Create patches (diff)/restore them
+
+```sh
+# Create the diff (`u`nified format)
+#
+diff -u $original $modified > patch.diff
+
+# Create the diff from git (see git notes for details)
+#
+git diff --no-prefix $file > patch.diff
+
+# `p0`: required for files in subdirs; for safety, best to always use it.
+#
+patch -p0 $patch.diff
+```
+
+If a hunk has been applied, patch will prompt. It's possible to skip this by using `--forward`, although that will return `1` exit status.

@@ -316,6 +316,7 @@ Metacharacters:
 - `\b`: supported
 - `\s`: `[:space:]`
 - `[:xdigit:]`: hexadecimal!
+- `()` + `|`: supported
 
 References:
 
@@ -475,6 +476,12 @@ ${filename##*/}                   # extract basename, eg. `"${PWD##*/}"`
 ${filename%/*/*}                  # parent dir of a file (watch out - requires at least two slashes!)
 ```
 
+Fun trick for repeating a string:
+
+```sh
+printf '<SAV>%.0s' {1..10}
+```
+
 ### Examples
 
 ```sh
@@ -519,7 +526,8 @@ a=$((a++))                        # numerical values don't need `$`
 ((a & b | c))                     # bitwise operators supported
 
 `true`/`false`                    # not supported in arithmetic...
-! ((a))                           # ... however, 0/'' are evaluated as false, and everything else as true.
+((! a))                           # ... however, 0/'' are evaluated as false, and any other number as true (strings
+                                  # will fail)
 
 a+=1                              # WRONG!!! this is a string operation (if not an arithmetic expression)
 ```
@@ -702,15 +710,19 @@ read -rsn1 [<variable_name>]
 
 ### Trapping errors
 
-Execute a (explicit) command on exit; generally convenient to trap ERR and INT:
+Execute a (explicit) command on exit; generally convenient to trap `ERR` + `INT`, or `EXIT`.
+
+`EXIT` will trap everything (which can be fine), so don't use it with `ERR`/`INT`, otherwise the handler will be invoked once for each signal.
+
+!! Can't register multiple handlers for the same signal; the last will override the preceding !!
 
 ```sh
 LOCKFILE=/var/lock/makewhatis.lock
 
 # Explicit command form. WATCH OUT! Use single outer quotes, otherwise the content is interpolated!
-# Don't use `EXIT` when trapping only errors.
-#
-trap '{ rm -f $LOCKFILE; }' ERR INT EXIT
+# The context is still valid, so variables in the string will be referenced.
+
+trap '{ rm -f $LOCKFILE; }' EXIT
 
 # Function form:
 #
@@ -718,7 +730,7 @@ function remove_lockfile {
   rm -f "$LOCKFILE"
 }
 
-trap remove_lockfile ERR INT EXIT
+trap remove_lockfile EXIT
 ```
 
 ### Log a script output/Enable debugging [log]
@@ -825,7 +837,7 @@ while true ; do
       USE_SHARED_FOLDERS=1
       shift ;;
     -c|--cd1-image)
-      CD1_IMAGE="$2"
+      CD1_IMAGE=$2
       shift 2 ;;
     --)
       shift

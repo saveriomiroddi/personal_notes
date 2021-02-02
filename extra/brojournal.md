@@ -1,3 +1,15 @@
+## Tue 02/Feb/2021
+
+- Blog articles
+  - [ ] High-performance Gaming/Content creation PC build
+    - [x] Fight finding exact PCI lanes information
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Cross-compile Parsec benchmarks
+      - [x] Compile a few, and fight attempt to compile the rest
+    - [ ] Check the native compiling on Fedora
+
 ## Mon 01/Feb/2021
 
 - Admin/tools

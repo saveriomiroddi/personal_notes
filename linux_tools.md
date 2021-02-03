@@ -20,6 +20,7 @@
   - [GNU Screen](#gnu-screen)
   - [Clonezilla](#clonezilla)
   - [Sleep](#sleep)
+  - [Watch](#watch)
   - [Dates](#dates)
     - [Formatting](#formatting)
     - [Operations](#operations)
@@ -425,6 +426,20 @@ Sleeping works for decimals, and multiple times!
 #
 sleep 1.5h
 sleep 1h 30m
+```
+
+## Watch
+
+Be aware that watch commands are tricky. While not quoting the command works, for more complex commands, it will fail. Additionally, the shell executed it dash.
+
+Example of scripted invocation:
+
+```sh
+watch_command=(watch -n 1 -x) # will execute bash
+output_format_options=()
+query_option=("$(printf "%q" "SELECT * FROM mytable")")
+
+"${watch_command[@]}" bash -c "mysql ${output_format_options[*]} -uroot -h$mysql_host ${schema_option[*]} ${query_option[*]}"
 ```
 
 ## Dates

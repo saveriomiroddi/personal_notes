@@ -1,3 +1,31 @@
+## Wed 03/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Check the native compiling on Fedora
+      - [x] Review image preparation
+        - [x] Prepare
+      - [x] Compile all compilable
+        - [x] Minor fix for a few
+    - [ ] Local tests run
+      - [x] Review/test run
+        - [x] Review the input types
+        - [x] Review how to run tests
+          - [x] Test run, and find how to parse output
+            - [x] Test run simple
+              - Use `Total time without initialization :\s+(\d+)` (in µs), or `^real\s+(\S+)s$` when the first is not found
+            - [x] ROI: `ROI time measured: (\d+\.\d+) seconds.`
+              - [x] Fight investigate ROI
+                - [x] Review `darchr` fork ROI logic
+                - [x] Review source code for original timing logic
+          - [x] Check `ns` and `NTHREADS`
+        - [x] Run a few
+          - [x] Test segfaulting ones with 16 GB
+        - [x] ROI/fork testing
+          - [x] Download `darchr` and compile a few tests
+            - [x] Recompile all
+          - [x] Fight enabling ROI
+
 ## Tue 02/Feb/2021
 
 - Blog articles

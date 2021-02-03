@@ -3,7 +3,8 @@
 - [Rails](#rails)
   - [Controllers](#controllers)
   - [ActiveRecord](#activerecord)
-  - [Migrations](#migrations)
+    - [Querying](#querying)
+    - [Migrations](#migrations)
 
 ## Controllers
 
@@ -19,8 +20,13 @@ Query hints (6.0+):
 Article.joins(:user).optimizer_hints("JOIN_ORDER(articles, users)").to_sql
 # => SELECT /*+ JOIN_ORDER(articles, users) */ `articles`.* FROM `articles` INNER JOIN `users` ON `users`.`id` = `articles`.`user_id`
 ```
+### Querying
 
-## Migrations
+```ruby
+query.ids                   # pluck the ids!
+```
+
+### Migrations
 
 Reference: https://apidock.com/rails/ActiveRecord/ConnectionAdapters/SchemaStatements
 

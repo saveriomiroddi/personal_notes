@@ -4,7 +4,9 @@
   - [Virtual disks](#virtual-disks)
     - [Creation/copy/conversion:](#creationcopyconversion)
     - [Zeroing/compacting/compressing an image](#zeroingcompactingcompressing-an-image)
-    - [Mount an image](#mount-an-image)
+    - [Working with an image content](#working-with-an-image-content)
+      - [Filesystem operations](#filesystem-operations)
+      - [Mount an image](#mount-an-image)
     - [VirtualBox-specific](#virtualbox-specific)
   - [QEMU](#qemu)
 
@@ -80,15 +82,14 @@ Compact a VDI image (must be pre-zeroed):
 vboxmanage modifymedium --compact $image.vdi
 ```
 
-Zero and compact an image:
+Zero/compact/compress an image with dedicated tooling:
 
 ```sh
+# Zero
+#
 sudo virt-sparsify --tmp $tmp_path $image.vdi{,.sparse}
-```
 
-Compress an image:
-
-```sh
+# Compress
 # Options: [p]rogress, [O]utput format, [c]ompress
 #
 qemu-img convert -p -c -O qcow2 $source.qcow2 $dest.qcow2
@@ -99,7 +100,33 @@ qemu-img convert -p -c -O qcow2 $source.qcow2 $dest.qcow2
 sudo virt-sparsify --convert qcow2 --compress $source.raw $dest.qcow2
 ```
 
-### Mount an image
+### Working with an image content
+
+#### Filesystem operations
+
+Print partition informations:
+
+```sh
+sudo virt-filesystems --long -h --all -a $image  # partition infos
+sudo virt-df -h -a $image                        # partitions usage
+```
+
+Resize a partition:
+
+```sh
+# Resize to an exact destination size
+#
+# There is a "resize" action (e.g. add 40G), but it's dumb, as it requires the output disk to be at least
+# the required size, which can't be exactly calculated (even for a qcow destination).
+#
+# - `-v`: verbose
+# - `-x`: trace underlying calls, for better error messages
+#
+truncate -s 40G $dest.raw
+sudo virt-resize -v -x --expand /dev/sda4 $source $dest.raw
+```
+
+#### Mount an image
 
 Mount:
 

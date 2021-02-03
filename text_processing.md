@@ -382,11 +382,16 @@ Examples:
 
 ### Special characters
 
-In order to handle tabs (`\t`), either use `$` quoting or parameter substitution:
 
 ```sh
+# In order to handle tabs (`\t`), either use `$` quoting or parameter substitution:
+#
 sed $'s/\t/ /'
 sed "s/$(printf '\t')/ /"
+
+# WATCH OUT!! Newlines don't require `$` quoting:
+#
+sed 's/from/to1\nto2/'
 ```
 
 ## Snippets

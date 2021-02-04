@@ -714,7 +714,7 @@ Execute a (explicit) command on exit; generally convenient to trap `ERR` + `INT`
 
 `EXIT` will trap everything (which can be fine), so don't use it with `ERR`/`INT`, otherwise the handler will be invoked once for each signal.
 
-!! Can't register multiple handlers for the same signal; the last will override the preceding !!
+!! Can't register multiple handlers for the same signal; the last will override the preceding !! However, each subshell (script) has their own handlers.
 
 ```sh
 LOCKFILE=/var/lock/makewhatis.lock

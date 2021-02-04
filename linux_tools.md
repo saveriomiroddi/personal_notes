@@ -6,6 +6,7 @@
     - [Examples](#examples)
       - [Search text inside multiple PDFs](#search-text-inside-multiple-pdfs)
   - [xargs](#xargs)
+  - [tar](#tar)
   - [rsync](#rsync)
   - [mkfifo](#mkfifo)
   - [Files](#files)
@@ -185,6 +186,13 @@ Examples:
 ```sh
 ls -1rt | xargs -d "\n" $cmd                  # executes the command, with files sorted by reverse modification time
 cat /proc/self/environ | xargs -0 -L 1        # print the env vars (null-terminated), one per line
+```
+
+## tar
+
+```sh
+tar -C /tmp xvz                                        # Extract to a different directory
+tar xvz --transform="s/^parsec-3.0/parsec-benchmark/"  # Rename destination files while extracting!!
 ```
 
 ## rsync

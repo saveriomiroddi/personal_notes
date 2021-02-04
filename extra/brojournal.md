@@ -1,3 +1,12 @@
+## Thu 04/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Local tests run
+      - [ ] Add fedora preparation
+        - [ ] Preparation stage
+        - [ ] Build stage (single-process)
+
 ## Wed 03/Feb/2021
 
 - Projects/Open source

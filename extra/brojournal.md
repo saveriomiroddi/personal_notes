@@ -1,3 +1,17 @@
+## Fri 05/Feb/2021
+
+- Admin/tools
+  - [x] Repositories sync script updates
+    - [x] Manager brojournal
+    - [x] Minor refactoring
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Local tests run
+      - [ ] Add fedora preparation
+        - [x] Preparation stage
+        - [ ] Build stage (single-process)
+
 ## Thu 04/Feb/2021
 
 - Projects/Open source

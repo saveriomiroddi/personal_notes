@@ -193,6 +193,7 @@ cat /proc/self/environ | xargs -0 -L 1        # print the env vars (null-termina
 ```sh
 tar -C /tmp xvz                                        # Extract to a different directory
 tar xvz --transform="s/^parsec-3.0/parsec-benchmark/"  # Rename destination files while extracting!!
+tar --exclude='parsec-benchmark/.git' parsec-benchmark # Exclude (glob pattern)
 ```
 
 ## rsync

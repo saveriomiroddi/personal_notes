@@ -207,3 +207,7 @@ qemu-system-riscv64 \
 
 echo system_powerdown | socat - UNIX-CONNECT:"$QEMU_MONITOR_FILE"
 ```
+
+Other options:
+
+- `-nographic`: runs in the foreground, in the terminal (without window)

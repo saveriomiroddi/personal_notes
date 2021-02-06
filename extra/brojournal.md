@@ -1,3 +1,26 @@
+## Sat 06/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Local tests run
+      - [ ] Add fedora preparation
+        - [x] Fight QEMU networking issue
+        - [x] Disable Fedora blocking service
+        - [x] Build stage (single-process)
+  - ZFS
+    - [x] Review and reply support reques
+
+- Admin/tools
+- Blog articles
+- Blog admin
+- Studies
+  - Other
+  - Rust
+  - Javascript/WASM
+  - SWE
+  - Systems programming/assembler
+  - Games
+
 ## Fri 05/Feb/2021
 
 - Admin/tools

@@ -39,7 +39,6 @@
     - [Workaround sudo expiry during a long-running script](#workaround-sudo-expiry-during-a-long-running-script)
     - [Time-related functionalities](#time-related-functionalities)
     - [Parse commandline options (`getopt`)](#parse-commandline-options-getopt)
-    - [Poor man's configfile parser](#poor-mans-configfile-parser)
     - [Variables printing function](#variables-printing-function)
   - [Shell colors](#shell-colors)
 
@@ -820,6 +819,8 @@ See http://www.bahmanm.com/blogs/command-line-options-how-to-parse-in-bash-using
 Note that when using this getopt (GNU) inside a function, all the processing should be performed inside the function - `$@/$#` are not as expected after returning.
 
 ```sh
+c_help="Usage: $(basename "$0") [-h|--help] ..."
+
 # Options (case sensitive): [-h|--help], [-s|--shared-folders], [-c|--cd1-image MANDATORY_ARGUMENT]
 # `--name` is the name of the program printed when an error is reported.
 # Note the external double quotes; without them, messy things happen!
@@ -827,6 +828,7 @@ Note that when using this getopt (GNU) inside a function, all the processing sho
 eval set -- "$(getopt --options hsc: --long help,shared-folders,cd1-image: --name "$(basename "$0")" -- "$@")"
 
 # DON'T FORGET THE `shift` commands and the `--` case.
+# Rigorously, one should add the '*' case (internal error), but it's not required.
 #
 while true ; do
   case "$1" in
@@ -845,13 +847,10 @@ while true ; do
   esac
 done
 
-# Rigorously, one should add the following case, but it's not required.
-#
-*)
-  echo "Internal error: '$1'"
-  exit 1 ;;
-
-```
+if [[ $# -ne 0 ]]; then
+  echo "$c_help"
+  exit 1
+fi
 
 Non-option params are available, after the `while` block, from `$1`.
 

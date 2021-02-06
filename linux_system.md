@@ -478,15 +478,18 @@ systemctl reload-or-restart $service  # if reload is not defined (or has no effe
 systemctl status $service
 systemctl cat $service                # print unit file
 systemctl edit --full $service        # edit unit file
+systemctl mask $service               # "mask": disable a service, by symlinking it to /dev/null
 
 systemctl daemon-reload               # invoke this after updating a unit
 systemctl daemon-reexec               # required to reload Sytemd's own configuration (e.g. changes to `/etc/systemd/system.conf`)
 
 systemctl is-(active|enabled|failed) $service  # query status
 systemctl list-units                  # active loaded units
+systemctl list-unit-files [$pattern]  # all units, with their states; glob pattern
 systemctl --failed                    # show units that failed to start
-systemctl --all                       # list everything (with their states), including timers
 ```
+
+A static service can't be manually enabled or disabled; use mask for that.
 
 ### journalctl
 

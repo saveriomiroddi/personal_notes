@@ -28,7 +28,7 @@
   - [Images handling](#images-handling)
     - [Imagemagick](#imagemagick)
     - [Raw to JPEG conversion](#raw-to-jpeg-conversion)
-  - [SSH](#ssh)
+  - [SSH/utilities](#sshutilities)
   - [SSL/Certificates](#sslcertificates)
   - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
     - [Key servers](#key-servers)
@@ -530,7 +530,7 @@ for f in *.ORF; do darktable-cli "$f" "$f".jpg; done
 
 [Reference](https://askubuntu.com/a/1256073/46091).
 
-## SSH
+## SSH/utilities
 
 ```sh
 openssl rsa -in $private_key -pubout   # Generate a public key from private
@@ -555,6 +555,17 @@ openssl s_client -connect $url:$port < /dev/null | openssl x509  -noout -enddate
 
 # Run a program in the primary display, from an SSH section
 DISPLAY=:0 teamviewer
+```
+
+sshpass usages:
+
+```sh
+sshpass -p 'fedora_rocks!' ssh -p 10000 riscv@localhost
+
+# With sshpass, it's odd.
+#
+echo -n 'fedora_rocks!' > /tmp/pwdfile
+sshfs -p 10000 riscv@localhost: /media/saverio/temp -o ssh_command="sshpass -f /tmp/pwdfile ssh"
 ```
 
 ## SSL/Certificates

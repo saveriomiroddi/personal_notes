@@ -1,31 +1,32 @@
+## Sun 07/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Packages compilation
+      - [x] Try `-fcommon` solution
+      - [x] Open PR + issue to `parsec-benchmark` repo
+
 ## Sat 06/Feb/2021
 
 - Projects/Open source
   - QEMU research paper
     - [ ] Local tests run
-      - [ ] Add fedora preparation
+      - [x] Scripting: minor refactorings/extensions to run scripts
+      - [x] Add fedora preparation
         - [x] Fight QEMU networking issue
         - [x] Disable Fedora blocking service
         - [x] Build stage (single-process)
+    - [ ] Packages compilation
+      - [x] Epic fight with the remaining uncompiled package
   - ZFS
     - [x] Review and reply support reques
-
-- Admin/tools
-- Blog articles
-- Blog admin
-- Studies
-  - Other
-  - Rust
-  - Javascript/WASM
-  - SWE
-  - Systems programming/assembler
-  - Games
 
 ## Fri 05/Feb/2021
 
 - Admin/tools
   - [x] Repositories sync script updates
-    - [x] Manager brojournal
+    - [x] Add brojournal update
+    - [x] Fully automate personal_notes handling
     - [x] Minor refactoring
 
 - Projects/Open source

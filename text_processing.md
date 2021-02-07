@@ -25,7 +25,7 @@
   - [Sed](#sed)
     - [Syntax](#syntax-1)
     - [Regexes](#regexes)
-    - [Operators](#operators-1)
+    - [Operators/variables](#operatorsvariables)
     - [Operations](#operations)
     - [Concatenate operations](#concatenate-operations)
     - [Special characters](#special-characters)
@@ -350,9 +350,10 @@ Some supported by `-E`:
 
 Capturing groups are not supported.
 
-### Operators
+### Operators/variables
 
-`/from/,/to/p` : flip flop
+- `$`            : last line
+- `/from/,/to/p` : flip flop
 
 ### Operations
 
@@ -363,7 +364,8 @@ General:
 
 Operations on numbered lines (1-based):
 
-- insert : `i<content>` (includes newline)
+- insert : `i<content>` (before match; includes newline)
+- insert : `a<content>` (after match; includes newline)
 - delete : `d`.
 - replace : `c<content>`.
 - search/replace: `s/<search>/<replace>/[g]`

@@ -70,6 +70,8 @@ set -o xtrace             # `-x`: debugging mode; prints all the statements
 shopt -s nocasematch      # case insensitive matches
 ```
 
+If the xtrace is set before a backgrounded block (e.g. `{ while ... } &`), it won't be logged.
+
 See http://linuxcommand.org/lc3_man_pages/seth.html.
 
 ### Related operations

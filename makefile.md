@@ -1,11 +1,20 @@
 # Makefile
 
 - [Makefile](#makefile)
+  - [Useful stuff](#useful-stuff)
   - [Sample breakdown](#sample-breakdown)
     - [Variables](#variables)
     - [Targets/Symbols](#targetssymbols)
     - [Shell commands execution](#shell-commands-execution)
     - [If/then/else](#ifthenelse)
+
+## Useful stuff
+
+Print variables during run (put this in a target):
+
+```makefile
+echo [CC: ${CC}] [LIBS: ${LIBS}] # etc.
+```
 
 ## Sample breakdown
 

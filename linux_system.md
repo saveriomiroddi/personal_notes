@@ -478,7 +478,7 @@ systemctl reload-or-restart $service  # if reload is not defined (or has no effe
 systemctl status $service
 systemctl cat $service                # print unit file
 systemctl edit --full $service        # edit unit file
-systemctl mask $service               # "mask": disable a service, by symlinking it to /dev/null
+systemctl mask $service               # "mask": disable a service, by symlinking it to /dev/null; WATCH OUT! doesn't fail if the service doesn't exis
 
 systemctl daemon-reload               # invoke this after updating a unit
 systemctl daemon-reexec               # required to reload Sytemd's own configuration (e.g. changes to `/etc/systemd/system.conf`)

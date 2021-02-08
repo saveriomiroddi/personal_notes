@@ -1,3 +1,24 @@
+## Mon 08/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Complete PARSEC automated build
+      - [x] Find the complete list of tests
+      - [x] Check if compiling is parallel
+        - [x] Check on `parsec.facesim`
+        - [x] Check indirectly built projects (no; previously hacked `cmake/bootstrap`)
+        - [x] Apply (and publish) improvement
+      - [x] Update the splash2.raytrace Makefile to make it compile (and test)
+      - [x] Implement parallel build
+        - [x] Check out packages dependencies tree
+      - [x] Build all
+          - Exclude failing one (and dependent)
+          - [x] Observe occupation
+          - [x] Fix volrend
+        - [x] Review failures
+          - [x] canneal
+          - [x] ssl/dedup
+
 ## Sun 07/Feb/2021
 
 - Projects/Open source

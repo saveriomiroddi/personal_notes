@@ -40,6 +40,12 @@ INCLUDES := -I .
 LIST_FILES := ls -l
 ```
 
+Set a variable if blank:
+
+```sh
+HOSTCC := $(if $(HOSTCC),$(HOSTCC),$(CC))
+```
+
 Variables can be overriden from the commandline by passing them as `make` params:
 
 ```sh
@@ -106,6 +112,7 @@ clean:
 
 ### If/then/else
 
+- `if(condition, true_branch, false_branch)`
 - `ifeq($(VARIABLE),value)`
 - `ifneq`
 

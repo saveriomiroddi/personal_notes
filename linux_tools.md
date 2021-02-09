@@ -198,10 +198,23 @@ tar --exclude='parsec-benchmark/.git' parsec-benchmark # Exclude (glob pattern)
 
 ## rsync
 
-Copy the the structure of a relative path. Use `--relative`, and place a dot path `./`:
-
 ```sh
+# Copy the the structure of a relative path. Use `--relative`, and place a dot path `./`:
+#
 rsync -av --relative "/target/run/./systemd/resolve" "/mnt/run"
+
+# "Move-merge" a directory into another (mv doesn't allow this)
+#
+rsync -av --remove-source-files $from $to
+
+# Resume partial files, but obviously must be 100% sure that the file content is the same
+#
+rsync --append ...
+
+# Exclude (glob)
+#
+rsync --exclude=.git parsec-benchmark/ /dest                     # exclude at any level
+rsync --exclude=parsec-benchmark/.git parsec-benchmark/ /dest    # exclude only the root one
 ```
 
 ## mkfifo

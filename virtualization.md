@@ -107,8 +107,17 @@ sudo virt-sparsify --convert qcow2 --compress $source.raw $dest.qcow2
 Print partition informations:
 
 ```sh
-sudo virt-filesystems --long -h --all -a $image  # partition infos
-sudo virt-df -h -a $image                        # partitions usage
+# fs/partition infos
+#
+# `--all`               : both FS and partitions
+# `-a|--add $image`
+# `-h|--human-readable`
+#
+sudo virt-filesystems --long --human-readable --all --add $image
+
+# partitions space usage
+#
+sudo virt-df -h -a $image
 ```
 
 Resize a partition:

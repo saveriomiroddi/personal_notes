@@ -102,7 +102,8 @@ Parameter variables; WATCH OUT!! When inside a function, they refer to the funct
 myvar=value                         # no spaces around equal; if value includes spaces, it must be quoted
 myvar=$myvar2                       # $myvar2 doesn't require quotes
 unset myvar                         # delete myvar
-export myvar=value                  # makes available to subshells (also applies to local vars). `local export` is allowed, but doesn't work as intended
+export myvar=value                  # makes available to subshells. `local export` is allowed, but doesn't work as intended; in order to export
+                                    # local variables, do it separately from assignment
 ((var+=1))                          # increment variable value
 ((var++)) || true                   # increment variable value. WATCH OUT!!! `|| true` is required if var=0 before the increment/decrement!!!!
 
@@ -732,6 +733,13 @@ function remove_lockfile {
 }
 
 trap remove_lockfile EXIT
+
+# It's possible to nest functions (!)
+#
+function register_exit_hook {
+  function _exit_hook { rm -f "$LOCKFILE"; }
+  trap _exit_hook EXIT
+}
 ```
 
 ### Log a script output/Enable debugging [log]

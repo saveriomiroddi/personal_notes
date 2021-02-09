@@ -1,3 +1,25 @@
+## Tue 09/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Complete PARSEC automated build
+      - [x] Fix also `dedup` package
+      - [x] Add copy stage
+    - [x] Merge VM run scripts into a single one
+    - [x] Fix an incorrect ROI patch
+    - [x] Complete PARSEC automated build
+      - [ ] End-to-end test
+    - [x] Cleanups
+      - [x] Move the Fedora `.prepared.run.qcow2` out of the way
+      - [x] Add exit cleanup hook, and cleanup loop device/mountpoint variables
+    - [ ] Benchmark: support the PARSEC tests
+      - [x] Generalize guest benchmark script
+      - [x] Basic implementation (blackscholes)
+    - [ ] Other instance of the QEMU networking issue
+      - [x] Review
+    - [ ] Review exact working of QEMU -smp in relation to the riscv64 target
+      - [x] Epic fight with the source code
+
 ## Mon 08/Feb/2021
 
 - Projects/Open source

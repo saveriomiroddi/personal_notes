@@ -3,8 +3,10 @@
 - [C](#c)
   - [Basics](#basics)
     - [Base program and functions](#base-program-and-functions)
+      - [printf](#printf)
   - [Conveniences](#conveniences)
     - [Print a struct instances's bytes](#print-a-struct-instancess-bytes)
+    - [Print a stack trace on segfault](#print-a-stack-trace-on-segfault)
   - [Library issues](#library-issues)
     - [Error `glibconfig.h: No such file or directory`](#error-glibconfigh-no-such-file-or-directory)
     - [Error `cannot find install-sh, install.sh, or shtool in ...`](#error-cannot-find-install-sh-installsh-or-shtool-in-)
@@ -34,6 +36,10 @@ int main(int argc, char **argv) {
 }
 ```
 
+#### printf
+
+- `lu/ld` long unsigned/signed
+
 ## Conveniences
 
 ### Print a struct instances's bytes
@@ -42,6 +48,38 @@ int main(int argc, char **argv) {
 for (int i = 0; i < sizeof(struct fanotify_event_metadata); i++)
   printf("%02x ", ((unsigned char*)metadata)[i]);
 printf("\n");
+```
+
+### Print a stack trace on segfault
+
+Requires enabling the debug symbols:
+
+```c
+#include <execinfo.h>
+void sav_handler(int sig);
+
+void sav_handler(int sig) {
+  void *array[10];
+
+  // get void*'s for all entries on the stack
+  size_t size = backtrace_symbols(array, 10);
+
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+
+  exit(1);
+}
+
+int main(int argc, char **argv) {
+  signal(SIGSEGV, sav_handler); // install the handler
+  raise(SIGSEGV);
+}
+```
+
+Send the result to addr2line:
+
+```sh
+a.out 2>&1 | perl -ne '/\(\+(0x\w+)\)/ && print("$1 ")' | xargs addr2line -e a.out
 ```
 
 ## Library issues

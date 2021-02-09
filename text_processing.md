@@ -271,7 +271,7 @@ NR                    # line number (1-based)
 RS                    # separator
 
 ==                    # string comparison
-=~                    # regex comparison
+~                     # regex comparison
 !~                    # negative regex comparison
 
 /regex/               # regular expression
@@ -306,8 +306,9 @@ echo 'a 8 9' | gawk '{print match($0, /a ([0-9]) ([0-9])/, a)}'                 
 
 # substr(string, start[, number]): returns `number` chars from `string``, starting at `start` (1-based!!):
 
-echo "Every good boy. " | awk '{print substr($1, 1, 1)}'   # `E` (first char)
-echo "Every good boy. " | awk '{print substr($1, 3)}'      # `ery`
+echo "Every good boy. " | awk '{print substr($1, 1, 1)}'       # `E` (first char)
+echo "Every good boy. " | awk '{print substr($1, length($1))}' # `d` (last char)
+echo "Every good boy. " | awk '{print substr($1, 3)}'          # `ery`
 ```
 
 ### Useful examples

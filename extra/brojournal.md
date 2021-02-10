@@ -1,3 +1,20 @@
+## Wed 10/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Other instance of the QEMU networking issue
+      - [x] Workaround (use loop device to transfer data, rather than tar)
+        - [x] Refactor: write routine to setup loop device
+    - [ ] Complete PARSEC automated build
+      - [x] End-to-end test
+        - [x] Fixes
+        - [x] Handle Busybox missing bash
+          - [x] Try stripping to make parsecmgmt ash-compatible
+          - [x] Review bash (cross-)compilation
+          - [x] Add to setup_system
+      - [ ] Test run of all the suites
+        - [x] Other fight with QEMU networking bug
+
 ## Tue 09/Feb/2021
 
 - Projects/Open source

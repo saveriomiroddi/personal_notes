@@ -217,6 +217,8 @@ rsync --exclude=.git parsec-benchmark/ /dest                     # exclude at an
 rsync --exclude=parsec-benchmark/.git parsec-benchmark/ /dest    # exclude only the root one
 ```
 
+The destination user is the current user, unless rsync is run as sudo, in which case, ownership is preserved.
+
 ## mkfifo
 
 Messages don't need termination; this is abstracted, so empty messages and binary files can be sent:

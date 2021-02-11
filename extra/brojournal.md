@@ -1,3 +1,21 @@
+## Thu 11/Feb/2021
+
+- Studies
+  - Git
+    - Review `--rebase-merges`, and experiment
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Complete PARSEC automated build
+      - [x] Check/test if the ASM in `facesim` is compiled
+    - [x] Test run of all the suites (`simmedium` input)
+      - [x] Review failing ones
+      - [x] Fix `parsec.vips`: requires libs
+        - [x] Statically compile `vips`
+          - [x] Fight chasing down and (statically) compiling the dependencies
+          - [x] Fight subtly corrupted `parsec-benchmark` project
+          - [x] Statically compile with workaround and test
+
 ## Wed 10/Feb/2021
 
 - Projects/Open source

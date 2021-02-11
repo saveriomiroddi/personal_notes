@@ -215,6 +215,10 @@ rsync --append ...
 #
 rsync --exclude=.git parsec-benchmark/ /dest                     # exclude at any level
 rsync --exclude=parsec-benchmark/.git parsec-benchmark/ /dest    # exclude only the root one
+
+# Specify a custom ssh command (e.g. for the port) + auto ssh password
+#
+sshpass -p 'fedora_rocks!' rsync -av -e 'ssh -p 10000' --progress --delete . riscv@localhost:parsec-benchmark/
 ```
 
 The destination user is the current user, unless rsync is run as sudo, in which case, ownership is preserved.

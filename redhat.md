@@ -10,6 +10,11 @@
 # Equivalent to Debian "build-essential" package.
 #
 dnf groupinstall -y "Development Tools" "Development Libraries"
+
+# Find out which packages a file belongs to. rpm is much faster.
+#
+rpm -qf /usr/lib64/liblzma.so
+dnf provides /usr/lib64/liblzma.so
 ```
 
 ## System conveniences

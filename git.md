@@ -16,6 +16,7 @@
   - [Metadata](#metadata)
   - [Merging](#merging)
   - [Rebase](#rebase)
+    - [Preserve merges when rebasing](#preserve-merges-when-rebasing)
   - [Remotes](#remotes)
   - [Stash](#stash)
   - [Bisect](#bisect)
@@ -285,6 +286,16 @@ git rebase -i --root
 #
 GIT_SEQUENCE_EDITOR="sed -i -re 's/^pick /e /'" git rebase -i "$(git merge-base HEAD master)"
 ```
+
+### Preserve merges when rebasing
+
+It's possible to preserve merges using `--rebase-merges`.
+
+It's not entirely clear how to do funky manipulations of history, however, for the case where there is an ff merge that has been stored as non-ff (ie. branch rebased before merging), one can:
+
+- checkout the last commit of the branch
+- squash its history
+- rebase the merge commit of the master branch (with `--rebase-merges`) onto the top of the squash commit
 
 ## Remotes
 

@@ -10,6 +10,7 @@
     - [Data type conversions](#data-type-conversions)
     - [Collections destructuring in blocks](#collections-destructuring-in-blocks)
     - [Modules](#modules)
+    - [Refinements](#refinements)
     - [Regular expression exceptions](#regular-expression-exceptions)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
   - [Reflection](#reflection)
@@ -256,6 +257,26 @@ module MyModule
 end
 
 class MyClass; include MyModule; end
+```
+
+### Refinements
+
+```ruby
+module NilEmptyHelper
+  refine NilClass do
+    def empty?
+      true
+    end
+  end
+end
+
+describe NilEmptyHelper do
+  using NilEmptyHelper
+
+  it "should make nil#empty? return true" do
+    expect(nil.empty?).to be(true)
+  end
+end
 ```
 
 ### Regular expression exceptions

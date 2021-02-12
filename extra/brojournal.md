@@ -1,3 +1,17 @@
+## Fri 12/Feb/2021
+
+- Projects/Open source
+  - [ ] Benchmark: support the PARSEC tests
+    - [x] Implement all the benchmarks
+      - [x] Review benchmarks without input data
+      - [x] Spread per-threads number runs
+    - [x] Test run all the benchmarks
+      - [x] Cap threads for benchs taking too long
+      - [x] Find out volrend segfault cause
+      - [x] Investigate and solve swaptions issue (mistake in documentation)
+    - [ ] Review exact working of QEMU -smp in relation to the riscv64 target
+      - [x] Complete analysis
+
 ## Thu 11/Feb/2021
 
 - Studies

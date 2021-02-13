@@ -7,6 +7,7 @@
   - [Conveniences](#conveniences)
     - [Print a struct instances's bytes](#print-a-struct-instancess-bytes)
     - [Print a stack trace on segfault](#print-a-stack-trace-on-segfault)
+  - [Compiler (gcc)](#compiler-gcc)
   - [Library issues](#library-issues)
     - [Error `glibconfig.h: No such file or directory`](#error-glibconfigh-no-such-file-or-directory)
     - [Error `cannot find install-sh, install.sh, or shtool in ...`](#error-cannot-find-install-sh-installsh-or-shtool-in-)
@@ -81,6 +82,10 @@ Send the result to addr2line:
 ```sh
 a.out 2>&1 | perl -ne '/\(\+(0x\w+)\)/ && print("$1 ")' | xargs addr2line -e a.out
 ```
+
+## Compiler (gcc)
+
+Use `-static` in order to compile statically.
 
 ## Library issues
 

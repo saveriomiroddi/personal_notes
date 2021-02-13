@@ -1,3 +1,31 @@
+## Sat 13/Feb/2021
+
+- Projects/Open source
+  - ZFS
+    - [x] Review and close discussion about space reclamation
+    - [x] Help new contributor to add support for PopOS
+  - QEMU research paper
+    - [x] Run swaptions, and merge in
+    - [x] Solve new issue with libxml2 compilation
+    - [x] Compile facesim, and test
+    - [x] Run VM script: add remove temp file
+    - [x] Review exact working of QEMU -smp in relation to the riscv64 target
+      - [x] Double check, summarize, and reply
+    - setup_system improvements/fixes
+      - [x] On data copy, copy only the `**/bin` directories
+      - [x] Statically compile pigz
+      - [x] Failed attempt at using the Debian-provided RISC-V cross-compiler
+    - [x] Open source tooling
+    - [ ] Issue with writes/flushes on slow drive
+      - [x] Fight and diagnose
+
+- Studies
+  - Linux tools
+    - [x] `rsync`: partial syncing of a tree, with certain conditions
+  - Rust
+    - [x] Rust high performance
+      - Summary reading
+
 ## Fri 12/Feb/2021
 
 - Projects/Open source

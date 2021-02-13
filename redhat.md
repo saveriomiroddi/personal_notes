@@ -15,6 +15,10 @@ dnf groupinstall -y "Development Tools" "Development Libraries"
 #
 dnf remove $package
 
+# Find a package dependencies
+#
+dnf repoquery --requires --resolve $package
+
 # Find out which packages a file belongs to. rpm is much faster.
 #
 rpm -qf /usr/lib64/liblzma.so

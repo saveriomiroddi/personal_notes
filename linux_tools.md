@@ -89,9 +89,11 @@ ls --block-size=K   # human-readable; use K,M,G...
 -print                            # when passing the content to the pipe, adds the filename to the start of every line
 -print0 | xargs -0                # use null-char to separate filenames (useful for filenames with spaces)
 -print -quit                      # print one entry and quit; useful to check if there is one or more files in a directory (or matching)
+-printf '%P\0'                    # print the relative path, and also append null-char
 
--exec <command> {} \;             # execute command for every file found, passing the name as {}; multiple -exec can be passed
--exec <command> {} +              # execute command with as many files as possible (see https://unix.stackexchange.com/a/389706)
+# exec: in both, `{}` must be the last argument
+-exec $command {} \;              # execute command for every file found, passing the name as {}; multiple -exec can be passed
+-exec $command {} +               # execute command with as many files as possible (see https://unix.stackexchange.com/a/389706)
 ```
 
 ### Examples
@@ -169,6 +171,8 @@ find . -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep -i --with-filename --l
 
 ## xargs
 
+Note that, when grouping args, they must be at the end of the command (with -I, once invocation per arg is performed)
+
 For the parallel concepts, see the specific section.
 
 ```sh
@@ -213,8 +217,19 @@ rsync --append ...
 
 # Exclude (glob)
 #
-rsync --exclude=.git parsec-benchmark/ /dest                     # exclude at any level
+rsync --exclude=.git parsec-benchmark/ /dest                     # exclude at any level, unless the excluded directory
+                                                                 # is passed as source
 rsync --exclude=parsec-benchmark/.git parsec-benchmark/ /dest    # exclude only the root one
+
+# Inclusion is a holy mess. In some cases, e.g. syncing dir `**/a`, it's simpler to use bash features
+# (note the subshell!).
+# Examples using `--include`: https://stackoverflow.com/q/15687755.
+#
+(shopt -s globstar; rsync -av --relative source/./**/a dest)
+
+# Ownership is presreved, when running as sudo (consider that it's id-based). In order to change it:
+#
+sudo ryns -og --chown=$user:$group $from $to
 
 # Specify a custom ssh command (e.g. for the port) + auto ssh password
 #

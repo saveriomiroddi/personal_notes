@@ -17,12 +17,23 @@
 Create:
 
 ```sh
+# The $format defaults to raw.
+# The $image is overwritten, if it exists!
+#
+# Backing:
+# - if the backing image path is relative, it's relative to the image.
+# - it's possible to create a diff image of a diff image
+# - WATCH OUT!: It's possible to specify a size, but in at least one instance, it caused subtle issues.
+#
+qemu-img create [-f $format] [-b $backing_iamge] $image [20G]
+
 # Create a qcow image (with NTFS filesystem) from a directory:
 #
 virt-make-fs --verbose --format=qcow2 --type=ntfs $input_dir $dest.qcow2
 
 # Create a raw file, with a partition, with standard linux tools
 # 8300: Partition type: native Linux FS
+# Guestmount is easier (see [Mount an image](#mount-an-image)).
 #
 dd if=/dev/zero bs=1M count=10240 of=disk.img
 sgdisk -n1:0:0 -t1:8300 disk.img
@@ -32,14 +43,7 @@ sudo mount ${loop_device}p1 /mnt
 # ...copy stuff etc...
 sudo umount /mnt
 sudo losetup -d $loop_device
-
 # now, use losetup (see below)
-
-# Create a diff image of a "backing" one.
-# If the diff exists, it will be overwritten.
-# WATCH OUT! The backing image path is relative to the diff one.
-#
-qemu-img create -f qcow2 -b $backing.qcow2 $diff.qcow2
 ```
 
 Copy:
@@ -53,7 +57,7 @@ Convert:
 ```sh
 vboxmanage clonehd --format VDI $source.vmdk $dest.vdi
 
-# Options: [p]rogress, [O]utput format
+# Options: [p]rogress, [O]utput format (not autodetected)
 #
 qemu-img convert -p -O qcow2 $source.qcow2 $dest.qcow2
 ```
@@ -120,10 +124,12 @@ sudo virt-filesystems --long --human-readable --all --add $image
 sudo virt-df -h -a $image
 ```
 
-Resize a partition:
+Resize a disk/partition:
 
 ```sh
-# Resize to an exact destination size
+qemu-img resize $source.qcow2 +20G
+
+# Resize a disk/partition to an exact destination size.
 #
 # There is a "resize" action (e.g. add 40G), but it's dumb, as it requires the output disk to be at least
 # the required size, which can't be exactly calculated (even for a qcow destination).
@@ -136,6 +142,32 @@ sudo virt-resize -v -x --expand /dev/sda4 $source $dest.raw
 ```
 
 #### Mount an image
+
+Easy way, via libguestfs-tools:
+
+```sh
+# $block_device is /dev/sdaN; typically a partition, but can be the entire disk (e.g. busybear image).
+#
+sudo guestmount -a $image -m $block_device $mountpoint
+
+# WATCH OUT!
+#
+# The libguestfs stack is functionally poor.
+# Unmounting (also via umount), causes an odd `fuse: mountpoint is not empty` error; the guestunmount
+# help seems to acknowledge this (ie. retries option), so we don't display errors.
+# Additionally, on unmount, the sync is tentative, so need to manually check that the file is closed.
+#
+if sudo mountpoint -q "$c_local_mount_dir"; then
+  sudo guestunmount -q "$c_local_mount_dir"
+
+  # Just ignore the gvfs warning.
+  while [[ -n $(sudo lsof -e "$XDG_RUNTIME_DIR/gvfs" "$1" 2> /dev/null) ]]; do
+    sleep 0.5
+  done
+fi
+```
+
+It's possible to use qemu-nbd, but the events management (for automation) is insane.
 
 Mount:
 

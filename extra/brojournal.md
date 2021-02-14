@@ -1,3 +1,27 @@
+## Sun 14/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Issue with writes/flushes on slow driver
+      - [x] Use qcow2 image format for working images, in order to solve slow disk issues
+        - [x] Fight `guest(un)mount` poor async behavior
+        - [x] Fight `qemu-img create` bug with backing image+size
+    - [x] setup_system: Attempt to use Debian-provided QEMU for Fedora preparation
+
+- Blog admin
+  - [x] Decrease books font size
+  - [x] Add new book
+
+- Admin/tools
+- Blog articles
+- Studies
+  - Other
+  - Rust
+  - Javascript/WASM
+  - SWE
+  - Systems programming/assembler
+  - Games
+
 ## Sat 13/Feb/2021
 
 - Projects/Open source

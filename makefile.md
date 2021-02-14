@@ -49,7 +49,7 @@ HOSTCC := $(if $(HOSTCC),$(HOSTCC),$(CC))
 Variables can be overriden from the commandline by passing them as `make` params:
 
 ```sh
-make CC="riscv64-unknown-linux-gnu-gcc -I/path/to/riscv-gnu-toolchain/riscv-gcc/zlib -L/path/to/riscv-gnu-toolchain/riscv-gcc/zlib"
+make "LDFLAGS=-static" CC="riscv64-unknown-linux-gnu-gcc -I/path/to/riscv-gnu-toolchain/riscv-gcc/zlib -L/path/to/riscv-gnu-toolchain/riscv-gcc/zlib"
 ```
 
 ### Targets/Symbols

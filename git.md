@@ -17,6 +17,7 @@
   - [Merging](#merging)
   - [Rebase](#rebase)
     - [Preserve merges when rebasing](#preserve-merges-when-rebasing)
+  - [Entirely remove a merge from the history](#entirely-remove-a-merge-from-the-history)
   - [Remotes](#remotes)
   - [Stash](#stash)
   - [Bisect](#bisect)
@@ -289,13 +290,39 @@ GIT_SEQUENCE_EDITOR="sed -i -re 's/^pick /e /'" git rebase -i "$(git merge-base 
 
 ### Preserve merges when rebasing
 
-It's possible to preserve merges using `--rebase-merges`.
+It's possible to preserve merges using `--rebase-merges`, although it's not entirely clear how to do funky manipulations of history.
 
-It's not entirely clear how to do funky manipulations of history, however, for the case where there is an ff merge that has been stored as non-ff (ie. branch rebased before merging), one can:
+## Entirely remove a merge from the history
 
-- checkout the last commit of the branch
-- squash its history
-- rebase the merge commit of the master branch (with `--rebase-merges`) onto the top of the squash commit
+To remove the merge `cleaner_pigz_compiling_flags`:
+
+```
+*   e1a9575 (HEAD -> master, origin/master) Merge branch 'increase_start_vm_timeout'
+|\
+| * f92c47a setup_system: Increase timeout when connecting to the VM
+|/
+*   8473f42 Merge branch 'cleaner_pigz_compiling_flags'
+|\
+| * 3b9f0df setup_system: Improve static compilation flags strategy
+|/
+*   fef2766 Merge branch 'add_qemu_log'
+```
+
+Remove the ones prefixed with `> `:
+
+```
+# Branch cleaner-pigz-compiling-flags
+> reset onto
+> pick 3b9f0df setup_system: Improve static compilation flags strategy
+> label cleaner-pigz-compiling-flags
+
+# Branch increase-start-vm-timeout
+reset onto
+> merge -C 8473f42 cleaner-pigz-compiling-flags # Merge branch 'cleaner_pigz_compiling_flags'
+label branch-point
+pick f92c47a setup_system: Increase timeout when connecting to the VM
+label increase-start-vm-timeout
+```
 
 ## Remotes
 

@@ -36,7 +36,7 @@
     - [Switching to root user inside a script](#switching-to-root-user-inside-a-script)
     - [Check if there's data in stdin](#check-if-theres-data-in-stdin)
     - [Check if a script is `source`d](#check-if-a-script-is-sourced)
-    - [Workaround sudo expiry during a long-running script](#workaround-sudo-expiry-during-a-long-running-script)
+    - [Sudo-related tasks](#sudo-related-tasks)
     - [Time-related functionalities](#time-related-functionalities)
     - [Parse commandline options (`getopt`)](#parse-commandline-options-getopt)
     - [Variables printing function](#variables-printing-function)
@@ -793,9 +793,9 @@ fi
 [[ "${BASH_SOURCE[0]}" != "$0" ]] # true if script is sourced
 ```
 
-### Workaround sudo expiry during a long-running script
+### Sudo-related tasks
 
-Source: https://serverfault.com/a/702019.
+Workaround sudo expiry during a long-running script ([source](https://serverfault.com/a/702019)):
 
 ```sh
 sudo -v
@@ -810,6 +810,14 @@ while true; do
   # `-n`: non-interactive
   sudo -nv
 done 2>/dev/null &
+```
+
+Check if a script is run as sudo:
+
+```sh
+if [[ $EUID -eq 0 ]]; then
+  >&2 echo "Don't run this script as root!"; exit 1
+fi
 ```
 
 ### Time-related functionalities

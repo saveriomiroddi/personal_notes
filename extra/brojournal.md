@@ -1,3 +1,26 @@
+## Mon 15/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] setup_system
+      - [x] Full end-to-end test on a clean machine
+        - [x] Revert to raw image strategy for BusyBear
+        - [x] Handle QEMU/SSH insanity
+    - [x] Handle Scaleway
+      - [x] Review models
+      - [x] Open account
+      - [x] Request access to mega-machine
+
+- Studies
+  - Linux tools
+    - [x] Review guest resizing and sparse filesystem concepts
+
+- Admin/tools
+  - Tools
+    - [x] Solve terminal emulator SSH key problem
+  - Scripting
+    - [x] Automate VMs start/stop
+
 ## Sun 14/Feb/2021
 
 - Projects/Open source
@@ -6,21 +29,19 @@
       - [x] Use qcow2 image format for working images, in order to solve slow disk issues
         - [x] Fight `guest(un)mount` poor async behavior
         - [x] Fight `qemu-img create` bug with backing image+size
-    - [x] setup_system: Attempt to use Debian-provided QEMU for Fedora preparation
+    - [x] setup_system
+      - [x] Attempt to use Debian-provided QEMU for Fedora preparation
+      - [x] Minor tweaks
+      - [ ] Full end-to-end test on a clean machine
+        - [x] Setup clean VM
 
 - Blog admin
   - [x] Decrease books font size
   - [x] Add new book
 
-- Admin/tools
-- Blog articles
 - Studies
-  - Other
   - Rust
-  - Javascript/WASM
-  - SWE
-  - Systems programming/assembler
-  - Games
+    - [x] Review a Rust question
 
 ## Sat 13/Feb/2021
 

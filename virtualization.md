@@ -127,6 +127,9 @@ sudo virt-df -h -a $image
 Resize a disk/partition:
 
 ```sh
+# Watch out! If the underlying FS has no partitions (e.g. Busybox), this won't automatically make the
+# space available.
+#
 qemu-img resize $source.qcow2 +20G
 
 # Resize a disk/partition to an exact destination size.
@@ -136,6 +139,8 @@ qemu-img resize $source.qcow2 +20G
 #
 # - `-v`: verbose
 # - `-x`: trace underlying calls, for better error messages
+#
+# The output is still sparse, even if raw.
 #
 truncate -s 40G $dest.raw
 sudo virt-resize -v -x --expand /dev/sda4 $source $dest.raw

@@ -171,7 +171,7 @@ find . -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep -i --with-filename --l
 
 ## xargs
 
-Note that, when grouping args, they must be at the end of the command (with -I, once invocation per arg is performed)
+Note that, when grouping args, they must be at the end of the command (with -I, one invocation per arg is performed). Empty lines are ignored.
 
 For the parallel concepts, see the specific section.
 
@@ -297,9 +297,11 @@ Specifying the input delimiter; WARNING! Newline is still considered a delimiter
 echo 'a b c' | parallel --delimiter ' ' echo
 ```
 
+If automatedly citing, must run as `echo "will cite" | parallel --citation || true`.
+
 #### Using xargs
 
-Differently from GNU Parallel, the command must can't be quoted.
+Differently from GNU Parallel, the command can't be quoted.
 
 - `-P <processes>`: use 0 for unlimited; based on the manpage, `-n` or `-L` should be used, but they weren't required with the personal use cases.
 

@@ -1,3 +1,26 @@
+## Tue 16/Feb/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Delete the Fedora completed image, if not completed
+    - [x] Reorganize improvements, and create an issue
+    - [x] Add README
+    - [x] Switch from `parallel` to `xargs`
+  - Ruby packer
+    - [ ] Solve compilation issue (https://git.io/Jt1FJ)
+      - [x] Review and send possible patch
+
+- Studies
+  - Rust
+    - [x] Review StackOverflow question
+
+- Admin/planning/tools
+  - Admin: system
+    - [x] Change password policy
+  - Planning
+    - [ ] Next project(s) planning
+      - [x] Rearrange/archive current pool
+
 ## Mon 15/Feb/2021
 
 - Projects/Open source

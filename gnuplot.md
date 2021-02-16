@@ -36,9 +36,9 @@ Commandline:
 gnuplot --persist $file
 
 # Execute. !! the command must be semicolon-separated !!
-# It's better to pass commands via stdin; in one case, `-e` was not reporting errors.
+# It's better to pass commands via stdin; `-e` doesn't behave as intended when there are comments.
 #
-gnuplot -e "$commands"
+gnuplot -e "$command1; $command2"
 echo "$commands" | gnuplot
 ```
 

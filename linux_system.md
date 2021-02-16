@@ -288,7 +288,7 @@ Display the current info (for machine parsing).
 #   Alternative: /usr/bin/ruby2.6
 #   Priority: 9999
 #
-update-alternatives --query <program>
+update-alternatives --query $program
 ```
 
 Install an alternative:
@@ -301,6 +301,11 @@ Install an alternative:
 #
 update-alternatives --install /etc/mysql/my.cnf my.cnf "$(pwd)/config/my.travis.cnf" 9999 \
                     --slave   /path/to/slave    slave  /path/to/slave_file
+
+# Simple:
+#
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 50
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
 ```
 
 Clear the alternatives:
@@ -312,7 +317,7 @@ update-alternatives --remove-all ruby
 Example: set `/etc/alternatives/editor` to vim (requires the alternative to be installed):
 
 ```sh
-update-alternatives --set editor /usr/bin/vim
+sudo update-alternatives --set editor /usr/bin/vim
 ```
 
 ## Environment

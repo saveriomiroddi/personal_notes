@@ -1,3 +1,30 @@
+## Wed 17/Feb/2021
+
+- Projects/Open source
+  - Ruby packer
+    - [x] Solve all compilation issues
+      - [x] Fix build, due to Rubocop error
+      - [x] Fix Ruby 2.7 options warning during compilation
+      - [x] Fix Rubygems outdated certificate
+      - [x] Make the gdbm subproject build on GCC 10
+
+- Tools
+  - [x] Improve `personal_notes` push script
+  - [x] Improve day hours computation script
+  - [x] Fix month hours hours computation script
+  - [x] Investigate Lightning event timestamps storage format
+
+- Studies
+  - Rust
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 4: Graphs
+      - [ ] Section 5: Hash maps
+      - [ ] Section 6: Entity component systems
+
+- Admin
+  - Notes
+    - [x] Review and archive: `rails.odt`
+
 ## Tue 16/Feb/2021
 
 - Projects/Open source
@@ -14,8 +41,8 @@
   - Rust
     - [x] Review StackOverflow question
 
-- Admin/planning/tools
-  - Admin: system
+- Admin/tools
+  - System
     - [x] Change password policy
   - Planning
     - [ ] Next project(s) planning

@@ -14,7 +14,7 @@
     - [Shell (initscripts)](#shell-initscripts)
       - [Example cases](#example-cases)
       - [sudo -i, login shell test, and bash](#sudo--i-login-shell-test-and-bash)
-  - [Update system time](#update-system-time)
+  - [Handle system time](#handle-system-time)
   - [Job scheduling](#job-scheduling)
     - [Cron](#cron)
     - [At](#at)
@@ -414,7 +414,7 @@ Bash options:
 -l, --login : Make bash act as if it had been invoked as a login shell (see INVOCATION below).
 ```
 
-## Update system time
+## Handle system time
 
 ```sh
 # Modern approach.
@@ -427,6 +427,10 @@ apt-get install ntpdate
 ntp stop
 ntpdate ntp.ubuntu.com
 ntp start
+
+# In order to manually set time, disable NTP service (no sudo required)
+#
+timedatectl set-ntp no
 ```
 
 ## Job scheduling

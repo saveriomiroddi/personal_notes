@@ -9,6 +9,7 @@
       - [Mount an image](#mount-an-image)
     - [VirtualBox-specific](#virtualbox-specific)
   - [QEMU](#qemu)
+  - [Vagrant](#vagrant)
 
 ## Virtual disks
 
@@ -257,3 +258,11 @@ echo system_powerdown | socat - UNIX-CONNECT:"$QEMU_MONITOR_FILE"
 Other options:
 
 - `-nographic`: runs in the foreground, in the terminal (without window)
+
+## Vagrant
+
+Find SSH key:
+
+```sh
+vagrant ssh-config $host | awk '/IdentityFile/ {print $NF}'
+```

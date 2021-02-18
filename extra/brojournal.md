@@ -1,3 +1,11 @@
+## Thu 18/Feb/2021
+
+- Studies
+  - Rust/CS
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 6: Entity component systems
+      - [ ] Section 7: Storage
+
 ## Wed 17/Feb/2021
 
 - Projects/Open source

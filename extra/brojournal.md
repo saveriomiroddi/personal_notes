@@ -1,3 +1,19 @@
+## Sat 20/Feb/2021
+
+- Admin
+  - Tools
+    - [x] Review if can handle personal_notes with less commits
+  - Planning
+    - [x] Next project(s) planning
+  - Other
+    - [x] Review Code the classics assets and licensing
+      - License: BSD-2 (https://github.com/Wireframe-Magazine/Code-the-Classics/issues/3)
+      - License consequences: https://gamedev.stackexchange.com/a/98962
+
+- Studies
+  - Gamedev
+    - [ ] Bevy intro
+
 ## Thu 18/Feb/2021
 
 - Studies

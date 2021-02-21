@@ -1,3 +1,15 @@
+## Sun 21/Feb/2021
+
+- Projects/Open source
+  - Ruby packer
+    - [x] Investigate open issue related to macro
+
+- Studies
+  - Javascript/WASM
+    - Building JavaScript Games
+      - [ ] Chapter 7
+        - [x] Theory
+
 ## Sat 20/Feb/2021
 
 - Admin
@@ -20,7 +32,9 @@
   - Rust/CS
     - Hands-On Data Structures and Algorithms in Rust
       - [ ] Section 6: Entity component systems
+        - [ ] Theory
       - [ ] Section 7: Storage
+        - [ ] Theory
 
 ## Wed 17/Feb/2021
 
@@ -42,8 +56,11 @@
   - Rust
     - Hands-On Data Structures and Algorithms in Rust
       - [ ] Section 4: Graphs
+        - [ ] Theory
       - [ ] Section 5: Hash maps
+        - [ ] Theory
       - [ ] Section 6: Entity component systems
+        - [ ] Theory
 
 - Admin
   - Notes

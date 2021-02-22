@@ -1,3 +1,13 @@
+## Mon 22/Feb/2021
+
+- Projects/Open source
+  - Libemuls
+    - [x] Update README; move architectural sections to the wiki
+
+- Studies
+  - Javascript/Gamedev
+    - [ ] Building JavaScript Games (theory)
+
 ## Sun 21/Feb/2021
 
 - Projects/Open source
@@ -8,7 +18,7 @@
   - Javascript/WASM
     - Building JavaScript Games
       - [ ] Chapter 7
-        - [x] Theory
+        - [ ] Theory
 
 ## Sat 20/Feb/2021
 

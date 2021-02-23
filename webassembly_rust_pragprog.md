@@ -10,6 +10,8 @@
 
 ## General
 
+Notes from book [Programming WebAssembly with Rust](https://pragprog.com/titles/khrust/programming-webassembly-with-rust).
+
 Online IDE: https://webassembly.studio
 Toolkit: https://github.com/WebAssembly/wabt
 

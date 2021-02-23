@@ -1,3 +1,24 @@
+## Tue 23/Feb/2021
+
+- Studies
+  - Javascript/Gamedev
+    - [ ] Building JavaScript Games (theory)
+      - [x] Chapter 9
+      - [x] Chapter 10
+      - [x] Chapter 11
+      - [x] Chapter 12
+      - [x] Chapter 13
+  - Rust/CS
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 4: Graphs
+        - [x] 26. Review theory; practice
+  - Javascript/Rust/Gamedev
+    - [ ] Snake Game With Rust, JavaScript, and WebAssembly
+      - [x] Chapter 1: Intro
+      - [x] Chapter 2: Theory + practice
+      - [x] Chapter 3: Theory + practice
+        - Fight favicon/constructor/source map errors
+
 ## Mon 22/Feb/2021
 
 - Projects/Open source
@@ -7,6 +28,8 @@
 - Studies
   - Javascript/Gamedev
     - [ ] Building JavaScript Games (theory)
+      - [x] Chapter 7
+      - [x] Chapter 8
 
 ## Sun 21/Feb/2021
 

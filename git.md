@@ -97,6 +97,8 @@ update-index --[no-]assume-unchanged $file                  # ignore changes to 
 echo '/.ruby-version' >> .git/info/exclude                  # ignore an untracked file only in the local repository
 ```
 
+It's possible to ignore a directory also by adding a gitignore to it, containing `*`.
+
 Ignore a directory but not a file levels below it; in order for this to work, all the directories in the middle must be excluded.
 
 ```

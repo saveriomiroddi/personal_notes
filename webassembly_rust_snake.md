@@ -4,6 +4,7 @@
   - [General](#general)
   - [Setup and Hello world](#setup-and-hello-world)
   - [Base concepts](#base-concepts)
+    - [Rust dependencies](#rust-dependencies)
     - [Rust side](#rust-side)
     - [JS side](#js-side)
 
@@ -64,6 +65,10 @@ xdg-open http://localhost:8080
 
 ## Base concepts
 
+### Rust dependencies
+
+Add `js-sys` for bindings to JS standard objects.
+
 ### Rust side
 
 Import/export:
@@ -86,8 +91,27 @@ pub fn greet() {
 pub struct Vector {
   // Mark a method as constructor; adds `new Klazz()` form, otherwise, the error `Error: null pointer passed to rust`
   // is raised. See https://github.com/rustwasm/wasm-bindgen/issues/166.
+  // No other methods of the struct need the attribute.
   #[wasm_bindgen(constructor)]
   pub fn new() -> Self { /* ... */ }
+}
+```
+
+Bindings:
+
+```rust
+use js_sys::Array;
+
+// Convenience to convert &Vector to JsValue, so that a JS Array can be made.
+//
+impl From<&Vector> for JsValue {
+  fn from(vector: &Vector) -> Self {
+    JsValue::from(vector.clone())
+  }
+}
+
+pub fn to_array(source: Vec<Vector>) -> Array {
+  source.iter().map(JsValue::from).collect()
 }
 ```
 

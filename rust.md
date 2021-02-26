@@ -449,7 +449,9 @@ std::mem::size_of_val(v)        // memory occupation of a variable !!
 10_f64.powi(2);                 // exponentiation, float/int
 10_f64.sqrt();                  // square root
 10_f64.sin();                   // sine (in rad)
+10_f64.cos();                   // cosine (in rad)
 10_f64.signum();                // sign. float: (>= +0.0 -> 1.0), (<= -0.0 -> -1.0), (NaN -> NaN); int: (0 -> 0), (< 0 -> -1), (> 0 -> 1)
+10_f64.hypot(10_f64);           // hypotenuse (!!)
 
 std::f64::consts::PI;
 std::f64::INFINITY, NEG_INFINITY;
@@ -1470,8 +1472,8 @@ impl<T, U> Point<T, U> {
 
 ```rust
 pub trait Summary {
-  // Trait constants can't be imported, and they must be accessed from the implementig type (in this
-  // case, Article::MAX_LENGTH).
+  // Trait constants are not constants in a strict sense - they're defaults. They must be accessed from the implementing type (in this
+  // case, Article::MAX_LENGTH or <Article as Summary>::MAX_LENGTH).
   //
   const MAX_LENGTH: u16 = 4096;
 
@@ -3651,10 +3653,10 @@ let randval = match rand::thread_rng().gen_range(0..2) {
     _ => unreachable!(),
 };
 
-// Fetching a random element from an array (keep in mind that it returns a reference).
+// Fetching a random element from an array
 //
 use rand::seq::SliceRandom;
-vec.choose(&mut rand::thread_rng());
+let entry: Option<&MyType> = vec.choose(&mut rand::thread_rng());
 
 // Use thread_rng
 // `thread_rng()`: seeded by the O/S; local to the current thread.

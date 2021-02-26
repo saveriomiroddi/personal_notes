@@ -1,3 +1,22 @@
+## Fri 26/Feb/2021
+
+- Studies
+  - Javascript/Rust/Gamedev
+    - [ ] Building JavaScript Games (theory)
+      - [x] Chapter 15
+    - [ ] Snake Game With Rust, JavaScript, and WebAssembly (without rewrite)
+      - [x] Chapter 5
+        - [x] Practice
+      - [x] Chapter 6: Theory + practice
+        - [x] Think alternative design
+
+- Writings
+  - [x] Article: Rust lulz: Implementing (floating point) approximate equality via traits
+
+- Admin
+  - Blog
+    - [x] Sync gem versions with current ones on Github Pages
+
 ## Thu 25/Feb/2021
 
 - Studies

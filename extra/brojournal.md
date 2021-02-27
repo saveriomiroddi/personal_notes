@@ -1,3 +1,13 @@
+## Sat 27/Feb/2021
+
+- Studies
+  - Javascript/Rust/Gamedev
+    - [ ] Building JavaScript Games (theory)
+      - [x] Chapter 16
+    - [ ] Snake Game With Rust, JavaScript, and WebAssembly (without rewrite)
+      - [x] Chapter 7: Theory + practice
+
+
 ## Fri 26/Feb/2021
 
 - Studies

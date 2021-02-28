@@ -1,3 +1,32 @@
+## Sun 28/Feb/2021
+
+- Studies
+  - Javascript/Rust/Gamedev
+    - [x] Snake Game With Rust, JavaScript, and WebAssembly (without rewrite)
+      - [x] Chapter 8: Theory + practice
+      - [x] Chapter 9: Theory + practice
+      - [x] Chapter 10: Theory + practice
+      - [x] Review all code, and copy to notes
+      - [x] Merge notes from the PragProg book and this course
+    - [ ] Building JavaScript Games (theory)
+      - [x] Chapter 17
+      - [x] Chapter 18
+      - [x] Chapter 19
+      - [x] Chapter 20
+      - [x] Chapter 21
+
+- Projects/Open source
+  - [x] Review and evaluate https://github.com/coding-horror/basic-computer-games
+
+- Projects/Open source
+  - Geet
+    - [x] Implement repository opening functionality (`repo open`)
+      - Refactorings
+        - [x] Simplify (and improve) regexes
+        - [x] Rename REMOTE_ORIGIN_REGEX to REMOTE_URL_REGEX
+        - [x] Use the default repository instead of specifying `origin`
+        - [x] Make :name an optional (keyword) parameter
+
 ## Sat 27/Feb/2021
 
 - Studies

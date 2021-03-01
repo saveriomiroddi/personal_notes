@@ -1,3 +1,14 @@
+## Mon 01/Mar/2021
+
+- Studies
+  - Javascript/Rust/Gamedev
+    - [ ] Building JavaScript Games (theory)
+      - [x] Chapter 22
+
+- Projects/Open source
+  - Geet
+    - [x] Implement upstream repository addition (`repo add_upstream`)
+
 ## Sun 28/Feb/2021
 
 - Studies

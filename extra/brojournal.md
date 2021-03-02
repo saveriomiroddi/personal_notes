@@ -1,3 +1,9 @@
+## Tue 02/Mar/2021
+
+- Projects/Open source
+  - Geet
+    - [x] `repo open --upstream`
+
 ## Mon 01/Mar/2021
 
 - Studies

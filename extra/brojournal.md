@@ -1,3 +1,13 @@
+## Wed 03/Mar/2021
+
+- Projects/Open source
+  - Spreadbase
+    - [ ] Review all issues opened
+      - [x] Verification of `rexml` gem issue on Ruby 3.0
+      - [x] Review opened PR
+  - ZFS
+    - [x] Review issue about (likely) nameserver problem
+
 ## Tue 02/Mar/2021
 
 - Projects/Open source

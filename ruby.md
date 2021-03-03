@@ -403,6 +403,7 @@ Perform COUNT/GROUP BY on an array; Ruby 2.7 implements #tally:
 ```ruby
 Hash.new(default_value)                   # sets a default value when a key is not found; uses always the same instance, though
 Hash.new {|h, k| h[k] = default_value}    # same as previous, but generates new instances
+Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) } # same as previous, but supports default nested hashes!
 
 [[:a, 1], [:b, 2]].to_h                   # => {a: 1, b: 2} # !!! convert an array to hash !!!
 Hash[:a, 1, :b, 2]                        # => {a: 1, b: 2} # !!! convert an array to hash !!!

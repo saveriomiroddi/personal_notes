@@ -39,6 +39,8 @@
     - [Flock](#flock)
     - [Etc](#etc)
     - [StringIO](#stringio)
+    - [Gem](#gem)
+      - [Version comparisons](#version-comparisons)
     - [ERB templates](#erb-templates)
     - [GC (garbage collection)](#gc-garbage-collection)
   - [Handling processes](#handling-processes)
@@ -673,7 +675,7 @@ The `yaml` library is actually an alias for `psych`.
 ```ruby
 YAML.load_file(filename)
 YAML.load(string)         # Parse into Ruby objects
-object.to_yaml            # Dump convenience
+object.to_yaml            # Dump convenience; implicitly pretty prints
 
 YAML.parse(string)        # Parse into Psych objects
 YAML.dump(object)
@@ -828,6 +830,18 @@ buffer.print "line\n"    # one trailing newline
 buffer.puts  "line\n"    # one trailing newline
 buffer.puts  "line\n\n"  # two trailing newlines
 buffer.puts  "line", ""  # two trailing newlines
+```
+
+### Gem
+
+#### Version comparisons
+
+Rigorous way to compare versions:
+
+```ruby
+'3.0' > '10.0'                                     # true (wrong!)
+Gem::Version.new('3.0') > Gem::Version.new('10.0') # correct
+Gem.ruby_version > Gem::Version.new('10.0')        # ready API to retrieve the ruby version
 ```
 
 ### ERB templates

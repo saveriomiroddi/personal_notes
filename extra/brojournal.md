@@ -1,3 +1,15 @@
+## Thu 04/Mar/2021
+
+- Studies
+  - Javascript/Rust/Gamedev
+    - [ ] Building JavaScript Games (theory)
+      - [x] Chapter 23
+
+- Projects/Open source
+  - Spreadbase
+    - [x] Review/merge PRs
+    - [ ] Review GH Actions
+
 ## Wed 03/Mar/2021
 
 - Projects/Open source

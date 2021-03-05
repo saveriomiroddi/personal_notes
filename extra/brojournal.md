@@ -1,3 +1,22 @@
+## Fri 05/Mar/2021
+
+- Projects/Open source
+  - Spreadbase
+    - [x] Review GH Actions
+    - [x] Merge PR
+    - [x] README updates
+    - [x] Check and drop Ruby 2.3 support
+  - Openscripts
+    - [x] `ship_gem`: Make compatible with Ruby 3.0
+    - [x] `prettify`: Minor updates
+      - [x] Add YAML support
+      - [x] Fix: the backup is done before checking the extension is supported
+
+- Studies
+  - Javascript/Rust/Gamedev
+    - [ ] Building JavaScript Games (theory)
+      - [x] Chapter 24
+
 ## Thu 04/Mar/2021
 
 - Studies

@@ -670,15 +670,14 @@ string = JSON.pretty_generate(input)
 
 ### YAML/Psych
 
-The `yaml` library is actually an alias for `psych`.
+The `yaml` library is actually an alias for `psych`. Comments are always ignored when parsing!
 
 ```ruby
-YAML.load_file(filename)
-YAML.load(string)         # Parse into Ruby objects
-object.to_yaml            # Dump convenience; implicitly pretty prints
+YAML.load_file(filename)  # Parse from file
+YAML.load(string)         # ... from string
 
-YAML.parse(string)        # Parse into Psych objects
-YAML.dump(object)
+YAML.dump(object[, io])   # Convert to string, optionally into IO
+object.to_yaml            # ... convenience
 ```
 
 ### Optparse

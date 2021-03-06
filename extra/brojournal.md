@@ -1,3 +1,9 @@
+## Sat 06/Mar/2021
+
+- Projects/Open source
+  - Awesome-Rust
+    - [x] Add/update Game engine entries
+
 ## Fri 05/Mar/2021
 
 - Projects/Open source

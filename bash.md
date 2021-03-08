@@ -89,6 +89,7 @@ export SHELLOPTS                          # pass the shell options to subshells!
 - `!$`       last argument of last command
 - `!<n>`     executes the `<n>`th command
 - `$$`       current pid
+- `$!`       pid of last backgrounded process; doesn't work with `sudo -b`, which requires manual processing
 
 Parameter variables; WATCH OUT!! When inside a function, they refer to the function:
 
@@ -399,7 +400,7 @@ function myfx() {
 ```sh
 jobs                # job currently running; use tipically when `there are stopped jobs`
 kill %[-]<n>        # kill nth (1-based) job; if `-`, start from the end (-1 = last)
-kill $!             # kill latest backgrounded job; note that "$!" is the PID of the latest background job
+kill $!             # kill latest backgrounded job
 wait $pid           # wait for the process to finish; if no $pid is provided, all the baground jobs are waited
 ```
 

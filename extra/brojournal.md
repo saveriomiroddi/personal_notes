@@ -1,29 +1,18 @@
+## Mon 08/Mar/2021
+
+- Projects/Open source
+  - Libreoffice
+    - [x] Test and close presumed bug with locale
+  - Openscripts/vga-passthrough
+    - QEMU script
+      - [x] Large refactoring of the QEMU script, in preparation for publishing
+      - [x] Implement audio passthrough
+
 ## Sun 07/Mar/2021
 
 - Admin
   - Tools
     - [x] Change file sharing provider
-
-- Projects/Open source
-  - SimpleScripting
-  - Libemuls
-  - Geet
-  - ZFS
-  - Spreadbase
-  - PPA Packaging
-- Writings
-- Admin
-  - Blog
-  - Planning
-  - Tools
-  - System
-  - Other
-- Studies
-  - Bash
-  - Rust
-  - Gamedev
-  - Ruby
-  - Javascript/Rust/Gamedev
 
 ## Sat 06/Mar/2021
 

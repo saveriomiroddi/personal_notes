@@ -1,3 +1,9 @@
+## Thu 11/Mar/2021
+
+- Projects/Open source
+  - Rails
+    - [x] Investigate, open issue w/fix for ActiveRecord issue
+
 ## Mon 08/Mar/2021
 
 - Projects/Open source

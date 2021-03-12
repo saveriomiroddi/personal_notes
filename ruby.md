@@ -493,10 +493,10 @@ Substituting/matching:
 ```ruby
 # The closure is not supported for [g]sub!.
 #
-'foobar'.gsub(/(ba.)/, '\1\1')                        # 'foobarbar'; WATCH OUT!: the replacement string can't be manipulated, e.g. `reverse()`
-'foobar'.gsub(/(ba.)/) { |entire_match| $1.reverse }  # 'foorab'
+'foobar'.gsub(/(ba.)/, '\1\1')                        # 'foobarbar'; WATCH OUT!: the replacement string can't be manipulated, e.g. `upcase()`
+'foobar'.gsub(/(b)(a)/) { |match| $2.upcase + $1 }    # 'fooaBr'; `match` is a String
 "Saverio <a@b.c>".match(/<(.*)>/)                     # returns MatchData object; [0] = entire match; [1..] = matching groups
-stri[/regex/, idx]                                    # same as `str.match(/regex/)[idx]`
+str[/regex/, idx]                                     # same as `str.match(/regex/)[idx]`
 "saverio".scan(/(ver(io))/)                           # [["verio", "io"]]
 "saverio".scan(/cusumano/)                            # []
 

@@ -1,3 +1,25 @@
+## Fri 12/Mar/2021
+
+- Writings
+  - Blog: VGA Passthrough
+    - [x] Add new motherboard data
+    - [x] Add audio passthrough section
+
+- Admin
+  - Tools: Travis builds notifier
+    - [x] Simplify purging logic
+    - [x] Refactor: Convert instance variable @notify_travis_builds to local
+    - [x] Permanently store last notified builds
+  - Tools: Schedule manager
+    - [x] Minor cleanups
+    - [x] Add skipped event functionality
+    - [x] Add list mode
+
+- Studies
+  - Rust
+    - [x] Review Rust gamedev resources and meetings
+      - [x] Report rg3d website bug
+
 ## Thu 11/Mar/2021
 
 - Projects/Open source

@@ -36,6 +36,7 @@
   - [Benchmarking](#benchmarking)
   - [Mounting images](#mounting-images)
   - [Create patches (diff)/restore them](#create-patches-diffrestore-them)
+  - [Remote desktop](#remote-desktop)
 
 ## ls
 
@@ -776,3 +777,51 @@ patch -p0 $patch.diff
 ```
 
 If a hunk has been applied, patch will prompt. It's possible to skip this by using `--forward`, although that will return `1` exit status.
+
+## Remote desktop
+
+Remove desktop on a headless server.
+
+Broken (disconnects) - just use Nomachine; kept here for reference.
+
+References:
+
+- https://stackoverflow.com/a/40678605
+- https://www.richud.com/wiki/Ubuntu_Fluxbox_GUI_with_x11vnc_and_Xvfb
+
+Server configuration
+
+```sh
+ fluxbox: simple diplay manager
+
+sudo apt install x11vnc xvfb fluxbox
+
+# Short way
+#
+# - `-no6 -noipv6 -rfbportv6 -1`: for systems with ipv6 disabled (see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=672449)
+# - `-forever`                  : without it, the service will terminate after the first session
+# - `-ncache`                   : suggested, but corrupts the screen
+
+x11vnc -create -env FD_PROG=/usr/bin/fluxbox \
+	-env X11VNC_FINDDISPLAY_ALWAYS_FAILS=1 \
+  -env X11VNC_CREATE_GEOM=${1:-1280x800x16} \
+  -gone 'killall Xvfb' \
+  -nopw \
+  -forever \
+  -bg
+  -no6 -noipv6 -rfbportv6 -1
+```
+
+Client:
+
+```sh
+sudo apt install tigervnc-viewer
+
+# `-N`                              : no command; just proxy
+# `-T`                              : disable pseudo-terminal allocation
+# `-L $local_socket:$remote_socket` : proxy!
+#
+ssh -N -T -L 5900:localhost:5900 arcade &
+
+xtigervncviewer localhost:5900
+```

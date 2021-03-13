@@ -249,6 +249,7 @@ set offsets graph 0.1, graph 0.1, graph 0.1, graph 0.1 # relative
 
 # Print tics only for the dataset values; best to `set offset graph` (see relative above)
 #
+plot 'results.dat' using 2:3:xtic(2)         with linespoints # tics only on x, not y
 plot 'results.dat' using 2:3:xtic(2):ytic(3) with linespoints
 ```
 

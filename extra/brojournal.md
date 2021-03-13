@@ -1,3 +1,19 @@
+## Sat 13/Mar/2021
+
+- Studies
+  - Javascript/Rust/Gamedev
+    - [ ] Building JavaScript Games (theory)
+      - [x] Chapter 25
+  - Other
+    - [x] Review odd Perl behavior with Windows line ending
+
+- Admin
+  - Tools
+    - [x] Solve fixed width problem
+      - [x] Upgrade local SQLite
+  - Notes
+    - [ ] Flush small notes
+
 ## Fri 12/Mar/2021
 
 - Writings

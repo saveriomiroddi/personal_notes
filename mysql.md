@@ -17,6 +17,8 @@
     - [Cursors (with convenient example of looping)](#cursors-with-convenient-example-of-looping)
   - [Optimizer](#optimizer)
     - [Join order](#join-order)
+  - [Administration](#administration)
+    - [Observe ALTER TABLE progress](#observe-alter-table-progress)
 
 ## Privileges
 
@@ -363,3 +365,31 @@ Reference: https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimize
 SELECT /*+ JOIN_ORDER(t2, t1) */ COUNT(*)
 FROM table_1 t1 JOIN table_2 t2
 ```
+
+## Administration
+
+### Observe ALTER TABLE progress
+
+Reference: https://dev.mysql.com/doc/refman/8.0/en/monitor-alter-table-performance-schema.html
+
+Example of ALTER TABLE monitoring, at different stages; test estimation is updated (increased) between stages:
+
+```sql
+SELECT EVENT_NAME, WORK_COMPLETED, WORK_ESTIMATED FROM performance_schema.events_stages_current;
+
+-- +------------------------------------------------------+----------------+----------------+
+-- | EVENT_NAME                                           | WORK_COMPLETED | WORK_ESTIMATED |
+-- +------------------------------------------------------+----------------+----------------+
+-- | stage/innodb/alter table (read PK and internal sort) |         155094 |        7904880 |
+-- +------------------------------------------------------+----------------+----------------+
+
+-- +----------------------------------+----------------+----------------+
+-- | EVENT_NAME                       | WORK_COMPLETED | WORK_ESTIMATED |
+-- +----------------------------------+----------------+----------------+
+-- | stage/innodb/alter table (flush) |        7054880 |        7901111 |
+-- +----------------------------------+----------------+----------------+
+```
+
+The `alter table (flush)` stage empirically took from 10% to 100% of the total time before that stage.
+
+Only the last stage `log apply table` causes contention; on the longest occurrence, it took ≈2.4% of the total time (44/1858").

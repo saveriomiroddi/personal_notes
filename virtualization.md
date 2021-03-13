@@ -112,7 +112,7 @@ sudo virt-sparsify --convert qcow2 --compress $source.raw $dest.qcow2
 Print partition informations:
 
 ```sh
-# fs/partition infos
+# FS/partition infos
 #
 # `--all`               : both FS and partitions
 # `-a|--add $image`
@@ -120,7 +120,7 @@ Print partition informations:
 #
 sudo virt-filesystems --long --human-readable --all --add $image
 
-# partitions space usage
+# Partitions space usage
 #
 sudo virt-df -h -a $image
 ```

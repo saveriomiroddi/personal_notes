@@ -3,6 +3,7 @@
 - [Linux system](#linux-system)
   - [Security](#security)
   - [Filesystems/partitions](#filesystemspartitions)
+    - [Sparse files](#sparse-files)
   - [Packages](#packages)
     - [Apt/dpkg installation hooks (`etc/apt/apt.conf.d`)](#aptdpkg-installation-hooks-etcaptaptconfd)
   - [Repositories](#repositories)
@@ -103,6 +104,34 @@ parted -s $disk_device resizepart $part_number_1_based 100%
 # Remove a partition
 
 parted -s $disk_device rm $part_number_1_based
+```
+
+### Sparse files
+
+```sh
+# Create a sparse file (different ways)
+#
+truncate -s $size $file
+dd of=$file bs=$size seek=1 count=0
+dd if=/dev/zero of=$file conv=sparse bs=$block_size count=$count
+
+# Copy a file in sparse mode; `bs=512` is crucial, because a block needs to be entirely zero in order
+# to be discarded. Two ways; first is more convenient.
+# See https://en.wikipedia.org/wiki/Sparse_file.
+#
+dd if=$source of=$dest conv=sparse bs=512
+
+# Convert a file to sparse
+#
+fallocate -d $file
+
+# Shows the sparse size (first column)
+#
+ls -ls
+
+# COW!! Supported only on XFS/BTRFS, not (currently) ZFS (https://git.io/JqWqU)
+#
+cp --reflink=always $source $dest
 ```
 
 ## Packages

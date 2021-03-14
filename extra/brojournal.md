@@ -1,3 +1,32 @@
+## Sun 14/Mar/2021
+
+- Projects/Open source
+  - Openscripts
+    - [x] gitio: Strip protocol, and minor refactorings
+  - Rust/Gamedev
+    - [ ] Search beginner issues on Rust gamedev mailing list
+    - luminance
+      - [x] Open PR: update deprecated calls `DynamicImage#to_rgb()`
+    - Amethyst
+      - [ ] Discuss/work on: https://github.com/amethyst/amethyst/issues/2083
+        - [x] Research
+          - [x] Discussion documentation spin loop/yield now: https://github.com/rust-lang/rust/issues/55418
+          - [x] https://doc.rust-lang.org/std/thread/fn.yield_now.html
+          - [x] https://man7.org/linux/man-pages/man3/pthread_yield.3.html
+          - [x] https://stackoverflow.com/questions/21760566/yielding-from-linux-kernel
+        - [x] Review: https://github.com/alexheretic/spin-sleep/blob/master/src/lib.rs
+          - [x] Open issue to discuss the technical implementation
+        - [x] Review: https://github.com/All8Up/test_limiter
+        - [x] Review Cryengine: git.io/Jqw0i
+
+- Studies
+  - Javascript/Gamedev
+    - [x] Building JavaScript Games
+      - [x] Chapter 26
+      - [x] Chapter 27
+      - [x] Chapter 28
+      - [x] Chapter 29
+
 ## Sat 13/Mar/2021
 
 - Studies

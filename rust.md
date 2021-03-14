@@ -2673,7 +2673,7 @@ Watch out! This can't be used for as a pseudo-channel, because the mutex value c
 Intrinsic to use in busy waiting:
 
 ```rust
-std::sync::atomic::spin_loop_hint();
+std::hint::spin_loop();
 ```
 
 ### Unsafe

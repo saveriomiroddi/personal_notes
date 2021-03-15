@@ -24,7 +24,7 @@
   - [Arithmetic operations](#arithmetic-operations)
   - [Date operations](#date-operations)
   - [Redirections](#redirections)
-  - [Process substitution](#process-substitution)
+  - [Substitutions](#substitutions)
   - [Brace expansion](#brace-expansion)
   - [Arrays](#arrays)
     - [Snippets](#snippets)
@@ -39,6 +39,7 @@
     - [Sudo-related tasks](#sudo-related-tasks)
     - [Time-related functionalities](#time-related-functionalities)
     - [Parse commandline options (`getopt`)](#parse-commandline-options-getopt)
+    - [`bash` command options](#bash-command-options)
     - [Variables printing function](#variables-printing-function)
   - [Shell colors](#shell-colors)
 
@@ -402,6 +403,8 @@ jobs                # job currently running; use tipically when `there are stopp
 kill %[-]<n>        # kill nth (1-based) job; if `-`, start from the end (-1 = last)
 kill $!             # kill latest backgrounded job
 wait $pid           # wait for the process to finish; if no $pid is provided, all the baground jobs are waited
+
+(echo abc &)        # avoid printing the job number
 ```
 
 In order to get the exit status of a backgrounded process, use `wait $pid`, and inspect its exit status (`$?`)``:
@@ -566,9 +569,9 @@ formatted_result=`date '+%Y-%m-%d %H:%M:%S' --date="@$((timestamp_in_secs – se
 exec 200> "$filename"                                   # associate a file to a file descriptor (create if not existing)
 ```
 
-## Process substitution
+## Substitutions
 
-Creates a file (descriptor) from the command.
+Process substitution: creates a file (descriptor) from the command.
 
 For input file; typically used to feed output of multiple commands to another command:
 
@@ -584,10 +587,16 @@ For output file; typically used with tee, to both print to stdout and redirect t
 echo "abc" >(xsel -ib)
 ```
 
-Extension to input: if the command is just a filename, the command is repliced with the file content:
+Command substitution; if the command is just a filename, the command is replaced with the file content ([reference](https://wiki.bash-hackers.org/syntax/expansion/cmdsubst)):
 
 ```sh
 echo $(< "$filename")
+
+# The subtitution syntax is actually optional.
+#
+< "$filename" command
+command < "$filename"
+< "$filenameL" command < "$filenameR" # both are printed, L -> R
 ```
 
 ## Brace expansion
@@ -605,8 +614,11 @@ Creation:
 
 ```sh
 declare -a $array_name              # create an empty array; local by default
-myarray=("entry 1" entry2)          # create a filled array; space/newline is separator
-myarray2=("$myarray")               # copy an array
+myarray=(                           # create a filled array; space/newline is separator
+  "entry 1" # comment allowed!
+  entry2
+)
+myarray2=("${myarray[@]}")          # copy an array
 
 coordinates=(${1//./ })             # split by `.` (bash) !!! use only for unspaced stuff !!!
 
@@ -895,6 +907,14 @@ A useful functionality is to interpret all values starting with `$`:
     else
       declare -g $key="$value"
     fi
+```
+
+### `bash` command options
+
+```sh
+# Pass arguments to bash command, when the script is passed from stdin.
+#
+echo 'echo $1' | bash -s 1
 ```
 
 ### Variables printing function

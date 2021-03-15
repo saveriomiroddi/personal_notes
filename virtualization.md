@@ -9,6 +9,8 @@
       - [Mount an image](#mount-an-image)
     - [VirtualBox-specific](#virtualbox-specific)
   - [QEMU](#qemu)
+    - [Usermode](#usermode)
+    - [RISC-V](#risc-v)
   - [Vagrant](#vagrant)
 
 ## Virtual disks
@@ -258,6 +260,19 @@ echo system_powerdown | socat - UNIX-CONNECT:"$QEMU_MONITOR_FILE"
 Other options:
 
 - `-nographic`: runs in the foreground, in the terminal (without window)
+
+### Usermode
+
+```sh
+# `/lib` suffix is implied, and must not be specified!
+#
+qemu-riscv64 -L /usr/riscv64-linux-gnu pigz
+qemu-riscv64 -L /path/to/riscv-gnu-toolchain/build/sysroot pigz
+```
+
+### RISC-V
+
+See https://risc-v-getting-started-guide.readthedocs.io/en/latest/linux-qemu.html.
 
 ## Vagrant
 

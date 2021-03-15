@@ -292,13 +292,12 @@ ls -1 | parallel "avconv -i {} {}.wav && neroAacEnc -q 0.5 -if {}.wav -of {}.m4a
 parallel 'ruby -e "while true; end"' ::: $(seq 4)
 ```
 
-Specifying the input delimiter; WARNING! Newline is still considered a delimiter:
+Other options:
 
-```sh
-echo 'a b c' | parallel --delimiter ' ' echo
-```
+- `--delimiter $delim`    : input delimiter; WARNING! Newline is still considered a delimiter
+- `-P|--max-procs <N>[%]` : max procs; `%` (optional) accepts decimal; watch out! uses the ceiling (e.g.13% of 32 yields 5)
 
-If automatedly citing, must run as `echo "will cite" | parallel --citation || true`.
+In order to programmatically confirm the citation, must run as `echo "will cite" | parallel --citation || true`.
 
 #### Using xargs
 

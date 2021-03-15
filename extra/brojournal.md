@@ -1,3 +1,37 @@
+## Mon 15/Mar/2021
+
+- Projects/Open source
+  - Nextcloud
+    - [x] Open issue with desktop client conflicts
+  - Drunken tomatoes
+    - [x] Set size as fixed
+
+- Studies
+  - Rust/Gamedev
+    - [x] Review Building JavaScript Games [license](https://github.com/Apress/building-javascript-games)
+      - Not permissive
+    - Amethyst
+      - [ ] Work on [frame limiter](https://github.com/amethyst/amethyst/issues/2083)
+        - [x] First review project
+          - [x] Old-review Duration concepts
+          - [x] First look frame limiters and `arc_ball_camera`
+          - [x] Try to hack in simulated input
+        - [x] Follow up discussion about `spin-sleep` performance
+      - [ ] Studies
+        - [x] Generate the book for master
+    - [ ] Game Programming Patterns
+      - [ ] V. Decoupling patterns
+        - [x] Chapter 14
+
+- Admin
+  - Tools
+    - planning script
+      - [x] Check if there is a duplication bug
+      - [x] Minor constants refactoring
+      - [x] Add convenient debug mode
+  - Notes
+    - [ ] Flush small notes
+
 ## Sun 14/Mar/2021
 
 - Projects/Open source

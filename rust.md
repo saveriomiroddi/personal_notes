@@ -2,6 +2,7 @@
 
 - [Rust](#rust)
   - [Cargo](#cargo)
+    - [Cross-compilation](#cross-compilation)
   - [Rustfmt](#rustfmt)
   - [Syntax/basics](#syntaxbasics)
     - [Basic structure/Printing/Input](#basic-structureprintinginput)
@@ -177,6 +178,17 @@ Versioning is pessimistic by default.
 See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
+
+### Cross-compilation
+
+```sh
+# Requires Ubuntu package `gcc-mingw-w64-x86-64`
+
+rustup target add x86_64-pc-windows-gnu
+rustup toolchain install stable-x86_64-pc-windows-gnu
+
+cargo build --release --target x86_64-pc-windows-gnu
+```
 
 ## Rustfmt
 
@@ -3745,6 +3757,8 @@ if let Some(captures) = VERTEX_REGEX.captures(&line) {
 ```
 
 ### Date/times (standard)
+
+The Instant counter doesn't stop when a sleep is issued.
 
 ```rust
 // Compute time elapsed.

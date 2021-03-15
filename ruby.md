@@ -36,6 +36,7 @@
     - [open-uri](#open-uri)
     - [Dir/FileUtils](#dirfileutils)
     - [Tempfile, Tmpdir](#tempfile-tmpdir)
+    - [I/O and terminal](#io-and-terminal)
     - [Flock](#flock)
     - [Etc](#etc)
     - [StringIO](#stringio)
@@ -791,6 +792,12 @@ Dir::Tmpname.create(['a', '.png']) { }
 # Find system temporary directory
 require 'tmpdir'
 Dir.tmpdir
+```
+
+### I/O and terminal
+
+```ruby
+require 'io/console'; $stdin.getch              # Read a single char
 ```
 
 ### Flock

@@ -1,3 +1,17 @@
+## Tue 16/Mar/2021
+
+- Projects/Open source
+  - Nextcloud
+    - [x] Upload reported bug (provide logs)
+
+- Admin
+  - Notes
+    - [x] Flush small notes
+
+- Writing
+  - Blog
+    - [x] Updates to the kernel build article
+
 ## Mon 15/Mar/2021
 
 - Projects/Open source

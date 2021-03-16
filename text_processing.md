@@ -5,7 +5,7 @@
   - [Perl](#perl)
     - [Commandline args](#commandline-args)
     - [Operators](#operators)
-    - [Data types and conversions](#data-types-and-conversions)
+    - [Data types, conversions and contexts](#data-types-conversions-and-contexts)
       - [Arrays](#arrays)
       - [Hashes](#hashes)
     - [Flow control](#flow-control)
@@ -75,7 +75,7 @@ print if /match/ .. -1                       # print all the lines after /match/
 'a' eq 'a' # 1
 'a' ne 'b' # 1
 ```
-### Data types and conversions
+### Data types, conversions and contexts
 
 ```sh
 # Strings can be single- or double-quoted
@@ -93,6 +93,18 @@ print if /match/ .. -1                       # print all the lines after /match/
 # Regex matches and boolean true conditions, evaluate to 1
 $counter += /matching_line/
 $counter += ($match != "1")
+```
+
+Depending on the context, operations return different values. Watch out when using capturing groups!
+
+```sh
+# Prints (unexpectedly) 2, because the regex returns a scalar for the match (0/1)
+#
+echo $'1\n2\n3' | perl -ne '$tot += /([23])/; END { print $tot }'
+
+# Prints (correctly) 6, because the array addressing makes the regex return an array with the matches.
+#
+echo $'1\n2\n3' | perl -ne '$tot += (/(.)/)[0]; END { print $tot }'
 ```
 
 #### Arrays

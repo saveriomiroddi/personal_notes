@@ -12,6 +12,7 @@
     - [Usermode](#usermode)
     - [RISC-V](#risc-v)
   - [Vagrant](#vagrant)
+  - [WINE](#wine)
 
 ## Virtual disks
 
@@ -281,3 +282,7 @@ Find SSH key:
 ```sh
 vagrant ssh-config $host | awk '/IdentityFile/ {print $NF}'
 ```
+
+## WINE
+
+If fonts are not rendering correctly, install the core fonts: `winetricks corefonts`.

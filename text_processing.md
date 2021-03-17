@@ -5,6 +5,10 @@
   - [Perl](#perl)
     - [Commandline args](#commandline-args)
     - [Operators](#operators)
+    - [Expression-related](#expression-related)
+      - [Flip-flop, with examples](#flip-flop-with-examples)
+    - [Priority](#priority)
+    - [Special variables](#special-variables)
     - [Data types, conversions and contexts](#data-types-conversions-and-contexts)
       - [Arrays](#arrays)
       - [Hashes](#hashes)
@@ -14,7 +18,6 @@
       - [Regex extra backslash sequences](#regex-extra-backslash-sequences)
     - [Formatting/printing](#formattingprinting)
     - [Line numbers/Position-based operations](#line-numbersposition-based-operations)
-    - [Priority](#priority)
     - [Useful examples](#useful-examples)
   - [Awk](#awk)
     - [Commandline args](#commandline-args-1)
@@ -59,6 +62,8 @@ grep -Pzo '(?s)void\srb_backtrace\(.*?\n\}' --include="*.c" -r .
 ### Commandline args
 
 - `-0`: use null character as line separator
+- `-a`: splits the input into the `@F` array (0b.)
+- `-F<val>`: separator
 
 ### Operators
 
@@ -75,6 +80,59 @@ print if /match/ .. -1                       # print all the lines after /match/
 'a' eq 'a' # 1
 'a' ne 'b' # 1
 ```
+
+For regexes, see the dedicated note file.
+
+### Expression-related
+
+Interpolate an expression via `@{[...]}` (trick):
+
+```sh
+echo "abc: 250" | perl -ne '/(\d+)/ && print "@{[$1 + 1]}"' # 251
+```
+
+#### Flip-flop, with examples
+
+The flip-flop itself returns the line number (1b.), with an `E0` suffix for the last line.
+
+Manipulate the lines matching the flip-flop operator:
+
+```sh
+# Only match
+printf 'a\nb\nc\nd\ne' | perl -ne 'print "# $_" if /b/ .. /d/'
+
+# Entire textfile
+printf 'a\nb\nc\nd\ne' | perl -pe '/b/ .. /d/ and print "# "'
+
+# Entire textfile, without commenting the last match ('d')
+printf 'a\nb\nc\nd\ne' | perl -pe '$ln = /b/ .. /d/; $ln && $ln !~ /E0/ and print "# "'
+```
+
+### Priority
+
+Watch out the priority!!!
+
+```sh
+# Prints only "Line 1" and an empty line
+printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline && print $line'
+
+# Prints "Line 1" and "Line 2"
+printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline and print $line'
+printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line'
+
+# In cases like flip-flop, either use parenteses, or the low-priority operators `and`/`or`.
+#
+/start/ .. /end/ and print "match!"
+```
+
+### Special variables
+
+Special variables can be modified, depending on the type, on each cycle, or in the `BEGIN` block.
+
+- `$_`: current line; if modified, and `-p` is specified, the new value is printed.
+- `$/`: separator; see examples.
+- `$ENV`: env variables; don't forget that they need to be exported!!
+
 ### Data types, conversions and contexts
 
 ```sh
@@ -100,11 +158,11 @@ Depending on the context, operations return different values. Watch out when usi
 ```sh
 # Prints (unexpectedly) 2, because the regex returns a scalar for the match (0/1)
 #
-echo $'1\n2\n3' | perl -ne '$tot += /([23])/; END { print $tot }'
+printf '1\n2\n3' | perl -ne '$tot += /([23])/; END { print $tot }'
 
 # Prints (correctly) 6, because the array addressing makes the regex return an array with the matches.
 #
-echo $'1\n2\n3' | perl -ne '$tot += (/(.)/)[0]; END { print $tot }'
+printf '1\n2\n3' | perl -ne '$tot += (/(.)/)[0]; END { print $tot }'
 ```
 
 #### Arrays
@@ -112,6 +170,8 @@ echo $'1\n2\n3' | perl -ne '$tot += (/(.)/)[0]; END { print $tot }'
 ```perl
 (1, 2, 3)                             # array literal
 (1..3)                                # array literal, as range; inclusive
+
+$#array                               # length
 
 push(@array, item)                    # append an item to an array
 item = pop(@array)                    # pop an item from an array
@@ -159,6 +219,14 @@ foreach my $val (values %hash) { ... }
 ```perl
 length $str                          # length of a string
 Math::Complex->sqrt($value)          # square root (but `$value ** 0.5` works as well)
+```
+
+Equivalent of Ruby scan/join:
+
+```sh
+# Fancy!!: return a list from captured groups (`m/`), and joins it.
+#
+printf "k1: a\nk2: b\nk3: c" | perl -0777 -ne 'print join(",", m/^k[13]: (.+)$/mg)' # => a,c
 ```
 
 ### Search/replace
@@ -226,19 +294,6 @@ printf "0\n1\n2" | perl -pe '$_ .= "abc\n" if /1/'        # print after a match;
 printf "0\n0\n0" | perl -pe '$_ .= "abc\n" if /0/ && ++$cnt == 2'  # 2nd occurrence of the pattern (!!) => 0 0 abc 0
 ```
 
-### Priority
-
-Watch out the priority!!!
-
-```sh
-# Prints only "Line 1" and an empty line
-printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline && print $line'
-
-# Prints "Line 1" and "Line 2"
-printf 'Line 1\nLine 2' | perl -lne 'print $_; $line = readline and print $line'
-printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line'
-```
-
 ### Useful examples
 
 Replace only the first occurrence in a file:
@@ -257,14 +312,48 @@ perl -0777 -pe 's/\s+$//'  # all the whitespaces
 Print part of line if there is a match:
 
 ```perl
-# Conventional way.
+# Conventional and compact way.
+# The compact way work only when there is only one match (if there are multiple, either there is no separator, or one separator is printed for each input line).
 #
 print $1 if /^Host: (.*)/
-
-# Clever way! If there isn't a capturing group, all the match is printed, otherwise, only the
-# capturing group. Since this is a print, without newline, lines not matching don't print anything!
-#
 print /^Host: (.*)/
+```
+
+Print the next line after a match (alternatives):
+
+```sh
+printf 'a\nb1' | perl -ne '/a/ && print readline =~ /b(\d)/'  # => 1
+printf 'a\nb\nc\nd\n' | perl -pe '$_ = readline'              # => b\nd
+```
+
+Print progress:
+
+```sh
+# Simple, generic format:
+#
+perl -lne 'BEGIN { $/ = "\r" } print /(\d+)%/'
+
+# Progress tracking with Whiptail gauge + autoflushing (see https://perl.plover.com/FAQs/Buffering.html); equivalent versions (like `stdbuf -o0 awk`):
+#
+rsync --progress --human-readable bigfile host:/path/ |
+  perl -lne 'BEGIN { $/ = "\r"; $|++ } print /(\d+)%/' |
+  whiptail --gauge Syncing 20 80 0
+
+rsync --progress --human-readable bigfile host:/path/ |
+  perl -lne 'BEGIN { $/ = "\r"; *STDOUT->autoflush } print /(\d+)%/' |
+  whiptail --gauge Syncing 20 80 0
+
+# Simulate awk field vars, with slicing support!
+# Autosplit (`-a`, 0-based)) + array slicing + array length + automatically add newline to output (`-l`, +chomp) !!!
+# `-F` is used for the field separator; defaults to space
+#
+perl -F: -lane 'print "@F[3..$#F]"'
+```
+
+Amusing way to expand tilde (home):
+
+```sh
+echo '~/.my.cnf' | perl -pe 's/~/$ENV{HOME}/'
 ```
 
 ## Awk
@@ -297,6 +386,8 @@ Expressions apply by default to the current string:
 /^pizza / { print $1 } # print the first token if the line starts with "pizza "
 ```
 
+Flip-flop is not supported; it must be simulated via a variable.
+
 ### Base commands
 
 ```awk
@@ -328,11 +419,15 @@ echo "Every good boy. " | awk '{print substr($1, 3)}'          # `ery`
 ```sh
 # Print a line after a match
 #
-echo $'1\n2' | awk '/1/ { getline; print }' # 2
+printf '1\n2' | awk '/1/ { getline; print }' # 2
 
 # Add a line to Nth line (0-based)
 #
 awk -i inplace 'NR==1{print; print "export LD_LIBRARY_PATH=/usr/local/mysql/lib:$LD_LIBRARY_PATH"} NR!=1' /etc/init/mysql.server
+
+# Print $N tokens, starting from the third; `cut` can do the same, but has issues
+#
+awk '{$1=$2=""; print $0}'
 ```
 
 ## Sed

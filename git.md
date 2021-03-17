@@ -17,7 +17,9 @@
   - [Merging](#merging)
   - [Rebase](#rebase)
     - [Preserve merges when rebasing](#preserve-merges-when-rebasing)
-  - [Entirely remove a merge from the history](#entirely-remove-a-merge-from-the-history)
+  - [History rewrite](#history-rewrite)
+    - [Remove a file](#remove-a-file)
+    - [Remove a merge](#remove-a-merge)
   - [Remotes](#remotes)
   - [Stash](#stash)
   - [Bisect](#bisect)
@@ -159,6 +161,7 @@ clone $url # clone a remote repos
 
 ```sh
 log --oneline --date-order --graph --all --decorate   # !! graph/diagram of the commits !!
+script --return --quiet -c "git --no-pager log --no-color --graph --oneline" /dev/null > /path/to/out # dump the history to a file
 
 log --branches=$branch $file        # search in another branch
 
@@ -294,7 +297,15 @@ GIT_SEQUENCE_EDITOR="sed -i -re 's/^pick /e /'" git rebase -i "$(git merge-base 
 
 It's possible to preserve merges using `--rebase-merges`, although it's not entirely clear how to do funky manipulations of history.
 
-## Entirely remove a merge from the history
+## History rewrite
+
+### Remove a file
+
+In order to remove a file from the history, it's easier to use the [BFG Repo-Cleaner](https://rtyley.github.io/bfg-repo-cleaner).
+
+WATCH OUT! Don't forget to unprotect branches (e.g. `master`), otherwise, after pushing, the BFGRC will leave the repository in an inconsistent (history-wise) state.
+
+### Remove a merge
 
 To remove the merge `cleaner_pigz_compiling_flags`:
 
@@ -406,8 +417,6 @@ git filter-branch --force --tree-filter 'rm -f terraform/terraform.tfstate' mast
 # Delete a Ruby method.
 git filter-branch --force --tree-filter 'ag "def mymethod" -l | xargs -r perl -0777 -i -pe "s/^(\s+)def mymethod.*?^\g1end\n\n//sm"' master..HEAD
 ```
-
-In order to remove a file from the entire repository, it's easier to use the [BFG Repo-Cleaner](https://rtyley.github.io/bfg-repo-cleaner).
 
 ## Diffing/Patching/Status
 

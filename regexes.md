@@ -3,6 +3,7 @@
 - [Regexes](#regexes)
   - [Character classes](#character-classes)
   - [Quantifiers (including `*`/`+`)](#quantifiers-including-)
+  - [Backreferences](#backreferences)
   - [PCRE flags](#pcre-flags)
   - [Complex cases](#complex-cases)
     - [Capturing sequences of N characters](#capturing-sequences-of-n-characters)
@@ -35,6 +36,19 @@ WATCH OUT!! When there are group quantifiers, only the last occurrence is captur
 ```ruby
 " a b".match(/( \w)+/)[1..] # => [" b"]
 " a b".scan(/( \w)/)        # => [" a", " b"]
+```
+
+## Backreferences
+
+```sh
+# In search pattern: `\g1`.
+# Example: Find the `end` of a method, by matching the `def` indentation.
+#
+perl -i -pe 's/^(\s+)def mymethod$.*?^\g1end$\n\n//sm'
+
+# In replacement pattern: `$1` (or ${1} to disambiguate).
+#
+perl -i -pe 's/^(ident_file = .*)/#${1}/'
 ```
 
 ## PCRE flags

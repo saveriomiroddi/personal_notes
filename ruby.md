@@ -1,7 +1,8 @@
 # Ruby
 
 - [Ruby](#ruby)
-  - [General syntax](#general-syntax)
+  - [General syntax/concepts](#general-syntaxconcepts)
+    - [Variables](#variables)
     - [Array literals](#array-literals)
     - [Runtime code evaluation](#runtime-code-evaluation)
     - [Block-oriented processing methods](#block-oriented-processing-methods)
@@ -55,7 +56,15 @@
     - [Convert Hash/Array to recursive openstruct](#convert-hasharray-to-recursive-openstruct)
     - [Convert curl request to Ruby](#convert-curl-request-to-ruby)
 
-## General syntax
+## General syntax/concepts
+
+### Variables
+
+```ruby
+# Test and undefine an instance variable; undefine raises an error if the variable is not defined.
+#
+remove_instance_variable :@my_var if instance_variable_defined?(:@my_var)
+```
 
 ### Array literals
 

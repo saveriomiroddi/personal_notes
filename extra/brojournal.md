@@ -1,3 +1,21 @@
+## Wed 17/Mar/2021
+
+- Studies
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [x] V. Decoupling patterns
+        - [x] Chapter 15
+        - [x] Chapter 16
+    - Catherine West talk/discussions
+      - [x] [Catherine West talk](https://www.youtube.com/watch?v=aKLntZcp27M)
+      - [x] (15 minutes) [Jonathan Blow analysis CW talk](https://www.youtube.com/watch?v=4t1K66dMhWk)
+      - [x] [Jonathan Blow HN Discussion](https://news.ycombinator.com/item?id=17993594)
+
+- Admin
+  - [ ] Notes: move old ones/write pending
+    - [x] text_processing.odt (2)
+      - Rearrange Perl
+
 ## Tue 16/Mar/2021
 
 - Projects/Open source
@@ -21,6 +39,10 @@
     - [x] Set size as fixed
 
 - Studies
+  - Gamedev
+    - [ ] Game Programming Patterns
+      - [ ] V. Decoupling patterns
+        - [x] Chapter 14
   - Rust/Gamedev
     - [x] Review Building JavaScript Games [license](https://github.com/Apress/building-javascript-games)
       - Not permissive
@@ -33,9 +55,6 @@
         - [x] Follow up discussion about `spin-sleep` performance
       - [ ] Studies
         - [x] Generate the book for master
-    - [ ] Game Programming Patterns
-      - [ ] V. Decoupling patterns
-        - [x] Chapter 14
 
 - Admin
   - Tools

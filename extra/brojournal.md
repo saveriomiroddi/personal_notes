@@ -1,3 +1,11 @@
+## Thu 18/Mar/2021
+
+- Studies
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [ ] I. Introduction
+        - [ ] 1. Architecture, Performance, and Games
+
 ## Wed 17/Mar/2021
 
 - Studies

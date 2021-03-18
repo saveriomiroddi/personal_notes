@@ -385,24 +385,24 @@ Example cases (the tracker has been set before the interactive test in every fil
 
 ```sh
 # Interactive SSH session: /etc/profile /etc/bash.bashrc /etc/profile.d/track.sh /home/user1/.bashrc
-ssh myserver.ts.int
+ssh myserver
 env | grep ^ENV_TRACKER
 
 # Non-interactive SSH session: /etc/bash.bashrc /home/user1/.bashrc
-ssh myserver.ts.int 'env | grep ^ENV_TRACKER'
+ssh myserver 'env | grep ^ENV_TRACKER'
 
 # `sudo -u`: none, [explanation](https://unix.stackexchange.com/a/472226): $HOME is not changed!
-ssh -t myserver.ts.int 'sudo -u user2 bash -c "env | grep ^ENV_TRACKER"'
+ssh -t myserver 'sudo -u user2 bash -c "env | grep ^ENV_TRACKER"'
 
 # `sudo -iu` + non interactive shell (`bash -c`): /etc/profile /etc/profile.d/track.sh /home/user2/.bashrc
-ssh -t myserver.ts.int 'sudo -iu user2 bash -c "env | grep ^ENV_TRACKER"'
+ssh -t myserver 'sudo -iu user2 bash -c "env | grep ^ENV_TRACKER"'
 
 # `sudo -iu` -> interactive shell: /etc/profile /etc/bash.bashrc /etc/profile.d/ticketsolve.sh /home/app/.bashrc
-ssh -t myserver.ts.int sudo -iu user2
+ssh -t myserver sudo -iu user2
 env | grep ^ENV_TRACKER
 
 # `sudo -Eu` + non interactive shell (`bash -c`): /etc/bash.bashrc /home/user1/.bashrc
-ssh -t myserver.ts.int 'sudo -Eu user2 bash -c "env | grep ^ENV_TRACKER"'
+ssh -t myserver 'sudo -Eu user2 bash -c "env | grep ^ENV_TRACKER"'
 ```
 
 The above are **not** all the possible cases (!!); in a tested Capistrano workflow, `$HOME/.bashrc` was not sourced (wondering if it was using another shell).

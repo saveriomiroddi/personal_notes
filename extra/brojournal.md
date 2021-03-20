@@ -1,3 +1,24 @@
+## Sat 20/Mar/2021
+
+- Admin
+  - Tools
+    - planner
+      - [x] Regex + related logic refactorings
+      - [x] Add fixed timestamp support
+
+- Projects/Open source
+  - Openscripts
+    - [x] bedtime: Add poweroff-only mode
+
+- Studies
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [ ] II. Design Patterns Revisited
+        - [x] 2. Flyweight
+        - [x] 3. Observer
+        - [x] 4. Prototype
+        - [x] 5. Singleton
+
 ## Fri 19/Mar/2021
 
 - Studies

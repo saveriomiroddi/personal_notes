@@ -1,3 +1,9 @@
+## Sun 21/Mar/2021
+
+- Projects/Open source
+  - terraform-archive
+    - [x] Review the new proposal and discussion, follow up and close the discussion
+
 ## Sat 20/Mar/2021
 
 - Admin

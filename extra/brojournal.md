@@ -1,3 +1,9 @@
+## Mon 22/Mar/2021
+
+- Writings
+  - VGA Passthrough
+    - [x] Audio passthrough: Add the necessary new_id step, and update references to stability
+
 ## Sun 21/Mar/2021
 
 - Projects/Open source

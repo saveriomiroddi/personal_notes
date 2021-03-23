@@ -1,3 +1,13 @@
+## Tue 23/Mar/2021
+
+- Projects/Open source
+    - Amethyst
+      - [ ] Amethyst book
+
+- Admin
+  - Tools
+    - [x] Planner: Listing: print header comments
+
 ## Mon 22/Mar/2021
 
 - Writings

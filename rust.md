@@ -156,7 +156,8 @@ cucumber = {package = "cucumber_rust", version = "^0.7.0"}
 
 [dependencies]
 rand = "0.7.3"
-redisish = {path = "../redisish"}   # Relative dependency
+redisish = {path = "../redisish"}                                             # Relative dependency
+amethyst = { git = "https://github.com/amethyst/amethyst", rev = "cafebabe" } # Repository dependency
 
 [profile.release]
 strip = "symbols"
@@ -182,12 +183,27 @@ At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
 ### Cross-compilation
 
 ```sh
-# Requires Ubuntu package `gcc-mingw-w64-x86-64`
-
+# Preparation. Requires Ubuntu package `gcc-mingw-w64-x86-64`
+#
 rustup target add x86_64-pc-windows-gnu
 rustup toolchain install stable-x86_64-pc-windows-gnu
 
+# Cross-compile
+#
 cargo build --release --target x86_64-pc-windows-gnu
+
+# Alternative: Configure Cargo for cross-compilation:
+#
+mkdir .cargo
+cat > .cargo/config.toml <<TOML
+[build]
+
+target = "riscv64gc-unknown-linux-gnu"
+
+[target.riscv64gc-unknown-linux-gnu]
+
+linker = "riscv64-unknown-linux-gnu-gcc"
+TOML
 ```
 
 ## Rustfmt

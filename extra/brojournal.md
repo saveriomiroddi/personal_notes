@@ -1,3 +1,9 @@
+## Wed 24/Mar/2021
+
+- Admin
+  - Tools
+    - [x] Planner: Fix bug with current day editing
+
 ## Tue 23/Mar/2021
 
 - Projects/Open source

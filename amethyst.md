@@ -6,7 +6,10 @@
     - [States](#states)
     - [Game data](#game-data)
     - [State/date example](#statedate-example)
-  - [ECS](#ecs)
+    - [ECS general info](#ecs-general-info)
+    - [Components implementation](#components-implementation)
+    - [Storages](#storages)
+    - [Resources](#resources)
 
 ## Build book
 
@@ -59,14 +62,14 @@ Trivial state:
 
 ```rust
 struct GameplayState {
-    // State-local data
-    player_count: u8,
+  // State-local data
+  player_count: u8,
 }
 
 impl SimpleState for GameplayState {
-    fn on_start(&mut self, _data: StateData<'_, GameData<'_, '_>>) {
-        println!("Number of players: {}", self.player_count);
-    }
+  fn on_start(&mut self, _data: StateData<'_, GameData<'_, '_>>) {
+    println!("Number of players: {}", self.player_count);
+  }
 }
 ```
 
@@ -78,28 +81,28 @@ struct PausedState;
 
 // Instead of writing `State<(), StateEvent>`, we can instead use `EmptyState`.
 impl EmptyState for GameplayState {
-    fn handle_event(&mut self, _data: StateData<()>, event: StateEvent) -> EmptyTrans {
-        if let StateEvent::Window(event) = &event {
-            if is_key_down(&event, VirtualKeyCode::Escape) {
-                return Trans::Push(Box::new(PausedState));
-            }
-        }
-
-        Trans::None
+  fn handle_event(&mut self, _data: StateData<()>, event: StateEvent) -> EmptyTrans {
+    if let StateEvent::Window(event) = &event {
+      if is_key_down(&event, VirtualKeyCode::Escape) {
+        return Trans::Push(Box::new(PausedState));
+      }
     }
+
+    Trans::None
+  }
 }
 
 impl EmptyState for PausedState {
-    fn handle_event(&mut self, _data: StateData<()>, event: StateEvent) -> EmptyTrans {
-        if let StateEvent::Window(event) = &event {
-            if is_key_down(&event, VirtualKeyCode::Escape) {
-                // Go back to the `GameplayState`.
-                return Trans::Pop;
-            }
-        }
-
-        Trans::None
+  fn handle_event(&mut self, _data: StateData<()>, event: StateEvent) -> EmptyTrans {
+    if let StateEvent::Window(event) = &event {
+      if is_key_down(&event, VirtualKeyCode::Escape) {
+        // Go back to the `GameplayState`.
+        return Trans::Pop;
+      }
     }
+
+    Trans::None
+  }
 }
 ```
 
@@ -109,23 +112,23 @@ Select the events that a state receives:
 #[derive(Debug, EventReader, Clone)]
 #[reader(MyEventReader)]
 pub enum MyEvent {
-    Window(Event),
-    UI(UiEvent),
-    App(AppEvent),
+  Window(Event),
+  UI(UiEvent),
+  App(AppEvent),
 }
 
 struct GameplayState;
 
 impl State<(), MyEvent> for GameplayState {
-    fn handle_event(&mut self, _data: StateData<()>, event: MyEvent) -> Trans<(), MyEvent> {
-        match event {
-            MyEvent::Window(_) => { /* Events related to the window and inputs */ },
-            MyEvent::UI(_) => { /* UI event. Button presses, mouse hover, etc. */ },
-            MyEvent::App(ev) => println!("Got an app event: {:?}", ev),
-        };
+  fn handle_event(&mut self, _data: StateData<()>, event: MyEvent) -> Trans<(), MyEvent> {
+    match event {
+      MyEvent::Window(_) => { /* Events related to the window and inputs */ },
+      MyEvent::UI(_) => { /* UI event. Button presses, mouse hover, etc. */ },
+      MyEvent::App(ev) => println!("Got an app event: {:?}", ev),
+    };
 
-        Trans::None
-    }
+    Trans::None
+  }
 }
 
 // In order for the above to work, the app must be build this way:
@@ -134,7 +137,7 @@ CoreApplication::<_, MyEvent, MyEventReader>::build();
 CoreApplication::<_, MyEvent, MyEventReader>::new();
 ```
 
-## ECS
+### ECS general info
 
 Entities are trivial: `struct Entity(u32, Generation);`
 
@@ -150,3 +153,76 @@ The properties (of all the objects) could be stored in the three storages:
 - `BottleComponent`: `shape`
 
 This is very similar to an RDBMS (joins are indeed performed).
+
+### Components implementation
+
+```rust
+// Shape of an `Entity`
+enum Shape {
+  Sphere { radius: f32 },
+  Cuboid { height: f32, width: f32, depth: f32 },
+}
+
+// Transform of an `Entity`
+pub struct Transform {
+  isometry: Isometry3<f32>,
+  scale: Vector3<f32>,
+}
+
+// Storage is lazily initialized - on registration or usage.
+
+impl Component for Shape {
+  type Storage = DenseVecStorage<Self>;
+}
+
+impl Component for Transform {
+  type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
+```
+
+### Storages
+
+- `DenseVecStorage`: Contiguous (no empty space) vector, good for big components or as generic default;
+- `VecStorage`: Sparse vector, good for small (<= 2⁴ bytes) components or when carried by most (> 30%) entities;
+- `FlaggedStorage`: Tracks components changes, good for caches;
+- `NullStorage`: Used for tagging (tag = empty struct).
+
+
+### Resources
+
+Resources are types that are not specific to an entity (eg. score).
+
+```rust
+struct MyResource {
+  pub game_score: i32,
+}
+
+let mut world = World::empty();
+
+// Insert
+//
+let resource = MyResource { game_score: 0 };
+world.insert(resource);
+
+// Get and insert if not existing
+//
+let resource = world.entry::<MyResource>().or_insert_with(|| resource);
+
+// Fetch
+//
+if let Some(ref_resource) = world.try_fetch::<MyResource>() {
+  resource = *ref_resource;
+} else {
+  panic!("No MyResource present in `World`");
+}
+
+// Mutate (inside World)
+//
+if let Some(mut fm_resource) = world.try_fetch_mut::<MyResource>() {
+  fm_resource.game_score = 10; // type: FetchMut<MyResource>
+} else {
+  panic!("No MyResource present in `World`");
+}
+
+// Deletions can't be done directly. Instead, add an Option<MyResource>, then set it to None to delete.
+```

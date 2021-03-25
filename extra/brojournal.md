@@ -1,3 +1,12 @@
+## Thu 25/Mar/2021
+
+- Projects/Open source
+  - Amethyst
+    - [ ] Amethyst book
+      - [x] 3.1. State
+      - [x] 3.2. Entity and Component
+      - [x] 3.3. Resource
+
 ## Wed 24/Mar/2021
 
 - Admin

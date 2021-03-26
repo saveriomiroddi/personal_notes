@@ -757,6 +757,7 @@ File.extname(fname)                             # Extract the extension (includi
 
 Dir.pwd                                         # working path
 Dir.chdir(path) { }                             # Change current dir; WATCH OUT! not thread safe! see https://bugs.ruby-lang.org/issues/9785
+Dir.home(user)                                  # Find home of the given user
 
 Dir.foreach(dosPath){|fname|}                   # not recursive; includes '.[.]'
 Dir.glob(antPath){|fname|}                      # glob format; 'path/**/pattern' => '**' recurses under path
@@ -831,7 +832,7 @@ $lock_file.flock(File::LOCK_EX | File::LOCK_NB)
 
 ```ruby
 Etc.getlogin                                # Current user
-Etc.getpwuid.dir                		        # Get current user home dir
+Etc.getpwuid.dir                		        # Get current user home dir. For generic users, use `Dir.home`
 ```
 
 ### StringIO

@@ -10,6 +10,8 @@
     - [Components implementation](#components-implementation)
     - [Storages](#storages)
     - [Resources](#resources)
+    - [World/management](#worldmanagement)
+    - [Systems](#systems)
 
 ## Build book
 
@@ -190,39 +192,124 @@ impl Component for Transform {
 
 ### Resources
 
-Resources are types that are not specific to an entity (eg. score).
+Resources are types that are not specific to an entity (eg. score); they can be used by shared between systems.
+
+Resource example: sprites loader.
+
+```rust
+// Amethyst assets loader.
+//
+let loader: Fetch<Loader> = world.read_resource::<Loader>();
+```
+
+### World/management
+
+```rust
+let mut world = World::empty();
+```
+
+Resources handling:
 
 ```rust
 struct MyResource {
   pub game_score: i32,
 }
 
-let mut world = World::empty();
-
 // Insert
 //
 let resource = MyResource { game_score: 0 };
 world.insert(resource);
 
-// Get and insert if not existing
+// Fetch, fetch/insert, try fetch
 //
+let resource = world.read_resource::<MyResource>();
 let resource = world.entry::<MyResource>().or_insert_with(|| resource);
+let resource: Option<Fetch<_>> = world.try_fetch::<MyResource>();
 
-// Fetch
+// Mutable: Fetch, try fetch
 //
-if let Some(ref_resource) = world.try_fetch::<MyResource>() {
-  resource = *ref_resource;
-} else {
-  panic!("No MyResource present in `World`");
-}
-
-// Mutate (inside World)
-//
-if let Some(mut fm_resource) = world.try_fetch_mut::<MyResource>() {
-  fm_resource.game_score = 10; // type: FetchMut<MyResource>
-} else {
-  panic!("No MyResource present in `World`");
-}
+let mut resource = world.write_resource::<MyResource>();
+let mut resource: Option<FetchMut<_>>  = world.try_fetch_mut::<MyResource>();
 
 // Deletions can't be done directly. Instead, add an Option<MyResource>, then set it to None to delete.
 ```
+
+Entities handling:
+
+```rust
+// Create
+//
+let entity = world
+  .create_entity()
+  .with(MyComponent)
+  .build();
+
+// Get all
+//
+let entities: EntitiesRes = world.entities();
+
+// Delete one/many/all entities and their components
+// WATCH OUT!: Entities are lazily deleted; deletion only happens at the end of the frame and not immediately
+// when calling the delete method.
+//
+world.delete_entity(entity).unwrap();
+world.delete_entities(entities_slice).expect("Failed to delete entities from specified list.");
+world.delete_all();
+
+// Check if the entities has not been deleted.
+//
+let is_alive = world.is_alive(entity);
+```
+
+Components handling:
+
+```rust
+// Requires the entity!
+
+let storage: ReadStorage<_> = world.read_storage::<MyComponent>();
+let component: Option<&_> = storage.get(entity);
+
+let mut storage: WriteStorage = world.write_storage::<MyComponent>();
+let mut component: Option<&mut _> = storage.get_mut(entity);
+```
+
+### Systems
+
+Systems represent the game logic; a system has a function that is invoked for every game loop.
+
+```rust
+struct MySystem;
+
+impl<'a> System<'a> for MySystem {
+  type SystemData = Read<'a, Time>;
+
+  fn run(&mut self, data: Self::SystemData) {
+    let delta: amethyst::core::timing::Time = data.delta_seconds();
+  }
+}
+```
+
+The SystemData associated type determines the what the system accesses (for each `Read` there is a `Write`):
+
+- `Read<'a, Resource>`: get a reference to a resource of the type you specify; returns `Default::default()` for the type, if not found
+- `ReadExpectExpect<'a, Resource>`: like `Read`, for resources that don't implement `default()` (will fail if not found)
+- `ReadStorage<'a, Component>`: get reference to storage for the Component
+- `Entities<'a>` create or destroy entities
+- empty tuple
+
+```rust
+struct WalkPlayerUp {
+  player: Entity,
+}
+
+impl<'a> System<'a> for WalkPlayerUp {
+  type SystemData = WriteStorage<'a, Transform>;
+
+  // Move the player by 0.1 y unit on each loop
+  fn run(&mut self, mut transforms: Self::SystemData) {
+    transforms.get_mut(self.player).unwrap().prepend_translation_y(0.1);
+  }
+}
+```
+
+(follow up: manipulating storages)

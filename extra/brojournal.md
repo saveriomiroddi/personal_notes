@@ -1,3 +1,17 @@
+## Fri 26/Mar/2021
+
+- Projects/Open source
+  - Amethyst
+    - [ ] Amethyst book
+      - [x] 3.4. World
+      - [ ] 3.5. System
+      - [ ] Pong tutorial
+        - [x] 4.1
+        - [x] 4.2
+  - Ruby
+    - [x] Presumably redundant constant `HEAP_PAGE_BITMAP_PLANES` investigation
+      - [x] Write post author
+
 ## Thu 25/Mar/2021
 
 - Projects/Open source

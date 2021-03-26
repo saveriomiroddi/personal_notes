@@ -159,6 +159,11 @@ rand = "0.7.3"
 redisish = {path = "../redisish"}                                             # Relative dependency
 amethyst = { git = "https://github.com/amethyst/amethyst", rev = "cafebabe" } # Repository dependency
 
+# Another way to declare a dependency
+[dependencies.amethyst]
+features = ["vulkan"]
+version = "0.15"
+
 [profile.release]
 strip = "symbols"
 ```
@@ -3506,8 +3511,9 @@ for stream in listener.incoming() { handle_client(stream?) } // Watch out (Resul
 Don't forget that the first is the binary filename.
 
 ```rust
-std::env::args();     // only valid Unicode; can collect to Vec<String>
-std::env::args_os();  // returns `OsString`s, which are not restricted to Unicode
+std::env::args();                                       // only valid Unicode; can collect to Vec<String>
+std::env::args_os();                                    // returns `OsString`s, which are not restricted to Unicode
+let exe: io::Result<PathBuf> = std::end::current_exe(); // current binary/executable path
 ```
 
 ### Processes

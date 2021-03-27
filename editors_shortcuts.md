@@ -289,3 +289,7 @@ htop:
 
 - `h`: help
 - `H`: show/hide process threads
+
+Tilix:
+
+- `Ctrl+Shift+I`            Synchronize input

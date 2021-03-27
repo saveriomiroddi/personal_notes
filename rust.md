@@ -78,7 +78,8 @@
     - [Project structure](#project-structure)
     - [Modules](#modules)
   - [Standard library](#standard-library)
-    - [Files/paths/streams handling](#filespathsstreams-handling)
+    - [Files/streams](#filesstreams)
+    - [Paths handling/Directories](#paths-handlingdirectories)
     - [Testing](#testing)
       - [Integration tests](#integration-tests)
     - [String/char-related (conversions)](#stringchar-related-conversions)
@@ -87,7 +88,7 @@
       - [VecDeque: double-ended queue](#vecdeque-double-ended-queue)
     - [TCP client/server](#tcp-clientserver)
     - [Commandline arguments (basic)](#commandline-arguments-basic)
-    - [Processes](#processes)
+    - [O/S, Processes](#os-processes)
     - [Blackbox (nightly)](#blackbox-nightly)
   - [Traits](#traits-1)
     - [Default](#default)
@@ -113,6 +114,7 @@
     - [Enum utils, e.g. iterate (`strum`)](#enum-utils-eg-iterate-strum)
     - [Convenience macros for operator overloading (`auto_ops`)](#convenience-macros-for-operator-overloading-auto_ops)
     - [Indented Heredoc-like strings (`indoc`)](#indented-heredoc-like-strings-indoc)
+    - [User directories (`directories`)](#user-directories-directories)
 
 ## Cargo
 
@@ -156,8 +158,8 @@ cucumber = {package = "cucumber_rust", version = "^0.7.0"}
 
 [dependencies]
 rand = "0.7.3"
-redisish = {path = "../redisish"}                                             # Relative dependency
-amethyst = { git = "https://github.com/amethyst/amethyst", rev = "cafebabe" } # Repository dependency
+redisish = { path = "../redisish" }                         # Relative dependency
+amethyst = { git = "https://github.com/amethyst/amethyst" } # Repository; options: `branch`/`tag`/`rev` (master branch is the default)
 
 # Another way to declare a dependency
 [dependencies.amethyst]
@@ -3242,7 +3244,7 @@ use std::collections::*; // useful for testing; unidiomatic for the rest
 
 ## Standard library
 
-### Files/paths/streams handling
+### Files/streams
 
 ```rust
 std::fs::read_to_string(filename) -> Result<String, Error>;    // content must be valid UTF-8; filename can be relative.
@@ -3264,13 +3266,19 @@ let len = reader.read_line(&mut line)?;
 for line in reader.lines() { println!("{}", line?); }
 let lines = reader.lines().collect::<Result<Vec<_>, _>>()?;
 
+// Open file for writing; if existing, it's truncated.
+//
+let mut file = File::create("log.txt")
+
 // Buffered write. Think about write() vs. write_all()
+// Flushes when the buffer is full, not at the end of each line.
+//
 let mut stream = BufWriter::new(TcpStream::connect("127.0.0.1:34254").unwrap());
 stream.write(&[666]).unwrap();
 
-// Open file for writing.
-//
-let mut f = File::create("log.txt")
+// Per-line buffered write; convenient if each line must be immediately available.
+let mut writer = LineWriter::new(file);
+writer.write_all(b"I like pizza!\n")?;
 ```
 
 Abstract operation traits:
@@ -3289,15 +3297,23 @@ BufWriter::new(vec);
 
 for more complex operations (ie. involving seek), can use [io::Cursor](https://doc.rust-lang.org/std/io/struct.Cursor.html).
 
+### Paths handling/Directories
+
+(for user paths/directories, see the crates section)
+
 For paths handling, use `std::path::Path`, with several conveniences:
 
 ```rust
 let path = PathBuf::from("/path/to/file");
 let path: PathBuf = Path::new(ASSETS_PATH).join("triangles.obj");   // Path#join() return a PathBuf
 
+// The below return `Option<&OsStr>`, which requires the very ugly conversion.
+//
 path.file_name();            // Ruby basename(); for the poor man's version, use String#split
+path.file_stem();            // Filename without extension/path. Must do the (very)
 
-// Watch out! PathBuf conversion to String is quite ugly.
+// Watch out! PathBuf, and related types, conversion to String is quite ugly.
+// OsString doesn't implement fmt::Display, which is part of the ugliness.
 //
 pathbuf
   .into_os_string() // OsString
@@ -3310,6 +3326,14 @@ pathbuf
   .to_owned()       // OsString
   .into_string()
   .unwrap();
+```
+
+Directories:
+
+```rust
+path.exists()                    // test if file/dir exists
+std::fs::create_dir(&path)?;     // create a directory (mkdir)
+std::fs::create_dir_all(&path)?; // create a directory (mkdir -p)
 ```
 
 ### Testing
@@ -3513,12 +3537,14 @@ Don't forget that the first is the binary filename.
 ```rust
 std::env::args();                                       // only valid Unicode; can collect to Vec<String>
 std::env::args_os();                                    // returns `OsString`s, which are not restricted to Unicode
-let exe: io::Result<PathBuf> = std::end::current_exe(); // current binary/executable path
+let exe: io::Result<PathBuf> = std::env::current_exe(); // current binary/executable path
+let exe: io::Result<PathBuf> = std::env::current_dir(); // working directory
 ```
 
-### Processes
+### O/S, Processes
 
 ```rust
+std::env::consts::OS;               // values: https://doc.rust-lang.org/std/env/consts/constant.OS.html
 std::process::exit(exit_status);    // terminate program (exit)
 ```
 
@@ -3814,7 +3840,9 @@ WATCH OUT! While `Instant`s can be compared, it's not possible to perform an ope
 
 ### Date/times (`chrono`)
 
-Don't use `time::Duration`, since it doesn't implement the operation traits.
+WATCH OUT! Check accurately how the chrono crate is more convenient than the stdlib version.
+
+WATCH OUT! `std::time::Duration` doesn't support negative values.
 
 ```rust
 let start:DateTime<Utc> = Utc::now();                   // Current time
@@ -4349,4 +4377,21 @@ let expected_string = indoc! {"
     0 0 0 0 0 0 0 0 0 0 0 0 0 0 255 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 255 0
     0 0 0 0 0 0 0 0 0 0 0 0 0
 "};
+```
+
+### User directories (`directories`)
+
+Aside the temporary directory, there's not builtin way in Rust to find the home (and related) user directories.
+
+Generic create search: https://crates.io/search?q=home
+
+```rust
+// stdlib temp dir
+//
+let tmpdir: PathBuf = std::env::temp_dir();
+
+// `directories` crate
+//
+UserDirs::new().home_dir();
+UserDirs::new().desktop_dir();
 ```

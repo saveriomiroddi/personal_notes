@@ -1,3 +1,20 @@
+## Sat 27/Mar/2021
+
+- Projects/Open source
+  - Amethyst
+    - [ ] Amethyst book
+      - [ ] Pong tutorial
+        - [x] 4.3: Movement
+    - [x] Work on [frame limiter](https://github.com/amethyst/amethyst/issues/2083)
+      - [x] Write
+      - [x] Test on pong_6
+      - [x] Discuss Linux slowness on Discord
+      - [x] Test on other game(s)
+        - [x] Evoli
+        - [x] Fight compile dwarf_seeks_fortune
+          - [x] Discuss
+      - [x] Publish findings
+
 ## Fri 26/Mar/2021
 
 - Projects/Open source

@@ -64,7 +64,7 @@
       - [Atomic primitive type wrappers](#atomic-primitive-type-wrappers)
       - [Barrier](#barrier)
       - [Condvar](#condvar)
-      - [Busy waiting/spin loops](#busy-waitingspin-loops)
+      - [Busy waiting/spin loops (pause)](#busy-waitingspin-loops-pause)
     - [Unsafe](#unsafe)
       - [Interoperability with other languages (C)](#interoperability-with-other-languages-c)
     - [Macros](#macros)
@@ -121,7 +121,7 @@
 Base operations:
 
 ```sh
-cargo new "$project_name"
+cargo new "$project_name" [--lib]
 cargo check                          # check for errors
 cargo run
 cargo build [--release]              # builds (default: debug); if necessary, updates the crates index, and installs the dependencies
@@ -2703,7 +2703,7 @@ Watch out! This can't be used for as a pseudo-channel, because the mutex value c
   handle.join();
 ```
 
-#### Busy waiting/spin loops
+#### Busy waiting/spin loops (pause)
 
 Intrinsic to use in busy waiting:
 
@@ -3853,6 +3853,7 @@ NaiveDateTime::parse_from_str(string, "%Y-%m-%d %H:%M:%S")?; // Parse a datetime
 
 start + Duration::days(3);                              // Arithmetic
 start.checked_add(Duration::days(3));                   // Safe arithmetic
+end.checked_sub(start);                                 // Returns Option<Duration> (none if negative)
 naive_time_1 + naive_time_2                             // Returns duration
 nt1 + nt2 + Duration::seconds(nt3.second() as i64);     // Sample arithmetic with 3+ (odd) NaiveTime
 

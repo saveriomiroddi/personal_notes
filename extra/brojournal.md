@@ -1,3 +1,29 @@
+## Sun 28/Mar/2021
+
+- Projects/Open source
+  - Amethyst
+    - [x] Additional work on [frame limiter](https://github.com/amethyst/amethyst/issues/2083)
+      - [x] Search cpu monitoring crates
+        - [x] Test `sysstat`
+      - [x] Implement other two frame limiting strategies
+        - [x] Benchmark them
+      - [x] Measure (wall) power consumption
+  - Bevy
+    - Discuss [scheduler delay](https://github.com/bevyengine/bevy/issues/1501)
+      - [x] Review Bevy source code
+  - QEMU research paper
+    - [x] Build text file
+    - [x] Read research several times
+    - [x] First researches
+    - [x] Make first conclusion on the paper and write summary
+
+- Studies
+  - Rust
+    - [x] Review `slotmap` crate
+    - [x] Review `anymap` crate
+  - Rust/Gamedev
+    - [x] Preliminary review other Rust game engines
+
 ## Sat 27/Mar/2021
 
 - Projects/Open source

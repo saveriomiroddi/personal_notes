@@ -29,6 +29,7 @@
   - [Networking](#networking)
     - [NetworkManager](#networkmanager)
       - [Changing Network manager DNS (18.04+)](#changing-network-manager-dns-1804)
+    - [Netplan](#netplan)
     - [iproute2 (`ip` tool)](#iproute2-ip-tool)
   - [fstab](#fstab)
   - [Modules](#modules)
@@ -54,6 +55,7 @@
     - [Keyboard](#keyboard)
     - [Topology](#topology)
     - [Isolating processors](#isolating-processors)
+    - [Setting the CPU frequency](#setting-the-cpu-frequency)
 
 ## Security
 
@@ -722,6 +724,28 @@ When adding hooks, the scripts must be executable!
 
 On 18.04 Desktop, one needs to modify the Network manager connection; see https://askubuntu.com/a/1104305/46091.
 
+### Netplan
+
+```sh
+ETHERNET_ITF=enp42s0
+ETHERNET_IP=192.168.178.199
+
+cat > /etc/netplan/01-$ETHERNET_ITF.yaml <<YAML
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    $ETHERNET_ITF:
+      addresses:
+        - $ETHERNET_IP/24
+      gateway4: ${ETHERNET_IP%.*}.1
+      nameservers:
+        addresses: [${ETHERNET_IP%.*}.1]
+YAML
+
+netplay apply
+```
+
 ### iproute2 (`ip` tool)
 
 Show all the interfaces, even if unconfigured:
@@ -1085,3 +1109,14 @@ qemu-system-x86 1
 ```
 
 For a softer isolation (that is, with the kernel still being scheduled on the desired processors), use `cpuset` (see https://www.codeblueprint.co.uk/2019/10/08/isolcpus-is-deprecated-kinda.html).
+
+### Setting the CPU frequency
+
+It seems that there isn't a stable software way to do that; on a Ryzen 3950x, the strategies:
+
+- setting `userspace` governor
+- using `cpufreq-set`
+- using `cpupower`
+- setting `/sys/**/cpufreq/scaling_max_freq`
+
+didn't have any effect (verified via `grep MHz /proc/cpuinfo`).

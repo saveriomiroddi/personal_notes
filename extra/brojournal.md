@@ -1,3 +1,21 @@
+## Mon 29/Mar/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Plan current objectives/requirements, and reorganize notes
+    - [x] Lock cores speed during benchmark execution
+      - [x] Find speed: 3.94 GHz
+      - [x] Fight lock the speed
+        - [x] Try various tools
+        - [x] Try kernel 5.11
+      - [x] Update the benchmarking tools
+    - [x] Restore environment on key
+      - [x] Update system
+      - [x] Preset (3950x) ethernet driver
+      - [x] Must rebuild kernel
+        - [x] Fight compilation failure due to cert
+      - [x] Fight custom host kernel
+
 ## Sun 28/Mar/2021
 
 - Projects/Open source

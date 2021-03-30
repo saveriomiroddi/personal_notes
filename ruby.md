@@ -14,8 +14,10 @@
     - [Refinements](#refinements)
     - [Regular expression exceptions](#regular-expression-exceptions)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
-  - [Reflection](#reflection)
-    - [Pass a method as map block parameter](#pass-a-method-as-map-block-parameter)
+  - [Metaprogramming](#metaprogramming)
+    - [Dynamic class instantiation](#dynamic-class-instantiation)
+    - [Reflection](#reflection)
+      - [Pass a method as map block parameter](#pass-a-method-as-map-block-parameter)
   - [Concurrency](#concurrency)
     - [Mutex](#mutex)
     - [Thread-safe data structures](#thread-safe-data-structures)
@@ -338,9 +340,19 @@ RUBY_VERSION                        # e.g. "2.7.0"
 __dir__                              # directory of current file
 ```
 
-## Reflection
+## Metaprogramming
 
-### Pass a method as map block parameter
+### Dynamic class instantiation
+
+```ruby
+new_class = Class.new(opt_superclass) do
+  attr_accessor my_attr
+end
+```
+
+### Reflection
+
+#### Pass a method as map block parameter
 
 ```ruby
 # Invokes :mymethod on each of the `enumerable` items.

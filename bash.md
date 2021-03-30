@@ -561,7 +561,7 @@ formatted_result=`date '+%Y-%m-%d %H:%M:%S' --date="@$((timestamp_in_secs – se
 ## Redirections
 
 ```sh
-&> "$filename"                                          # redirect both stdout and stderr to <filename>
+&> "$filename"                                          # equivalent to `1> "$filename" 2>&1`
 >&2 echo "error"                                        # write to stderr
 
 { mycommand 3>&2 2>&1 1>&3 | grep -v "skipme" >&3; } 3>&2 2>&1  # filter out stderr message

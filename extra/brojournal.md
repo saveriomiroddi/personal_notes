@@ -1,3 +1,16 @@
+## Wed 31/Mar/2021
+
+- Projects/Open source
+  - Capistrano/Netssh
+    - [x] [Open issue](git.io/JYzPU) and propose implementation for ineffective `export`
+  - QEMU research paper
+    - [x] Remove pigz support
+    - [x] Restore environment on key
+      - [x] Prepare components
+      - [x] Run test benchmark(s)
+      - [x] Add `libsdl2-image-2.0-0` QEMU runtime dependency
+      - [x] benchmark_apis: Add conditional to SMT reset hook
+
 ## Tue 30/Mar/2021
 
 - Projects/Open source

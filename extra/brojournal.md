@@ -1,3 +1,11 @@
+## Thu 01/Apr/2021
+
+- Studies
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [ ] II. Design Patterns Revisited
+        - [ ] 6. State
+
 ## Wed 31/Mar/2021
 
 - Projects/Open source
@@ -10,6 +18,12 @@
       - [x] Run test benchmark(s)
       - [x] Add `libsdl2-image-2.0-0` QEMU runtime dependency
       - [x] benchmark_apis: Add conditional to SMT reset hook
+
+- Studies
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [ ] II. Design Patterns Revisited
+        - [ ] 6. State
 
 ## Tue 30/Mar/2021
 
@@ -145,10 +159,10 @@
   - Gamedev/SWE
     - [ ] Game Programming Patterns
       - [ ] II. Design Patterns Revisited
-        - [x] 2. Flyweight
-        - [x] 3. Observer
-        - [x] 4. Prototype
-        - [x] 5. Singleton
+        - [x] 3. Flyweight
+        - [x] 4. Observer
+        - [x] 5. Prototype
+        - [x] 6. Singleton
 
 ## Fri 19/Mar/2021
 
@@ -158,7 +172,8 @@
       - [x] I. Introduction
         - [x] 1. Architecture, Performance, and Games
       - [ ] II. Design Patterns Revisited
-        - [x] 1. Command
+        - [x] 1. Architecture, Performance, and Games
+        - [x] 2. Command
 
 ## Thu 18/Mar/2021
 

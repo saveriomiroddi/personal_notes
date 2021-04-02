@@ -1,3 +1,11 @@
+## Fri 02/Apr/2021
+
+- Studies
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [x] II. Design Patterns Revisited
+        - [x] 6. State
+
 ## Thu 01/Apr/2021
 
 - Studies

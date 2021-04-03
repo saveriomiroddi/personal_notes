@@ -290,10 +290,17 @@ Infix operators:
 - `-eq`,`-ne`,`-lt`,`-le`,`-ge`,`-gt`  arithmetic operators; !! DON'T USE FOR STRINGS !!
 - `==`, `!=`, `<`, `>`                 string operators - !! DON'T USE FOR ARITHMETIC !!
 
-Ternary operator (!!); work only in an arithmetic context:
+Ternary operator:
 
 ```sh
-a < b ? c : d
+# It exists, but it works only in an arithmetic context (can't use strings)
+#
+tern=$(( a < b ? c : d ))
+
+# Can use a compact conditional for anything else, BUT with the typical disclaimers of error exits (in
+# this case, it's impossible)
+#
+tern=$( [[ -n $v_smt_on ]] && echo 2 || echo 1 )
 ```
 
 Note that functions can return a condition result!!:

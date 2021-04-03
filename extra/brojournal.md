@@ -1,3 +1,15 @@
+## Sat 03/Apr/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Study/prepare perf
+      - [x] Review QEMU threads
+        - [x] Clean display of a process tree
+      - [x] [Perf case with unexpected results](https://linux.kernel.narkive.com/o9Y3HOOa/scheduler-perf-stat-question-about-cpu-migrations)
+      - [x] [Perf basics](http://www.brendangregg.com/perf.html)
+        - [x] Find out how to count per-thread/process (not aggregate)
+          - [x] Isolate the non-vcpu process(es)
+
 ## Fri 02/Apr/2021
 
 - Studies

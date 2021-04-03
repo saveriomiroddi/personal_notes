@@ -11,9 +11,11 @@
   - [mkfifo](#mkfifo)
   - [Files](#files)
   - [Processes](#processes)
+    - [Process tree display](#process-tree-display)
     - [Parallel execution](#parallel-execution)
       - [Using GNU Parallel](#using-gnu-parallel)
       - [Using xargs](#using-xargs)
+  - [Profiling (perf)](#profiling-perf)
   - [Networking](#networking)
     - [wget](#wget)
     - [curl](#curl)
@@ -263,6 +265,28 @@ stat $filename --format='%s'          # Get file size
 
 ## Processes
 
+### Process tree display
+
+```sh
+# pstree's modes are confusing; some imply each other, but not entirely.
+# the below is the minimum to get a pretty view.
+#
+# a: disable processes compaction (and show cmdline args)
+# u: uid transitions
+# t: display full thread names
+# p: show pids (disable compaction, but not entirely)
+#
+pstree -autp $(pgrep -f qemu-sys)
+
+# H: Threads, b: batch, n1: iterations, -p $pid: one process only
+#
+top -Hb -n1 -p $(pgrep -f qemu-sys)
+
+# Thread forest for a given process (HTML) - HTML output (required `aha`)
+#
+echo q | htop -p $(pgrep -f qemu-sys) | aha --black --line-fix > /tmp/htop.html
+```
+
 ### Parallel execution
 
 #### Using GNU Parallel
@@ -318,6 +342,29 @@ Ignore failing commands:
 
 ```sh
 seq 4 | xargs -I {} -P 0 sh -c 'aws ec2 delete-snapshot --snapshot-id {} || true'
+```
+
+## Profiling (perf)
+
+```sh
+# Display stats
+#
+# -p: attach to process
+# -e: events recorded
+#
+perf stat -e L1-dcache-load-misses,context-switches,migrations --per-thread -p $(pgrep -f qemu-sys) | tee perf.txt
+
+# Record in-depth profile (to `perf.data`); options are same as `stat`.
+#
+# -g: record call graph
+#
+perf record -g -p $(pgrep -f qemu-sys)
+
+# Display the record results; includes the call graph.
+# It's not clear if a simple list of aggregates can be displayed.
+#
+perf report
+perf report | grep ' of event '
 ```
 
 ## Networking

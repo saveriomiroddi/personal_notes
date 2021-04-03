@@ -378,6 +378,8 @@ RS                    # separator
 /regex/               # regular expression
 
 expr { statement }    # execute `statement` if `expr` is true
+
+ENVIRON["MYVAR"]      # access environment vars!
 ```
 
 Expressions apply by default to the current string:

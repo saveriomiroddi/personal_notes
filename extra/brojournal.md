@@ -1,3 +1,12 @@
+## Sun 04/Apr/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Learn perf
+      - [ ] Context switches/migrations
+        - [ ] https://eli.thegreenplace.net/2018/measuring-context-switching-and-memory-overheads-for-linux-threads
+    - [x] run_benchmark: Add warmup runs (and invert threads/run cycle)
+
 ## Sat 03/Apr/2021
 
 - Projects/Open source

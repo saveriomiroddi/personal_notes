@@ -347,12 +347,13 @@ seq 4 | xargs -I {} -P 0 sh -c 'aws ec2 delete-snapshot --snapshot-id {} || true
 ## Profiling (perf)
 
 ```sh
-# Display stats
+# Display stats (to stderr!!)
 #
 # -p: attach to process
 # -e: events recorded
+# -x|--field-separator: print in tabular format, with given separator
 #
-perf stat -e L1-dcache-load-misses,context-switches,migrations --per-thread -p $(pgrep -f qemu-sys) | tee perf.txt
+perf stat -e L1-dcache-load-misses,context-switches,migrations --per-thread -x, -p $(pgrep -f qemu-sys) 2>&1 | tee perf.txt
 
 # Record in-depth profile (to `perf.data`); options are same as `stat`.
 #
@@ -365,6 +366,10 @@ perf record -g -p $(pgrep -f qemu-sys)
 #
 perf report
 perf report | grep ' of event '
+
+# Terminate, with data save
+#
+kill -INT $(pgrep perf)
 ```
 
 ## Networking

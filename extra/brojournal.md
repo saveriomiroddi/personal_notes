@@ -1,3 +1,21 @@
+## Mon 05/Apr/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Benchmarking: Update isolated processors logic
+    - [x] Benchmarking: Benchmark: Execute all runs in a single SSH session
+    - [x] Remove warmup functionality
+    - [x] Benchmarking: Enable SMT by default
+    - [x] Test performance: isolcpus vs not
+    - [x] Investigate irregular benchmark times D\*CK F\*RK
+    - [x] blackscholes
+    - [x] water_nsquared
+    - [x] Further benchmark: ocean_cp
+    - [x] Log benchmark output
+    - [x] Make each cycle stand out more
+    - [x] Add perf support
+    - [x] Read: https://easyperf.net/blog/2019/10/05/Performance-Analysis-Of-MT-apps
+
 ## Sun 04/Apr/2021
 
 - Projects/Open source

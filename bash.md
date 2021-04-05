@@ -414,6 +414,14 @@ wait $pid           # wait for the process to finish; if no $pid is provided, al
 (echo abc &)        # avoid printing the job number
 ```
 
+Case with piped command:
+
+```sh
+sleep 100 | tee /dev/null &
+echo $!                       # returns tee's pid!
+jobs -p | tail -n 1           # pid of the latest backgrounded job (`-p`= pids of group leaders)
+```
+
 In order to get the exit status of a backgrounded process, use `wait $pid`, and inspect its exit status (`$?`)``:
 
 ```sh
@@ -528,10 +536,10 @@ Watch out!!:
 - operations will cause exit if they evaluate to 0 and the `errexit` shellopt is set (also applies to `let`)
 
 ```sh
-(( <expr> ))                      # preferred form
-let param=<expr>                  # alternative
+(( $expr ))                       # preferred form
+let param=$expr                   # alternative
 
-a=$((a++))                        # numerical values don't need `$`
+b=$((++a))                        # variables don't need `$`
 ((a += 1))                        # `+=` for numbers
 ((a *= 2))                        # supported
 ((a ** 2))                        # power
@@ -543,14 +551,12 @@ a=$((a++))                        # numerical values don't need `$`
                                   # will fail)
 
 a+=1                              # WRONG!!! this is a string operation (if not an arithmetic expression)
-```
 
-Exit status:
+# Exits with error status:
 
-```sh
-(( val ))                         # exits if `val` is 0
-(( val++ ))                       # postfix exits if the old `val` value is 0
-param=$(( val++ ))                # this doesn't exit
+(( expr ))                        # exits if `expr` is 0
+(( val++ ))                       # exits if the old `val` value is 0
+(( ++val ))                       # doesn't exit!
 ```
 
 ## Date operations
@@ -641,6 +647,8 @@ coordinates=(${1//./ })             # split by `.` (bash) !!! use only for unspa
 mapfile -td. coordinates < <(echo -n "$1")
 mapfile -t coordinates < <(printf "a a\nb b")
 mapfile -t coordinates <<< "$myvar"
+mapfile -t coordinates </path/to/file
+mapfile -t coordinates < <(perl -pe 'chomp if eof' /path/to/file) # strip end newline
 
 IFS=, read -ra coordinates <<< $1    # create via `read`; note how `echo -n` is not required
 
@@ -685,6 +693,9 @@ Iterate a multiple lines output, assigning it to an array:
 #
 binlogs=$(mysql -u"$my_user" -p"$my_pwd" -h"$my_host" -BNe 'SHOW BINARY LOGS')
 
+# WATCH OUT! If $binlogs has a trailing newline, a cycle with a blank value will be executed; for this
+# case, use `< <(echo -n ...)` or similar.
+#
 while IFS= read -r -a binlog; do
   echo Filename: "${binlog[0]}", Position: "${binlog[1]}"
 done <<< "$binlogs"

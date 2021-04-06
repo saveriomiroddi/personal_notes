@@ -1,3 +1,35 @@
+## Tue 06/Apr/2021
+
+- Projects/Open source
+  - PPA Packaging
+    - [x] Fix data directory incorrect value
+    - [x] Improve help/comments related to the data directory role
+
+- Projects/Open source
+  - QEMU-pinning
+    - [x] Print thread names and PIDs on start
+    - [x] Add option to skip configure step on build
+  - QEMU research paper
+    - [x] Check why dedup failed
+      - [x] Add script for running the benchmark programs used in the paper
+    - [x] Add --min/--max runs
+    - [x] Run perf on paper tests
+      - [x] Handle failures
+        - [x] Fight ferret instability
+        - [x] Fight freqmine failure
+          - [x] Add image check on shutdown
+    - [x] Remove benchmark output from `run_benchmark.log`
+    - [x] Perf improvements
+      - [x] Check out the slowdown
+      - [x] Fight dump threads
+        - [x] Find Linux way of printing the TID/PID
+        - [x] Investigate QEMU source code
+          - [x] Implement threads PIDs printing
+        - [x] Implement vCPU PIDs logging
+    - [x] run_paper_benchmarks.sh: Make QEMU boot script an argument
+    - [ ] Write isolcpus results on the paper
+      - [ ] Rerun all the isolcpu tests
+
 ## Mon 05/Apr/2021
 
 - Projects/Open source
@@ -24,6 +56,7 @@
       - [ ] Context switches/migrations
         - [ ] https://eli.thegreenplace.net/2018/measuring-context-switching-and-memory-overheads-for-linux-threads
     - [x] run_benchmark: Add warmup runs (and invert threads/run cycle)
+    - [x] Plan tests (first slice)
 
 ## Sat 03/Apr/2021
 

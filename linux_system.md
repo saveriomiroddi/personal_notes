@@ -539,6 +539,22 @@ journalctl --pager-end --unit=$service.service     # show unit log; `page-end`: 
 journalctl --vacuum-time=1d                        # clean systemd journal (/var/log/journal)
 ```
 
+Limit the max use:
+
+```sh
+mkdir -p /etc/systemd/journald.conf.d
+cat > /etc/systemd/journald.conf.d/00-journal-size.conf <<'CFG'
+[Journal]
+SystemMaxUse=128M
+CFG
+
+# Restart the journal service (won't purge the existing journal)
+systemctl kill --kill-who=main --signal=SIGUSR2 systemd-journald
+
+# Purge the existing journal
+journalctl --vacuum-size=128M
+```
+
 ### Configuring a unit
 
 See:

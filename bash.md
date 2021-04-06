@@ -665,7 +665,7 @@ coordinates[1]=b                     # set an indexed value
 echo "${coordinates[@]:2}"           # array slicing! ([2..-1]) (see https://stackoverflow.com/a/1336245)
 echo "${@:2}"                        # slice the `$@` variable
 echo ${#coordinates[@]}              # size (length)
-printf '%s\n' "${pizza[@]}"          # print the entries (one per line); echo print all in one line
+printf '%s\n' "${pizza[@]}"          # print the entries (one per line); `echo` prints all in one line
 echo $(IFS=,; echo "${pizza[*]}")    # join the entries. !!! don't forget the `;` and the quotes !!!
 
 # Iteration (regular vars/$@)

@@ -290,6 +290,7 @@ printf "0\n1\n2" | perl -ne 'eof && print'                # match and print last
 
 printf "0\n1\n2" | perl -lpe '$. == 2 && print "abc"'     # print before a numbered line => `0 abc 1 2`
 printf "0\n1\n2" | perl -pe '$_ .= "abc\n" if /1/'        # print after a match; !! `/regex/ && ...` doesn't work! !!
+printf "0\n1\n2" | perl -pe 'print $_; print "abc\n" if /1/' # print after a match (alternative)
 
 printf "0\n0\n0" | perl -pe '$_ .= "abc\n" if /0/ && ++$cnt == 2'  # 2nd occurrence of the pattern (!!) => 0 0 abc 0
 ```

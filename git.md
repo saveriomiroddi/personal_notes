@@ -445,7 +445,7 @@ Diff/Patching:
 format-patch [--stdout] [$start_commit^[..$end_commit]]
 am $patchfile
 
-# "Transfer" commit between two repositories:
+# "Transfer" commit between two repositories (use `$sha~..$sha` for single commit):
 #
 git -C ~/code/riscv_images format-patch --stdout -1 |
   sed 's/guest_benchmark_pigz/altscripts\/guest_benchmark_pigz/g' |

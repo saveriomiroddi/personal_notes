@@ -1,3 +1,23 @@
+## Wed 07/Apr/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [ ] Write isolcpus results on the paper
+      - [x] Rerun all the isolcpu tests
+    - [x] Study perf more in depth
+      - [x] https://easyperf.net/blog/2019/10/05/Performance-Analysis-Of-MT-apps
+      - [x] https://easyperf.net/blog/2019/10/12/MT-Perf-Analysis-part2
+      - [x] Check if can run stat + record at the same time
+        - https://stackoverflow.com/questions/10321073/can-perf-stat-results-be-generated-from-a-perf-data-file
+      - [x] Review other stats
+        - [x] Review http://www.brendangregg.com/perf.html#Examples
+        - [x] Add new ones
+          - [x] Search difference is usage between context-switches and sched:sched_switch
+        - [x] Other readings
+    - [ ] Implement perf stats and record
+      - [x] Significant refactoring in order to accommodate the feature
+      - [x] Implement it
+
 ## Tue 06/Apr/2021
 
 - Projects/Open source

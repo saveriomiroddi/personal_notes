@@ -16,6 +16,8 @@
       - [Using GNU Parallel](#using-gnu-parallel)
       - [Using xargs](#using-xargs)
   - [Profiling (perf)](#profiling-perf)
+    - [Waits on condvar](#waits-on-condvar)
+    - [Sleep times](#sleep-times)
   - [Networking](#networking)
     - [wget](#wget)
     - [curl](#curl)
@@ -347,29 +349,82 @@ seq 4 | xargs -I {} -P 0 sh -c 'aws ec2 delete-snapshot --snapshot-id {} || true
 ## Profiling (perf)
 
 ```sh
+sudo mkdir /usr/share/doc/perf-tip
+curl https://raw.githubusercontent.com/torvalds/linux/master/tools/perf/Documentation/tips.txt | sudo tee /usr/share/doc/perf-tip/tips.txt
+
 # Display stats (to stderr!!)
 #
-# -p: attach to process
-# -e: events recorded
-# -x|--field-separator: print in tabular format, with given separator
+# -e                   : events recorded
+# -x|--field-separator : print in tabular format, with given separator
+# -p                   : attach to process
 #
-perf stat -e L1-dcache-load-misses,context-switches,migrations --per-thread -x, -p $(pgrep -f qemu-sys) 2>&1 | tee perf.txt
+perf stat -e L1-dcache-load-misses,context-switches,migrations,cycles,sched:sched_switch --per-thread -x, -p $(pgrep -f qemu-sys) 2>&1 | tee perf.txt
 
-# Record in-depth profile (to `perf.data`); options are same as `stat`.
+# Record in-depth profile (to `perf.data`):
 #
-# -g: record call graph
+# -e, -s, -p         : same as `stat`
+# -s|--stat          : record per-thread event counts (NOT --per-thread!!!)
+# --call-graph dwarf : more accurate; enables `-g` (record call graph)
+# -o $file           : specify output file
 #
-perf record -g -p $(pgrep -f qemu-sys)
+perf record -e sched:sched_stat_sleep,sched:sched_switch,sched:sched_process_exit -s --call-graph dwarf -p $(pgrep -f qemu-sys)
+
+# `record` and `stat` can yield similar results, but they can't be used interchangeably (see
+# https://stackoverflow.com/questions/49216628/perf-stat-vs-perf-record).
 
 # Display the record results; includes the call graph.
-# It's not clear if a simple list of aggregates can be displayed.
+# It's not clear why the "PID TID" section at the end is empty.
 #
-perf report
-perf report | grep ' of event '
+# -T|--thread     : show per-thread (requires `record -s`); see `prev_pid=$tid` entries
+# --tid           : show only a single tid
+# --stdio         : text output (instead of GUI)
+# --no-call-graph : display in tabular format, without call graph
+# -n              : add samples; doesn't seem to be particularly useful.
+#
+perf report --thread --stdio
+perf report --stdio --no-call-graph --tid=mytid
 
-# Terminate, with data save
+# Terminate, with data saving.
 #
 kill -INT $(pgrep perf)
+```
+
+### Waits on condvar
+
+Requires recording `sched:sched_switch`; can also try `sched:*switch` for all the context switches.
+
+```sh
+# Convenient statement for checking the context switches caused by a thread waiting on a condvar.
+#
+grep __pthread_cond_wait $report_output -w -B10 | grep prev_comm=qemu | sed 's/%.*//' | awk '{i+=$1} END {printf("%.2f%%\n",i)}'
+```
+
+Reference: https://easyperf.net/blog/2019/10/12/MT-Perf-Analysis-part2#find-expensive-synchronization-with-perf-
+
+### Sleep times
+
+Requires recording `sched:sched_stat_sleep,sched:sched_switch,sched:sched_process_exit`.
+
+WATCH OUT! For unclear reasons, it fails, even with the official [patch code](https://lwn.net/Articles/510120).
+
+```sh
+# -v|--verbose
+# -s|--stat    : special mode to merge sched events in order to perform sleep analysis
+#
+perf inject -v -s -i perf.data -o perf.sleep.data
+perf report --stdio --show-total-period -i perf.sleep.data
+```
+
+Reference: https://perf.wiki.kernel.org/index.php/Tutorial#Profiling_sleep_times
+
+In order to use the LWN example, add:
+
+```c
+#include <time.h>
+#include <sys/time.h>
+
+struct timespec ts1;
+struct timeval tv1;
 ```
 
 ## Networking

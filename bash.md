@@ -105,7 +105,7 @@ myvar=value                         # no spaces around equal; if value includes 
 myvar=$myvar2                       # $myvar2 doesn't require quotes
 unset myvar                         # delete myvar
 export myvar=value                  # makes available to subshells. `local export` is allowed, but doesn't work as intended; in order to export
-                                    # local variables, do it separately from assignment
+                                    # local variables, do it separately from assignment (or use declare)
 ((var+=1))                          # increment variable value
 ((var++)) || true                   # increment variable value. WATCH OUT!!! `|| true` is required if var=0 before the increment/decrement!!!!
 
@@ -117,7 +117,7 @@ eval local myvar2=\$$var_name_ref   # works both on bash/zsh; this shows how to 
 
 myvar=$(nonexiting_command 2>&1)    # the assignment value is stdout's output; for stderr we need redirection (eg. see whiptail)
 
-declare -g                          # declare variable as global (eg. from a function)
+declare -g                          # declare variable as global (eg. from a function); without, the scope is the current one
 declare -x                          # export; can add to `-g`
 ```
 
@@ -729,6 +729,20 @@ for key in ${!MYHASH[@]}; do echo "$key => ${MYHASH[$key]}"; done
 # watch out! if a variable was defined via `declare -p`, it will be printed.
 #
 [[ "$(declare -p MYHASH 2> /dev/null)" == "declare -A"* ]] && echo "is associative array"
+```
+
+In order to pass an AA to a function:
+
+```sh
+declare -A MYHASH=([foo]=bar)
+
+function myfx {
+  local -n hash_ref=$1
+  hash_ref[baz]=qux
+}
+
+myfx MYHASH
+echo ${#MYHASH[@]} # 2
 ```
 
 ## Script operational concepts/Useful scripts

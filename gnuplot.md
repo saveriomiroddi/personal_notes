@@ -31,7 +31,8 @@ The `pl` language is used (Perl), which is not correct, but close enough.
 Commandline:
 
 ```sh
-# Batch mode: displays the diagram and exits. WATCH OUT! No effect if the output if a file.
+# Batch mode: displays the diagram and exits. WATCH OUT! No effect if the output if a file, or if the
+# commands are piped (use `pause mouse...` below).
 #
 gnuplot --persist $file
 

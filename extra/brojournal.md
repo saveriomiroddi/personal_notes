@@ -1,3 +1,32 @@
+## Thu 08/Apr/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Disable SSH host added warning
+    - [x] Implement perf stats
+      - [x] Test it (+minor fixes)
+    - [x] First review perf record/results
+      - [x] Find best suited benchmark (-> bodytrack 16,128)
+      - [x] Analysis of perf record
+        - [x] Find differences between parameters
+        - [x] Basic search futex informations
+      - [x] Adjust options
+    - [x] Write isolcpus results on the paper
+        - [x] Check missing results, and run
+          - Double check and store
+        - [x] Minor scripts reorganization
+          - [x] Add a couple of new small scripts
+        - [x] Aggregate data
+          - [x] plot_diagram.sh: `--dir` functionality, and a couple of other improvements
+          - [x] Add compare_each_bench.sh
+        - [x] Analyze results
+      - [x] Write piece
+        - [x] Re-read paper
+        - [x] Write summary and discussion
+    - [ ] Full 10-run batches
+      - [x] isolcpu
+      - [ ] basic
+
 ## Wed 07/Apr/2021
 
 - Projects/Open source

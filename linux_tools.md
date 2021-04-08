@@ -360,17 +360,19 @@ curl https://raw.githubusercontent.com/torvalds/linux/master/tools/perf/Document
 #
 perf stat -e L1-dcache-load-misses,context-switches,migrations,cycles,sched:sched_switch --per-thread -x, -p $(pgrep -f qemu-sys) 2>&1 | tee perf.txt
 
-# Record in-depth profile (to `perf.data`):
+# Record in-depth profile (to `perf.data`).
+#
+# This can take lots of space; recording 64 threads for around a minute created more than 1 GB of data.
 #
 # -e, -s, -p         : same as `stat`
 # -s|--stat          : record per-thread event counts (NOT --per-thread!!!)
-# --call-graph dwarf : more accurate; enables `-g` (record call graph)
+# -c|--count         : event period
+# -g                 : enable call graph
+# --call-graph dwarf : use this format if `-g` doesn't yield the call stacks, as it can take 50x space; implies `-g`
 # -o $file           : specify output file
+# -F|--freq $hz      : specify the frequency (default=1000)
 #
 perf record -e sched:sched_stat_sleep,sched:sched_switch,sched:sched_process_exit -s --call-graph dwarf -p $(pgrep -f qemu-sys)
-
-# `record` and `stat` can yield similar results, but they can't be used interchangeably (see
-# https://stackoverflow.com/questions/49216628/perf-stat-vs-perf-record).
 
 # Display the record results; includes the call graph.
 # It's not clear why the "PID TID" section at the end is empty.
@@ -388,6 +390,12 @@ perf report --stdio --no-call-graph --tid=mytid
 #
 kill -INT $(pgrep perf)
 ```
+
+General information:
+
+- `record` and `stat` can yield similar results, but they can't be used interchangeably (see https://stackoverflow.com/questions/49216628/perf-stat-vs-perf-record).
+- `report` can be slow for GBs of data, so the recording configuration must be chosen carefully
+- `$event:u` monitors only at user-level privilege; in some cases, kernel-level monitoring is important
 
 ### Waits on condvar
 

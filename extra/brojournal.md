@@ -1,3 +1,15 @@
+## Fri 09/Apr/2021
+
+- Projects/Open source
+  - QEMU-pinning
+    - [x] Update patch for 6.0
+  - QEMU research paper
+    - [x] Preview test on QEMU 6.0
+    - [x] Full 10-run batches
+      - [x] isolcpu (missing)
+      - [x] basic
+    - [x] review results
+
 ## Thu 08/Apr/2021
 
 - Projects/Open source

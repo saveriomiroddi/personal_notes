@@ -1,3 +1,11 @@
+## Sat 10/Apr/2021
+
+- Projects/Open source
+  - Bevy
+    - [x] Fix issue about required C++ package
+      - [x] Test on different O/Ss, and discuss
+      - [x] Open PR
+
 ## Fri 09/Apr/2021
 
 - Projects/Open source

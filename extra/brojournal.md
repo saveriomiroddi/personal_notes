@@ -1,3 +1,31 @@
+## Sun 11/Apr/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] In-depth analysis of high-vCPUs slowness
+      - [x] Scripting improvements
+        - [x] Execute perf record only once per threads group
+        - [x] Implement fixed threads number, in addition to interval
+          - [x] Preliminary refactoring: simplify the threads number customization
+        - [x] Add perf record pattern matching
+          - Crucial, otherwise, the measurements are very (more or less significantly) perturbed by the benchmark preparation
+          - [x] Brutal fight bash background subshells
+      - [x] Get usable call stacks
+        - [x] Check if useful, and added by QEMU make: `-fno-omit-frame-pointer`
+        - [x] Compile opts: https://github.com/OP-TEE/optee_os/issues/2158
+        - [x] Fight QEMU compile options
+      - [x] Find and run best suite
+        - [x] `cpu-cycles`
+        - [x] Fight pkill
+      - [x] Analyze results, and review possible improvements
+        - [x] http://kvmonz.blogspot.com/p/knowledge-disk-performance-hints-tips.html
+          - https://vmsplice.net/~stefan/stefanha-kvm-forum-2014.pdf
+        - [x] https://www.ovirt.org/develop/release-management/features/virt/iothreads-support.html
+        - [x] https://github.com/qemu/qemu/blob/master/docs/devel/multiple-iothreads.txt
+        - [x] http://blog.vmsplice.net/2013/03/new-in-qemu-14-high-performance-virtio.html
+          - https://wiki.qemu.org/Features/VirtioIoeventfd
+      - [x] Open issue with summary
+
 ## Sat 10/Apr/2021
 
 - Projects/Open source

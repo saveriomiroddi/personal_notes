@@ -15,7 +15,8 @@
     - [`expr` tool (also for regular expressions)](#expr-tool-also-for-regular-expressions)
     - [Applications](#applications)
   - [Functions](#functions)
-  - [Jobs management](#jobs-management)
+  - [Grouping commands](#grouping-commands)
+  - [Background processes/jobs management](#background-processesjobs-management)
   - [Cycle a string tokens based on separator (IFS)](#cycle-a-string-tokens-based-on-separator-ifs)
   - [String functions](#string-functions)
     - [Examples](#examples)
@@ -403,7 +404,39 @@ function myfx() {
 }
 ```
 
-## Jobs management
+## Grouping commands
+
+```sh
+# Notice the difference between the `;` requirement
+#
+( commands  )  # creates a subshell
+{ commands; }  # runs in current context
+```
+
+The exit status is the exit status of `commands`.
+
+WATCH OUT! Don't use:
+
+```sh
+( complex_commands ) &
+my_pid=$!
+# ...commands...
+kill $!
+```
+Because no subshell process is created, and it won't be obvious what `$!` will point to (it may point to something that is ephemeral). Instead, use:
+
+```sh
+{ complex_commands } } &
+my_pid=$!
+# ...commands...
+pkill -P $!
+```
+
+which will create a subshell process, so that `pkill -P` will send the signal to all its children.
+
+## Background processes/jobs management
+
+Jobs:
 
 ```sh
 jobs                # job currently running; use tipically when `there are stopped jobs`

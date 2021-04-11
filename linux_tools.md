@@ -232,7 +232,7 @@ rsync --exclude=parsec-benchmark/.git parsec-benchmark/ /dest    # exclude only 
 #
 (shopt -s globstar; rsync -av --relative source/./**/a dest)
 
-# Ownership is presreved, when running as sudo (consider that it's id-based). In order to change it:
+# Ownership is preserved, when running as sudo (consider that it's id-based). In order to change it:
 #
 sudo ryns -og --chown=$user:$group $from $to
 
@@ -368,7 +368,7 @@ perf stat -e L1-dcache-load-misses,context-switches,migrations,cycles,sched:sche
 # -s|--stat          : record per-thread event counts (NOT --per-thread!!!)
 # -c|--count         : event period
 # -g                 : enable call graph
-# --call-graph dwarf : use this format if `-g` doesn't yield the call stacks, as it can take 50x space; implies `-g`
+# --call-graph dwarf : use when `-g` doesn't work (see end of this section); implies `-g`
 # -o $file           : specify output file
 # -F|--freq $hz      : specify the frequency (default=1000)
 #
@@ -382,9 +382,10 @@ perf record -e sched:sched_stat_sleep,sched:sched_switch,sched:sched_process_exi
 # --stdio         : text output (instead of GUI)
 # --no-call-graph : display in tabular format, without call graph
 # -n              : add samples; doesn't seem to be particularly useful.
+# --sort comm     : sort by command (easiest to read)
 #
 perf report --thread --stdio
-perf report --stdio --no-call-graph --tid=mytid
+perf report --stdio --no-call-graph --tid=mytid --sort comm
 
 # Terminate, with data saving.
 #
@@ -394,8 +395,23 @@ kill -INT $(pgrep perf)
 General information:
 
 - `record` and `stat` can yield similar results, but they can't be used interchangeably (see https://stackoverflow.com/questions/49216628/perf-stat-vs-perf-record).
-- `report` can be slow for GBs of data, so the recording configuration must be chosen carefully
 - `$event:u` monitors only at user-level privilege; in some cases, kernel-level monitoring is important
+
+Record/report:
+
+- generally speaking, if the call graph is insufficient:
+  - enable the debug information for the given program (e.g. `--enable-debug-info` for QEMU)
+  - disable optimizations: `-Og` or `-O0`
+    - `-Og` adds extra info, but also treats more warnings as errors (use if certain that it's ok `-Wno-error`)
+    - on paper, `-O0` produces less debug info, but with QEMU, it produces more
+  - set `-fno-omit-frame-pointer`
+  - macros seem not to affect the production of call stacks
+- `--call-graph dwarf` can get more information than the default, however, it doesn't help anyway with optimizations/lack of debug info
+  - it can take 100x as much space (!!)
+
+Events:
+
+- `cpu-cycles` (synonym of `cycles`) is better choice than `cpu-clock`; use the latter only if the first can't be used
 
 ### Waits on condvar
 

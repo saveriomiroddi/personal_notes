@@ -3,6 +3,7 @@
 - [ZFS](#zfs)
   - [Basic usage](#basic-usage)
   - [Snapshotting](#snapshotting)
+  - [Lightweight per-file rollback workflow](#lightweight-per-file-rollback-workflow)
   - [Cool diffing functions](#cool-diffing-functions)
 
 ## Basic usage
@@ -179,42 +180,34 @@ zpool attach -o ashift=9 <pool> <device_in_mirror> <new_device>  # force the opt
 
 ## Snapshotting
 
-Create a subvolume.
+(`$volume` can also be a pool)
+
+Create a subvolume, then a snapshot.
 
 ```sh
-zfs create -o mountpoint=<volume_mountpoint> <pool/volume_name>
-```
-
-Create a snaphot.
-
-```sh
-zfs snapshot <pool/volume_name>@<snaphot>
+zfs create -o mountpoint=$mountpoint $pool/$volume
+zfs snapshot $volume@$snaphot
 ```
 
 List snapshots.
 
 ```sh
-zfs list -t snapshots
+zfs list -t snapshot
 ```
 
 Rollback after modifications!
 
 ```sh
-zfs rollback <pool/volume_name>@<snaphot>
+zfs rollback $volume@$snaphot
 ```
 
-Destroy snapshot.
-
-- `-r`: destroy subsequent snapshots, if present
+Destroy snapshot (changes are kept), then subvolume.
 
 ```sh
-zfs destroy -r <pool/volume_name>@<snaphot>
-```
-
-Destroy subvolume.
-
-```sh
-zfs destroy <pool/volume_name>
+# `-r`: destroy subsequent snapshots, if present
+#
+zfs destroy -r $volume@$snaphot
+zfs destroy $volume
 ```
 
 Check SIMD performance (see https://github.com/zfsonlinux/zfs/issues/9215).
@@ -222,6 +215,26 @@ Check SIMD performance (see https://github.com/zfsonlinux/zfs/issues/9215).
 ```sh
 cat /proc/spl/kstat/zfs/fletcher_4_bench
 cat /proc/spl/kstat/zfs/vdev_raidz_bench
+```
+
+## Lightweight per-file rollback workflow
+
+```sh
+zfs create -o mountpoint=/busy rpool/busy
+
+# Move the file, symlink it, and create the snapshot
+mv components/busybear.raw /busy/
+ln -s /busy/busybear.raw components/
+zfs snapshot rpool/busy@unchanged
+
+# do all the work, and when required, rollback:
+zfs rollback rpool/busy@unchanged
+
+# Restore the file and destroy the snapshot/volume
+zfs rollback rpool/busy@unchanged
+mv -f /busy/busybear.raw components/
+zfs destroy rpool/busy@unchanged
+zfs destroy rpool/busy
 ```
 
 ## Cool diffing functions

@@ -1,3 +1,16 @@
+## Tue 13/Apr/2021
+
+- Projects/Open source
+  - QEMU research paper
+    - [x] Double check, and write section about QEMU performance with large number of vCPUs
+
+- Admin
+  - System
+    - [x] Add new SSD
+  - Tools
+    - Schedule manager
+      - [x] Add move skipped events
+
 ## Sun 11/Apr/2021
 
 - Projects/Open source

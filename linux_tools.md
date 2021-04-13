@@ -22,6 +22,7 @@
     - [wget](#wget)
     - [curl](#curl)
     - [Netcat (nc)](#netcat-nc)
+  - [Sending emails](#sending-emails)
   - [GNU Screen](#gnu-screen)
   - [Clonezilla](#clonezilla)
   - [Sleep](#sleep)
@@ -518,6 +519,16 @@ mkfifo loop.pipe && cat loop.pipe | nc -l -p 3000 | nc localhost 3001 > loop.pip
 # Wait until a port is open.
 #
 while ! nc -z localhost 9200; do sleep 0.5; done
+```
+
+## Sending emails
+
+Mutt is a non-default, but convenient, email client:
+
+```sh
+# Use /dev/null to send an empty email
+#
+mutt -s 'Subject' user@mail.com <<< "Body $(hostname)"
 ```
 
 ## GNU Screen

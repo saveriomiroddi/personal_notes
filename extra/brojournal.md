@@ -1,3 +1,33 @@
+## Wed 14/Apr/2021
+
+- Projects/Open source
+  - vga-passthrough
+    - [x] 3_BASIC_SETUP: Update QEMU `readonly` argument to the exact format
+  - qemu-pinning
+    - [x] Revert "Build script: Add option to disable GUI modules"
+    - [x] Build script: Disable docs building
+    - [x] Bundle the debug logic into build option `--debug`
+    - [x] Build script: Enable AIO in QEMU build
+    - [x] Check if QEMU's configure supports `prefix`
+    - [x] Update README
+    - [x] Sync branches (master/5.2-changes/6.0/riscv_cpus)
+    - [x] Fix symlinks patch permissions
+    - [x] Make symlinks patch configurable
+    - [x] Make riscv cpus increase patch configurable
+    - [x] Simplify branches structure
+    - [x] Other updates to README.md
+
+- Admin
+  - Tools
+    - Schedule manager
+      - Add half/off days functionality
+        - [x] Addition to scheduler
+        - [x] Computation
+
+- Studies
+  - Bash
+    - [x] Bloody fight with killing sudoed background processes
+
 ## Tue 13/Apr/2021
 
 - Projects/Open source
@@ -10,8 +40,8 @@
   - Tools
     - Schedule manager
       - [x] Add move skipped events
-
 ## Sun 11/Apr/2021
+
 
 - Projects/Open source
   - QEMU research paper

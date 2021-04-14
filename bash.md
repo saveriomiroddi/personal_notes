@@ -413,26 +413,65 @@ function myfx() {
 { commands; }  # runs in current context
 ```
 
-The exit status is the exit status of `commands`.
+The exit status is the exit status of `commands`. It's not clear why `{}` creates a new process, while `()` doesn't (intuitively, it should be the opposite).
 
-WATCH OUT! Don't use:
+WATCH OUT! Killing a (sudoed) background command by PID is an unholy mess, for a few reasons:
 
-```sh
-( complex_commands ) &
-my_pid=$!
-# ...commands...
-kill $!
-```
-Because no subshell process is created, and it won't be obvious what `$!` will point to (it may point to something that is ephemeral). Instead, use:
+1. kill the parent of a process doesn't necessarily kill the children
+2. `{}` creates a process, while `()` doesn't
+3. `sudo command` crates two processes, a `sudo` one, and a child `command` one.
+
+Using the `()` commands group:
 
 ```sh
-{ complex_commands } } &
-my_pid=$!
-# ...commands...
+( sudo perf sleep 6000 ) &
+
+# $! is 960068
+#
+#  960066 pts/6    S+     0:00  |   \_ /bin/bash /tmp/mytest.sh
+#  960068 pts/6    S+     0:00  |       \_ sudo perf record sleep 6000
+#  960070 pts/6    Sl+    0:00  |       |   \_ /usr/lib/linux-tools/5.8.0-49-generic/perf record sleep 6000
+#  960073 pts/6    S+     0:00  |       |       \_ sleep 6000
+
+# `kill`ing the sudo won't work; `pkill -P` is required.
+# Using process groups requires preparation via `setsid`.
+#
 pkill -P $!
 ```
 
-which will create a subshell process, so that `pkill -P` will send the signal to all its children.
+Using the `{}` commands group:
+
+```sh
+{ sudo perf sleep 6000; } &
+
+# $! is 966104
+#
+#  966102 pts/6    S+     0:00  |   \_ /bin/bash /tmp/mytest.sh
+#  966104 pts/6    S+     0:00  |       \_ /bin/bash /tmp/mytest.sh
+#  966106 pts/6    S+     0:00  |       |   \_ sudo perf record sleep 6000
+#  966107 pts/6    Sl+    0:00  |       |       \_ /usr/lib/linux-tools/5.8.0-49-generic/perf record sleep 6000
+#  966110 pts/6    S+     0:00  |       |           \_ sleep 6000
+
+# Nothing works here!
+```
+
+Working around with a subshell and a pidfile; this is likely the best:
+
+```sh
+sudo sh -c 'echo $$ > /tmp/cmdgroup.pid; perf sleep 6000;' &
+
+# Pidfile content: 976668
+#
+#  976664 pts/6    S+     0:00  |   \_ /bin/bash /tmp/mytest.sh
+#  976666 pts/6    S+     0:00  |       \_ sudo sh -c echo $$ > /tmp/perfshell.pid; perf record sleep 6000
+#  976668 pts/6    S+     0:00  |       |   \_ sh -c echo $$ > /tmp/perfshell.pid; perf record sleep 6000
+#  976669 pts/6    Sl+    0:00  |       |       \_ /usr/lib/linux-tools/5.8.0-49-generic/perf record sleep 6000
+#  976672 pts/6    S+     0:00  |       |           \_ sleep 6000
+
+# Most solid - it will send the signal to the intended process.
+#
+sudo pkill -P $(< /tmp/cmdgroup.pid)
+```
 
 ## Background processes/jobs management
 

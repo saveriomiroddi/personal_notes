@@ -636,9 +636,9 @@ a+=1                              # WRONG!!! this is a string operation (if not 
 Add/subtract dates: convert to seconds, then perform an operation via `date --date`, then convert back:
 
 ```sh
-timestamp_in_secs=`date -d "2015-12-12 13:13:28" +"%s"`
+timestamp_in_secs=$(date -d "2015-12-12 13:13:28" +"%s")
 seconds_to_subtract=90
-formatted_result=`date '+%Y-%m-%d %H:%M:%S' --date="@$((timestamp_in_secs – seconds_to_subtract))"`
+formatted_result=$(date '+%Y-%m-%d %H:%M:%S' --date="@$((timestamp_in_secs - seconds_to_subtract))")
 ```
 
 `date -d $date` can also be used to check if a date is valid!

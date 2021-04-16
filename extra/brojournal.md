@@ -1,26 +1,8 @@
 ## Thu 15/Apr/2021
 
 - Projects/Open source
-  - QEMU research paper
-  - Notes to copy
-  - Amethyst
-  - Rust/Gamedev
-  - Geet
-  - SimpleScripting
-  - ZFS
-  - Spreadbase
-  - PPAs
-- Writings
-- Admin
-  - Blog
-  - Tools
-  - System
-  - Planning/Other
-- Studies
-  - Bash
-  - Rust
-  - Gamedev
-  - Rust/Gamedev
+  - Openscripts
+    - [x] bedtime: Add warning before shutdown
 
 ## Wed 14/Apr/2021
 

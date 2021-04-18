@@ -1,3 +1,15 @@
+## Sun 18/Apr/2021
+
+- Admin
+  - Tools
+    - [x] Notes syncing: update tooling to sync only at the end of the day
+  - [ ] Notes: move old ones/write pending
+    - [ ] linux.odt (9 pag.)
+
+- Studies
+  - Bash
+    - [x] Handle invalid options with `getopt`
+
 ## Sat 17/Apr/2021
 
 - Projects/Open source

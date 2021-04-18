@@ -958,9 +958,13 @@ c_help="Usage: $(basename "$0") [-h|--help] ..."
 
 # Options (case sensitive): [-h|--help], [-s|--shared-folders], [-c|--cd1-image MANDATORY_ARGUMENT]
 # `--name` is the name of the program printed when an error is reported.
-# Note the external double quotes; without them, messy things happen!
 #
-eval set -- "$(getopt --options hsc: --long help,shared-folders,cd1-image: --name "$(basename "$0")" -- "$@")"
+if ! params=$(getopt --options hsc: --long help,shared-folders,cd1-image: --name "$(basename "$0")" -- "$@"); then
+  exit 1
+fi
+
+eval set -- "$params"
+unset params
 
 # DON'T FORGET THE `shift` commands and the `--` case.
 # Rigorously, one should add the '*' case (internal error), but it's not required.

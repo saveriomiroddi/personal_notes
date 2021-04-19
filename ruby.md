@@ -644,7 +644,7 @@ Combinations:
 
 - `%F`: The ISO 8601 date format (%Y-%m-%d)
 - `%R`: 24-hour time (%H:%M)
-- `%T`: 24-hour time (%H:%M:%S)
+- `%T`: 24-hour full time (%H:%M:%S)
 
 Examples:
 

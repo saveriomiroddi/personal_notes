@@ -7,41 +7,36 @@
       - [Search text inside multiple PDFs](#search-text-inside-multiple-pdfs)
   - [xargs](#xargs)
   - [tar](#tar)
-  - [rsync](#rsync)
   - [mkfifo](#mkfifo)
   - [Files](#files)
-  - [Processes](#processes)
-    - [Process tree display](#process-tree-display)
-    - [Parallel execution](#parallel-execution)
-      - [Using GNU Parallel](#using-gnu-parallel)
-      - [Using xargs](#using-xargs)
+    - [lsof](#lsof)
+    - [Find/restore deleted but open files](#findrestore-deleted-but-open-files)
+  - [Parallel execution](#parallel-execution)
+    - [Using GNU Parallel](#using-gnu-parallel)
+    - [Using xargs](#using-xargs)
   - [Profiling (perf)](#profiling-perf)
     - [Waits on condvar](#waits-on-condvar)
     - [Sleep times](#sleep-times)
-  - [Networking](#networking)
-    - [wget](#wget)
-    - [curl](#curl)
-    - [Netcat (nc)](#netcat-nc)
-  - [Sending emails](#sending-emails)
   - [GNU Screen](#gnu-screen)
   - [Clonezilla](#clonezilla)
   - [Sleep](#sleep)
   - [Watch](#watch)
+  - [Displaying messages](#displaying-messages)
   - [Dates](#dates)
     - [Formatting](#formatting)
     - [Operations](#operations)
+    - [Calendar](#calendar)
   - [Images handling](#images-handling)
     - [Imagemagick](#imagemagick)
     - [Raw to JPEG conversion](#raw-to-jpeg-conversion)
-  - [SSH/utilities](#sshutilities)
-  - [SSL/Certificates](#sslcertificates)
-  - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
-    - [Key servers](#key-servers)
-  - [Formatting tools](#formatting-tools)
+  - [Formatting/diff operations](#formattingdiff-operations)
+  - [Encoding](#encoding)
   - [Benchmarking](#benchmarking)
   - [Mounting images](#mounting-images)
   - [Create patches (diff)/restore them](#create-patches-diffrestore-them)
   - [Remote desktop](#remote-desktop)
+  - [Partclone](#partclone)
+  - [Create an iso from a directory](#create-an-iso-from-a-directory)
 
 ## ls
 
@@ -206,44 +201,6 @@ tar xvz --transform="s/^parsec-3.0/parsec-benchmark/"  # Rename destination file
 tar --exclude='parsec-benchmark/.git' parsec-benchmark # Exclude (glob pattern)
 ```
 
-## rsync
-
-```sh
-# Copy the the structure of a relative path. Use `--relative`, and place a dot path `./`:
-#
-rsync -av --relative "/target/run/./systemd/resolve" "/mnt/run"
-
-# "Move-merge" a directory into another (mv doesn't allow this)
-#
-rsync -av --remove-source-files $from $to
-
-# Resume partial files, but obviously must be 100% sure that the file content is the same
-#
-rsync --append ...
-
-# Exclude (glob)
-#
-rsync --exclude=.git parsec-benchmark/ /dest                     # exclude at any level, unless the excluded directory
-                                                                 # is passed as source
-rsync --exclude=parsec-benchmark/.git parsec-benchmark/ /dest    # exclude only the root one
-
-# Inclusion is a holy mess. In some cases, e.g. syncing dir `**/a`, it's simpler to use bash features
-# (note the subshell!).
-# Examples using `--include`: https://stackoverflow.com/q/15687755.
-#
-(shopt -s globstar; rsync -av --relative source/./**/a dest)
-
-# Ownership is preserved, when running as sudo (consider that it's id-based). In order to change it:
-#
-sudo ryns -og --chown=$user:$group $from $to
-
-# Specify a custom ssh command (e.g. for the port) + auto ssh password
-#
-sshpass -p 'fedora_rocks!' rsync -av -e 'ssh -p 10000' --progress --delete . riscv@localhost:parsec-benchmark/
-```
-
-The destination user is the current user, unless rsync is run as sudo, in which case, ownership is preserved.
-
 ## mkfifo
 
 Messages don't need termination; this is abstracted, so empty messages and binary files can be sent:
@@ -266,33 +223,31 @@ mktemp --suffix="${filename##*.}"     # Create a temporary filename (using the e
 stat $filename --format='%s'          # Get file size
 ```
 
-## Processes
+### lsof
 
-### Process tree display
+Funky lsof stuff; note that a program may not always keep the files open while is running!
 
 ```sh
-# pstree's modes are confusing; some imply each other, but not entirely.
-# the below is the minimum to get a pretty view.
-#
-# a: disable processes compaction (and show cmdline args)
-# u: uid transitions
-# t: display full thread names
-# p: show pids (disable compaction, but not entirely)
-#
-pstree -autp $(pgrep -f qemu-sys)
-
-# H: Threads, b: batch, n1: iterations, -p $pid: one process only
-#
-top -Hb -n1 -p $(pgrep -f qemu-sys)
-
-# Thread forest for a given process (HTML) - HTML output (required `aha`)
-#
-echo q | htop -p $(pgrep -f qemu-sys) | aha --black --line-fix > /tmp/htop.html
+lsof $filename            # specific open file[s]; also works on mountpoints
+lsof +D $directory/       # files open in a specific directory (end slash required!); also works on mountpoints
+lsof -c $process_prefix   # files opened by a process starting whose name starts with a given prefix
+lsof -p $pid              # files opened by a process with the a given pid
+lsof -i :$port            # processes listening on a given port
 ```
 
-### Parallel execution
+### Find/restore deleted but open files
 
-#### Using GNU Parallel
+```sh
+lsof -s | grep deleted
+
+lsof | grep fileName					     # get the process id (col 2) and the file descriptor (col 4, remove the letter)
+cp /proc/$pid/fd/$fd $dest         # recover the file
+cat /dev/null > /proc/$pid/fd/$fd  # truncate a deleted open file!!
+```
+
+## Parallel execution
+
+### Using GNU Parallel
 
 The number of jobs is automatically limited to the number of cores.
 Quoting is not required.
@@ -326,7 +281,7 @@ Other options:
 
 In order to programmatically confirm the citation, must run as `echo "will cite" | parallel --citation || true`.
 
-#### Using xargs
+### Using xargs
 
 Differently from GNU Parallel, the command can't be quoted.
 
@@ -452,85 +407,6 @@ struct timespec ts1;
 struct timeval tv1;
 ```
 
-## Networking
-
-Find process listening on port:
-
-```sh
-sudo lsof -i :4000
-```
-
-### wget
-
-Options:
-
-- `-P|--directory-prefix $dir`: download to a specific directory (`P`refix)
-
-### curl
-
-Options:
-
-- `-d`, `--data`
-- `-X`, `--request <command>`
-- `-H`, `--header <header/@file>`
-- `-i`, `--include`: include headers in the response
-
-```sh
-# Bare form: implies `-X GET`
-#
-curl "$URL"
-
-# `-d` implies `-X POST`.
-# In this case, the data format must be specified.
-#
-curl \
-  -H "Authorization: Bearer $token" \
-  -H 'Content-type: application/json; charset=utf-8' \
-  -d '
-  {
-    "channel": "'"$channel"'",
-    "text": "test",
-  }' \
-  "https://slack.com/api/chat.postMessage"
-
-# Send an HTTP request for a specific format
-#
-curl -H 'Accept: application/halo+json' "$URL"
-```
-
-### Netcat (nc)
-
-```sh
-nc <address> $port           # simulate telnet
-nc -lk -p $port              # listen to port; [k]=keep listening after a connection terminates
-```
-
-Examples:
-
-```sh
-# Net transfer from 1.1.1.1 via port 666
-#
-echo 'pizza' | nc -l -p 666 ==> nc highnotes.org 666 > pizza.txt
-
-# Bidirectional proxy (3000→3001→3000)
-#
-mkfifo loop.pipe && cat loop.pipe | nc -l -p 3000 | nc localhost 3001 > loop.pipe
-
-# Wait until a port is open.
-#
-while ! nc -z localhost 9200; do sleep 0.5; done
-```
-
-## Sending emails
-
-Mutt is a non-default, but convenient, email client:
-
-```sh
-# Use /dev/null to send an empty email
-#
-mutt -s 'Subject' user@mail.com <<< "Body $(hostname)"
-```
-
 ## GNU Screen
 
 Commandline params:
@@ -629,6 +505,15 @@ query_option=("$(printf "%q" "SELECT * FROM mytable")")
 "${watch_command[@]}" bash -c "mysql ${output_format_options[*]} -uroot -h$mysql_host ${schema_option[*]} ${query_option[*]}"
 ```
 
+## Displaying messages
+
+```sh
+# Simple popup window with button.
+# WATCH OUT! Don't forget `--text`, otherwise, a cryptic message 'All updates are complete.' is shown (!?).
+#
+zenity --info --text 'Text message!'
+```
+
 ## Dates
 
 General format: `date +<format>`
@@ -637,31 +522,74 @@ Interpret a date: `date -d <input>`
 
 ### Formatting
 
-Sequences:
+General format: `date $format --date=$expression`
 
-- `%a/%A`: short/full day of the week
-- `%b/%B`: short/full month
+Symbols:
+
+- `%a/%A`    : short/full day of the week
+- `%b/%B`    : short/full month
 - `%H:%M:%s`
 - `%Y-%m-%d`
-- `%F %R` == `%Y-%m-%d %H:%M`
+- `%F %T`    : same as `%Y-%m-%d %H:%M:S` (time without seconds: `%R`)
+- `+%s`      : date in seconds
 
-Operations:
+The output language is the system one; in order to change, set `LC_ALL`:
 
 ```sh
-# Print in a specific language:
-#
-LC_ALL=en_GB date --date='-1 month' +%B | tr '[:upper:]' '[:lower:]'
+LC_ALL=en_GB date # ...
 ```
+
+Checking: `date -d $date` can be used to check if a date is valid.
 
 ### Operations
 
-Subtract (result is in seconds):
+Operations via natural language expressions:
 
 ```sh
-data_start_secs=`date -d "$data_start" +"%s"`
-highlight_start_secs=`date -d "$highlight_start" +"%s"`
+date                                # `now` is implied
+date --date='yesterday'
+date --date='2 years ago'
+date --date='2 days'                # now plus days
+date --date='next tue'
+date --date='@1'                    # epoch time
+```
 
-rel_highlight_start=`expr $highlight_start_secs - $data_start_secs`
+The option `--debug` shows the logic applied.
+
+WATCH OUT!! When performing operations with a date, the timezone must be specified, otherwise, the '+/- ...' will be interpreted as the time zone:
+
+```sh
+$ date '+%R'; date '+%R' --date '-1 hour'
+22:07
+21:07
+
+# WRONG!
+$ date '+%R' --date='2021/04/19 22:07 - 1 hour'
+02:07
+
+# Correct!
+$ date '+%R' --date="2021/04/19 22:07 $(date +%Z) - 1 hour"
+21:07
+```
+
+Arithmetic via conversion to seconds:
+
+```sh
+timestamp_secs=$(date -d "2015-12-12 13:13:28" +"%s")
+result_secs=$(( timestamp_secs - 90 ))
+date '+%F %R' --date="@$result_secs"
+
+data_start_secs=$(date -d "$data_start" +"%s")
+highlight_start_secs=$(date -d "$highlight_start" +"%s")
+expr $highlight_start_secs - $data_start_secs
+```
+
+### Calendar
+
+!!!
+
+```sh
+cal [[$month] $year]
 ```
 
 ## Images handling
@@ -708,126 +636,41 @@ for f in *.ORF; do darktable-cli "$f" "$f".jpg; done
 
 [Reference](https://askubuntu.com/a/1256073/46091).
 
-## SSH/utilities
+## Formatting/diff operations
 
 ```sh
-openssl rsa -in $private_key -pubout   # Generate a public key from private
-ssh-keygen -e [-f $private_key]        # Generate a public key from private, for SSH usage
-ssh-keygen -y                          # Same as previous, but requires user input
-ssh-copy-id -i $private_key $user@$host # Authorize a user (key) on a host!
-
-ssh-add -D                             # Delete cached keys. Useful if there are problems in authenticating!
-ssh-add                                # adds the ssh key password to the authentication agent (e.g. gnome-keyring)
-
-<RETURN><RETURN>~.                     # terminate an ssh session
-
-openssl rsa -in $private_key -out $private_key_dec # decrypt a key
-ssh-keygen -p -f $private_key                      # encrypt a key (or change passphrase)
-ssh-keygen -t rsa                                  # generate ssh key pair
-
-ssh-keyscan -H $address > ~/.ssh/known_hosts                                     # Programmatically add fingerprints to known_hosts
-ssh-keygen -E md5 -lf $public_key                                                # Print public keys fingerprint
-openssl pkey -in $private_key -pubout -outform DER | openssl md5 -c              # !!! Print fingerprint, for EC2 !!!
-
-openssl s_client -connect $url:$port < /dev/null | openssl x509  -noout -enddate # Get the expiry of an ssl certificate
-
-# Run a program in the primary display, from an SSH section
-DISPLAY=:0 teamviewer
-```
-
-sshpass usages:
-
-```sh
-sshpass -p 'fedora_rocks!' ssh -p 10000 riscv@localhost
-
-# With sshpass, it's odd.
+# Table (columns) formatting
 #
-echo -n 'fedora_rocks!' > /tmp/pwdfile
-sshfs -p 10000 riscv@localhost: /media/saverio/temp -o ssh_command="sshpass -f /tmp/pwdfile ssh"
-```
-
-## SSL/Certificates
-
-For an automatic (and locally trusted) solution, see [mkcert](https://github.com/FiloSottile/mkcert).
-
-Create a self-signed certificate, manual procedure:
-
-```sh
-# Generate a key (insert a 4-letters password; it will be discarded in subsequent steps)
-openssl genrsa -des3 -out server.key 2048
-
-# Remove the password
-openssl rsa -in server.key -out server.key.insecure
-mv -f server.key.insecure server.key
-
-# Create the CSR; use `*.$domain.com` as Common Name.
-openssl req -new -key server.key -out server.csr
-
-# Create the certificate
-openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
-
-# Display informations
-openssl x509 -in server.crt -noout -text
-```
-
-## PGP (GnuPG/gpg)
-
-Main commands (`gpg...`); `$key_id` can be email or key id. See the [Key Servers section](#key-servers) for important notes.
-
-```sh
---gen-key                                            # generate a gpg keypair (store in the database)
-
---armor --export[-secret-key] $key_id                # export a key
---import [$pubkey]                                   # import a key (also secret); accepts stdin (don't specify $pubkey)
-
-printf $'fpr\nsign\n'   | gpg --command-fd 0 --edit-key $key_id  # self-sign a key
-printf $'trust\n5\ny\n' | gpg --command-fd 0 --edit-key $key_id  # ultimately trust a key [required by some programs]
-
-printf $'passwd' | gpg --command-fd 0 --edit-key $key_id   # remove passphrase -> INTERACTIVE!
-
---delete[-secret]-key $key_id
-
---list[-secret]-keys
---fingerprint [$key_id]
-
---recipient $key_id --encrypt [--output $destfile]   # encrypt from stdin
---decrypt [file] [--output $destfile]
-
---detach-sign [--default-key $key_id] $doc           # don't include the original; use default key for specifying to key
---clearsign [--default-key $key_id] $doc             # don't compress the original, useful for ascii files
---verify [$sig] $doc                                 # see https://security.stackexchange.com/a/45534 about key not trusted
-
---keyserver $keyserver_address --search-key $key_id  # search key, by email, on a keyserver
-```
-
-WATCH OUT GnuPG private keys are composed of a "master" and a "subordinate" key. Both are necessary. If for some reason, a master key is missing the `sec` entry in the listings will show as `sec#`.
-
-Snippets:
-
-```sh
-# Encode a group of files; gpg can also input from stdin.
-#
-find . -name *.log.gz | xargs -I {} gpg -r phony@recipient.com [--output {}.xxx] --encrypt {}
-```
-
-### Key servers
-
-Key servers are surprisingly terrible (timeouts, usability, correct practices...).
-
-WATCH OUT: once a key has been published, the master key is required in order to replace an existing public key; without it, nothing can be done, aside waiting for the expiry.
-
-The best choice is [The HKPS pool](http://hkps.pool.sks-keyservers.net) (see [Stack Overflow](https://superuser.com/a/228033)).
-
-When searching keys in servers via fingerprint, the prefix `0x` must be added.
-
-## Formatting tools
-
-Table (columns) formatting:
-
-```sh
 # `-t`: automatically determine columns based on whitespace
 #
-column [-s "$separators"] -t
+column -s $separators -t
+
+# "subtract" lines of one files from another
+#
+grep -Fvx -f $file_1 $file_2
+
+# Find common lines between two files; must be both sorted (lexicographycally)
+#
+comm -12 $file_1_sorted $file_2_sorted
+```
+
+## Encoding
+
+```sh
+enca -L none filename                   detects file encoding
+iconv -f UCS-2 -t UTF-8 filename        converts file encoding
+
+# convert binary input to something human readable (eg. hexadecimal)
+#
+hexdump -C
+# `-e`: custom format; every byte (`/1`) the lowercase hex value), and every 32 bytes (`/32`) the newline (NL is not printed by default)
+#
+hexdump -e '/1 "%02x"' -e '/32 "\n"'
+
+# convert binary to base64, and back [hexadecimal,human readable].
+#
+base64 [-i <input>] [-o <output>]
+base64 -d [-i <input>] [-o <output>]
 ```
 
 ## Benchmarking
@@ -944,7 +787,7 @@ sudo apt install x11vnc xvfb fluxbox
 # - `-ncache`                   : suggested, but corrupts the screen
 
 x11vnc -create -env FD_PROG=/usr/bin/fluxbox \
-	-env X11VNC_FINDDISPLAY_ALWAYS_FAILS=1 \
+  -env X11VNC_FINDDISPLAY_ALWAYS_FAILS=1 \
   -env X11VNC_CREATE_GEOM=${1:-1280x800x16} \
   -gone 'killall Xvfb' \
   -nopw \
@@ -965,4 +808,36 @@ sudo apt install tigervnc-viewer
 ssh -N -T -L 5900:localhost:5900 arcade &
 
 xtigervncviewer localhost:5900
+```
+
+## Partclone
+
+Dump a single partition:
+
+```sh
+# Find the partition type
+#
+mount /dev/sdc1
+df -T /dev/sdc1
+umount /dev/sdc1
+
+# [c]lone, [d]ebug info, [s]ource, [o]utput
+#
+partclone.vfat -c -d -s /dev/sdc1 -o - | pixz -2 > sdc1.vfat-ptcl-img.xz.aa
+```
+
+Restore a single partition:
+
+```sh
+# [d]ebug info, [s]ource, [o]utput
+#
+gunzip -c pizza.gz.a* | partclone.restore -d -s - -o /dev/sdc1
+```
+
+## Create an iso from a directory
+
+```sh
+# Use [J]oliet FS and [R]ock Ridge, for better compatibility with filesystem features
+#
+mkisofs -JR -o $outfile.iso $dir
 ```

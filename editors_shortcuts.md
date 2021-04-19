@@ -294,3 +294,7 @@ Tilix:
 
 - `Ctrl+Shift+I`            Synchronize input
 - `Alt+<directtion>`        Move between terminals
+
+Telnet:
+
+- `Ctrl+]` => `q`           Terminate session

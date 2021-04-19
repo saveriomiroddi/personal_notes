@@ -1,9 +1,17 @@
 # Linux system
 
 - [Linux system](#linux-system)
+  - [Processes](#processes)
+    - [Suspension](#suspension)
+    - [Process tree display](#process-tree-display)
   - [Security](#security)
-  - [Filesystems/partitions](#filesystemspartitions)
+  - [Filesystems/partitions/mounts](#filesystemspartitionsmounts)
+    - [Partitions](#partitions)
+    - [In-memory filesystems](#in-memory-filesystems)
     - [Sparse files](#sparse-files)
+    - [ulimit](#ulimit)
+      - [Solve "Too many open files"](#solve-too-many-open-files)
+  - [Add swap file](#add-swap-file)
   - [Packages](#packages)
     - [Apt/dpkg installation hooks (`etc/apt/apt.conf.d`)](#aptdpkg-installation-hooks-etcaptaptconfd)
   - [Repositories](#repositories)
@@ -19,18 +27,7 @@
   - [Job scheduling](#job-scheduling)
     - [Cron](#cron)
     - [At](#at)
-  - [Systemd/SystemV](#systemdsystemv)
-    - [Systemctl](#systemctl)
-    - [journalctl](#journalctl)
-    - [Configuring a unit](#configuring-a-unit)
-    - [Event triggers](#event-triggers)
-    - [Timers (scheduled events)](#timers-scheduled-events)
   - [Apparmor](#apparmor)
-  - [Networking](#networking)
-    - [NetworkManager](#networkmanager)
-      - [Changing Network manager DNS (18.04+)](#changing-network-manager-dns-1804)
-    - [Netplan](#netplan)
-    - [iproute2 (`ip` tool)](#iproute2-ip-tool)
   - [fstab](#fstab)
   - [Modules](#modules)
   - [Install grub from live cd (or perform chrooted operations)](#install-grub-from-live-cd-or-perform-chrooted-operations)
@@ -45,17 +42,39 @@
     - [Adding and associating a new application](#adding-and-associating-a-new-application)
     - [Split MAFF association](#split-maff-association)
   - [Mount encrypted (.ecryptfs) home](#mount-encrypted-ecryptfs-home)
-  - [Hardware](#hardware)
-    - [Disable SMT (hyperthreading)](#disable-smt-hyperthreading)
-    - [Disable mouse/keyboard](#disable-mousekeyboard)
-    - [Screen stuff](#screen-stuff)
-      - [Add new resolution (HiDPI problem)](#add-new-resolution-hidpi-problem)
-    - [Audio](#audio)
-    - [Disconnect and power off a device](#disconnect-and-power-off-a-device)
-    - [Keyboard](#keyboard)
-    - [Topology](#topology)
-    - [Isolating processors](#isolating-processors)
-    - [Setting the CPU frequency](#setting-the-cpu-frequency)
+
+## Processes
+
+### Suspension
+
+```sh
+kill -STOP $pid  # suspend
+ps               # STAT=`T`: suspended
+kill $pid        # when running on a suspended process, it won't kill it, but ->
+kill -CONT $pid  # resume (in background) -> if previously sent TERM, it will now have effect
+```
+
+### Process tree display
+
+```sh
+# pstree's modes are confusing; some imply each other, but not entirely.
+# the below is the minimum to get a pretty view.
+#
+# a: disable processes compaction (and show cmdline args)
+# u: uid transitions
+# t: display full thread names
+# p: show pids (disable compaction, but not entirely)
+#
+pstree -autp $(pgrep -f qemu-sys)
+
+# H: Threads, b: batch, n1: iterations, -p $pid: one process only
+#
+top -Hb -n1 -p $(pgrep -f qemu-sys)
+
+# Thread forest for a given process (HTML) - HTML output (required `aha`)
+#
+echo q | htop -p $(pgrep -f qemu-sys) | aha --black --line-fix > /tmp/htop.html
+```
 
 ## Security
 
@@ -76,7 +95,39 @@ chage -d $(date +%Y-%m-%d) myuser           # set the change date to today!
 chage -I 0 myuser                           # expire password
 ```
 
-## Filesystems/partitions
+User name/home/sudo:
+
+```sh
+# Find current user (if sudo, find the logged on user).
+# No method is foolproof; however, logname also works on an SSH sessions without terminal attached.
+#
+logname
+who am i | awk '{print $1}'
+
+# Find the user home.
+#
+getent passwd $username | cut -f6 -d:
+
+$SUDO_USER              # User who invoked sudo
+[[ $EUID -eq 0 ]]       # Shell (all) check for user being root
+```
+
+## Filesystems/partitions/mounts
+
+Useful operations:
+
+```sh
+# Get the device to whom a partition belongs (parent)
+lsblk -no pkname $partition
+
+# Find which filesystem (/device) a path is stored on (also symlinks)
+df $file
+
+# Find if a path is a mountpoint (if it's mounted)
+if mountpoint -q $path; then echo is mountpoint; fi
+```
+
+### Partitions
 
 ```sh
 fdisk -l                        # list the partitions
@@ -108,6 +159,17 @@ parted -s $disk_device resizepart $part_number_1_based 100%
 parted -s $disk_device rm $part_number_1_based
 ```
 
+### In-memory filesystems
+
+```sh
+# Both tmpfs/ramfs use only the memory needed
+# /dev/shm can be used as well; it's created by default (it's tmpfs), but if it's filled, other apps using it may crash.
+#
+mount -t tmpfs -o size=256m tmpfs /mnt/myfs  # tmpfs: limited size; can use swap
+mount -t ramfs -o size=256m ramfs /mnt/myfs  # ramfs: unlimited size; all in RAM; it's an older FS - using tmpfs is encouraged
+mount -o remount,size=8g /mnt/myfs           # !!! resize !!!
+```
+
 ### Sparse files
 
 ```sh
@@ -134,6 +196,83 @@ ls -ls
 # COW!! Supported only on XFS/BTRFS, not (currently) ZFS (https://git.io/JqWqU)
 #
 cp --reflink=always $source $dest
+```
+
+### ulimit
+
+```sh
+# the command is a shell built-in; the first won't run, the second
+# will:
+#
+sudo -u elasticsearch ulimit -l
+sudo -u elasticsearch bash -c 'ulimit -l'
+#
+# there is generally a misunderstanding about the limits; setting
+# /etc/security/limits.conf alone won't work.
+#
+# The general instructions are:
+#
+# - interactive login:
+#   - set /etc/pam.d/common-session
+#   - only the logged user's limit is applied
+# - non-interactive login execution (sudo -u...)
+#   - the parent user's limit is applied (not the child), so it needs
+#     to be set
+#   - some parameters may be enforced at the system level (eg. open
+#     files, in sysctl)
+#
+# Examples (reboot required after settings):
+#
+# - interactive, memlock:
+#   - set limits.conf for root: 'root - memlock unlimited'
+#   - set common-session: 'session required pam_limits.so'
+#   - sudo su
+#   - sudo -u elasticsearch bash -c 'ulimit -l'
+# - non-interactive/upstart, memlock:
+#   - simply set 'limit memlock unlimited unlimited' in the config file (!!)
+# - both interactive and non/init, open files:
+#   - set sysctl.conf: 'fs.file-max = 65536'
+#   - set limits.conf for mysql: 'mysql soft nofile 24000' 'mysql hard nofile 32000'
+#   - set common-session: 'session required pam_limits.so'
+
+# ulimits for a user (even if without shell login)
+#
+cat /proc/<uid>/limits
+```
+
+#### Solve "Too many open files"
+
+```sh
+# when mysql reports too many open files, look for open files limit, and extend it (as root):
+
+# check the limit for a user
+sudo -u mysql bash -c "ulimit -n"
+
+# extend the limit at global level; add to /etc/sysctl.conf
+echo fs.file-max = 65536 >> /etc/sysctl.conf
+
+# check the result
+sysctl -p
+
+# check the limits at user level; add to /etc/security/limits.conf
+mysql             soft    nofile           24000
+mysql             hard    nofile           32000
+
+# needed; add to /etc/pam.d/common-session
+session required pam_limits.so
+
+# now check again
+sudo -u mysql bash -c "ulimit -n"
+```
+
+## Add swap file
+
+```sh
+fallocate -l 512M /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile swap swap defaults 0 0' >> /etc/fstab        # activate on restart
 ```
 
 ## Packages
@@ -312,10 +451,10 @@ Display the current info (for machine parsing).
 #   Status: auto
 #   Best: /usr/bin/ruby2.6
 #   Value: /usr/bin/ruby2.6
-#   
+#
 #   Alternative: /usr/bin/ruby2.5
 #   Priority: 9999
-#   
+#
 #   Alternative: /usr/bin/ruby2.6
 #   Priority: 9999
 #
@@ -472,13 +611,17 @@ Cron doesn't need to be restarted when files are changed.
 
 Note that besides the `/etc/cron*` files/dirs, there are also files in the locations `/var/spool/cron/crontabs/$user`.
 
-User operation:
+Be **very** careful of the executed shell type (at least non-interactive).
+
+User operations:
 
 ```sh
 crontab -l   # list
 crontab -e   # edit
 crontab -d   # delete
 ```
+
+`MAILTO=dest@email.com` (put on top) sends email.
 
 ### At
 
@@ -503,184 +646,6 @@ atrm $jobnum                          # remove job (use number from `atq` output
 ```
 
 Some programs/systems won't work out of the box, due to the `at` context. For systemd suspend, see [Systemd timers](#timers-scheduled-events).
-
-## Systemd/SystemV
-
-List all the services, and their running status: `service --status-all`. Great for disabling unnecessary services!!
-
-### Systemctl
-
-```sh
-systemctl enable|disable $service     # enable/disable start on boot
-systemctl start|stop $service         # immediately start/stop
-systemctl reload $service             # reload; not always functional
-systemctl reload-or-restart $service  # if reload is not defined (or has no effect), restart; WATCH OUT! don't define `ExecReload`
-systemctl status $service
-systemctl cat $service                # print unit file
-systemctl edit --full $service        # edit unit file
-systemctl mask $service               # "mask": disable a service, by symlinking it to /dev/null; WATCH OUT! doesn't fail if the service doesn't exis
-
-systemctl daemon-reload               # invoke this after updating a unit
-systemctl daemon-reexec               # required to reload Sytemd's own configuration (e.g. changes to `/etc/systemd/system.conf`)
-
-systemctl is-(active|enabled|failed) $service  # query status
-systemctl list-units                  # active loaded units
-systemctl list-unit-files [$pattern]  # all units, with their states; glob pattern
-systemctl --failed                    # show units that failed to start
-```
-
-A static service can't be manually enabled or disabled; use mask for that.
-
-### journalctl
-
-```sh
-journalctl -b [-k]                                 # view log for current Boot; only [k]ernel messages
-journalctl --pager-end --unit=$service.service     # show unit log; `page-end`: go to end
-journalctl --vacuum-time=1d                        # clean systemd journal (/var/log/journal)
-```
-
-Limit the max use:
-
-```sh
-mkdir -p /etc/systemd/journald.conf.d
-cat > /etc/systemd/journald.conf.d/00-journal-size.conf <<'CFG'
-[Journal]
-SystemMaxUse=128M
-CFG
-
-# Restart the journal service (won't purge the existing journal)
-systemctl kill --kill-who=main --signal=SIGUSR2 systemd-journald
-
-# Purge the existing journal
-journalctl --vacuum-size=128M
-```
-
-### Configuring a unit
-
-See:
-
-- https://www.freedesktop.org/software/systemd/man/systemd.service.html
-- https://www.freedesktop.org/software/systemd/man/systemd.kill.html
-
-General location of systemd units (not the only one): `/lib/systemd/system/$name.service`.
-
-Almost all the entries are optional. Escaping is not standard; in order to escape, use `systemd-escape`.
-
-```sh
-# If entries need escaping, use double quotes, but not slashes. In at least the `ExecStart` entry, if,
-# for example, a space is escaped with a slash, both the slash and the space will be part of the string
-# (!).
-#
-cat > /etc/systemd/system/myservice.service <<UNIT
-[Unit]
-Description=My Service
-
-# `Requires` states only dependency; `After` mandates ordering.
-#
-Requires=network.target
-After=network.target
-
-# Example of waiting for a network device to be online.
-#
-# After=sys-subsystem-net-devices-wlan0.device
-# BindsTo=sys-subsystem-net-devices-wlan0.device
-
-[Service]
-# If ExecStart is specified (and `BusName` not specified), `simple` is implicit.
-# Use `forking` when the process forks (e.g. nmon).
-#
-Type=simple
-
-# Convenient.
-#
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=my-service
-
-User=app
-Group=app
-
-WorkingDirectory=/path/to/base_dir
-
-Environment=BUNDLE_GEMFILE=/path/to/Gemfile
-Environment=RAILS_ENV=my_rail_env
-
-# In other to extend $PATH, use something like:
-#
-#     ExecStart=/bin/bash -c 'PATH=/new/path:$PATH exec /bin/mycmd'
-#
-ExecStart=/usr/bin/bundle exec my_command
-ExecReload=/bin/kill -HUP $MAINPID
-
-# Other options: `mixed`, `process`, `none`
-# Better not to specify, unless required.
-#
-KillMode=control-group
-
-# Other options: `no` (default), `on-failure`, ...
-#
-Restart=always
-
-[Install]
-# Generally, this is the setting.
-#
-WantedBy=multi-user.target
-UNIT
-
-# now enable and start
-```
-
-### Event triggers
-
-Run a script on suspend/hibernate/thaw/resume (the change applies immediately):
-
-```sh
-cat > /lib/systemd/system-sleep/50_myscript << 'SH'
-#!/bin/bash
-set -o errexit
-
-case "$1" in
-  pre)
-    # ACTION BEFORE SUSPEND/HIBERNATE
-    ;;
-  post)
-    # ACTION AFTER THAW/RESUME
-    ;;
-esac
-SH
-
-chmod +x /lib/systemd/system-sleep/50_myscript
-```
-
-Run a script on screen lock/unlock:
-
-```sh
-dbus-monitor --session "type='signal',interface='org.gnome.ScreenSaver'" |
-  while true; do
-    read X;
-    if echo $X | grep "boolean true" &> /dev/null;
-      then echo locked >> /tmp/pizza.txt;
-    elif echo $X | grep "boolean false" &> /dev/null;
-      then echo unlocked >> /tmp/pizza.txt;
-    fi
-  done
-```
-
-### Timers (scheduled events)
-
-Once-off events can be scheduled; mind that they're not second-accurate.
-
-```sh
-# Execute after certain interval, with output.
-#
-$ systemd-run --user --on-active=10min /bin/systemctl suspend
-Running timer as unit: run-r4eeea4bc49524bb8b40f609cb183db48.timer
-Will run service as unit: run-r4eeea4bc49524bb8b40f609cb183db48.service
-
-# Execute at given time
-#
-$ systemd-run --user --on-calendar=09:12 /bin/systemctl suspend
-```
 
 ## Apparmor
 
@@ -707,80 +672,6 @@ aa-complain /opt/nginx_app_server/sbin/nginx
 aa-logprof -f /etc/apparmor.d/opt.nginx_app_server.sbin.nginx
 ```
 
-## Networking
-
-Sample system network configuration (`/etc/network/interfaces`):
-
-```
-auto lo
-iface lo inet loopback
-
-auto enp42s0
-iface enp42s0 inet static
-        address 10.0.2.15
-        netmask 255.255.255.0
-        broadcast 10.0.2.255
-        gateway 10.0.2.2
-
-auto enp43s0
-iface enp43s0 inet dhcp
-```
-
-Simpler static parameters could be used (`address .../24` and `gateway ...` only), but they may not be compatible with all the systems.
-
-For USB network interfaces, use [`allow-hotplug`](https://lists.debian.org/debian-user/2017/09/msg00911.html).
-
-Recent Linux distros have persistent names; in the past, udev rules were used (`70-local-persistent-net.rules`).
-
-### NetworkManager
-
-When adding hooks, the scripts must be executable!
-
-#### Changing Network manager DNS (18.04+)
-
-On 18.04 Desktop, one needs to modify the Network manager connection; see https://askubuntu.com/a/1104305/46091.
-
-### Netplan
-
-```sh
-ETHERNET_ITF=enp42s0
-ETHERNET_IP=192.168.178.199
-
-cat > /etc/netplan/01-$ETHERNET_ITF.yaml <<YAML
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    $ETHERNET_ITF:
-      addresses:
-        - $ETHERNET_IP/24
-      gateway4: ${ETHERNET_IP%.*}.1
-      nameservers:
-        addresses: [${ETHERNET_IP%.*}.1]
-YAML
-
-netplay apply
-```
-
-### iproute2 (`ip` tool)
-
-Show all the interfaces, even if unconfigured:
-
-```sh
-ip link show
-```
-
-Manually setup an ethernet card on Ubuntu server:
-
-```sh
-ip addr add 192.168.0.2/24 dev enp42s0
-ip link set enp42s0 up
-ip route add default via 192.168.0.1
-echo 'nameserver 8.8.8.8' > /etc/resolv.conf
-```
-
-For a permanent configuration, use Netplan.
-
 ## fstab
 
 Columns:
@@ -802,6 +693,10 @@ mount -fav
 ## Modules
 
 ```sh
+modprobe $name      # load module
+modprobe -r $name   # unload the module, with all the dependencies
+lsmod               # list loaded modules
+
 # Find if a module is loaded.
 #
 if lsmod | grep -qP '^zfs\s'; then echo loaded; fi
@@ -815,15 +710,15 @@ if modinfo zfs > /dev/null 2>&1; then echo installed; fi
 
 ```sh
 sudo su
-mount -o subvol=@ /dev/sda1 /mnt	# use '-o subvol=@' for btrfs
-mount --bind /dev /mnt/dev		    # mirror dev etc. (see https://unix.stackexchange.com/questions/198590/what-is-a-bind-mount)
+mount -o subvol=@ /dev/sda1 /mnt  # use '-o subvol=@' for btrfs
+mount --bind /dev /mnt/dev        # mirror dev etc. (see https://unix.stackexchange.com/questions/198590/what-is-a-bind-mount)
 mount --bind /sys /mnt/sys
 mount --bind /proc /mnt/proc
-mount /dev/sda1 /mnt/boot		      # only if there is a separate boot partition
+mount /dev/sda1 /mnt/boot          # only if there is a separate boot partition
 chroot /mnt
 grub-install /dev/sda
 exit
-umount -R /mnt				            # `R`ecursively
+umount -R /mnt                    # `R`ecursively
 ```
 
 ## Logging/syslog/tools
@@ -999,140 +894,3 @@ ecryptfs-add-passphrase --fnek                                                  
 mount -t ecryptfs /mnt/home/.ecryptfs/saverio/.Private /mnt                         # use mount PP; enable filename encryption; use signature
 ```
 
-## Hardware
-
-Get hardware information:
-
-```sh
-# Without options, all the system information is reported.
-#
-dmidecode -s \
-  system-product-name   # (laptop) model
-  bios-version
-  chassis-serial-number # (dell) service tag
-```
-
-### Disable SMT (hyperthreading)
-
-```sh
-sudo tee /sys/devices/system/cpu/smt/control <<< "off"
-```
-
-### Disable mouse/keyboard
-
-```sh
-xinput --list
-# ⎡ Virtual core pointer                    	id=2	[master pointer  (3)]
-# ⎜ [...]
-# ⎣ Virtual core keyboard                   	id=3	[master keyboard (2)]
-#     ↳ [...]
-
-xinput --list-props 3
-# Device 'Virtual core keyboard':
-# 	Device Enabled (156):	1
-# 	[...]
-
-# Enable
-xinput set-int-prop 3 "Device Enabled" 8 0
-
-# Disable
-xinput set-int-prop 3 "Device Enabled" 8 1
-```
-
-### Screen stuff
-
-```sh
-# disable screen blanking
-setterm -blank 0 -powersave off -powerdown 0 => xset s off
-```
-
-#### Add new resolution (HiDPI problem)
-
-Create resolution mode:
-
-    cvt 1500 1000 60
-
-    # 1504x1000 59.85 Hz (CVT) hsync: 62.12 kHz; pclk: 124.25 MHz
-    Modeline "1504x1000_60.00"  124.25  1504 1600 1752 2000  1000 1003 1013 1038 -hsync +vsync
-
-Declare it (using the `Modeline` data):
-
-    xrandr --newmode "1500x1000_60.00" 124.25  1504 1600 1752 2000  1000 1003 1013 1038 -hsync +vsync
-
-Find the screen name:
-
-    xrandr
-
-    eDP1 connected 1504x1000+0+0 (normal left inverted right x axis y axis) 290mm x 190mm
-       3000x2000     59.99 +
-       2560x1600     59.99
-    [...]
-
-Add the resolution to the device:
-
-    sudo xrandr --addmode eDP1 1500x1000_60.00
-
-Now it can be chosen in the `Displays` desktop environment settings.
-
-For setting it at startup, create a shell script $HOME/.xprofile, and assign executable permissions.
-
-### Audio
-
-```sh
-# Create remapped mono sink (downmix stereo to mono)
-#
-pacmd list-sinks | grep name:
-pacmd load-module module-remap-sink sink_name=mono master=THE_NAME_FROM_THE_PREVIOUS_COMMAND channels=2 channel_map=mono,mono
-```
-
-### Disconnect and power off a device
-
-```sh
-udisksctl dump                  # check disks with "\bRemovable: +true"
-udisksctl unmount -b /dev/sdb1  # unmount parts from dump which have "MountPoints: +$"
-udisksctl power-off -b /dev/sdb # yay!
-```
-
-### Keyboard
-
-Reconfigure keyboard:
-
-```sh
-dpkg-reconfigure console-data
-```
-
-### Topology
-
-```sh
-lstopo --of console --no-io --no-caches # ubuntu
-hwloc-ls -v --no-io                     # fedora
-```
-
-### Isolating processors
-
-In order to isolate processors from the kernel scheduling, add `isolcpus=isolcpus=1-4,5,666` to the kernel commandline.
-
-Isolated processors can be inspected via `/sys/devices/system/cpu/isolated`.
-
-Then, one can use `taskset -c 1-4,5,666 -p $vcpu_task_pid` . Not all `taskset` support `-c`; example to exclude processor 0: `taskset 0xFFFFFFFE` (bitmask; bits for non-existing processors are ignored).
-
-WATCH OUT! Processes associated via `taskset` do not load balance, therefore, one will, for example, observe that the associated process (tree) runs on a single processor:
-
-```sh
-$ ps -aLo comm,psr | grep qemu
-qemu-system-x86 1
-qemu-system-x86 1
-```
-
-For a softer isolation (that is, with the kernel still being scheduled on the desired processors), use `cpuset` (see https://www.codeblueprint.co.uk/2019/10/08/isolcpus-is-deprecated-kinda.html).
-
-### Setting the CPU frequency
-
-It seems that there isn't a stable software way to do that; on a Ryzen 3950x, the strategies:
-
-- setting `userspace` governor
-- using `cpufreq-set`
-- using `cpupower`
-- setting `/sys/**/cpufreq/scaling_max_freq`
-
-didn't have any effect (verified via `grep MHz /proc/cpuinfo`).

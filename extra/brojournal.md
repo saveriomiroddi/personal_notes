@@ -1,3 +1,30 @@
+## Mon 19/Apr/2021
+
+- Projects/Open source
+  - ZFS
+    - [x] Review and release Mint v20.1 support (contribution)
+  - Openscripts
+    - [x] bedtime
+      - [x] Improve dates computation
+      - [x] Add timer unit names; fix Zenity improper call
+      - [x] Add checks for times not before now
+- Admin
+  - Tools
+    - [x] Virtual machines handling script
+      - [x] Refactor
+      - [x] Make pattern optional, and improve listing
+      - [x] Make headless mode optional
+  - [ ] Notes: move old ones/write pending
+    - [x] linux.odt (7 pag.)
+    - [x] mysql.odt (22 pag.)
+- Studies
+  - Bash
+    - [x] Improve `getopt`  invalid options handling
+  - Linux
+    - [x] Systemd: Service/Timer overrides
+    - [x] Transient timers stop
+    - [x] date: arithmetic; fight substraction with date operand
+
 ## Sun 18/Apr/2021
 
 - Admin

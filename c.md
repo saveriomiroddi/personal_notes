@@ -7,6 +7,7 @@
   - [Conveniences](#conveniences)
     - [Print a struct instances's bytes](#print-a-struct-instancess-bytes)
     - [Print a stack trace on segfault](#print-a-stack-trace-on-segfault)
+  - [Make](#make)
   - [Configure/Compiler (gcc)](#configurecompiler-gcc)
   - [Library issues](#library-issues)
     - [Error `glibconfig.h: No such file or directory`](#error-glibconfigh-no-such-file-or-directory)
@@ -81,6 +82,15 @@ Send the result to addr2line:
 
 ```sh
 a.out 2>&1 | perl -ne '/\(\+(0x\w+)\)/ && print("$1 ")' | xargs addr2line -e a.out
+```
+
+## Make
+
+```sh
+# Note that 'make' depends on the product of './configure'.
+#
+make clean           # Remove `make` output
+make distclean       # Remove `configure`+`make` output
 ```
 
 ## Configure/Compiler (gcc)

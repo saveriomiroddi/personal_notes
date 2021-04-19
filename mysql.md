@@ -2,12 +2,17 @@
 
 - [MySQL](#mysql)
   - [Privileges](#privileges)
-  - [Built-in functions](#built-in-functions)
+  - [Control flow](#control-flow)
+  - [General built-in functions](#general-built-in-functions)
     - [String functions](#string-functions)
       - [Character conversions](#character-conversions)
-    - [Regular expressions (regexes)](#regular-expressions-regexes)
-      - [Strategies](#strategies)
-    - [XPath](#xpath)
+    - [Date functions](#date-functions)
+    - [Numeric functions](#numeric-functions)
+    - [Other/generic functions](#othergeneric-functions)
+  - [Regular expressions (regexes)](#regular-expressions-regexes)
+    - [Strategies](#strategies)
+  - [XPath](#xpath)
+  - [CSV Import/Export](#csv-importexport)
   - [Window functions](#window-functions)
     - [Define each window extent (`PARTITION BY`), and picking a row per window](#define-each-window-extent-partition-by-and-picking-a-row-per-window)
     - [Window function aggregates](#window-function-aggregates)
@@ -15,10 +20,10 @@
       - [Replace spaced coordinates with monotonically increasing values](#replace-spaced-coordinates-with-monotonically-increasing-values)
   - [Stored procedures](#stored-procedures)
     - [Cursors (with convenient example of looping)](#cursors-with-convenient-example-of-looping)
-  - [Optimizer](#optimizer)
-    - [Join order](#join-order)
+  - [Performance](#performance)
   - [Administration](#administration)
     - [Observe ALTER TABLE progress](#observe-alter-table-progress)
+  - [Metadata](#metadata)
 
 ## Privileges
 
@@ -29,16 +34,34 @@ SHOW GRANTS for <user>[@'<host>']\G
 -- Grants for user@%: GRANT SELECT, .. ON *.* TO `user`@`1.2.3.4` WITH GRANT -- OPTION
 -- *************************** 2. row ***************************
 -- Grants for user@%: GRANT APPLICATION_PASSWORD_ADMIN, ... ON *.* TO `user`@`1.2.3.4` WITH GRANT OPTION
-
 ```
 
-## Built-in functions
+## Control flow
+
+```sql
+IF(condition, trueBranch, falseBranch)
+
+CASE case_value
+WHEN when_value THEN statement_list
+[WHEN when_value THEN statement_list] ...
+[ELSE statement_list]
+END CASE
+```
+
+## General built-in functions
 
 ### String functions
 
 ```sql
-TRIM(<expr>)                                             # Strips only spaces by default!
-TRIM([BOTH|LEADING|TRAILING] <str> FROM <expr>)          # Strip characters; usable for newlines
+TRIM(<expr>)                                       # Strips only spaces by default!
+TRIM([BOTH|LEADING|TRAILING] str FROM <expr>)      # Strip characters; usable for newlines
+
+SUBSTR(`field` (FROM|,) @start (FOR|,) @len)       # @start = 1-based; if start < 0, start from the end
+
+INSTR(@str, @pattern)                              # 1-based; 0 if not found
+
+CONCAT_WS(@separator, @fields..)                   # concatenate using the separator; ignores nulls
+(L|U)CASE(@sstr)                                   # down/upcase
 ```
 
 #### Character conversions
@@ -63,7 +86,41 @@ SELECT HEX(ORD('👸'));
 -- +---------------+
 ```
 
-### Regular expressions (regexes)
+### Date functions
+
+```sql
+NOW(), CURDATE(), CURTIME()                        # current time functions
+
+# Read the next command note!
+#
+DATE_(ADD|SUB(@date, INTERVAL @n (DAY|SECOND|...))
+
+# When adding a time to a time, use the following. DON'T use "+ INTERVAL xx MINUTES"!
+#
+ADDTIME(@time, 'hh:mm:ss');
+```
+
+### Numeric functions
+
+```sql
+CONV(@str, @from_base, @to_base)     # useful e.g. for hex conversion
+TRUNCATE(@val, @places)              # truncate to decimal places (places can be negative), !!! always towards zero !!!
+RAND()                               # random number; has low entropy
+GET_BYTES(@number)                   # random number; has higher entropy. can use as `HEX(GET_BYTES)` in order to get a random hex string.
+```
+
+### Other/generic functions
+
+```sql
+IFNULL(<expr>, @substitute)
+UUID()                               # generates a uuid
+SLEEP(@secs)
+LAST_INSERT_ID()                     # last inserted AUTO_INCREMENTed id
+ROW_COUNT()                          # number of rows affected by last operation
+GREATEST|LEAST(@values...)           # min/max on multiple values
+```
+
+## Regular expressions (regexes)
 
 Metacharacters/functionalities supported:
 
@@ -132,7 +189,7 @@ SELECT REGEXP_REPLACE('a b b c', 'b', 'X', 1, 0) `replace`;
 -- +---------+
 ```
 
-#### Strategies
+### Strategies
 
 Since capturing groups are not supported, using `REGEXP_REPLACE` can be the simplest option in some cases.  
 Note that MySQL supports XPath, so input data like this is best handle throught that.
@@ -156,7 +213,7 @@ SELECT
 -- +----------+
 ```
 
-### XPath
+## XPath
 
 Examples:
 
@@ -187,6 +244,44 @@ SELECT ExtractValue(@input, "/bookstore/book[price>35.00]/title") `match`;
 -- +--------------+
 -- | Learning XML |
 -- +--------------+
+```
+
+## CSV Import/Export
+
+Field options are not defaults, so they must be set when needed.
+
+If an import fails due to mysterious invalid characters, investigate the line terminators and characters via `hexdump` and `file -i`.
+
+`LOAD DATA` syntax:
+
+```sql
+LOAD DATA [LOCAL] INFILE '/tmp/customers.csv'
+[REPLACE|IGNORE]
+INTO TABLE customers
+[CHARACTER SET <charset>]
+[FIELDS [TERMINATED BY ','] [ENCLOSED BY '"']]
+[LINES TERMINATED BY '\n']
+[IGNORE 1 LINES]
+[(<column>, @variable, ...)]      # see example
+[SET <column> = FUNC(@variable)]  # see example
+;
+```
+
+Examples:
+
+```sql
+SELECT columns INTO OUTFILE 'outFile'
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+FROM fromPart;
+
+# CSV contains only three fields; insert them in the specified colums. set the tenant_id field to 89, and set customer_id to NULL if it's blank.
+#
+LOAD DATA INFILE '/tmp/layouts_89.csv'
+INTO TABLE events
+FIELDS TERMINATED BY ','
+( id, layout_id, @customer_id )
+SET tenant_id = 89, customer_id = NULLIF(@customer_id, '');
 ```
 
 ## Window functions
@@ -337,12 +432,11 @@ BEGIN
            COUNT(*) `Accounts remaining`
     FROM tenants WHERE id > v_tenant_id;
 
-    UPDATE mytable
-    SET col_1_id = NULL
-    WHERE col_2_id IS NULL
-          AND tenant_id = v_tenant_id
-          AND col_1_id IS NOT NULL
-    ;
+    -- Insert the operation here, using v_tenant_id.
+    --
+    UPDATE ...;
+
+    SELECT ROW_COUNT() `Updated rows`;
   END LOOP tenants_loop;
 END$$
 
@@ -355,15 +449,29 @@ DELIMITER ;
 CALL ALL_TENANTS_OPERATION(); DROP PROCEDURE ALL_TENANTS_OPERATION;
 ```
 
-## Optimizer
-
-### Join order
-
-Reference: https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimizer-hints-join-order.
+## Performance
 
 ```sql
+# Join order
+# Reference: https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimizer-hints-join-order.
+
 SELECT /*+ JOIN_ORDER(t2, t1) */ COUNT(*)
 FROM table_1 t1 JOIN table_2 t2
+
+# Disable optimizer switches:
+#
+SET GLOBAL optimizer_switch = "duplicateweedout=off";
+
+# Display query trace:
+#
+SET optimizer_trace = "enabled=on";
+SELECT * FROM information_schema.optimizer_trace\G
+SET optimizer_trace = "enabled=off";
+
+# Per-table (persistent) stats options.
+# Reference: https://dev.mysql.com/doc/refman/8.0/en/innodb-persistent-stats.html.
+#
+ALTER TABLE seat_assignments STATS_SAMPLE_PAGES=50, STATS_AUTO_RECALC=0;
 ```
 
 ## Administration
@@ -393,3 +501,25 @@ SELECT EVENT_NAME, WORK_COMPLETED, WORK_ESTIMATED FROM performance_schema.events
 The `alter table (flush)` stage empirically took from 10% to 100% of the total time before that stage.
 
 Only the last stage `log apply table` causes contention; on the longest occurrence, it took ≈2.4% of the total time (44/1858").
+
+## Metadata
+
+Space occupation of InnoDB indexes (data):
+
+```sql
+# Remember that the table data is the primary index!
+#
+SELECT index_name, stat_value*@@innodb_page_size `size`
+FROM mysql.innodb_index_stats
+WHERE stat_name = 'size'
+     AND (database_name, table_name) = ('my_db', 'my_table')
+ORDER BY index_name;
+```
+
+Find the foreign keys for a table/column:
+
+```sql
+SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE (REFERENCED_TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME) = ('my_db', 'my_table', 'my_column');
+```

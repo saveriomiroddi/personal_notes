@@ -23,7 +23,6 @@
   - [Paths](#paths)
   - [printf (escaping/formatting)](#printf-escapingformatting)
   - [Arithmetic operations](#arithmetic-operations)
-  - [Date operations](#date-operations)
   - [Redirections](#redirections)
   - [Substitutions](#substitutions)
   - [Brace expansion](#brace-expansion)
@@ -606,6 +605,7 @@ Watch out!!:
 - bash arithmetic handles only integers (use `bc` for that)
 - empty string equals to 0
 - operations will cause exit if they evaluate to 0 and the `errexit` shellopt is set (also applies to `let`)
+- command substitutions inside arithmetic expansion will not exit if they fail
 
 ```sh
 (( $expr ))                       # preferred form
@@ -631,25 +631,13 @@ a+=1                              # WRONG!!! this is a string operation (if not 
 (( ++val ))                       # doesn't exit!
 ```
 
-## Date operations
-
-Add/subtract dates: convert to seconds, then perform an operation via `date --date`, then convert back:
-
-```sh
-timestamp_in_secs=$(date -d "2015-12-12 13:13:28" +"%s")
-seconds_to_subtract=90
-formatted_result=$(date '+%Y-%m-%d %H:%M:%S' --date="@$((timestamp_in_secs - seconds_to_subtract))")
-```
-
-`date -d $date` can also be used to check if a date is valid!
-
 ## Redirections
 
 ```sh
 &> "$filename"                                          # equivalent to `1> "$filename" 2>&1`
 >&2 echo "error"                                        # write to stderr
 
-{ mycommand 3>&2 2>&1 1>&3 | grep -v "skipme" >&3; } 3>&2 2>&1  # filter out stderr message
+{ mycommand 3>&2 2>&1 1>&3 | grep -v "skipme" >&3; } 3>&2 2>&1  # apply a filter to stderr output (see https://stackoverflow.com/a/40336333)
 
 exec 200> "$filename"                                   # associate a file to a file descriptor (create if not existing)
 ```
@@ -959,17 +947,21 @@ c_help="Usage: $(basename "$0") [-h|--help] ..."
 # Options (case sensitive): [-h|--help], [-s|--shared-folders], [-c|--cd1-image MANDATORY_ARGUMENT]
 # `--name` is the name of the program printed when an error is reported.
 #
-if ! params=$(getopt --options hsc: --long help,shared-folders,cd1-image: --name "$(basename "$0")" -- "$@"); then
-  exit 1
-fi
+# If not in a function, the simplest approach is:
+#
+#     if params=$(getopt ...); then exit 1; fi
+#     eval ...
+#     unset params
+#
+local params
+params=$(getopt --options hsc: --long help,shared-folders,cd1-image: --name "$(basename "$0")" -- "$@")
 
 eval set -- "$params"
-unset params
 
 # DON'T FORGET THE `shift` commands and the `--` case.
 # Rigorously, one should add the '*' case (internal error), but it's not required.
 #
-while true ; do
+while true; do
   case "$1" in
     -h|--help)
       echo "$c_help"

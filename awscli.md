@@ -5,6 +5,7 @@
   - [Resources](#resources)
     - [EC2](#ec2)
     - [IAM](#iam)
+    - [RDS](#rds)
     - [Account-related](#account-related)
     - [Lightsail](#lightsail)
     - [Secrets Manager](#secrets-manager)
@@ -38,6 +39,17 @@ aws ec2 describe-snapshots --restorable-by-user-ids all |
 ```sh
 aws iam list-users
 aws iam get-user --user-name=$username
+```
+
+### RDS
+
+```sh
+# Find RDS reservations expiry:
+#
+aws rds describe-reserved-db-instances \
+  --region eu-west-1 \
+  --reserved-db-instance-id my-reservation-id \
+  --query 'ReservedDBInstances[*].[StartTime,Duration]'
 ```
 
 ### Account-related

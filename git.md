@@ -181,8 +181,8 @@ log --diff-filter=[M|D] -- $file    # search for [M]odifications/[D]eletions of 
 
 log --grep=$regex                   # search by log message (case insensitive); simple regex, supports at least: '.*[]'; doesn't support: '+(){}'
 log --author $email_pattern         # search by author; pattern is a substring, and also accepts `*`
-log -G $regex [$path]               # search $regex in the diff
-log -S $string [$path]              # search the deletions for $string
+log -S $string [$path]              # search the changes (additions/deletions) for $string, as string
+log -G $regex [$path]               # search the changes (additions/deletions) for $string, as regex
 ```
 
 Blaming format:
@@ -422,6 +422,7 @@ git filter-branch --force --tree-filter 'ag "def mymethod" -l | xargs -r perl -0
 
 ```sh
 show --name-[only|status] rev[:file]            # diff rev^..rev; show name only [--name-only] or status only [--name-status]
+show -m $merge                                  # show the full diff of the parents of a merge
 
 diff [--cached]                                 # non committed files; [--cached] files in the index
 diff --stat                                     # only filenames

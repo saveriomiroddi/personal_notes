@@ -511,7 +511,10 @@ query_option=("$(printf "%q" "SELECT * FROM mytable")")
 # Simple popup window with button.
 # WATCH OUT! Don't forget `--text`, otherwise, a cryptic message 'All updates are complete.' is shown (!?).
 #
-zenity --info --text 'Text message!'
+# - `--no-markup`       : disable text interpretation ("Pango" markup)
+# - `width`, `--height`
+#
+zenity --info --no-markup --text 'Text message!'
 ```
 
 ## Dates

@@ -2,6 +2,7 @@
 
 - [Linux system](#linux-system)
   - [Processes](#processes)
+    - [Useful operations](#useful-operations)
     - [Suspension](#suspension)
     - [Process tree display](#process-tree-display)
   - [Security](#security)
@@ -45,6 +46,18 @@
 
 ## Processes
 
+### Useful operations
+
+```sh
+# check if pid exists
+ps -p $pid > dev/null
+
+# pgrep/pkill use regexes.
+# character classes are a trick not to match itself (especially useful when sudo killing)
+#
+sudo pkill -f '[p]rocessname'
+```
+
 ### Suspension
 
 ```sh
@@ -87,6 +100,14 @@ chage [-m $min] [-M $max] [-W $warn] [-I $inactive_days] $login # change passwor
 chage -l $login                             # show info
 ```
 
+Rename user/group/home:
+
+```sh
+usermod -l $new_user $old_user
+groupmod -n $new_user $old_user
+usermod -d $new_home -m $user
+```
+
 Snippets:
 
 ```sh
@@ -110,6 +131,13 @@ getent passwd $username | cut -f6 -d:
 
 $SUDO_USER              # User who invoked sudo
 [[ $EUID -eq 0 ]]       # Shell (all) check for user being root
+```
+
+Passwordless sudo:
+
+```sh
+echo "$(whoami) ALL=(ALL:ALL) NOPASSWD: ALL" > "/etc/sudoers.d/$(whoami)_no_sudo_pwd"
+sudo chmod 440 !$
 ```
 
 ## Filesystems/partitions/mounts

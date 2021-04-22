@@ -1,3 +1,14 @@
+## Thu 22/Apr/2021
+
+- Projects/Open source
+  - QEMU-pinning
+    - [x] Use `$SUDO_USER`, when present
+  - SSHKit::Sudo::Next
+    - [x] Release gem
+- Admin
+  - Planning/Other
+    - [x] Copy temporary notes
+
 ## Mon 19/Apr/2021
 
 - Projects/Open source

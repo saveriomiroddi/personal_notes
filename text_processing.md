@@ -40,6 +40,7 @@
   - [sort](#sort)
   - [Silver searcher (ag)](#silver-searcher-ag)
   - [Generic snippets](#generic-snippets)
+    - [Stop tail when a string matches](#stop-tail-when-a-string-matches)
     - [Sorting versions](#sorting-versions)
     - [Sum/average/etc. values extracted from a textfile](#sumaverageetc-values-extracted-from-a-textfile)
 
@@ -611,6 +612,14 @@ ag -G '_spec.rb$' <pattern> [directory]
 ```
 
 ## Generic snippets
+
+### Stop tail when a string matches
+
+```sh
+# $pattern must quote backslashes, if there are any.
+#
+sh -c "tail --pid=\$\$ -f $(printf "%q" "$filename") | { sed -n $(printf "%q" "/$pattern/ q") && kill \$\$; }" || true
+```
 
 ### Sorting versions
 

@@ -285,7 +285,7 @@ rebase --onto $dest_branch $feat_branch_parent_commit
 
 # Add a root (initial) commit
 #
-git add --allow-empty -m "Initial (empty) commit"
+git commit --allow-empty -m "Initial (empty) commit"
 git rebase -i --root
 
 # Programmatically run an interactive rebase. Example: edit all the commits of a branch:

@@ -511,6 +511,23 @@ $ echo $?
 0
 ```
 
+Background jobs + command substitution blocking:
+
+```sh
+# Must disconnect from stdout in order not to block.
+#
+myvar=$(sleep 5             & echo b)  # blocks
+myvar=$(sleep 5 > /dev/null & echo b)  # doesn't block
+
+# Same; without `> /dev/null`, it blocks.
+#
+function bkg_function {
+  { sleep 60; } > /dev/null &
+  echo -n result
+}
+result=$(bkg_function)
+```
+
 ## Cycle a string tokens based on separator (IFS)
 
 Use IFS to tokenize a string with alternative characters (they're considered a set of **single** chars); **must** unset after:
@@ -602,7 +619,8 @@ printf %02d "$i"                  # pad number with zeros
 
 Watch out!!:
 
-- bash arithmetic handles only integers (use `bc` for that)
+- bash arithmetic handles only integers (use `bc` for floating point)
+- use brackets!!! priority is not as expected: `2 & 1 == 0` == `2 & (1 == 0)` == `0` (false)
 - empty string equals to 0
 - operations will cause exit if they evaluate to 0 and the `errexit` shellopt is set (also applies to `let`)
 - command substitutions inside arithmetic expansion will not exit if they fail
@@ -660,17 +678,19 @@ For output file; typically used with tee, to both print to stdout and redirect t
 echo "abc" >(xsel -ib)
 ```
 
-Command substitution; if the command is just a filename, the command is replaced with the file content ([reference](https://wiki.bash-hackers.org/syntax/expansion/cmdsubst)):
+Command substitution. If the command is just a filename, the command is replaced with the file content ([reference](https://wiki.bash-hackers.org/syntax/expansion/cmdsubst)):
 
 ```sh
 echo $(< "$filename")
 
-# The subtitution syntax is actually optional.
+# The substitution syntax is actually optional.
 #
 < "$filename" command
 command < "$filename"
 < "$filenameL" command < "$filenameR" # both are printed, L -> R
 ```
+
+WATCH OUT! See the [background processes section](#background-processesjobs-management) for notes about cmd substitution + background jobs.
 
 ## Brace expansion
 

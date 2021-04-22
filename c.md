@@ -1,9 +1,14 @@
 # C
 
 - [C](#c)
+  - [Requirements](#requirements)
   - [Basics](#basics)
     - [Base program and functions](#base-program-and-functions)
       - [printf](#printf)
+  - [Stdlib](#stdlib)
+    - [Env variables](#env-variables)
+  - [Linux](#linux)
+    - [User ids](#user-ids)
   - [Conveniences](#conveniences)
     - [Print a struct instances's bytes](#print-a-struct-instancess-bytes)
     - [Print a stack trace on segfault](#print-a-stack-trace-on-segfault)
@@ -13,14 +18,23 @@
     - [Error `glibconfig.h: No such file or directory`](#error-glibconfigh-no-such-file-or-directory)
     - [Error `cannot find install-sh, install.sh, or shtool in ...`](#error-cannot-find-install-sh-installsh-or-shtool-in-)
 
+## Requirements
+
+In all the examples (stdlib, linux...), the following inclusions are implied:
+
+```c
+#include <stdio.h>   // printf(3)
+#include <stdlib.h>  // exit(3)`, EXIT_FAILURE
+```
+
+The exit with error examples are intentionally simplified (no braces, messages, etc.).
+
 ## Basics
 
 ### Base program and functions
 
 ```c
 #include <fcntl.h>    // open(2), O_RDONLY, AT_FDCWD
-#include <stdio.h>    // printf(3)
-#include <stdlib.h>   // exit(3), EXIT_FAILURE
 #include <unistd.h>   // read(2), close(2)
 
 int main(int argc, char **argv) {
@@ -41,6 +55,37 @@ int main(int argc, char **argv) {
 #### printf
 
 - `lu/ld` long unsigned/signed
+
+## Stdlib
+
+### Env variables
+
+```c
+#include <stdlib.h>  // getenv(3)
+
+char *sudo_user = getenv("SUDO_USER");
+
+if (!sudo_user) exit(EXIT_FAILURE);
+
+printf("%s\n", sudo_user);
+```
+
+## Linux
+
+### User ids
+
+```c
+#include <pwd.h>        // getpwuid(3)
+#include <unistd.h>     // geteuid(2)
+#include <sys/types.h>  // uid_t
+
+uid_t euid = geteuid();
+struct passwd *passwd = getpwuid(euid);
+
+if (!passwd) exit(EXIT_FAILURE);
+
+printf("%s\n", passwd->pw_name);
+```
 
 ## Conveniences
 

@@ -10,7 +10,7 @@
     - [SSL/Certificates](#sslcertificates)
     - [PGP (GnuPG/gpg)](#pgp-gnupggpg)
       - [Key servers](#key-servers)
-    - [Access/create an SMB (Samba) share](#accesscreate-an-smb-samba-share)
+    - [Samba (SMB)](#samba-smb)
   - [Lower level networking](#lower-level-networking)
     - [SSL](#ssl)
     - [DNS](#dns)
@@ -267,7 +267,7 @@ The best choice is [The HKPS pool](http://hkps.pool.sks-keyservers.net) (see [St
 
 When searching keys in servers via fingerprint, the prefix `0x` must be added.
 
-### Access/create an SMB (Samba) share
+### Samba (SMB)
 
 ```sh
 # Mount a share
@@ -288,6 +288,7 @@ guest ok = yes			    # choose this...
 valid users = myuser		# ... or this
 # browseable = yes      # default
 # read only = yes       # default
+force user = myuser     # avoid created files to be owned by root
 
 # Set all the below to allow symlinks
 follow symlinks = yes

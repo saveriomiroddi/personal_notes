@@ -56,6 +56,11 @@ ps -p $pid > dev/null
 # character classes are a trick not to match itself (especially useful when sudo killing)
 #
 sudo pkill -f '[p]rocessname'
+
+# Be *very* careful when choosing which pid to kill. If the process has been invoked via sudo, the child
+# process will need to be killed.
+#
+pkill --parent --pidfile $(< parent_pidfile)
 ```
 
 ### Suspension

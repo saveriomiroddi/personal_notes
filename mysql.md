@@ -3,6 +3,7 @@
 - [MySQL](#mysql)
   - [Privileges](#privileges)
   - [Control flow](#control-flow)
+  - [General statements](#general-statements)
   - [General built-in functions](#general-built-in-functions)
     - [String functions](#string-functions)
       - [Character conversions](#character-conversions)
@@ -13,16 +14,25 @@
     - [Strategies](#strategies)
   - [XPath](#xpath)
   - [CSV Import/Export](#csv-importexport)
+  - [Dates](#dates)
+    - [General useful notes](#general-useful-notes)
+    - [Formatting/parsing](#formattingparsing)
   - [Window functions](#window-functions)
     - [Define each window extent (`PARTITION BY`), and picking a row per window](#define-each-window-extent-partition-by-and-picking-a-row-per-window)
     - [Window function aggregates](#window-function-aggregates)
     - [Applications/examples](#applicationsexamples)
       - [Replace spaced coordinates with monotonically increasing values](#replace-spaced-coordinates-with-monotonically-increasing-values)
   - [Stored procedures](#stored-procedures)
+    - [Control flow syntax](#control-flow-syntax)
     - [Cursors (with convenient example of looping)](#cursors-with-convenient-example-of-looping)
   - [Performance](#performance)
+    - [Profiling](#profiling)
+    - [Dynamic SQL](#dynamic-sql)
   - [Administration](#administration)
+    - [Non-blocking schema changes](#non-blocking-schema-changes)
     - [Observe ALTER TABLE progress](#observe-alter-table-progress)
+  - [Client/server](#clientserver)
+    - [Find configuration files used](#find-configuration-files-used)
   - [Metadata](#metadata)
 
 ## Privileges
@@ -46,6 +56,15 @@ WHEN when_value THEN statement_list
 [WHEN when_value THEN statement_list] ...
 [ELSE statement_list]
 END CASE
+```
+
+## General statements
+
+```sql
+# Note that values outside the @values list will take priority over the ones inside, so for some cases
+# it's necessary to use the DESC modifier.
+#
+ORDER BY FIELD( field, @values...)
 ```
 
 ## General built-in functions
@@ -284,6 +303,76 @@ FIELDS TERMINATED BY ','
 SET tenant_id = 89, customer_id = NULLIF(@customer_id, '');
 ```
 
+## Dates
+
+### General useful notes
+
+```sql
+# Current timezone:
+#
+SELECT TIMEDIFF( NOW(), CONVERT_TZ( NOW(), @@session.time_zone, '+00:00' ) );
+
+# Don't use `-` to substract timestamps!! Use:
+#
+TIMESTAMPDIFF(SECOND, timestamp1, timestamp2);
+```
+
+### Formatting/parsing
+
+```sql
+DATE_FORMAT(@date, @format);
+STR_TO_DATE(@date, @format);
+```
+
+- `%a` : Abbreviated weekday name (Sun..Sat)
+- `%b` : Abbreviated month name (Jan..Dec)
+- `%c` : Month, numeric (0..12)
+- `%D` : Day of the month with English suffix (0th, 1st, 2nd, 3rd, …)
+- `%d` : Day of the month, numeric (00..31)
+- `%e` : Day of the month, numeric (0..31)
+- `%f` : Microseconds (000000..999999)
+- `%H` : Hour (00..23)
+- `%h` : Hour (01..12)
+- `%I` : Hour (01..12)
+- `%i` : Minutes, numeric (00..59)
+- `%j` : Day of year (001..366)
+- `%k` : Hour (0..23)
+- `%l` : Hour (1..12)
+- `%M` : Month name (January..December)
+- `%m` : Month, numeric (00..12)
+- `%p` : AM or PM
+- `%r` : Time, 12-hour (hh:mm:ss followed by AM or PM)
+- `%S` : Seconds (00..59)
+- `%s` : Seconds (00..59)
+- `%T` : Time, 24-hour (hh:mm:ss)
+- `%U` : Week (00..53), where Sunday is the first day of the week
+- `%u` : Week (00..53), where Monday is the first day of the week
+- `%V` : Week (01..53), where Sunday is the first day of the week; used with %X
+- `%v` : Week (01..53), where Monday is the first day of the week; used with %x
+- `%W` : Weekday name (Sunday..Saturday)
+- `%w` : Day of the week (0=Sunday..6=Saturday)
+- `%X` : Year for the week, where Sunday is the first day of the week, numeric, four digits; used with %V
+- `%x` : Year for the week, where Monday is the first day of the week, numeric, four digits; used with %v
+- `%Y` : Year, numeric, four digits
+- `%y` : Year, numeric (two digits)
+- `%%` : A literal "%" character
+
+```sql
+# 0427 = Sunday
+
+# Week starts on Sunday
+#
+str_to_date(date_format('20080426', '%X%V 0'), '%X%V %w'); -- 04-20
+str_to_date(date_format('20080427', '%X%V 0'), '%X%V %w'); -- 04-27
+str_to_date(date_format('20080428', '%X%V 0'), '%X%V %w'); -- 04-27
+
+# Week starts on Monday
+#
+str_to_date(date_format('20080426', '%x%v 1'), '%x%v %w'); -- 04-21
+str_to_date(date_format('20080427', '%x%v 1'), '%x%v %w'); -- 04-21
+str_to_date(date_format('20080428', '%x%v 1'), '%x%v %w'); -- 04-28
+```
+
 ## Window functions
 
 Basic window functions example: compute the difference of a week of sales compared to the previous year.
@@ -382,6 +471,46 @@ WHERE {parent_fk} = ?
 
 ## Stored procedures
 
+### Control flow syntax
+
+If/then/else:
+
+```sql
+IF @condition THEN
+  # block
+ELSEIF @condition THEN
+  # block
+ELSE
+  # block
+END IF;
+```
+
+Cycles (there is no for loop!):
+
+```sql
+WHILE condition DO
+  # block
+END WHILE;
+
+REPEAT
+  # block
+UNTIL @condition
+END REPEAT;
+
+LOOP
+  # block
+END LOOP;
+```
+
+Common properties:
+
+```sql
+label_name: STATEMENT
+  # Repeat the cycle
+  ITERATE label_name;
+END STATEMENT;
+```
+
 ### Cursors (with convenient example of looping)
 
 ```sql
@@ -415,6 +544,12 @@ BEGIN
   #
   DECLARE cur_tenants CURSOR FOR SELECT id FROM tenants;
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_cur_notfound := TRUE;
+
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated';
+  END;
 
   OPEN cur_tenants;
   tenants_loop: LOOP
@@ -462,19 +597,95 @@ FROM table_1 t1 JOIN table_2 t2
 #
 SET GLOBAL optimizer_switch = "duplicateweedout=off";
 
-# Display query trace:
-#
-SET optimizer_trace = "enabled=on";
-SELECT * FROM information_schema.optimizer_trace\G
-SET optimizer_trace = "enabled=off";
-
 # Per-table (persistent) stats options.
 # Reference: https://dev.mysql.com/doc/refman/8.0/en/innodb-persistent-stats.html.
 #
 ALTER TABLE seat_assignments STATS_SAMPLE_PAGES=50, STATS_AUTO_RECALC=0;
+
+# On batch inserion, disable key checks:
+#
+SET unique_checks=0;
+SET foreign_key_checks=0;
+```
+
+### Profiling
+
+General profiler:
+
+```sql
+SET PROFILING=1;
+
+# execute query
+
+SHOW PROFILES;
+SHOW PROFILE FOR QUERY @query_id;
+
+SELECT
+  STATE,
+  SUM(DURATION)            `Total_R`,
+  ROUND(
+    100 * SUM(DURATION) / (
+      SELECT SUM(DURATION)
+      FROM INFORMATION_SCHEMA.PROFILING
+      WHERE QUERY_ID = @query_id
+    ) , 2) `Pct_R`,
+  COUNT(*)                 `Calls`,
+  SUM(DURATION) / COUNT(*) `R/Call`
+FROM INFORMATION_SCHEMA.PROFILING
+WHERE QUERY_ID = @query_id
+GROUP BY STATE
+ORDER BY Total_R DESC;
+```
+
+Query optimizer trace:
+
+```sql
+SET optimizer_trace = "enabled=on";
+SELECT * FROM information_schema.optimizer_trace\G
+SET optimizer_trace = "enabled=off";
+```
+
+Digest slow query log, using Maatkit:
+
+```sh
+mk-query-digest /path/to/*-slow.log
+```
+
+### Dynamic SQL
+
+- `@SQL_STRING` must be either a literal, or a variable - functions are illegal;
+- remember that ROW_COUNT() is valid only after EXECUTE.
+
+```sql
+PREPARE pst_count FROM @SQL_STRING;
+EXECUTE pst_count;
+DEALLOCATE PREPARE pst_count;
 ```
 
 ## Administration
+
+### Non-blocking schema changes
+
+Gh-ost (works also on tables with triggers).
+
+This is the configuration for running it on the master (has more overhead than running from the slave); with `--execute`, changes are applied, and the old table is kept, without it, changes are not applied:
+
+```sh
+gh-ost \
+  --user=$USER --password=$PWD --host=localhost \
+  --database=ticketsolve_production --table=comments \
+  --alter="ENGINE=InnoDB" \
+  --exact-rowcount --verbose \
+  --allow-on-master \
+  --execute \
+;
+```
+
+`pt-online-schema-change` doesn’t work on tables with triggers; crashed on production:
+
+```sh
+pt-online-schema-change --execute --alter "MODIFY section VARCHAR(40) NOT NULL DEFAULT ''" D=db_name,t=table_name,u=root,p=root_pwd
+```
 
 ### Observe ALTER TABLE progress
 
@@ -501,6 +712,14 @@ SELECT EVENT_NAME, WORK_COMPLETED, WORK_ESTIMATED FROM performance_schema.events
 The `alter table (flush)` stage empirically took from 10% to 100% of the total time before that stage.
 
 Only the last stage `log apply table` causes contention; on the longest occurrence, it took ≈2.4% of the total time (44/1858").
+
+## Client/server
+
+### Find configuration files used
+
+```sh
+ls -l $(mysqld --verbose --help | awk "/Default options/ { getline; gsub(\"~\", \"$HOME\", \$0); print }") 2> /dev/null
+```
 
 ## Metadata
 

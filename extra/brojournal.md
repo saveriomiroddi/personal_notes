@@ -1,3 +1,22 @@
+## Fri 23/Apr/2021
+
+- Admin
+  - [ ] Notes: move old ones/write pending
+    - [x] mysql.odt (11 pag.)
+    - [x] ruby.odt (27 pag.)
+    - [x] Reorganize zfs notes
+  - Tools
+    - [x] qemu.sh: Add fetch QEMU repo
+- Writings
+  - Blog
+    - [x] Kernel building: Add solution for certificate error
+- Admin
+  - Planning/Other
+    - [x] Review/plan next two weeks
+    - [x] Search computer architecture books
+  - Tools
+    - [x] QEMU script: Fix QEMU killer
+
 ## Thu 22/Apr/2021
 
 - Projects/Open source

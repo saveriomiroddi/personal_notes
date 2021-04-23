@@ -1,181 +1,166 @@
 # ZFS
 
 - [ZFS](#zfs)
-  - [Basic usage](#basic-usage)
+  - [Pools](#pools)
+    - [Basic operations](#basic-operations)
+    - [Features](#features)
+    - [Import/export](#importexport)
+    - [Admin](#admin)
+  - [Mirror/devices](#mirrordevices)
+  - [Mountpoints](#mountpoints)
   - [Snapshotting](#snapshotting)
   - [Lightweight per-file rollback workflow](#lightweight-per-file-rollback-workflow)
   - [Cool diffing functions](#cool-diffing-functions)
 
-## Basic usage
+## Pools
+
+### Basic operations
 
 For more advanced concepts, see http://j.mp/18tSgvx.
 
-List the pools.
-
 ```sh
+# Create a pool from a file/device (if file, it must be present).
+# - `-d` + `-o $features`: enable only the specified features.
+#
+zpool create [-d {-o feature@$name>=enabled, ...}] $pool $device
+
+# List the pools.
+#
 zpool list
-```
 
-More details about the pools.
-[-v] displays files with error, if there are any.
-
-```sh
+# More details about the pools.
+# [-v] displays files with error, if there are any.
+#
 zpool status [-v]
+
+# Destroy a pool.
+#
+zpool destroy $pool
 ```
 
-Create a pool from a file/device (if file, it must be present).
-
-- `-d` + `-o <features>`: enable only the specified features.
+### Features
 
 ```sh
-zpool create [-d {-o feature@<name>=enabled, ...}] <pool> <device>
-```
-
-Hackish way of getting the supported features.
-
-```sh
+# Hackish way of getting the supported features.
+#
 man zpool-features | grep -E '^       \w+$'
+
+# Enable all the supported features in a pool.
+#
+zpool upgrade $pool
 ```
 
-Don't allow pool mounting.
-Useful on creating a pool that is purely a container
-
-```sh
-zpool create -O canmount=off
-```
-
-Create with a permanent mountpoint (-O mountpoint), but a different temporary one (-R).
-WATCH OUT!: With `-R`, filesystem's mountpoint will be relative to it.
-The mountpoints are created on pool creation, but not destroyed on pool destruction.
-
-```sh
-zpool create -O mountpoint=/ -R /media/disk_a
-```
-
-Enable all the supported features in a pool.
-
-```sh
-zpool upgrade <pool>
-```
-
-Import a pool:
+### Import/export
 
 ```sh
 # Import in the given path.
+#
 zpool import -d $path $pool
 
 # Import pool using $alt_root as temporary root.
+#
 zpool import -R $alt_root $pool
 
 # Import an encrypted pool. IMPORTANT!:
 # - if `-l` is not specified, and the pool is encrypted, it will be imported, with successful exit status (!), and with empty content (!!)
 # - if `-l` is specified, and the pool is not encrypted, it will be imported, without prompt
+#
 zpool import -l $pool
+
+# Rename a pool (permanently).
+#
+zpool import $pool $new_name
+
+# Export must not be used to unmount, otherwise the pool is not automatically imported on boot.
+#
+zpool export $device_or_mountpoint
 ```
 
-Rename a pool (permanently).
+### Admin
 
 ```sh
-zpool import <pool> <new_name>
-```
-
-Create a mirrored pool.
-
-```sh
-zpool create <pool> mirror <device1> <device2>
-```
-
-Replace a device.
-
-If the new device is in the same place as the old one, don't specify the new one.
-
-```sh
-zpool replace <pool> <old_device> [<new_device>]
-```
-
-Add a new device to a pool (doesn't mirror!).
-
-```sh
-zpool add <pool> <device>
-```
-
-Attach a new device to a mirror (convert the pool to a mirror, if it isn't already so)
-
-Resilvering will start immediately.
-Note that $device_in_mirror is the name of the device as defined in the pool status.
-
-```sh
-zpool attach $pool $device_in_mirror $new_device
-```
-
-Add a new top level mirror.
-
-```sh
-zpool add <pool> mirror <device1> <device2>
-```
-
-Expand a pool to the entire partition. If performed on a mirror, the operation must be performed on each device.
-
-```sh
+# Expand a pool to the entire partition. If performed on a mirror, the operation must be performed on each device.
+#
 parted -s $disk_device resizepart $part_number_1_based 100%
 zpool online -e $pool $part_device
+
+# Scrub a pool. Results are displayed both in :list and :status.
+#
+zpool scrub $pool
 ```
 
-Scrub a pool. Results are displayed both in :list and :status.
+## Mirror/devices
 
 ```sh
-zpool scrub <pool>
-```
+# Create a mirrored pool.
+#
+zpool create $pool mirror $device1 $device2
 
-Destroy a pool.
+# Replace a device.
+# If the new device is in the same place as the old one, don't specify the new one.
 
-```sh
-zpool destroy <pool>
-```
+zpool replace $pool $old_device [$new_device]
 
-Unmount datasets (don't use export!, or it won't be automatically autoimported).
+# Add a new device to a pool (doesn't mirror!)
+#
+zpool add $pool $device
 
-```sh
-zpool export <device_or_mountpoint>
-```
+# Attach a new device to a mirror (convert the pool to a mirror, if it isn't already so).
+# Resilvering will start immediately.
+# Note that $device_in_mirror is the name of the device as defined in the pool status.
+#
+zpool attach $pool $device_in_mirror $new_device
 
-Detach a device from a pool (/mirror).
+# Add a new top level mirror
+#
+zpool add $pool mirror $device1 $device2
 
-```sh
+# Detach a device from a pool (/mirror):
+#
 zpool detach $pool $device
-```
 
-Store the mountpoint and mount a dataset/pool.
-The dataset is mounted automatically when importing the pool!
-The mountpoint presence is optional, but it won't be deleted when unmounting.
-
-```sh
-zfs set mountpoint=<mountpoint> <dataset>
-zfs set readonly=on <dataset>
-```
-
-Get mountopoint/mount status -> mount.
-
-```sh
-zfs get mountpoint <filesystem>
-zfs get mounted
-zfs mount <filesystem>
-```
-
-[re]mount in readonly mode.
-if a FS is mounted, use the 'remount' option to change a property.
-
-```sh
-zfs mount -o remount,ro <dataset>
-```
-
-ZFS mirroring with different sector sizes (9=512, 12=4096).
-Note that it has a significant impact on performance.
-
-```sh
+# ZFS mirroring with different sector sizes (9=512, 12=4096). Watch out! It has a significant impact on performance.
+#
 fdisk -l                                                         # show the SS for the disks
 zdb | grep ashift                                                # show the pool current ashift
-zpool attach -o ashift=9 <pool> <device_in_mirror> <new_device>  # force the optimal ashift for the attaching device
+zpool attach -o ashift=9 $pool $device_in_mirror> <new_device  # force the optimal ashift for the attaching device
+```
+
+## Mountpoints
+
+```sh
+# Don't allow pool mounting.
+# Useful on creating a pool that is purely a container
+#
+zpool create -O canmount=off
+
+# Create with a permanent mountpoint (-O mountpoint), but a different temporary one (-R).
+# WATCH OUT!: With `-R`, filesystem's mountpoint will be relative to it.
+# The mountpoints are created on pool creation, but not destroyed on pool destruction.
+#
+zpool create -O mountpoint=/ -R /media/disk_a
+
+# Store the mountpoint and mount a dataset/pool.
+# The dataset is mounted automatically when importing the pool!
+# The mountpoint presence is optional, but it won't be deleted when unmounting.
+#
+zfs set mountpoint=$mountpoint $dataset
+zfs set readonly=on $dataset
+
+# Get mountpoint/mount status -> mount.
+#
+zfs get mountpoint $filesystem
+
+# Watch out! Don't confuse $filesystem with the path - using the second will print the mount status
+# of the pool the path belongs to.
+#
+zfs get mounted [$filesystem]
+
+zfs mount $filesystem
+
+# (Re)mount in readonly mode; if a FS is mounted, use the 'remount' option to change a property.
+#
+zfs mount -o remount,ro $dataset
 ```
 
 ## Snapshotting

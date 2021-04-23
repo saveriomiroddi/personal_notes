@@ -27,6 +27,7 @@
   - [Batch operations (message/tree filtering, files removal)](#batch-operations-messagetree-filtering-files-removal)
   - [Diffing/Patching/Status](#diffingpatchingstatus)
   - [Useful operations](#useful-operations)
+    - [Aggressive garbage collection](#aggressive-garbage-collection)
     - [Shell prompt](#shell-prompt)
     - [Correct whitespaces problems](#correct-whitespaces-problems)
     - [Revert common mistakes](#revert-common-mistakes)
@@ -466,6 +467,12 @@ apply [--check] $patchfile
 ```
 
 ## Useful operations
+
+### Aggressive garbage collection
+
+```sh
+git reflog expire --expire=now --all && git gc --prune=now --aggressive
+```
 
 ### Shell prompt
 

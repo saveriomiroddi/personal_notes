@@ -103,6 +103,8 @@ chmod [ugoa][-+][rwx] $file...              # change permissions; [u]ser [g]grou
 
 chage [-m $min] [-M $max] [-W $warn] [-I $inactive_days] $login # change password properties
 chage -l $login                             # show info
+
+passwd -d                                   # set a blank password
 ```
 
 Rename user/group/home:
@@ -143,6 +145,15 @@ Passwordless sudo:
 ```sh
 echo "$(whoami) ALL=(ALL:ALL) NOPASSWD: ALL" > "/etc/sudoers.d/$(whoami)_no_sudo_pwd"
 sudo chmod 440 !$
+```
+
+Passwordless ssh (it seems that the suggested changes to UsePAM/ChallengeEtc don't work):
+
+```sh
+perl -i -pe 's/^#?(PasswordAuthentication) \w+/$1 yes/' /etc/ssh/sshd_config
+perl -i -pe 's/^#?(PermitEmptyPasswords) \w+/$1 yes/'   /etc/ssh/sshd_config
+systemctl restart sshd
+passwd -d $user
 ```
 
 ## Filesystems/partitions/mounts

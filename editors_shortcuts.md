@@ -65,6 +65,8 @@ The VIM section requires some cleanup.
 
 - `Ctrl+K, P`                 Copy file path
 
+- `Ctrl+K, S`                 Save without formatting
+
 - `F10/F11`                   Step over/into
 - `Shift+F11`                 Step out
 - `F5`                        Start/Continue
@@ -72,7 +74,7 @@ The VIM section requires some cleanup.
 - `Ctrl+F5`                   Run without debug
 - `Shift+F9`                  Toggle breakpoint (custom)
 
-- `Ctrl+K, Ctrl+P`              Du(p)licate selection!! (custom)
+- `Ctrl+K, Ctrl+P`            Du(p)licate selection!! (custom)
 
 #### Extensions
 

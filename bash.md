@@ -57,17 +57,23 @@ Basic (important):
 ```sh
 set -o pipefail
 set -o errexit
-set -o nounset            # WATCH OUT! Unset arrays don't cause errors
-set -o errtrace           # `-E`: trap errors also inside functions
-shopt -s inherit_errexit  # subshells inherit errexit (Bash 4.4+)
+set -o nounset
+set -o errtrace
+shopt -s inherit_errexit
 ```
+
+Notes:
+
+- `nounset`         : WATCH OUT! Unset arrays don't cause errors
+- `errtrace`        : (`-E`) trap errors also inside functions
+- `inherit_errexit` : subshells inherit errexit (Bash 4.4+)
 
 Extra:
 
 ```sh
-set -o monitor            # `-m`: enable job control
+set -o monitor            # (`-m`) enable job control
 shopt -s nullglob         # IMPORTANT: when globs don't match anything, expand to null string, rather than to themselves
-set -o xtrace             # `-x`: debugging mode; prints all the statements
+set -o xtrace             # (`-x`) debugging mode; prints all the statements
 shopt -s nocasematch      # case insensitive matches
 ```
 
@@ -131,7 +137,7 @@ echo $'l\'s\n'          # prints `l's` and newline
 
 ## Herestrings/Heredocs (+stdin handling)
 
-Herestring: Bash alternative for "echo X | command", with the difference that it doesn't create a subshell.  
+Herestring: Bash alternative for "echo X | command", with the difference that it doesn't create a subshell.
 WATCH OUT: it adds a newline, which in some cases is undesirable.
 
 ```sh
@@ -166,7 +172,7 @@ Assignment/passing:
 #
 if read -t 0; then ...; fi
 
-# Assign stdin to a variable 
+# Assign stdin to a variable
 # `read -r`: don't interpret backslashes.
 #
 read -r <var_name>           # single line
@@ -746,7 +752,14 @@ echo "${coordinates[@]:2}"           # array slicing! ([2..-1]) (see https://sta
 echo "${@:2}"                        # slice the `$@` variable
 echo ${#coordinates[@]}              # size (length)
 printf '%s\n' "${pizza[@]}"          # print the entries (one per line); `echo` prints all in one line
-echo $(IFS=,; echo "${pizza[*]}")    # join the entries. !!! don't forget the `;` and the quotes !!!
+
+# Joining arrays.
+#
+# The pure multi-char bash version is ugly (see https://stackoverflow.com/a/17841619 and https://dev.to/meleu/how-to-join-array-elements-in-a-bash-script-303a).
+#
+echo $(IFS=,; echo "${arr[*]}")                  # Single-char; !!! don't forget the `;` and the quotes !!!
+perl -e 'print join("--", @ARGV)' -- "${arr[@]}" # Multi-char, perl `--` is for safety, if any value starts with `-`
+printf %s "${arr[@]/#/->}"                       # Join, but also prepends the separator; works also with `arr[*]` (for interpolation)
 
 # Iteration (regular vars/$@)
 #

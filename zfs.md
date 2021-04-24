@@ -8,9 +8,11 @@
     - [Admin](#admin)
   - [Mirror/devices](#mirrordevices)
   - [Mountpoints](#mountpoints)
+  - [Settings](#settings)
+    - [Compression](#compression)
   - [Snapshotting](#snapshotting)
-  - [Lightweight per-file rollback workflow](#lightweight-per-file-rollback-workflow)
-  - [Cool diffing functions](#cool-diffing-functions)
+    - [Lightweight per-file rollback workflow](#lightweight-per-file-rollback-workflow)
+    - [Cool diffing functions](#cool-diffing-functions)
 
 ## Pools
 
@@ -45,9 +47,9 @@ zpool destroy $pool
 #
 man zpool-features | grep -E '^       \w+$'
 
-# Enable all the supported features in a pool.
+# Without $pool list the upgrade status of all the pools; with it, upgrades it.
 #
-zpool upgrade $pool
+zpool upgrade [$pool]
 ```
 
 ### Import/export
@@ -163,6 +165,18 @@ zfs mount $filesystem
 zfs mount -o remount,ro $dataset
 ```
 
+## Settings
+
+### Compression
+
+```sh
+$ zfs get all [$pool] | grep -P '\bcompress'
+rpool  compressratio         1.21x                 -
+rpool  compression           lz4                   local
+
+$ zfs set compression=zstd $pool
+```
+
 ## Snapshotting
 
 (`$volume` can also be a pool)
@@ -202,7 +216,7 @@ cat /proc/spl/kstat/zfs/fletcher_4_bench
 cat /proc/spl/kstat/zfs/vdev_raidz_bench
 ```
 
-## Lightweight per-file rollback workflow
+### Lightweight per-file rollback workflow
 
 ```sh
 zfs create -o mountpoint=/busy rpool/busy
@@ -222,7 +236,7 @@ zfs destroy rpool/busy@unchanged
 zfs destroy rpool/busy
 ```
 
-## Cool diffing functions
+### Cool diffing functions
 
 The function don't work with ecryptfs, due to the files at a higher level than the storage layer.
 

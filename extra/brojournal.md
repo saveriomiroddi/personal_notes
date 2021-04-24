@@ -1,3 +1,32 @@
+## Sat 24/Apr/2021
+
+- Projects/Open source
+  - vga-passthough
+    - QEMU pass usb host port
+      - [x] Fight research
+- Studies
+  - Bash
+    - [x] Fight best option(s) for multichar array join
+- Projects/Open source
+  - ZFS
+    - [x] Move build to GH Actions
+    - [x] Review all issues, and update if necessary
+    - [x] Make jonathonf PPA user-selectable
+      - [x] Review OpenZFS 2.0 benefits
+      - [x] Test on VM, then desktop
+      - [x] Implement
+      - [x] Test
+    - [x] Cosmetic cleanups
+    - [x] Fight passwordless ssh login
+    - [x] Fight multiple VBox machines tree issues
+    - [x] Check memory requirement
+    - [ ] First slice: remove boot pool import hack  (Closes #140)
+      - [x] Review of the whole procedure
+      - [x] Attempt at updating the whole functionality
+      - [x] Fight first slice
+        - [x] Apply several refactorings
+      - [x] First round of testing
+
 ## Fri 23/Apr/2021
 
 - Admin

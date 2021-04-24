@@ -41,7 +41,7 @@
   - [Silver searcher (ag)](#silver-searcher-ag)
   - [Generic snippets](#generic-snippets)
     - [Stop tail when a string matches](#stop-tail-when-a-string-matches)
-    - [Sorting versions](#sorting-versions)
+    - [Compare/sort versions](#comparesort-versions)
     - [Sum/average/etc. values extracted from a textfile](#sumaverageetc-values-extracted-from-a-textfile)
 
 ## Grep
@@ -69,6 +69,9 @@ grep -Pzo '(?s)void\srb_backtrace\(.*?\n\}' --include="*.c" -r .
 ### Operators
 
 ```perl
+# !!!!!!!!!!!!!!!!!!!!!!!!! Custom search delimiter !!!!!!!!!!!!!!!!!!!!!!!!!
+s|from|to|
+
 # Ternary operator
 CONDITION ? TRUE_BRANCH : FALSE_BRANCH
 
@@ -131,8 +134,10 @@ printf 'Line 1\nLine 2' | perl -lne 'print $_; ($line = readline) && print $line
 Special variables can be modified, depending on the type, on each cycle, or in the `BEGIN` block.
 
 - `$_`: current line; if modified, and `-p` is specified, the new value is printed.
+- `$.`: current line number (1-based)
 - `$/`: separator; see examples.
 - `$ENV`: env variables; don't forget that they need to be exported!!
+- `@ARGV`: arguments (not including command)
 
 ### Data types, conversions and contexts
 
@@ -445,6 +450,7 @@ Cmdline params:
 - `<n><operation>[<param>]` : execute `operation` on line `n`, optionally with operation `params`
 - `<pattern> <operation>`   : execute `operation` when `pattern` matches
 - `/pattern/[modifier]`     : pattern with modifier(s)
+- `s|from|to|`              : custom search delimiter
 
 ### Regexes
 
@@ -621,7 +627,7 @@ ag -G '_spec.rb$' <pattern> [directory]
 sh -c "tail --pid=\$\$ -f $(printf "%q" "$filename") | { sed -n $(printf "%q" "/$pattern/ q") && kill \$\$; }" || true
 ```
 
-### Sorting versions
+### Compare/sort versions
 
 Options:
 
@@ -631,7 +637,10 @@ Options:
 - `sort -V`
   - see [sort](#sort) section
 
-Dpkg has more complex rules for comparing empty versions, so they should be avoided if possible.
+Dpkg:
+
+- has more complex rules for comparing empty versions, so they should be avoided if possible.
+- considers valid a blank string, and lower than any non-blank version (including 0)
 
 ### Sum/average/etc. values extracted from a textfile
 

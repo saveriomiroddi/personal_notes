@@ -612,10 +612,10 @@ Gem.activate_bin_path(...)
 # Find a gem version
 Gem.loaded_specs['activerecord'].version
 
-# Compare gem versions!!!
+# Compare (gem) versions!!!
 #
-spec.version >= Gem::Version.new('0.3.12')
-Gem::Version.new('1.66') > Gem::Version.new('1.7')
+Gem::Version.new('3.0') > Gem::Version.new('10.0') # string-comparison returns true (wrong)!
+Gem.ruby_version > Gem::Version.new('10.0')        # ready API to retrieve the ruby version
 ```
 
 ## Handling processes

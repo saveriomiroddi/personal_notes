@@ -309,11 +309,12 @@ Replace only the first occurrence in a file:
 perl -pe '!$found && s/.../.../ && ($found=1)'
 ```
 
-Strip trailing file spaces:
+Strip trailing file spaces (or arbitrary characters):
 
 ```sh
 perl -pe 'chomp if eof'    # only last whitespace
 perl -0777 -pe 's/\s+$//'  # all the whitespaces
+head -c -1                 # last character (!!)
 ```
 
 Print part of line if there is a match:

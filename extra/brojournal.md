@@ -1,3 +1,21 @@
+## Sun 25/Apr/2021
+
+- Projects/Open source
+  - ZFS
+    - [x] First slice: remove boot pool import hack  (Closes #140)
+      - [x] Test on all major O/Ss
+        - [x] Ubuntu Desktop
+        - [x] Ubunt Server
+        - [x] Debian - investigate issue
+        - [x] Brutal fight Debian build problem
+    - [x] Sort disks in selection dialog (Closes #10)
+    - [x] Memory check update: 3.5 GB + always shows it if ram is below the threshold
+    - [x] Minor improvements
+      - [x] Clean pools raid type option, using a Bash array
+      - [x] Cosmetic: Use `\K` on `perl.*\$1`/`perl.*\$\{1`
+    - [x] Print internal variables as ZFS_* exports
+    - [x] Simplify pool passphrase storage handling
+
 ## Sat 24/Apr/2021
 
 - Projects/Open source

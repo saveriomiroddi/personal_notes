@@ -24,7 +24,7 @@
     - [Shell (initscripts)](#shell-initscripts)
       - [Example cases](#example-cases)
       - [sudo -i, login shell test, and bash](#sudo--i-login-shell-test-and-bash)
-  - [Handle system time](#handle-system-time)
+  - [Handle system date/time](#handle-system-datetime)
   - [Job scheduling](#job-scheduling)
     - [Cron](#cron)
     - [At](#at)
@@ -147,13 +147,18 @@ echo "$(whoami) ALL=(ALL:ALL) NOPASSWD: ALL" > "/etc/sudoers.d/$(whoami)_no_sudo
 sudo chmod 440 !$
 ```
 
-Passwordless ssh (it seems that the suggested changes to UsePAM/ChallengeEtc don't work):
+Passwordless ssh:
 
 ```sh
 perl -i -pe 's/^#?(PasswordAuthentication) \w+/$1 yes/' /etc/ssh/sshd_config
 perl -i -pe 's/^#?(PermitEmptyPasswords) \w+/$1 yes/'   /etc/ssh/sshd_config
 systemctl restart sshd
 passwd -d $user
+
+# On some system, like Debian, also run the following,
+# and ensure that ChallengeResponseAuthentication is set to `no`.
+perl -i -pe 's/^UsePAM \K\w+/no/'                       /etc/ssh/sshd_config
+
 ```
 
 ## Filesystems/partitions/mounts
@@ -312,11 +317,11 @@ sudo -u mysql bash -c "ulimit -n"
 ## Add swap file
 
 ```sh
-fallocate -l 512M /swapfile
+fallocate -l 512M /swapfile                           # use dd if=/dev/zero if this fails because of holes
 chmod 600 /swapfile
 mkswap /swapfile
 swapon /swapfile
-echo '/swapfile swap swap defaults 0 0' >> /etc/fstab        # activate on restart
+echo '/swapfile swap swap defaults 0 0' >> /etc/fstab # activate on restart
 ```
 
 ## Packages
@@ -628,7 +633,7 @@ Bash options:
 -l, --login : Make bash act as if it had been invoked as a login shell (see INVOCATION below).
 ```
 
-## Handle system time
+## Handle system date/time
 
 ```sh
 # Modern approach.
@@ -937,4 +942,3 @@ ecryptfs-unwrap-passphrase /mnt/home/.ecryptfs/saverio/.ecryptfs/wrapped-passphr
 ecryptfs-add-passphrase --fnek                                                      # use mount PP; store the second signature
 mount -t ecryptfs /mnt/home/.ecryptfs/saverio/.Private /mnt                         # use mount PP; enable filename encryption; use signature
 ```
-

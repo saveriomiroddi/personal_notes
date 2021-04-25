@@ -775,6 +775,11 @@ Sort an array (/keys of an associative array):
 # For entries with newlinews, `sort -z` and mapfile `-d ''` should be used.
 #
 mapfile -t sorted_keys < <(printf '%s\n' "${!my_arr[@]}" | sort)
+
+# Sorting more complex entries; relies on entries not including newlines.
+#
+my_arr=("entry1 key2" "entry2 key1")
+mapfile -td$'\n' sorted_arr < <(printf $'%s\n' "${my_arr[@]}" | sort -k 2)
 ```
 
 Iterate a multiple lines output, assigning it to an array:

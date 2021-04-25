@@ -158,7 +158,6 @@ passwd -d $user
 # On some system, like Debian, also run the following,
 # and ensure that ChallengeResponseAuthentication is set to `no`.
 perl -i -pe 's/^UsePAM \K\w+/no/'                       /etc/ssh/sshd_config
-
 ```
 
 ## Filesystems/partitions/mounts

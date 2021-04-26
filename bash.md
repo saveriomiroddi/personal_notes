@@ -591,10 +591,11 @@ ${filename##*/}                   # extract basename, eg. `"${PWD##*/}"`
 ${filename%/*/*}                  # parent dir of a file (watch out - requires at least two slashes!)
 ```
 
-Fun trick for repeating a string:
+Fun tricks:
 
 ```sh
-printf '<SAV>%.0s' {1..10}
+printf '<SAV>%.0s' {1..10}        # repeat a string
+echo "  ab  " | xargs             # strip/trim leading and trailing whitespace
 ```
 
 ### Examples

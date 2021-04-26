@@ -1,3 +1,13 @@
+## Mon 26/Apr/2021
+
+- ZFS
+  - Reference: git.io/JODLd
+  - [x] Merge Debian-specific GRUB configuration with regular one
+  - [x] Test Debian, and deprecated it
+  - [x] Enable GCM encryption, and test if supported
+  - [x] Save all the disks in the log (Closes #75)
+  - [ ] Slice 2: allow the user splitting directories into separate datasets (Closes #137)
+
 ## Sun 25/Apr/2021
 
 - Projects/Open source

@@ -1,3 +1,18 @@
+## Tue 27/Apr/2021
+
+- Projects/Open source
+  - ZFS
+    - [x] Add script functions hotswapping
+      - [x] Switch to new `invoke()`
+      - [x] Restructure parameter
+      - [x] Automatically invoke `print_step_info_header()`
+      - [x] Implement hotswap
+    - [x] Slice 2: allow the user splitting directories into separate datasets (Closes #137)
+      - [x] Write
+      - [x] Test
+      - [x] Add support for user parameter
+      - [x] Test again
+
 ## Mon 26/Apr/2021
 
 - ZFS

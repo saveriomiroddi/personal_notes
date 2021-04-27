@@ -133,6 +133,19 @@ declare -x                          # export; can add to `-g`
 # Interpret new lines!. It won't be interpolated when inside double quotes.
 #
 echo $'l\'s\n'          # prints `l's` and newline
+
+# Interpolate strings in string quotes. Requires no double quotes to be in $str.
+#
+# Working:
+#
+# - the inner double quotes are for correctly quoting $str;
+# - the outer double quotes are for not breaking str into multiple lines; the first line would be interpreted
+#   as echo, but the following as other commands.
+#
+# This logic doesn't allow double quotes, because it's not possible to distringuish which ones to escape,
+# if there are at multiple scopes (e.g. outside and inside a command substitution).
+#
+eval echo \""$str"\"
 ```
 
 ## Herestrings/Heredocs (+stdin handling)
@@ -330,9 +343,11 @@ Metacharacters:
 
 - `\w`: not supported; use `[:alnum:]`, but *doesn't match underscore*
 - `\d`: not supported; use `[0-9]` or `[:digit:]`
+- `\S`: not supported
 - `\b`: supported
 - `\s`: `[:space:]`
 - `[:xdigit:]`: hexadecimal!
+- `[^...]`: supported
 - `()` + `|`: supported
 
 References:

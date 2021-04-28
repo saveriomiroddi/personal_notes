@@ -34,6 +34,7 @@
     - [S3](#s3)
       - [Bucket/properties/policies (many)](#bucketpropertiespolicies-many)
       - [Objects](#objects)
+      - [Lifecycle rules/intelligent tiering](#lifecycle-rulesintelligent-tiering)
     - [Lambda](#lambda)
     - [Lightsail](#lightsail)
     - [DNS: `aws_route53_zone`](#dns-aws_route53_zone)
@@ -937,6 +938,25 @@ resource "aws_s3_bucket_object" "beach" {
   source = "s3/images/beach.jpg"
 
   storage_class = "INTELLIGENT_TIERING"
+}
+```
+
+#### Lifecycle rules/intelligent tiering
+
+Sample lifecycle rule that defaults (specifically, transitions) the uploaded objects to the intelligent tiering class:
+
+```ruby
+resource "aws_s3_bucket" "intelligent_tiering" {
+  bucket = "mybucketname"
+
+  lifecycle_rule {
+    id      = "intelligent-tiering"
+    enabled = true
+
+    transition {
+      storage_class = "INTELLIGENT_TIERING"
+    }
+  }
 }
 ```
 

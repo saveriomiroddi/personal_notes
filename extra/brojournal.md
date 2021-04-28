@@ -1,3 +1,15 @@
+## Thu 29/Apr/2021
+
+- Projects/Open source
+  - ZFS
+    - [x] Fix installation issue with Ubuntu standard (Closes #191)
+      - [x] Refactorings: functions splitting
+      - [x] Implement
+    - [ ] Add KUbuntu support (Closes #192)
+      - [x] Refactoring: group base/common packages installation to a prior step
+      - [x] Cleanup: when running `add-apt-repository`, add `-n` is an update is executed later
+      - [x] Implement two required changes
+
 ## Tue 27/Apr/2021
 
 - Projects/Open source

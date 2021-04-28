@@ -440,6 +440,12 @@ Comments can be added with `//` and `/* */`.
 
 ## Repositories
 
+```sh
+# Add a repository; exit=0 if the repository is already enabled.
+#
+add-apt-repository universe
+```
+
 ### Keys handling
 
 List keys:

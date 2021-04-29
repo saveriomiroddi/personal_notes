@@ -184,6 +184,7 @@ log --grep=$regex                   # search by log message (case insensitive); 
 log --author $email_pattern         # search by author; pattern is a substring, and also accepts `*`
 log -S $string [$path]              # search the changes (additions/deletions) for $string, as string
 log -G $regex [$path]               # search the changes (additions/deletions) for $string, as regex
+log -- $path                        # search a deleted file (path is relative)
 ```
 
 Blaming format:

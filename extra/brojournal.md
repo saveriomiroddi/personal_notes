@@ -1,5 +1,18 @@
 ## Thu 29/Apr/2021
 
+- Writings
+  - Blog
+    - [x] Update Ruby `tk` gem build procedure
+      - [x] Review native gems compiling
+- Admin
+  - Blog
+    - [x] Update bio
+    - [x] Add ZFS installer release announcement
+  - System
+    - [x] Fight inspecting Windows registry changes
+
+## Thu 29/Apr/2021
+
 - Projects/Open source
   - ZFS
     - [x] Fix installation issue with Ubuntu standard (Closes #191)

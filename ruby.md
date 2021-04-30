@@ -16,6 +16,7 @@
     - [Regular expression exceptions](#regular-expression-exceptions)
     - [Weak references](#weak-references)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
+  - [Strings substitution](#strings-substitution)
   - [Classes/Metaprogramming](#classesmetaprogramming)
     - [Dynamic class instantiation](#dynamic-class-instantiation)
     - [Reflection](#reflection)
@@ -368,16 +369,31 @@ $;  $FS, $FIELD_SEPARATOR           # [ENG]
 $/  $RS, $INPUT_RECORD_SEPARATOR    # [ENG] input record separator
 $\  $ORS, $OUTPUT_RECORD_SEPARATOR  # [ENG] output record separator
 
-$>  $DEFAULT_OUTPUT                  # [ENG]
-$<  $DEFAULT_INPUT                   # [ENG]
+$>  $DEFAULT_OUTPUT                 # [ENG]
+$<  $DEFAULT_INPUT                  # [ENG]
 
-$=  $IGNORECASE                      # [ENG] obsolete: case-insensitivity flag
+$=  $IGNORECASE                     # [ENG] obsolete: case-insensitivity flag
 ```
 
 ```ruby
 RUBY_PATCHLEVEL                     # patch level (Integer)
 RUBY_VERSION                        # e.g. "2.7.0"
-__dir__                              # directory of current file
+__dir__                             # directory of current file
+```
+
+## Strings substitution
+
+```ruby
+# Using a non-capturing group (`?:`) will not capture it, but replace it;
+# In order to get the full match, use `$~0`.
+#
+'foo bar baz'.sub(/(bar)(?= baz)/) do |match|
+  puts match      # "bar"
+  puts $1.inspect # "bar"
+  puts $2.inspect # nil
+  "_"
+end # => 'foo _ baz'
+
 ```
 
 ## Classes/Metaprogramming

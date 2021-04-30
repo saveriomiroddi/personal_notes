@@ -1,3 +1,14 @@
+## Fri 30/Apr/2021
+
+- Projects/Open source
+  - ZFS
+    - [x] Fix endless loops in internal invoke() calls
+    - [x] Fix differences between distros in add-apt-repository options
+- Admin
+  - Tools
+    - Schedule manager
+      - [x] Add work computation (1: without end time detection)
+
 ## Thu 29/Apr/2021
 
 - Writings

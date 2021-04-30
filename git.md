@@ -347,8 +347,9 @@ pull [--rebase]                                          # fetch+merge; do [reba
 
 remote                                                   # list the remotes; a remote is a label for a remote repos url
 remote add $name $remote_url                             # add a remote (eg. for forks (upstream))
-push [-u] [$remote [$branch[$rem_branch]]] --tags        # push changes; optionally only for a [branch] - if it's a branch, a remote branch is created; push
-                                                         # set [u]pstream; set [rem_branch] if name differs from local; push [tags] information
+push [-u] [$remote [$branch[$rem_branch]]]               # push changes; optionally only for a [branch] - if it's a branch, a remote branch is created; push
+                                                         # set [u]pstream; set [rem_branch] if name differs from local
+push --tags [--force]                                    # push [tags] information; this will *not* push the branch, unless also the branch data is specified ($remote $branch...)
 
 push $remote :$branch                                    # delete a remote branch
 push $remote :heads/$branch                              # delete a remote branch

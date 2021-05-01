@@ -1,3 +1,12 @@
+## Sat 01/May/2021
+
+- Projects/Open source
+  - QEMU-pinning
+    - [x] Release 6.0.0
+- Admin
+  - Planning/Other
+    - [x] Select book to study in order to understand QEMU
+
 ## Fri 30/Apr/2021
 
 - Projects/Open source

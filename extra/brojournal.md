@@ -1,3 +1,29 @@
+## Sun 02/May/2021
+
+- Projects/Open source
+  - QEMU-pinning
+    - [x] Release 6.0.0
+  - Amethyst
+    - [x] PR: Implement "spin-sleep" strategy for the frame rate limiter sleep
+    - [x] Review and close issue in the spin-sleep project
+- Admin
+  - Blog
+    - [x] Add script for adding a new book to the bookshelf
+  - Tools
+    - Schedule manager
+      - [x] Add skip mode with `replan` removal
+  - Planning/Other
+    - [x] Select book to study in order to understand QEMU
+  - [ ] Notes: move old ones/write pending
+    - [ ] Game Programming Patterns
+- Studies
+  - Rust/Gamedev
+    - [x] Read/evaluate game engines and interesting projects with easy issues
+      - [x] Piston
+      - [x] ggez
+      - [x] A/B street
+      - [x] Veloren
+
 ## Sat 01/May/2021
 
 - Projects/Open source

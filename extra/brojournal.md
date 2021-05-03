@@ -1,3 +1,15 @@
+## Mon 03/May/2021
+
+- Admin
+  - [ ] Notes: move old ones/write pending
+    - [ ] Game Programming Patterns (https://gameprogrammingpatterns.com/command.html)
+      - [ ] II. Design Patterns Revisited
+        - [x] Command
+- Gamedev/SWE
+  - [ ] Game Programming Patterns
+    - [ ] III. Sequencing Patterns
+      - [ ] 2. Game Loop
+
 ## Sun 02/May/2021
 
 - Projects/Open source
@@ -16,6 +28,8 @@
     - [x] Select book to study in order to understand QEMU
   - [ ] Notes: move old ones/write pending
     - [ ] Game Programming Patterns
+      - [ ] II. Design Patterns Revisited
+        - [x] Command
 - Studies
   - Rust/Gamedev
     - [x] Read/evaluate game engines and interesting projects with easy issues

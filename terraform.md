@@ -798,7 +798,7 @@ resource "aws_s3_bucket" "sav-test" {
   force_destroy = true # default: false
 
   versioning {
-    enabled = true
+    enabled = false # default: true
   }
 
   # Endpoint: http://sav986.s3-website.eu-central-1.amazonaws.com.

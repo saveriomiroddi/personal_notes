@@ -1,8 +1,27 @@
+## Tue 04/May/2021
+
+- Projects/Open source
+  - AWS Scripts
+    - [ ] Large refactoring
+- Admin
+  - [ ] Notes: move old ones/write pending
+    - [ ] Game Programming Patterns
+      - [ ] II. Design Patterns Revisited
+        - [x] 3. Flyweight
+- Studies
+  - jq
+    - [x] Basics
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [x] III. Sequencing Patterns
+        - [x] 2. Game Loop
+        - [x] 3. Update Method
+
 ## Mon 03/May/2021
 
 - Admin
   - [ ] Notes: move old ones/write pending
-    - [ ] Game Programming Patterns (https://gameprogrammingpatterns.com/command.html)
+    - [ ] Game Programming Patterns
       - [ ] II. Design Patterns Revisited
         - [x] Command
 - Gamedev/SWE

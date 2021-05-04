@@ -4,6 +4,10 @@
   - [II. Design patterns revisited](#ii-design-patterns-revisited)
     - [2. Command](#2-command)
       - [Undo and Redo](#undo-and-redo)
+    - [3. Flyweight](#3-flyweight)
+  - [III. Sequencing Patterns](#iii-sequencing-patterns)
+    - [9. Game loop](#9-game-loop)
+    - [10. Update](#10-update)
 
 ## II. Design patterns revisited
 
@@ -125,3 +129,64 @@ def makeMoveUnitCommand(unit, x, y)
   }
 end
 ```
+
+### 3. Flyweight
+
+Simple: store common data into single location (eg. tiles, inside world), and add a reference to the subject class.
+
+If the shared property of an subject instance (eg. is terrain) is queried, one will forward the query to the parent instance (eg. tile).
+
+## III. Sequencing Patterns
+
+### 9. Game loop
+
+Variable time step: adjusts to machine speed.
+
+Big problem: it's non-deterministic!
+
+```ruby
+lastTime = Time.now
+
+loop do
+  current = Time.now
+  elapsed = current - lastTime
+
+  processInput()
+
+  update(elapsed)
+  render()
+
+  lastTime = current
+end
+```
+
+Fixed time step, with variable rendering rate: more precise than the previous. Important: the rendering is predictive, therefore not necessarily accurate.
+
+```ruby
+previous = Time.now
+lag = 0.0
+
+loop do
+  current = Time.now
+  elapsed = current - previous
+  previous = current
+  lag += elapsed
+
+  processInput()
+
+  while lag >= MS_PER_UPDATE
+    update()
+    lag -= MS_PER_UPDATE
+  end
+
+  render(lag / MS_PER_UPDATE) # This is the predictive part
+end
+```
+
+### 10. Update
+
+The concept is simple - encapsulate the update behavior of entities, rather than hardcoding them in the main loop. Some considerations:
+
+- entities modifications order can be critical;
+- must handle entities state change (including removal) during update cycle;
+- the entities update is strictly related to the architecture, i.e. ECS/deep inheritance.

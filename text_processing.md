@@ -38,6 +38,7 @@
   - [cut](#cut)
   - [tr (translate tokens)](#tr-translate-tokens)
   - [sort](#sort)
+  - [jq](#jq)
   - [Silver searcher (ag)](#silver-searcher-ag)
   - [Generic snippets](#generic-snippets)
     - [Stop tail when a string matches](#stop-tail-when-a-string-matches)
@@ -602,6 +603,88 @@ sort -t, -n -k1
 sort -t, -n -k 1,1 -k 2,2 -k 3,3 -u
 ```
 
+## jq
+
+Select from a hash:
+
+```sh
+jq '.Versions' << JSON
+{
+    "Versions":      [ { "Key": "key1" } ],
+    "DeleteMarkers": [ { "Key": "key2" } ]
+}
+JSON
+# [
+#   {
+#     "Key": "key1"
+#   }
+# ]
+```
+
+Filter an array, based on a condition:
+
+```sh
+# The  `jq -s '.'` wraps the entries in an array (brackets, essentially) - see following example.
+#
+jq '.[] | select(.IsLatest)' << JSON | jq -s '.'
+[
+  { "Key": "key1", "IsLatest": true  },
+  { "Key": "key2", "IsLatest": false },
+  { "Key": "key3", "IsLatest": true  }
+]
+JSON
+# [
+#   {
+#     "Key": "key1",
+#     "IsLatest": true
+#   },
+#   {
+#     "Key": "key3",
+#     "IsLatest": true
+#   }
+# ]
+
+# Result not wrapped in an array.
+#
+jq '.[] | select(.IsLatest | not)' << JSON
+[
+  { "Key": "key1", "IsLatest": false },
+  { "Key": "key2", "IsLatest": true  }
+]
+JSON
+# {
+#   "Key": "key1",
+#   "IsLatest": false
+# }
+```
+
+Filter an array, selecting only some keys:
+
+```sh
+jq '.[] | {Key,VersionId}' << JSON
+[
+  {
+    "Key": "key1",
+    "VersionId": "key2",
+    "IsLatest": false
+  },
+  {
+    "Key": "key1",
+    "VersionId": "key2",
+    "IsLatest": false
+  }
+]
+JSON
+# {
+#   "Key": "key1",
+#   "VersionId": "key2"
+# },
+# {
+#   "Key": "key1",
+#   "VersionId": "key2"
+# }
+```
+
 ## Silver searcher (ag)
 
 WATCH OUT!: `.git` directory and `.log` files are ignored by default
@@ -615,7 +698,7 @@ ag --ignore=$glob
 # [-G] Filter in filenames matching the specified regex.
 # WATCH OUT: The pattern is implicitly surrounded with `.*`
 #
-ag -G '_spec.rb$' <pattern> [directory]
+ag -G '_spec.rb$' $pattern [$directory]
 ```
 
 ## Generic snippets

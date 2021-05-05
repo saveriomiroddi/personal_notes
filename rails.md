@@ -1,10 +1,17 @@
 # Rails
 
 - [Rails](#rails)
+  - [Tooling](#tooling)
   - [Controllers](#controllers)
   - [ActiveRecord](#activerecord)
     - [Querying](#querying)
     - [Migrations](#migrations)
+
+## Tooling
+
+```sh
+rails runner $code_or_filename   # also filename is valid
+```
 
 ## Controllers
 

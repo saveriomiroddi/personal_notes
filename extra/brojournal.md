@@ -1,3 +1,25 @@
+## Wed 05/May/2021
+
+- Projects/Open source
+  - AWS Scripts
+    - [x] Large refactoring
+    - [x] Open two issues and send fix PR to upstream project
+- Writings
+  - Blog
+    - [x] Review and reply apt lock post comment
+- Admin
+  - [ ] Notes: move old ones/write pending
+    - [ ] Game Programming Patterns
+      - [ ] II. Design Patterns Revisited
+        - [x] 4. Observer
+- Studies
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [x] III. Sequencing Patterns
+        - [x] 8. Double Buffer
+  - Linux/tools
+    - [x] jq: More basics (array handling)
+
 ## Tue 04/May/2021
 
 - Projects/Open source
@@ -9,13 +31,13 @@
       - [ ] II. Design Patterns Revisited
         - [x] 3. Flyweight
 - Studies
-  - jq
-    - [x] Basics
+  - Linux/tools
+    - [x] jq: Basics
   - Gamedev/SWE
     - [ ] Game Programming Patterns
       - [x] III. Sequencing Patterns
-        - [x] 2. Game Loop
-        - [x] 3. Update Method
+        - [x] 9. Game Loop
+        - [x] 10. Update Method
 
 ## Mon 03/May/2021
 

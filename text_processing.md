@@ -39,6 +39,9 @@
   - [tr (translate tokens)](#tr-translate-tokens)
   - [sort](#sort)
   - [jq](#jq)
+    - [Hash](#hash)
+    - [Arrays](#arrays-1)
+    - [Functions](#functions)
   - [Silver searcher (ag)](#silver-searcher-ag)
   - [Generic snippets](#generic-snippets)
     - [Stop tail when a string matches](#stop-tail-when-a-string-matches)
@@ -605,13 +608,15 @@ sort -t, -n -k 1,1 -k 2,2 -k 3,3 -u
 
 ## jq
 
-Select from a hash:
+### Hash
+
+Select from a hash; returns an array:
 
 ```sh
 jq '.Versions' << JSON
 {
-    "Versions":      [ { "Key": "key1" } ],
-    "DeleteMarkers": [ { "Key": "key2" } ]
+  "Versions":      [ { "Key": "key1" } ],
+  "DeleteMarkers": [ { "Key": "key2" } ]
 }
 JSON
 # [
@@ -621,46 +626,52 @@ JSON
 # ]
 ```
 
-Filter an array, based on a condition:
+### Arrays
+
+Array iteration/filtering:
 
 ```sh
-# The  `jq -s '.'` wraps the entries in an array (brackets, essentially) - see following example.
+# Iterator; used to apply filters. If printed, the result is that the wrapping brackets are absent.
 #
-jq '.[] | select(.IsLatest)' << JSON | jq -s '.'
-[
-  { "Key": "key1", "IsLatest": true  },
-  { "Key": "key2", "IsLatest": false },
-  { "Key": "key3", "IsLatest": true  }
-]
-JSON
-# [
-#   {
-#     "Key": "key1",
-#     "IsLatest": true
-#   },
-#   {
-#     "Key": "key3",
-#     "IsLatest": true
-#   }
-# ]
+jq ".[]"                 # Iterator
 
-# Result not wrapped in an array.
+# Array slicing; input: array; returns an array.
 #
-jq '.[] | select(.IsLatest | not)' << JSON
+jq ".[$start:$end]"      # Slice an array (0-based, open end)
+
+# Iterator operations are applied with the `|` operator; they return an iterator. In order to return an array, wrap the expression in `[]` (see git.io/J3roO).
+#
+jq "[.[] | $filter]"
+```
+
+Filters:
+
+```sh
+# Filter an array, based on a condition.
+#
+jq '.[] | select(.IsLatest)' << JSON
 [
-  { "Key": "key1", "IsLatest": false },
-  { "Key": "key2", "IsLatest": true  }
+  {
+    "Key": "key1",
+    "IsLatest": true
+  },
+  {
+    "Key": "key3",
+    "IsLatest": true
+  }
 ]
 JSON
 # {
 #   "Key": "key1",
-#   "IsLatest": false
+#   "IsLatest": true
 # }
-```
+# {
+#   "Key": "key3",
+#   "IsLatest": true
+# }
 
-Filter an array, selecting only some keys:
-
-```sh
+# Filter an array, selecting only some keys.
+#
 jq '.[] | {Key,VersionId}' << JSON
 [
   {
@@ -678,11 +689,17 @@ JSON
 # {
 #   "Key": "key1",
 #   "VersionId": "key2"
-# },
+# }
 # {
 #   "Key": "key1",
 #   "VersionId": "key2"
 # }
+```
+
+### Functions
+
+```sh
+jq 'length'    # length/size of array/hash
 ```
 
 ## Silver searcher (ag)

@@ -5,6 +5,7 @@
     - [2. Command](#2-command)
       - [Undo and Redo](#undo-and-redo)
     - [3. Flyweight](#3-flyweight)
+    - [4. Observer](#4-observer)
   - [III. Sequencing Patterns](#iii-sequencing-patterns)
     - [9. Game loop](#9-game-loop)
     - [10. Update](#10-update)
@@ -135,6 +136,28 @@ end
 Simple: store common data into single location (eg. tiles, inside world), and add a reference to the subject class.
 
 If the shared property of an subject instance (eg. is terrain) is queried, one will forward the query to the parent instance (eg. tile).
+
+### 4. Observer
+
+Very well-known and easy structure.
+
+- if the work to do is slow, send it to a thread, but take care of deadlocks
+- some complain about memory allocation
+  - simple linked list
+  - intrusive LL (more space-efficient)
+  - double LL (constant-time removal)
+
+Referential problems concepts:
+
+- if observers are just removed, subjects will hold invalid references
+  - add a removal call on destruction
+- if subjects are just removed, observers will assume they're still observing
+  - nice strategy: send a termination message, for observers to unregister
+- with GC: lapsed listener problem - if the observers don't deregister, the subjects will hold the references to them
+
+Design problems:
+
+- since observers are dynamically added, it's harder to trace them; if it gets too hard, this pattern may not be well-suited
 
 ## III. Sequencing Patterns
 

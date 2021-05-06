@@ -1,3 +1,18 @@
+## Thu 06/May/2021
+
+- Admin
+  - [ ] Notes: move old ones/write pending
+    - [ ] Game Programming Patterns
+      - [x] II. Design Patterns Revisited
+        - [x] 5. Prototype
+        - [x] 6. Singleton
+        - [x] 7. State
+- Studies
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [ ] VI. Optimization Patterns
+        - [ ] 17. Data Locality
+
 ## Wed 05/May/2021
 
 - Projects/Open source

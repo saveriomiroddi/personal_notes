@@ -15,7 +15,7 @@
     - [SSL](#ssl)
     - [DNS](#dns)
     - [Netcat (nc)](#netcat-nc)
-    - [Measure traffic](#measure-traffic)
+    - [Diagnose/measure traffic](#diagnosemeasure-traffic)
     - [Sniff network traffic](#sniff-network-traffic)
     - [Port scan (nmap)](#port-scan-nmap)
   - [Interfaces](#interfaces)
@@ -347,7 +347,7 @@ cat loop.pipe | nc -l -p 3000 | nc localhost 3001 > loop.pipe
 while ! nc -z localhost 9200; do sleep 0.5; done
 ```
 
-### Measure traffic
+### Diagnose/measure traffic
 
 ```sh
 # Measure traffic/connections on a certain port
@@ -355,6 +355,10 @@ tcptrack -i $interface port $port
 
 # Display all the connections on a certain network interface
 iftop [-i $interface]
+
+# Continuous connectivity test (like traceroute)
+#
+mtr $host
 ```
 
 ### Sniff network traffic

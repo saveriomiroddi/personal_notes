@@ -6,6 +6,9 @@
       - [Undo and Redo](#undo-and-redo)
     - [3. Flyweight](#3-flyweight)
     - [4. Observer](#4-observer)
+    - [5. Prototype](#5-prototype)
+    - [6. Singleton](#6-singleton)
+    - [7. State](#7-state)
   - [III. Sequencing Patterns](#iii-sequencing-patterns)
     - [9. Game loop](#9-game-loop)
     - [10. Update](#10-update)
@@ -158,6 +161,116 @@ Referential problems concepts:
 Design problems:
 
 - since observers are dynamically added, it's harder to trace them; if it gets too hard, this pattern may not be well-suited
+
+### 5. Prototype
+
+The chapter is somewhat weak, because it starts with a very poor example (one factory class for each instance type).
+
+Pattern essence: instead of instantiating, implement cloning, and clone existing instances (advantage: state can also be copied, which allows using "template" instances).
+
+### 6. Singleton
+
+Advantages of singleton:
+
+- initialized at runtime; a tree of (lazily initialize) singleton can recursively initialize without needing to be ordered (which would happen if they were statically initialized)
+- can be subclasses
+
+Disadvatanges:
+
+- it's essentially a global
+  - alternative: get it from something that is already global (e.g. game state/world instance)
+  - or use a service locator
+- it couples classes (if they are used anywhere)
+  - splitting the singleton (e.g. multiple log sytems) requires changes to all the callers
+- it's concurrence-unfriendly
+
+### 7. State
+
+Using a finite state machine, we avoid encoding actions as an ugly series of if/else.
+
+```ruby
+class PlayerState
+  def handleInput(player, input); raise "Abstract"; end
+  def update(player); raise "Abstract"; end
+end
+
+class StandingState < PlayerState
+  def initialize
+    @chargeTime = 0
+  end
+
+  def enter(player)
+    player.setGraphics(IMAGE_STAND)
+  end
+
+  def handleInput(player, input)
+    if input == PRESS_DOWN
+      return new DuckingState
+    end
+
+    # Stay in this state.
+    #
+    nil
+  end
+
+  def update(player)
+    @chargeTime += 1
+    if @chargeTime > MAX_CHARGE
+      player.bomb
+    end
+  end
+end
+
+class Player
+  def initialize
+    @state = nil
+  end
+
+  def handleInput(input)
+    new_state = @state.handleInput(self, input)
+
+    if new_state
+      @state = new_state
+      @state.enter(self)
+    end
+  end
+
+  def update
+    @state.update(self)
+  end
+end
+```
+
+For slightly more complex states (e.g. including a weapon), it's possible to store more than one state (e.g. position and weapon); this may require some conditionals for simplicity.
+
+For complex concepts (e.g. AI), this won't work. An option is to use hierarchical state machines, with super/substates; when a state doesn't handle a certain condition, it sends the request up the tree:
+
+```ruby
+class OnGroundState < HeroineState
+  def handleInput(heroine, input)
+    if input == PRESS_B
+      # ...
+    elsif input == PRESS_DOWN
+      # ...
+    end
+  end
+end
+
+class DuckingState < OnGroundState
+  def handleInput(heroine, input)
+    if input == RELEASE_DOWN
+      # ...
+    else
+      # Didn't handle input, so walk up hierarchy.
+      super(heroine, input)
+    end
+  end
+end
+```
+
+In order to keep history, a more sophisticated approach is required: the "Pushown automaton" - essentially, a stack of states (used also, for example, for game state handling).
+
+With this, one pushes/pops/replaces states in the stack.
 
 ## III. Sequencing Patterns
 

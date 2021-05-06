@@ -160,6 +160,12 @@ passwd -d $user
 perl -i -pe 's/^UsePAM \K\w+/no/'                       /etc/ssh/sshd_config
 ```
 
+Limit number of concurrent user logins (but not sudo); useful in rare circumstances, but typically discouraged:
+
+```sh
+echo "@user            -       maxlogins       1" >> /etc/security/limits.conf
+```
+
 ## Filesystems/partitions/mounts
 
 Useful operations:

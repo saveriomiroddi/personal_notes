@@ -97,6 +97,7 @@ export SHELLOPTS                          # pass the shell options to subshells!
 - `!<n>`     executes the `<n>`th command
 - `$$`       current pid
 - `$!`       pid of last backgrounded process; doesn't work with `sudo -b`, which requires manual processing
+- `IGNOREEOF=$n` prevents Ctrl+D from exiting (also from sudo) immediately, requiring doing it ($n + 1) times.
 
 Parameter variables; WATCH OUT!! When inside a function, they refer to the function:
 

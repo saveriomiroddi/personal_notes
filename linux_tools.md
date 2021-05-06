@@ -411,9 +411,9 @@ struct timeval tv1;
 
 Commandline params:
 
-- `-r`                 : resume screen session
 - `-ls`                : list session
-- `-x $name`           : join named session
+- `-r [$name]`         : resume screen session; if an exact match is not found, prefix search is performed (but must match only one)
+- `-x [$name]`         : join named session (see `-r` for matching rules)
 - `-h $scrollback`     : size of scrollback buffer
 - `-dm`                : (special) start session in detached mode
 - `-S $name`           : session name
@@ -454,6 +454,8 @@ screen -dmS $session_name
 screen -r $session_name -X logfile flush 0
 screen -r $session_name -X stuff 'ls^M' # ^M is enter
 ```
+
+In some workflows, it's convenient to set `IGNOREEOF`, in order to prevent accidental exits from the screen session.
 
 ## Clonezilla
 

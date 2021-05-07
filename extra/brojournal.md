@@ -1,3 +1,23 @@
+## Fri 07/May/2021
+
+- Writings
+  - Blog replies
+    - [x] Review and reply to Cherry pick MR comment
+- Admin
+  - [ ] Notes: move old ones/write pending
+    - [ ] Game Programming Patterns
+      - [x] III. Sequencing Patterns
+        - [x] 8. Double Buffer
+          - [x] Fight understanding the intended purpose
+      - [x] V. Decoupling Patterns
+        - [x] 14. Component
+        - [x] 15. Event Queue
+        - [x] 16. Service Locator
+- Studies
+  - Emulation
+    - [ ] The ZX Spectrum ULA - How to Design a Microcomputer
+      - [x] 3. The Standard Microcomputer
+
 ## Thu 06/May/2021
 
 - Admin

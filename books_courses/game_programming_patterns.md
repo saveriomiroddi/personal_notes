@@ -10,8 +10,13 @@
     - [6. Singleton](#6-singleton)
     - [7. State](#7-state)
   - [III. Sequencing Patterns](#iii-sequencing-patterns)
+    - [8. Double buffer](#8-double-buffer)
     - [9. Game loop](#9-game-loop)
     - [10. Update](#10-update)
+  - [V. Decoupling Patterns](#v-decoupling-patterns)
+    - [14. Component](#14-component)
+    - [15. Event Queue](#15-event-queue)
+    - [16. Service locator](#16-service-locator)
 
 ## II. Design patterns revisited
 
@@ -274,6 +279,135 @@ With this, one pushes/pops/replaces states in the stack.
 
 ## III. Sequencing Patterns
 
+### 8. Double buffer
+
+It can be used to work around ordering problems (at the cost of one frame of lag).
+
+```ruby
+class Comedian
+  def initialize(name)
+    @name = name
+    @slapped = false
+  end
+
+  def face(actor)
+    @facing = actor
+  end
+
+  def update
+    if wasSlapped
+      @facing.slap
+      puts "# #{self} slaps #{@facing}"
+    end
+  end
+
+  def reset;      @slapped = false; end
+  def slap;       @slapped = true;  end
+  def wasSlapped; @slapped;         end
+
+  def to_s
+    @name
+  end
+end
+
+class Stage
+  def initialize(*actors)
+    @actors = actors
+  end
+
+  def update
+    @actors.each do |actor|
+      actor.update
+      actor.reset
+    end
+  end
+end
+
+harry = Comedian.new("Harry")
+baldy = Comedian.new("Baldy")
+chump = Comedian.new("Chump")
+
+harry.face(baldy)
+baldy.face(chump)
+chump.face(harry)
+
+stage = Stage.new(harry, baldy, chump)
+harry.slap
+stage.update
+# Harry slaps Baldy
+# Baldy slaps Chump
+# Chump slaps Harry
+
+stage = Stage.new(chump, baldy, harry)
+harry.slap
+3.times { |i| puts "# #{i}"; stage.update }
+# 0
+# Harry slaps Baldy
+# 1
+# Baldy slaps Chump
+# 2
+# Chump slaps Harry
+# Harry slaps Baldy
+```
+
+The two runs have different output, depending on the order the actors where added on stage; additionally, on the 3rd run, two actors slap at the same time.
+
+The version with buffering (overrides the previous) doesn't suffer from the two problems.
+
+```ruby
+class Comedian
+  def initialize(name)
+    @name = name
+    @currentSlapped = false
+  end
+
+  def swap
+    # Swap the buffer
+    @currentSlapped = @nextSlapped
+
+    # Clear the new "next" buffer
+    @nextSlapped = false
+  end
+
+  def slap;       @nextSlapped = true; end
+  def wasSlapped; @currentSlapped;     end
+end
+
+class Stage
+  def update
+    @actors.each do |actor|
+      actor.update
+    end
+
+    @actors.each do |actor|
+      actor.swap
+    end
+  end
+end
+
+stage = Stage.new(harry, baldy, chump)
+harry.slap
+4.times { |i| puts "# #{i}"; stage.update }
+# 0
+# 1
+# Harry slaps Baldy
+# 2
+# Baldy slaps Chump
+# 3
+# Chump slaps Harry
+
+stage = Stage.new(chump, baldy, harry)
+harry.slap
+4.times { |i| puts "# #{i}"; stage.update }
+# 0
+# 1
+# Harry slaps Baldy
+# 2
+# Baldy slaps Chump
+# 3
+# Chump slaps Harry
+```
+
 ### 9. Game loop
 
 Variable time step: adjusts to machine speed.
@@ -326,3 +460,176 @@ The concept is simple - encapsulate the update behavior of entities, rather than
 - entities modifications order can be critical;
 - must handle entities state change (including removal) during update cycle;
 - the entities update is strictly related to the architecture, i.e. ECS/deep inheritance.
+
+## V. Decoupling Patterns
+
+###  14. Component
+
+Split monolithic, cross-cutting behavior, into different components, by domain (inevitably, some components will still have some coupling).
+
+Result after applying the following steps to the monolith:
+
+- splitting out the behaviors into separate component classes
+- create a InputComponent hierarchy
+
+```ruby
+class InputComponent
+  def update(player); raise "Abstract"; end
+end
+
+class PlayerInputComponent < InputComponent
+  def update(player)
+    case Controller::getJoystickDirection
+    when DIR_LEFT
+      player.velocity -= 1
+    when DIR_RIGHT
+      player.velocity += 1
+    end
+  end
+end
+
+class DemoInputComponent < InputComponent
+  def update( player)
+    # AI to automatically control the player...
+  end
+end
+
+class PhysicsComponent
+  attr_accessor :volume
+
+  def update(player, world)
+    player.x += player.velocity
+    world.resolveCollision(volume, player.x, player.y, player.velocity)
+  end
+end
+
+class GraphicsComponent
+  attr_accessor :spriteStand, :spriteWalkLeft, :spriteWalkRight
+
+  def update(player, graphics)
+    if player.velocity < 0
+      sprite = spriteWalkLeft
+    elsif player.velocity > 0
+      sprite = spriteWalkRight
+    else
+      sprite = spriteStand
+    end
+
+    graphics.draw(sprite, player.x, player.y)
+  end
+end
+
+class Player
+  attr_accessor :input, :physics, :graphics
+  attr_accessor :velocity, :x, :y
+
+  def initialize(input)
+    @input = input
+  end
+
+  def update(world, graphics)
+    input.update(this)
+    physics.update(this, world)
+    graphics.update(this, graphics)
+  end
+end
+```
+
+At this stage, the player class is essentially empty; we can abstract the player class to a completely generic one:
+
+```ruby
+# Component subclasses for the player should be created in order to have a functional player entity.
+
+class GameObject
+  attr_accessor :input, :physics, :graphics
+  attr_accessor :velocity, :x, :y
+
+  def initialize(input, physics, graphics)
+    @input, @physics, @graphics = input, physics, graphics
+  end
+
+  def update(world, graphics)
+    input.update
+    physics.update(world)
+    graphics.update(graphics)
+  end
+end
+```
+
+Components communication:
+
+1. if the container keeps the state, the components are decoupled between them
+  - however, it becomes shared with components who don't need it
+  - ordering becomes crucial
+2. if components communicate between each other (have references)
+  - it's simpler, but components between coupled
+3. if they send messages
+  - fully decoupled, but difficult to follow
+
+Real-world design uses a bit of all, typically, #2 for core components, and #3 for non-critical ones.
+
+### 15. Event Queue
+
+The difference with Observer is that EQ decouples clients _in time_. Typical: sound.
+
+An advantage is that ephemeral data can be passed, and processed even if it doesn't exist anymore.  
+A disadvantage is that feedback loops must be avoided; typically, even receivers should not generate events.
+
+An optimized queue is the ring buffer.
+
+Aggregation (e.g. playing only once two events of a single sound) can happen at the sender (but it adds extraneous logic) or at the receiver (but duplicate messages will take more space in the queue).
+
+Broadcast queue (each message can be read multiple times) <> work queue (each message is consumed by one consumer).
+
+### 16. Service locator
+
+Helps to decouple a given service (e.g. audio interface) from the reset of the code, however, it should be strongly considered to just pass a reference around.
+
+With this pattern, the services can be called from anywhere, so they must guarantee to always work.
+
+Basic form:
+
+```ruby
+class Locator
+  NULL_SERVICE = NullAudio.new
+
+  def self.getAudio
+    # If this must be optimized, an initializer can be added to the workflow to remove the conditional.
+    @service ||= NULL_SERVICE
+  end
+
+  def self.provide(service)
+    @service = service || @null_service
+  end
+```
+
+The Decorator pattern can be conveniently used:
+
+```ruby
+class LoggedAudioService
+  def initialize(wrapped)
+    @wrapped = wrapped
+  end
+
+  def play
+    log("Playing!")
+    @wrapped.play
+  end
+end
+
+Locator.provide(LoggedAudioService.new)
+```
+
+Decisions: how is the service located?
+
+- if outside code registers it
+  - we have control over where/how it's initialized
+    - if the service needs external data, the location cannot initialize it
+  - services can be swapped in/out at runtime
+  - downside: temporal coupling between initialization and usage (clients need to access in order)
+- bound at compile time
+  - yikes!!
+  - guaranteed to be initialized
+- user-configurable
+  - very convenient
+  - "slower"

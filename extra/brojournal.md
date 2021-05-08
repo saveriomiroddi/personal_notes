@@ -1,3 +1,16 @@
+## Sat 08/May/2021
+
+- Admin
+  - Planning/Other
+    - [x] Brogramming pools/Archive restructuring
+    - [x] Next cycle planning
+- Studies
+  - Comparch
+    - [ ] The ZX Spectrum ULA - How to Design a Microcomputer
+      - [x] 4. Semi-Custom Devices
+      - [x] 7. The ZX Spectrum Overview
+      - [x] 8. The Memory Map
+
 ## Fri 07/May/2021
 
 - Writings
@@ -14,7 +27,7 @@
         - [x] 15. Event Queue
         - [x] 16. Service Locator
 - Studies
-  - Emulation
+  - Comparch
     - [ ] The ZX Spectrum ULA - How to Design a Microcomputer
       - [x] 3. The Standard Microcomputer
 

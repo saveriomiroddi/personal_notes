@@ -1,3 +1,26 @@
+## Sun 09/May/2021
+
+- Admin
+  - Tools
+    - [x] Schedule manager
+      - [x] Minor updates/improvements
+      - [x] Refactor regex (tokens) handling
+      - [x] Add basic test suite
+      - [x] Add new format for work definition (`-MM -HH:MM`)
+- Studies
+  - Comparch
+    - [ ] The ZX Spectrum ULA - How to Design a Microcomputer
+      - [x] 9. The Video Display
+      - [x] ~~10. The Internal Clocks~~
+      - [x] ~~11. Video Synchronisation~~
+      - [x] 12. Generating The Display
+  - Gamedev/SWE
+    - [ ] Game Programming Patterns
+      - [ ] VI. Optimization Patterns
+        - [x] 17. Data Locality (notes)
+        - [x] 18. Dirty Flag
+        - [x] 19. Object Pool (theory)
+
 ## Sat 08/May/2021
 
 - Admin
@@ -7,9 +30,12 @@
 - Studies
   - Comparch
     - [ ] The ZX Spectrum ULA - How to Design a Microcomputer
-      - [x] 4. Semi-Custom Devices
+      - [x] 4. ~~Semi-Custom Devices~~
+      - [x] 5. ~~The Ferranti ULA~~
+      - [x] 6. ~~Sinclair and the ULA~~
       - [x] 7. The ZX Spectrum Overview
       - [x] 8. The Memory Map
+      - [ ] 9. The Video Display
 
 ## Fri 07/May/2021
 
@@ -29,6 +55,8 @@
 - Studies
   - Comparch
     - [ ] The ZX Spectrum ULA - How to Design a Microcomputer
+      - [x] 1. Introduction
+      - [x] 2. Integrated Circuits
       - [x] 3. The Standard Microcomputer
 
 ## Thu 06/May/2021
@@ -666,7 +694,7 @@
 
 - Admin
   - Tools
-    - [x] Planner: Fix bug with current day editing
+    - [x] Schedule manager: Fix bug with current day editing
 
 ## Tue 23/Mar/2021
 
@@ -676,7 +704,7 @@
 
 - Admin
   - Tools
-    - [x] Planner: Listing: print header comments
+    - [x] Schedule manager: Listing: print header comments
 
 ## Mon 22/Mar/2021
 
@@ -694,7 +722,7 @@
 
 - Admin
   - Tools
-    - planner
+    - Schedule manager
       - [x] Regex + related logic refactorings
       - [x] Add fixed timestamp support
 

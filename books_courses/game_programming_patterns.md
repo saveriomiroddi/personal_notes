@@ -17,6 +17,9 @@
     - [14. Component](#14-component)
     - [15. Event Queue](#15-event-queue)
     - [16. Service locator](#16-service-locator)
+  - [VI. Optimization Patterns](#vi-optimization-patterns)
+    - [17. Data Locality](#17-data-locality)
+    - [18. Dirty Flag](#18-dirty-flag)
 
 ## II. Design patterns revisited
 
@@ -633,3 +636,104 @@ Decisions: how is the service located?
 - user-configurable
   - very convenient
   - "slower"
+
+## VI. Optimization Patterns
+
+### 17. Data Locality
+
+Idea: pack data so that it fits in cache as much as possible.
+
+The cache unit is the cache line (typically, 64/128 bytes). The CPU reads data/instructions from the caches; if it doesn't find them it "stalls".
+
+Watch out for code that stores/accesses data in/from different locations:
+
+```ruby
+# - the enties array is made of pointers; this is indirect access, which is slower
+# - entities have pointers in turn
+# - allocation is opaque; it's managed by the allocator
+
+entities.each do |entity|
+  entity.ai.update
+end
+
+entities.each do |entity|
+  entity.physics.update
+end
+
+entities.each do |entity|
+  entity.render.render
+end
+```
+
+Compact storage:
+
+```ruby
+# Those are intended to be (in low-level languages) array of objects, not pointers
+
+aiComponents = Array.new(10)
+physicsComponents = Array.new(10)
+renderComponents = Array.new(10)
+```
+
+In the compact storage, a problem to handle is keeing tract of active objects - using a conditional trashes the cache.
+
+A possibility is to keep the array sorted by active objects first; instead of using a sorting algorithm, new objects can be swapped with the first inactive ones (the same strategy for removal works, but will lose the age ordering).
+This data structure has also the benefit that the active flag is not needed anymore - only the count of active ones.  
+A disadvantage is that each class doesn't encapsulate anymore the part of data using this strategy.
+
+Another performance strategy is the "hot/cold splitting": cold variables of a class are split into a separate class, and only a pointer is kept in the original class; this allows packing more data in the caches.
+
+How to handle polymorphism?
+
+- don't: easiest
+  - fast, but inflexbile
+- use separate arrays for each type
+  - still fast, because of static dispatch
+  - need to keep track of collections; additionally, each type is now coupled with the full set of related collections
+- collection of pointers
+  - slower, but flexible
+
+How are game entities defined?
+
+- components are pointers in game entity classes
+  - components can be stored in contiguous arrays
+  - moving components is hard (pointers need to be updated)
+- components are IDs
+  - slower
+  - more complex, and needs a manager
+- game entity is just an id
+  - modern; entities become shallow anyway
+  - no lifetime management: when all components are removed from an entity, it's implicity destroyed
+  - lookup is slower
+
+### 18. Dirty Flag
+
+When there is a tree of objects, with cascading effects, and reading is decoupled from writing (computing), one can use a dirty flag, and compute only at read-time.
+
+Conditions for using it:
+
+- the derived data is updated less frequently than the primary one
+- incremental updates cannot be simplifiable (e.g. a scalar property, which can be tracked with an aggregate variable for a tree)
+
+To keep in mind:
+
+- the dirty flags must be rigorously kept in sync, as this is essentially a caching system
+- the previous derived data may be needed
+
+Cleaning stragies (timings):
+
+- on read
+  - if the computation is intensive, it may lag
+- at checkpoints
+  - control is lost
+- in background
+  - more computing power may be available, since it may not affect the main thread
+  - more complex
+
+Granularity:
+
+- fine-grained
+  - no waste
+- coarser
+  - may be wasteful
+  - less overhead

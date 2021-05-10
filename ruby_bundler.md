@@ -1,7 +1,33 @@
 # Bundler
 
 - [Bundler](#bundler)
+  - [Generic structure](#generic-structure)
   - [Gem definition options](#gem-definition-options)
+
+## Generic structure
+
+```ruby
+source 'https://rubygems.org'
+
+# If there is a gemspec: add here `gemspec`, with rake/rspec as dev dependencies.
+#
+gemspec
+
+# If there isn't a gemspec: add here the `development` group, with rspec.
+# The rake gem can be excluded unless specifically required.
+#
+group :development do
+  # gem "rake"
+  gem 'rspec', '~> 3.10.0'
+end
+
+# The test group should include gems that are not strictly required.
+#
+group :test do
+  gem "coveralls_reborn", "~> 0.22.0"
+  gem "simplecov", "~> 0.21.2"
+end
+```
 
 ## Gem definition options
 

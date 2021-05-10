@@ -13,6 +13,9 @@
     - [8. Double buffer](#8-double-buffer)
     - [9. Game loop](#9-game-loop)
     - [10. Update](#10-update)
+  - [IV. Behavioral Patterns](#iv-behavioral-patterns)
+    - [12. Subclass Sandbox](#12-subclass-sandbox)
+  - [13. Type object](#13-type-object)
   - [V. Decoupling Patterns](#v-decoupling-patterns)
     - [14. Component](#14-component)
     - [15. Event Queue](#15-event-queue)
@@ -20,6 +23,8 @@
   - [VI. Optimization Patterns](#vi-optimization-patterns)
     - [17. Data Locality](#17-data-locality)
     - [18. Dirty Flag](#18-dirty-flag)
+    - [19. Object Pool](#19-object-pool)
+    - [20. Spatial Partition](#20-spatial-partition)
 
 ## II. Design patterns revisited
 
@@ -464,6 +469,152 @@ The concept is simple - encapsulate the update behavior of entities, rather than
 - must handle entities state change (including removal) during update cycle;
 - the entities update is strictly related to the architecture, i.e. ECS/deep inheritance.
 
+## IV. Behavioral Patterns
+
+### 12. Subclass Sandbox
+
+If many parts of a system need to be coupled with a behavior that in turn has many implementation, a solution is to:
+
+- implement a base class, which is coupled with the systems, and provides protected functions to the subclasses, in order to make them work;
+- implement many subclasses, which use only the protected functions, and don't communicate with the systems.
+
+Due to the coupling architecture, if systems change, only the base class will need to be modified. Example:
+
+```ruby
+class Superpower
+  protected def activate; raise "Abstract"; end
+
+  protected def move(*spatial_data);             implementation(); end
+  protected def playSound(*sound_data);          implementation(); end
+  protected def spawnParticles(*particles_data); implementation(); end
+end
+```
+
+Subclasses will just implement `activate()`, and use the provided protected methods in order to operate.
+
+If the base class grows too many methods, they can be grouped into classes:
+
+```ruby
+class SoundPlayer
+  def playSound(*data); implementation(); end
+  def stopSound(*data); implementation(); end
+  def setVolume(*data); implementation(); end
+end
+
+class Superpower
+  protected def getSoundPlayer(); @soundPlayer; end
+end
+```
+
+If the superclass needs data, it's tricky:
+
+```ruby
+# Ugly.
+#
+class SkyLaunch < Superpower
+  def initialize(particles)
+    super
+  end
+end
+
+# Divide in two stages - better, but must not forget to init.
+#
+class Superpower
+  def createSkyLaunch(particles)
+    power = SkyLaunch.new
+    power.init(particles);
+    power
+  end
+end
+
+# Make the state static.
+#
+class Superpower
+  def self.init(particles)
+    # In Ruby, this is a class variable.
+    @@particles = particles
+  end
+end
+
+# Service locator
+#
+class Superpower
+  def spawnParticles
+    particles = Locator::getParticles()
+    particles.spawn
+  end
+end
+```
+
+## 13. Type object
+
+This is essentially composition over inheritance, by using an embedded class; by using a data-driven approach, many entities can be defined very easily (e.g. via documents).
+
+The book's example is not very convincing - since there is no behavior, but only data, inheritance is not really needed in first place.
+
+This pattern makes it difficult to encode behavior (with inheritance, it's encoded in subclass methods); a solution is to use a VM (which is driven by data).
+
+```ruby
+# This is the type class.
+#
+class Breed
+  def initialize(health)
+    @health = health
+  end
+
+  def getHealth
+    @health
+  end
+end
+
+class Monster
+  def initialize(breed)
+    @breed = breed # type object
+  end
+
+  def getHealth
+    @breed.getHealth
+  end
+end
+```
+
+If we construct classes from the "module class", it can take control of the allocation (`someBreed.newMonster()`).
+
+Inheritance can be implemented manually:
+
+```ruby
+class Breed
+  def initialize(parent, health)
+    @parent = parent
+    @health = health
+  end
+
+  def getHealth
+    # If attribute not overrideen or there is no parent, return the child attribute.
+    #
+    if @health != 0 || @parent.nil?
+      return @health
+    end
+
+    @parent.getHealth
+  end
+end
+```
+
+If the parent is not dynamically changed, the attributes can be stored once ("copy-down delegation"):
+
+```ruby
+class Breed
+  def initialize(parent, health)
+    if parent && health == 0
+      @health = parent.getHealth
+    else
+      @health = health
+    end
+  end
+end
+```
+
 ## V. Decoupling Patterns
 
 ###  14. Component
@@ -492,7 +643,7 @@ class PlayerInputComponent < InputComponent
 end
 
 class DemoInputComponent < InputComponent
-  def update( player)
+  def update(player)
     # AI to automatically control the player...
   end
 end
@@ -737,3 +888,77 @@ Granularity:
 - coarser
   - may be wasteful
   - less overhead
+
+### 19. Object Pool
+
+The pool solves the dynamic allocation issues.
+
+An optimized version of a linked list is the "free list", where the object class has a union of a pointer and the instance data; active instances store the data, while inactive ones store the pointer.
+
+Essentially, we have two collections in one:
+
+- a flat array of instances;
+- an "internal" linked list of the free ones.
+
+The advantage is constant time addition/removal (which is actually activation/deactivation).
+
+```cpp
+// Only allocation-related logic displayed.
+
+class Particle {
+  bool animate() {
+    // Since the whole animation cycle goes through all the particle instances, we need to perform this
+    // check.
+    //
+    if (!inUse()) return false;
+
+    // ... animate ...
+
+    return --framesLeft_ == 0;
+  }
+
+  union {
+    struct { /* ... live data ... */ } live;
+    Particle* next;
+  } state_;
+};
+
+class ParticlePool {
+
+  void create()
+  {
+    // Make sure the pool isn't full.
+    assert(firstAvailable_ != NULL);
+
+    // Remove it from the available list.
+    Particle* newParticle = firstAvailable_;
+    firstAvailable_ = newParticle->getNext();
+
+    newParticle->init();
+  }
+
+  void ParticlePool::animate() {
+    for (int i = 0; i < POOL_SIZE; i++) {
+      bool particleExpired = particles_[i].animate();
+
+      if (particleExpired) {
+        particles_[i].setNext(firstAvailable_);
+        firstAvailable_ = &particles_[i];
+      }
+    }
+  }
+}
+```
+
+### 20. Spatial Partition
+
+The idea is to partition game objects by smaller locations, so that, in order to process interaction, we don't need to compare all of objects with each other.
+
+In the example, the data structure is:
+
+- a bidimensional array
+- each entry is a doubly linked list
+- when processing each location
+  - the objects in that locations are processed for interaction
+  - adjacent locations need processing as well (only half, in order to avoid repetition)
+- when an object moves, the location can be swapped easily, because of the doubly linked list

@@ -63,7 +63,7 @@ jobs:
     - name: Install dependencies
       run: bundle install
     - name: Run tests
-      run: bundle exec rake
+      run: bundle exec rspec
 ```
 
 ### Caching

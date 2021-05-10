@@ -1,3 +1,26 @@
+## Mon 10/May/2021
+
+- Admin
+  - Tools
+    - Schedule manager
+      - [x] Add support for half/off days
+      - [x] Open source the project
+        - [x] Add repo support stuff
+- Studies
+  - Comparch
+    - [x] ~~The ZX Spectrum ULA - How to Design a Microcomputer~~
+      - [ ] ~~13. Video Memory Access~~
+      - [ ] ~~14. Video Control Clocks~~
+  - Gamedev/SWE
+    - [x] Game Programming Patterns
+      - [x] VI. Optimization Patterns
+        - [x] 19. Object Pool
+        - [x] 20. Spatial Partition
+      - [x] IV. Behavioral Patterns
+        - [x] ~~11. Bytecode~~ (standard VM stuff)
+        - [x] 12. Subclass Sandbox
+        - [x] 13. Type Object
+
 ## Sun 09/May/2021
 
 - Admin
@@ -17,9 +40,9 @@
   - Gamedev/SWE
     - [ ] Game Programming Patterns
       - [ ] VI. Optimization Patterns
-        - [x] 17. Data Locality (notes)
+        - [x] 17. Data Locality
         - [x] 18. Dirty Flag
-        - [x] 19. Object Pool (theory)
+        - [ ] 19. Object Pool
 
 ## Sat 08/May/2021
 

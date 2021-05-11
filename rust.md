@@ -1,7 +1,9 @@
 # Rust
 
 - [Rust](#rust)
-  - [Cargo](#cargo)
+  - [Cargo/Rustup](#cargorustup)
+    - [Toolchain](#toolchain)
+    - [Fast builds](#fast-builds)
     - [Cross-compilation](#cross-compilation)
   - [Rustfmt](#rustfmt)
   - [Syntax/basics](#syntaxbasics)
@@ -84,7 +86,7 @@
     - [From (/Into)](#from-into)
     - [Index[Mut]](#indexmut)
 
-## Cargo
+## Cargo/Rustup
 
 Base operations:
 
@@ -154,6 +156,37 @@ Versioning is pessimistic by default.
 See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
+
+### Toolchain
+
+Set the specified toolchain for the current project:
+
+```sh
+# Using rustup; this is stored in rustup's config.
+#
+rustup override set nightly
+rustup override unset # raise error if none is set
+
+# Explicit alternative
+#
+echo nightly > rust-toolchain
+```
+
+### Fast builds
+
+Bevy hello world: 8.75" -> 1.25" (!!).
+
+```sh
+# If using rust stable, remove the "-Zshare-generics=y" below.
+# Requires lld. Source: git.io/JsfhD (includes other O/Ss).
+
+mkdir .cargo
+cat > .cargo/config << 'TOML'
+[target.x86_64-unknown-linux-gnu]
+linker = "/usr/bin/clang"
+rustflags = ["-Clink-arg=-fuse-ld=lld", "-Zshare-generics=y"]
+TOML
+```
 
 ### Cross-compilation
 

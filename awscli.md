@@ -57,7 +57,7 @@ aws rds describe-reserved-db-instances \
 
 See `text_processing##jq` for JSON manipulation.
 
-List objects:
+Print objects summary:
 
 ```sh
 # The prefix is optional
@@ -66,11 +66,36 @@ $ aws s3 ls --summarize --human-readable "s3://$bucket/$prefix" --recursive | he
 2019-03-26 21:07:11   26.8 KiB /prefix1/key0
 2019-03-26 21:07:12   45.9 KiB /prefix1/key1
 2018-02-28 13:14:50    1.7 KiB prefix2/key0
+
+$ aws s3api list-object-versions --bucket $bucket --query \
+  '
+    {
+      PreviousVersions: {
+        Size: sum(Versions[?IsLatest==`false`].Size)
+        Count: length(Versions[?IsLatest==`false`].Key)
+      }
+      DeleteMarkers: {
+        Count: length(DeleteMarkers[].Key)
+      }
+    }
+  '
+
+{
+    "PreviousVersions": {
+        "Size": 2064087,
+        "Count": 6
+    },
+    "DeleteMarkers": {
+        "Count": 35
+    }
+}
 ```
 
-List object versions (note: there may be a limit to the max number of items that can be retrieved):
+List object versions and informations (note: there may be a limit to the max number of items that can be retrieved):
 
 ```sh
+# --prefix is also available.
+#
 $ aws s3api list-object-versions --max-items 1 --bucket $bucket
 
 {

@@ -1,3 +1,33 @@
+## Tue 11/May/2021
+
+- Projects/Open source
+  - Intelleggere
+    - [x] Create project repository
+    - [ ] Prepare DDL Zan PR
+      - [x] Add base articles for the bill (Part 1)
+        - [x] 604-bis
+        - [x] 604-ter
+        - [x] 90-quater
+      - [x] Prepare diff Bill articles (Part 1: direct articles)
+        - [x] Art.2
+        - [x] Art.3
+        - [x] Art.6
+      - [ ] Understand legislative process
+        - [x] Find forums for question
+        - [x] Write down exact questions
+  - Hotplugger
+    - [x] Add executable bit and open PR
+    - [x] Test deprecated options format on 5.0, and open PR
+- Admin
+  - Tools
+    - [x] QEMU VFIO: Test USB ports passthrough: https://github.com/darkguy2008/hotplugger
+      - Temporarily disable powerdown functionality
+- Studies
+  - Rust/Gamedev
+    - [x] Review [Bevy learning material](https://github.com/bevyengine/awesome-bevy#learning)
+    - [ ] Go through all the tutorials/books
+      - [ ] [Chess game in Rust using Bevy](https://caballerocoll.com/blog/bevy-chess-tutorial)
+
 ## Mon 10/May/2021
 
 - Admin

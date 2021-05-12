@@ -1,3 +1,23 @@
+## Wed 12/May/2021
+
+- Projects/Open source
+  - Intelleggere
+  - [ ] Prepare DDL Zan PR
+    - [x] Understand legislative process paper trail
+      - [x] Follow the DL trail with new instructions
+- Studies
+  - Rust/Gamedev
+    - [ ] Go through all the tutorials/books
+      - [x] ~~[Chess game in Rust using Bevy](https://caballerocoll.com/blog/bevy-chess-tutorial)~~
+        - [x] Fight assets load/path issue
+      - [x] Review Path/PathBuf concepts
+      - [x] [Bevy book](https://bevyengine.org/learn/book)
+  - Rust/CS
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 4: Graphs
+        - [x] 27. Filling the Graph
+        - [x] 28. Route Structure
+
 ## Tue 11/May/2021
 
 - Projects/Open source

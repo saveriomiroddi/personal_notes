@@ -221,7 +221,7 @@ merge-base $A $B                                       # find common ancestor
 show :/$regex                                          # show the last commit matching a regex in the message
 branch --contains $commit                              # shows which branches contains the given commit
 name-rev --name-only $commit                           # shows which tag the commit was in. '~N' indicates how many commits (N) before the tag
-git rev-list --pretty=oneline --before="%F %R" $branch # show commits before/at given datetime
+log --before="%F %R" $branch                           # show commits before/at given datetime
 log --merges v0.1.8...v0.1.9                           # search merges between two tags
 
 [[ $(git cat-file -t $object 2> /dev/null) ]] && echo exists # check if a branch/commit/etc exists

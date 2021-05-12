@@ -96,7 +96,7 @@ cargo check                          # check for errors
 cargo run
 cargo build [--release]              # builds (default: debug); if necessary, updates the crates index, and installs the dependencies
 cargo update                         # updates the crates index, and the installed dependencies
-cargo test
+cargo test [-- --nocapture]          # pass nocapture in order to output print statements
 cargo fmt
 cargo clippy                         # linter
 cargo doc [--open]                   # builds and optionally opens docs for the installed crates
@@ -136,6 +136,7 @@ amethyst = { git = "https://github.com/amethyst/amethyst" } # Repository; option
 features = ["vulkan"]
 version = "0.15"
 
+# There are 4 profiles: `dev`, `release`, `test`, and `bench`
 [profile.release]
 strip = "symbols"
 ```

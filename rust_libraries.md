@@ -96,16 +96,28 @@ for more complex operations (ie. involving seek), can use [io::Cursor](https://d
 For paths handling, use `std::path::Path`, with several conveniences:
 
 ```rust
-let path = PathBuf::from("/path/to/file");
-let path: PathBuf = Path::new(ASSETS_PATH).join("triangles.obj");   // Path#join() return a PathBuf
-
-// The below return `Option<&OsStr>`, which requires the very ugly conversion.
+// PathBuf is the owned type.
 //
-path.file_name();            // Ruby basename(); for the poor man's version, use String#split
-path.file_stem();            // Filename without extension/path. Must do the (very)
+let p: PathBuf = PathBuf::from("/path/to/file");
+let p: PathBuf = Path::new(ASSETS_PATH).join("triangles.obj");
+let p: PathBuf = Path::new('/path').to_owned();
 
-// Watch out! PathBuf, and related types, conversion to String is quite ugly.
-// OsString doesn't implement fmt::Display, which is part of the ugliness.
+// Methods common to Path and PathBuf.
+//
+let p: Option<&OsStr> = path.file_name(); // Ruby basename(); for the poor man's version, use String#split
+let p: Option<&OsStr> = path.file_stem(); // Filename without extension/path. Must do the (very)
+
+// Conversions (methods available to both Path/PathBuf):
+//
+// - to borrowed types is easy;
+// - to owned (String) is easy (but lossy) via to_string_lossy() (which returns Cow<str>).
+//
+let p: &OsStr         = path.as_os_str();
+let p: Option<&str>   = path.to_str();
+let p: String         = path.to_string_lossy().into_owned();
+
+// The rigorous conversions are quite ugly.
+// OsString doesn't implement fmt::Display, however, it implements fmt::Debug.
 //
 pathbuf
   .into_os_string() // OsString
@@ -118,6 +130,15 @@ pathbuf
   .to_owned()       // OsString
   .into_string()
   .unwrap();
+
+// From borrowed version, as_os_str().to_str() is an alternative, although, it may be conceptually
+// simpler just to go through to_owned().
+//
+path
+  .as_os_str()      // &OsStr
+  .to_str()         // Option<&str>
+  .unwrap()         // &str
+  .into_string();   // String
 ```
 
 Directories:

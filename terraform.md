@@ -8,8 +8,8 @@
     - [Strings](#strings)
     - [Lists (arrays)](#lists-arrays)
     - [Maps](#maps)
-    - [Functions](#functions)
-    - [Iteration/dynamic blocks](#iterationdynamic-blocks)
+    - [Functions/Other syntax](#functionsother-syntax)
+    - [Control flow/dynamic blocks](#control-flowdynamic-blocks)
   - [State operations](#state-operations)
     - [Move resources from one statefile to another](#move-resources-from-one-statefile-to-another)
   - [Resources](#resources)
@@ -115,6 +115,14 @@ See [Variables](#variables) for setting env vars.
 
 ### Variables
 
+The variable data types are:
+
+- `string`
+- `number`
+- `bool`
+- `list`
+- `map`
+
 Environment variables can be used by TF by prefixing them with `TF_VAR_`.
 
 ### Predefined variables
@@ -158,7 +166,7 @@ mymap = {
 mymap["k2"] #                # "v2"
 ```
 
-### Functions
+### Functions/Other syntax
 
 ```ruby
 # Collections
@@ -194,7 +202,11 @@ coalesce(v1, v2)         # IFNULL; blank string is treated as null
 coalesce(["", "v2"]...)  # unpack operator
 ```
 
-### Iteration/dynamic blocks
+### Control flow/dynamic blocks
+
+```ruby
+condition ? true_block : false_block # ternary operator (must be on one line; condition must be bool); use for conditionals (if/then/else)
+```
 
 ```ruby
 # Inside a resource/module; the variable is a map. `for_each` is a bit picky; it requires a map or set
@@ -813,14 +825,32 @@ resource "aws_s3_bucket" "sav-test" {
     target_prefix = "log/"
   }
 
+  # In order to make lifecycle rules optional, one can use a dynamic block, cycling (foreach) on a conditionally
+  # set list.
+
+  # A rule like this ensures that any uploaded object is stored as IT.
+  #
   lifecycle_rule {
+    id      = "transition_to_IT"
     enabled = true # mandatory
 
     transition {
       # Classes: STANDARD, STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, GLACIER, DEEP_ARCHIVE
       #
       storage_class = "INTELLIGENT_TIERING"
+      # Some have a minimum term, e.g. STANDARD_IA requires 30 days.
+      #
       # days          = 30
+    }
+  }
+
+  lifecycle_rule {
+    id      = "expire"
+    enabled = true
+
+    expiration {
+      days                         = 365
+      # expired_object_delete_marker = false    # default
     }
   }
 }

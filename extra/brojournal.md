@@ -1,3 +1,17 @@
+## Thu 13/May/2021
+
+- Studies
+  - Rust/Gamedev
+    - [x] Review Rust 2D engines
+  - Rust/CS
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 4: Graphs
+        - [ ] 29. Finding the Shortest Path
+        - [ ] 30. A Greedy Solution to the Travelling Salesman
+- Tools
+  - Schedule manager
+    - [x] Fix skip mode: Don't move the current day
+
 ## Wed 12/May/2021
 
 - Projects/Open source

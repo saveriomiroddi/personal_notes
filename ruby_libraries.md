@@ -498,10 +498,33 @@ File.realpath("/path/to/symlink")               # get the real filename from sym
 require 'pathname'; Pathname.new(@path2).relative_path_from(Pathname.new(@path1)).to_s # find the directory relative to another directory
 ```
 
-File opening flags:
+File opening/closing (flags):
 
 ```ruby
-File.open(@file, File::CREAT | File::WRONLY | File::APPEND) { } # append to file, creating if non existent
+# If a file needs to be closed deterministically, then do it manually - GC collection doesn't guarantee
+# that it will be collected/closed.
+#
+f = File.open(@file, File::CREAT | File::WRONLY | File::APPEND) { } # append to file, creating if non existent
+f.close
+```
+
+File locking, via flock:
+
+```ruby
+# WATCH OUT!! This strategy doesn't play well with forked processes, if the file handle is acquired
+# before forking; in this case, the lock will be acquired on both processes (!).
+
+lock_file = File.open('/tmp/mylock', File::RDWR | File::CREAT)
+
+# Exclusive lock, non-blocking
+if lock_file.flock(File::LOCK_EX | File::LOCK_NB)
+  # ... critical area ...
+  # Make sure the handle is not GC'ed!
+  $lock_file = lock_file
+else
+  # See note in "File opening/closing"
+  lock_file.close
+end
 ```
 
 ### Tempfile, Tmpdir

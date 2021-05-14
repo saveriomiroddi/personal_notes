@@ -1,3 +1,14 @@
+## Fri 14/May/2021
+
+- Studies
+  - Rust/Gamedev
+    - [ ] Go through all the tutorials/books
+      - [ ] [Bevy examples: Breakout](https://github.com/bevyengine/bevy/blob/latest/examples/game/breakout.rs)
+        - Check also the improved version
+    - [ ] [Unofficial Bevy Cheat Book](https://bevy-cheatbook.github.io)
+      - [ ] 2. Bevy Programming
+        - [ ] 2.1: Basics
+
 ## Thu 13/May/2021
 
 - Studies

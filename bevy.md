@@ -1,13 +1,12 @@
 # Bevy
 
 - [Bevy](#bevy)
-  - [Bevy book](#bevy-book)
-    - [Setup](#setup)
-    - [Hello world/Basic APIs](#hello-worldbasic-apis)
+  - [Setup](#setup)
+  - [Hello world/Basic APIs](#hello-worldbasic-apis)
+  - [General design/data structures](#general-designdata-structures)
+  - [Math APIs](#math-apis)
 
-## Bevy book
-
-### Setup
+## Setup
 
 Increase compilation speed by using dynamic linking, but must disable for release!
 
@@ -15,7 +14,7 @@ Increase compilation speed by using dynamic linking, but must disable for releas
 bevy = { version = "0.5.0", features = ["dynamic"] }
 ```
 
-### Hello world/Basic APIs
+## Hello world/Basic APIs
 
 ```rust
 use bevy::prelude::*;
@@ -87,4 +86,41 @@ App::build()
   .add_plugins(DefaultPlugins)
   .add_plugin(HelloPlugin)
   .run();
+```
+
+## General design/data structures
+
+Components:
+
+```rust
+// Use wrapper structs for simple data types ("newtype" pattern)
+struct PlayerXp(u32);
+
+// Use empty structs to mark entities (and query them)
+struct Enemy;
+```
+
+Component Bundles are like templates for entities with common components:
+
+```rust
+// WATCH OUT! Don't forget the Bundle attribute, otherwise, if a bundle is accidentally used as component,
+// no error is raised.
+#[derive(Bundle)]
+struct PlayerBundle {
+  health: Health,
+  _p: Player,
+
+  // Bundles can be nested
+  #[bundle]
+  sprite: SpriteSheetBundle,
+}
+
+// Tuples of components are considered bundles
+(ComponentA, ComponentB, ComponentC)
+```
+
+## Math APIs
+
+```rust
+const_vec2!   // create a const Vec2; also for: Mat2/3/4, Quat, Vec3/3a/4
 ```

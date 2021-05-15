@@ -756,7 +756,7 @@ vec.extend([1, 2, 3].iter().copied());  // Append (concatenate) an array
 vec.extend(&[1, 2, 3]);                 // Append (borrowing version)
 vec[range].copy_from_slice(&source);    // memcpy; see array example
 
-// Convert to array; requires TryInto. If type annotations are required, use the second form:
+// Convert vector to array; requires TryInto. If type annotations are required, use the second form:
 //
 vec.as_slice().try_into().unwrap();
 TryInto::<&[f64; 3]>::try_into(vec.as_slice());

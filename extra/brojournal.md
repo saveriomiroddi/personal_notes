@@ -1,3 +1,14 @@
+## Sat 15/May/2021
+
+- Studies
+  - Rust
+    - [x] Refresh some subjects
+  - Rust/Gamedev
+    - [ ] Go through all the tutorials/books
+      - [ ] [Unofficial Bevy Cheat Book](https://bevy-cheatbook.github.io)
+        - [ ] 2. Bevy Programming
+          - [ ] 2.1: Basics
+
 ## Fri 14/May/2021
 
 - Studies

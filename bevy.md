@@ -4,6 +4,10 @@
   - [Setup](#setup)
   - [Hello world/Basic APIs](#hello-worldbasic-apis)
   - [General design/data structures](#general-designdata-structures)
+    - [Components/bundles](#componentsbundles)
+    - [Resources](#resources)
+    - [Systems](#systems)
+    - [Queries](#queries)
   - [Math APIs](#math-apis)
 
 ## Setup
@@ -90,6 +94,8 @@ App::build()
 
 ## General design/data structures
 
+### Components/bundles
+
 Components:
 
 ```rust
@@ -117,6 +123,110 @@ struct PlayerBundle {
 
 // Tuples of components are considered bundles
 (ComponentA, ComponentB, ComponentC)
+```
+
+### Resources
+
+Resources are used for globals, so be careful (use components as much as possible, as they can be shared). Any type (struct/enum) can be used
+
+Definition:
+
+```rust
+// Use `Default` attribute for simple ones:
+//
+#[derive(Default)]
+struct StartingLevel(usize);
+
+// More complex types:
+//
+struct ComplexResource {
+  // ... fields ...
+}
+impl FromWorld for ComplexResource {
+  fn from_world(world: &mut World) -> Self {
+    // This gives full access to anything in the ECS; e.g. mutating other resources:
+    let mut x = world.get_resource_mut::<MyOtherResource>().unwrap();
+
+    ComplexResource { /* ... */ }
+  }
+}
+```
+
+Instantiation:
+
+```rust
+// At app creation (extract):
+//
+App::build()
+  // if it implements `Default` or `FromWorld`
+  .init_resource::<ComplexResource>()
+  // if not, or if you want to set a specific value
+  .insert_resource(StartingLevel(3))
+
+// From inside a system:
+//
+commands.insert_resource(GoalsReached { main_goal: false, bonus: false });
+commands.remove_resource::<MyResource>();
+```
+
+### Systems
+
+Systems are functions executed by the engine. Access (R/W) to the world from a given system is determined via function parameters:
+
+```rust
+// Tuples can be used to organize complex parameters:
+//
+fn complex_system(
+  start: Res<StartingLevel>         // access resource
+  (a, mut b): (Res<ResourceA>, ResMut<ResourceB>),
+  mut c: Option<ResMut<ResourceC>>, // resource that may not exist
+) {
+  // ...
+}
+```
+
+Systems are run by adding them when building the app:
+
+```rust
+App::build()
+  .add_startup_system(init_menu.system())  // run it only once at launch
+  .add_system(move_player.system())        // run it every frame update
+}
+```
+
+### Queries
+
+Used to access entity components. WATCH OUT! Bundles must be queried via component(s), not bundle type!
+
+```rust
+fn check_zero_health(
+  // Find entities that have (`Health` & `Transform`) components, and are optionally a `Player`.
+  // Entity is the entity id (not required).
+  // With/out are (optional) filters: the entities must include an Ally, but not an Enemy.
+  mut query: Query<
+    (Entity, &Health, &mut Transform, Option<&Player>)>,
+    (With<Ally>, Without<Enemy>)
+) {
+  // Iterate all matching entities
+  for (eid, health, mut transform, player) in query.iter_mut() {
+    if health.hp <= 0.0 { transform.translation = Vec3::ZERO; }
+    if let Some(player) = player { /* the current entity is the player! */ }
+  }
+}
+
+// Components for a specific entity.
+//
+if let Ok((health, mut transform)) = query.get_mut(entity) {
+  // do something with the components
+} else {
+  // the entity does not have the components from the query
+}
+
+// Retrieve an entity that is guaranteed to be unique.
+//
+fn query_player(mut q: Query<(&Player, &mut Transform)>) {
+  let (player, mut transform) = q.single_mut().expect("...");
+}
 ```
 
 ## Math APIs

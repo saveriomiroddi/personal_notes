@@ -1,3 +1,18 @@
+## Sun 16/May/2021
+
+- Studies
+  - Rust/Gamedev
+    - [ ] Go through all the tutorials/books
+      - [ ] Unofficial Bevy Cheat Book
+        - [ ] 2. Bevy Programming
+          - [x] 2.1: Basics
+          - [ ] 2.2: Next Steps
+- Admin
+  - Tools
+    - QEMU script
+      - Make performance governor setting optional 
+      - Make QEMU killer optional
+
 ## Sat 15/May/2021
 
 - Studies
@@ -5,7 +20,7 @@
     - [x] Refresh some subjects
   - Rust/Gamedev
     - [ ] Go through all the tutorials/books
-      - [ ] [Unofficial Bevy Cheat Book](https://bevy-cheatbook.github.io)
+      - [ ] Unofficial Bevy Cheat Book
         - [ ] 2. Bevy Programming
           - [ ] 2.1: Basics
 
@@ -14,9 +29,9 @@
 - Studies
   - Rust/Gamedev
     - [ ] Go through all the tutorials/books
-      - [ ] [Bevy examples: Breakout](https://github.com/bevyengine/bevy/blob/latest/examples/game/breakout.rs)
+      - [ ] Bevy examples: Breakout
         - Check also the improved version
-    - [ ] [Unofficial Bevy Cheat Book](https://bevy-cheatbook.github.io)
+    - [ ] Unofficial Bevy Cheat Book
       - [ ] 2. Bevy Programming
         - [ ] 2.1: Basics
 
@@ -44,10 +59,10 @@
 - Studies
   - Rust/Gamedev
     - [ ] Go through all the tutorials/books
-      - [x] ~~[Chess game in Rust using Bevy](https://caballerocoll.com/blog/bevy-chess-tutorial)~~
+      - [x] ~~Chess game in Rust using Bevy~~
         - [x] Fight assets load/path issue
       - [x] Review Path/PathBuf concepts
-      - [x] [Bevy book](https://bevyengine.org/learn/book)
+      - [x] Bevy book
   - Rust/CS
     - Hands-On Data Structures and Algorithms in Rust
       - [ ] Section 4: Graphs

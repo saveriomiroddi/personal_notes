@@ -12,6 +12,7 @@
     - [Data types, conversions and contexts](#data-types-conversions-and-contexts)
       - [Arrays](#arrays)
       - [Hashes](#hashes)
+    - [Date/times](#datetimes)
     - [Flow control](#flow-control)
     - [Functions/APIs](#functionsapis)
     - [Search/replace](#searchreplace)
@@ -198,6 +199,17 @@ List::Util qw/sum/ -> sum(@Array)     # sum the elements of an array
 # Don't need to instantiate hashes!
 $totals{'foo'} = 12;
 print $totals{'foo'};
+```
+
+### Date/times
+
+Date/time conversion:
+
+```perl
+# localtime() is a native function, but it doesn't have a pretty output.
+#
+perl -MPOSIX=strftime -e 'print strftime("%Y", localtime(355701600))'      # 1981
+perl -MDateTime -e 'print DateTime->from_epoch(epoch => 355701600)->year'  # 1981
 ```
 
 ### Flow control
@@ -426,6 +438,10 @@ echo 'a 8 9' | gawk '{print match($0, /a ([0-9]) ([0-9])/, a)}'                 
 echo "Every good boy. " | awk '{print substr($1, 1, 1)}'       # `E` (first char)
 echo "Every good boy. " | awk '{print substr($1, length($1))}' # `d` (last char)
 echo "Every good boy. " | awk '{print substr($1, 3)}'          # `ery`
+
+# Execute a system command
+
+echo 'abc.txt:12:XXX' | awk -F: '{ system("echo git blame "$1" -L "$2","$2) }' # `git blame abc.txt -L 12,12`
 ```
 
 ### Useful examples
@@ -471,7 +487,11 @@ Some supported by `-E`:
 - `\w`
 - `+`
 
-Capturing groups are not supported.
+Capturing groups are supported, but they require escaping the parentheses:
+
+```sh
+echo 'abc' | sed 's/a\(b\)c/\1/' # `b`
+```
 
 ### Operators/variables
 

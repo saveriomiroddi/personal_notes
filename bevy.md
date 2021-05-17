@@ -13,6 +13,9 @@
     - [Commands](#commands)
       - [Recursive entities](#recursive-entities)
     - [Plugins](#plugins)
+    - [States](#states)
+    - [Stages](#stages)
+    - [Run criteria](#run-criteria)
   - [Hello world](#hello-world)
   - [Math APIs](#math-apis)
 
@@ -148,11 +151,10 @@ App::build()
 
 Bevy handles resources contention by looking at the system signatures.
 
-It's possible to specify the systems ordering:
+It's possible to specify the systems ordering by using labels.
 
 ```rust
 App::build()
-  // A group ("set") of systems
   .add_system_set(
     SystemSet::new()
       .label("input")
@@ -162,17 +164,51 @@ App::build()
 
   .add_system(update_map.system().label("map"))
 
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(SystemLabel)]
+enum MySystems { InputSet, Movement }
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(StageLabel)]
+enum MyStages { Prepare, Cleanup }
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(StageLabel)]
+struct DebugStage;
+
+App::build()
+  // A group ("set") of systems
+  //
+  .add_system_set(
+    SystemSet::new()
+      .label(MySystems::InputSet)
+      .with_system(keyboard_input.system())
+      .with_system(gamepad_input.system())
+  )
+
+  // Strings can be used, but type system advantages are lost.
+  //
+  .add_system(debug_movement.system().label("temp-debug"))
+
   .add_system(input_parameters.system().before("input"))
 
+  // before() and after() can be used on the same system.
+  //
   .add_system(
     player_movement.system()
       .label("player_movement")
-      .after("input")           // before() can be also added along with after()
+      .after("input")
       .after("map")
   )
+  // Add custom stages. `CoreStage` is a Bevy enum.
+  //
+  .add_stage_before(CoreStage::Update, MyStages::Prepare, SystemStage::parallel())
+  .add_stage_after(CoreStage::Update, DebugStage, SystemStage::parallel())
 ```
 
-Labels and systems are M:N.
+Labels and labelled items are M:N.
 
 #### Events
 
@@ -317,7 +353,7 @@ fn debug_new_hostiles(query: Query<(Entity, &Health), Added<Enemy>>) {
 }
 ```
 
-WATCH OUT 1-frame lag. For `Added`, stages may be required.
+WATCH OUT 1-frame lag; for `Added`, [stages](#stages) may be required.
 
 ### Commands
 
@@ -457,6 +493,142 @@ App::build()
     plugins.disable::<LogPlugin>()
   })
 ```
+
+### States
+
+States are the global app states.  
+It's convenient to use plugins to group systems to use with states.
+
+WATCH OUT! Since states aren internally implemented via run criteria, they will conflict with other run criteria uses, e.g. fixed timestep.
+
+Setup:
+
+```rust
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+enum AppState { MainMenu, InGame, Paused }
+
+App::build()
+  // add the app state type
+  .add_state(AppState::MainMenu)
+
+  // add systems to run regardless of state, as usual
+  .add_system(play_music.system())
+
+  // systems to run only in the main menu
+  .add_system_set(
+    SystemSet::on_update(AppState::MainMenu)
+      .with_system(handle_ui_buttons.system())
+  )
+
+  // setup when entering the state
+  .add_system_set(
+    SystemSet::on_enter(AppState::MainMenu)
+      .with_system(setup_menu.system())
+  )
+
+  // cleanup when exiting the state
+  .add_system_set(
+    SystemSet::on_exit(AppState::MainMenu)
+      .with_system(close_menu.system())
+  )
+```
+
+Match:
+
+```rust
+fn play_music(app_state: Res<State<AppState>>) {
+  match app_state.current() {
+    AppState::MainMenu => { /* ... */ }
+    AppState::InGame => { /* ... */ }
+    AppState::Paused => { /* ... */ }
+  }
+}
+```
+
+Stack:
+
+```rust
+App::build()
+  // player movement only when actively playing
+  .add_system_set(
+    SystemSet::on_update(AppState::InGame)
+      .with_system(player_movement.system())
+  )
+  // player idle animation while paused
+  .add_system_set(
+    SystemSet::on_inactive_update(AppState::InGame)
+      .with_system(player_idle.system())
+  )
+  // animations both while paused and while active
+  .add_system_set(
+    SystemSet::on_in_stack_update(AppState::InGame)
+      .with_system(animate_trees.system())
+      .with_system(animate_water.system())
+  )
+  // things to do when becoming inactive
+  .add_system_set(
+    SystemSet::on_pause(AppState::InGame)
+      .with_system(hide_enemies.system())
+  )
+  // things to do when becoming active again
+  .add_system_set(
+    SystemSet::on_resume(AppState::InGame)
+      .with_system(reset_player.system())
+  )
+  // setup when first entering the game
+  .add_system_set(
+    SystemSet::on_enter(AppState::InGame)
+      .with_system(setup_player.system())
+      .with_system(setup_map.system())
+  )
+  // cleanup when finally exiting the game
+  .add_system_set(
+    SystemSet::on_exit(AppState::InGame)
+      .with_system(despawn_player.system())
+      .with_system(despawn_map.system())
+  )
+```
+
+Change; all the current state's systems complete before moving to the next system (there's no limit to the number of state changes within a frame):
+
+```rust
+// Switch via stack.
+// Go into the pause screen, and back into the game.
+//
+app_state.push(AppState::Paused).unwrap();
+app_state.pop().unwrap();
+
+// Direct set.
+//
+fn enter_game(mut app_state: ResMut<State<AppState>>) {
+  app_state.set(AppState::InGame).unwrap();
+  // ^ this can fail if we are already in the target state
+  // or if another state change is already queued
+}
+```
+
+WATCH OUT!! Key-initiated state changes require Input to be reset:
+
+```rust
+fn esc_to_menu(mut keys: ResMut<Input<KeyCode>>, mut app_state: ResMut<State<AppState>>) {
+  if keys.just_pressed(KeyCode::Escape) {
+    app_state.set(AppState::MainMenu).unwrap();
+    keys.reset(KeyCode::Escape);
+  }
+}
+```
+
+### Stages
+
+Each frame goes through stages; Bevy has 5: `First`, `PreUpdate`, `Update`, `PostUpdate`, `Last`.
+
+By default, user-defined systems are placed in `Update`; if systems are added to the other stages, beware of interactions with Bevy's internal ones.
+
+See https://bevy-cheatbook.github.io/programming/stages.html.
+
+### Run criteria
+
+Run criteria allow low-level systems running specification. See: https://bevy-cheatbook.github.io/programming/run-criteria.html.
 
 ## Hello world
 

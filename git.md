@@ -185,12 +185,17 @@ log --author $email_pattern         # search by author; pattern is a substring, 
 log -S $string [$path]              # search the changes (additions/deletions) for $string, as string
 log -G $regex [$path]               # search the changes (additions/deletions) for $string, as regex
 log -- $path                        # search a deleted file (path is relative)
+
+# Grep search (!); outputs with the grep format
+# This has the advantage of (besides likely performance) searching only files in the index, which avoids cases like symlinks to unindexed files.
+#
+grep [--line-number] $regex         
 ```
 
 Blaming format:
 
 ```sh
-blame [$branch] $file
+blame [$branch] $file [-L $start[,$end]]                   # $end defaults to last line
 
 git show $(git blame example.js -L 4,4 | awk '{print $1}') # show the commit of a certain line
 ```

@@ -1,3 +1,32 @@
+## Mon 17/May/2021
+
+- Projects/Open source
+  - Intelleggere
+    - [x] Restructure project, primarily to allow straight DDL reading
+    - [ ] Prepare DDL Zan PR
+      - [x] Extra-code additions
+        - [x] Art. 1, definitions
+        - [x] Art. 4, exceptions
+        - [x] Art. 7, new festivity
+        - [x] Art. 10, stats
+      - [x] Addition DL Mancino (1993/04/26, n.122)
+  - Bevy
+- Studies
+  - Rust/Gamedev
+    - [ ] Go through all the tutorials/books
+      - [ ] Unofficial Bevy Cheat Book
+        - [x] 2. Bevy Programming
+          - [x] 2.2: Next Steps
+          - [x] 2.3: Advanced
+    - [x] Review Wireframe magazines/books
+  - Rust/CS
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 5: Hash maps
+        - [x] 33. Building HashMap from Scratch
+        - [x] 34. Building a Bucket List for the HashMap to Use
+          - [ ] Review `?Sized` trait
+          - [ ] Review `Borrow` trait
+
 ## Sun 16/May/2021
 
 - Studies
@@ -34,6 +63,7 @@
     - [ ] Unofficial Bevy Cheat Book
       - [ ] 2. Bevy Programming
         - [ ] 2.1: Basics
+        - [x] ~~7. Bevy on Different Platforms~~
 
 ## Thu 13/May/2021
 

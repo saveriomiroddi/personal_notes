@@ -1,3 +1,34 @@
+## Tue 18/May/2021
+
+- Projects/Open source
+  - Intelleggere
+    - [ ] Prepare DDL Zan PR
+      - [ ] Addition DL 9 luglio 2003, n. 215
+      - [ ] DL changes
+        - [x] Application Art.5 in differential form
+  - Code the Classics
+    - [x] Provide license (PR)
+  - Bevy Cheatbook
+    - [x] PR: Fix `assets-ready.rs` example
+    - [x] PR: Add group assets loading tracking example
+  - Bevy
+    - [x] PR: `AssetServer#get_group_load_state`: Convert the iterator to borrowed version
+  - Awesome Bevy
+    - [x] PR: Add Flappy Bevy game
+- Studies
+  - Rust/Gamedev
+    - [ ] Go through all the tutorials/books
+      - [x] Unofficial Bevy Cheat Book
+        - [x] 3. Bevy Features
+        - [x] 4. Common Pitfalls
+        - [x] ~~5. Advanced Patterns~~
+        - [x] 6. Bevy Cookbook
+    - [x] Review [YouTube tutorials](https://duckduckgo.com/?q=bevy+rust&k5=1&iar=videos&iax=videos&ia=videos)
+  - Rust/CS
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 5: Hash maps
+        - [x] 35. Finishing the HashMap
+
 ## Mon 17/May/2021
 
 - Projects/Open source

@@ -2,7 +2,8 @@
 
 - [Bevy](#bevy)
   - [Setup](#setup)
-  - [General design/data structures](#general-designdata-structures)
+  - [Hello world](#hello-world)
+  - [Architecture parts](#architecture-parts)
     - [Components/bundles](#componentsbundles)
     - [Resources](#resources)
     - [Systems](#systems)
@@ -16,18 +17,42 @@
     - [States](#states)
     - [Stages](#stages)
     - [Run criteria](#run-criteria)
-  - [Hello world](#hello-world)
+  - [Features](#features)
+    - [Transforms](#transforms)
+    - [Assets](#assets)
+      - [Custom asset events/hooks](#custom-asset-eventshooks)
+      - [Textures/sprites](#texturessprites)
+    - [Input handling](#input-handling)
+      - [Keyboard](#keyboard)
+      - [Mouse](#mouse)
+      - [Gamepad](#gamepad)
+      - [Touchscreen](#touchscreen)
+    - [Fixed timestep](#fixed-timestep)
+    - [Time](#time)
+    - [UI Layout](#ui-layout)
   - [Math APIs](#math-apis)
 
 ## Setup
 
-Increase compilation speed by using dynamic linking, but must disable for release!
-
 ```toml
-bevy = { version = "0.5.0", features = ["dynamic"] }
+bevy = {
+  version = "0.5.0",
+  features = [
+    # Increase compilation speed by using dynamic linking, but disable for release!
+    #
+    "dynamic",
+    # Enable if required; by default, only png/hdr/mp3 formats are supported.
+    #
+    "jpeg", "tga", "bmp", "dds", "flac", "ogg", "wav"
+  ]
+}
 ```
 
-## General design/data structures
+## Hello world
+
+See the [cookbook](bevy_cookbook.md).
+
+## Architecture parts
 
 ### Components/bundles
 
@@ -146,7 +171,6 @@ Systems are run by adding them when building the app:
 App::build()
   .add_startup_system(init_menu.system())  // run it only once at launch
   .add_system(move_player.system())        // run it every frame update
-}
 ```
 
 Bevy handles resources contention by looking at the system signatures.
@@ -214,7 +238,7 @@ Labels and labelled items are M:N.
 
 Systems can communicate via a message queue - the `Event`s system.
 
-WATCH OUT!! Events persists only until the end of the next frame.  
+WATCH OUT!! Events persists only until the end of the next frame (= max 2 frames).  
 Additionally, due to the async nature, a system may receive the event only on the next frame ("1-frame-lag" problem); if this is a problem, must explicitly order systems.
 
 ```rust
@@ -238,8 +262,7 @@ fn debug_levelups(mut levelup: EventReader<LevelUpEvent>) {
 
 // Don't forget to register (custom) events!
 //
-App::build()
-  .add_event::<LevelUpEvent>()
+App::build().add_event::<LevelUpEvent>()
 ```
 
 #### System Chaining
@@ -258,8 +281,7 @@ fn handle_io_errors(In(result): In<std::io::Result<()>>) {
 
 // WATCH OUT! Chaining must be registered:
 //
-App::build()
-  .add_system(net_receive.system().chain(handle_io_errors.system()))
+App::build().add_system(net_receive.system().chain(handle_io_errors.system()))
 ```
 
 WATCH OUT!
@@ -630,61 +652,292 @@ See https://bevy-cheatbook.github.io/programming/stages.html.
 
 Run criteria allow low-level systems running specification. See: https://bevy-cheatbook.github.io/programming/run-criteria.html.
 
-## Hello world
+## Features
+
+### Transforms
+
+Bevy's coordinates are left-hand.
+
+In 2D:
+
+- (0, 0) is at the center of the screen;
+- by default, the camera is far (999.9, slightly before Z-clipping), so that the sprites can be displayed, however, in case of custom transforms, this must be take into account;
+- it's convenient to put the background on z=0, and other sprites with increasing z (based on priority).
+
+There are two transforms: `Transform` (relative to parent) and `GlobalTransform` (best to use read-only; if a component has no parent, T = GT)
+
+WATCH OUT! GT is synced with T in the `PostUpdate` stage, so be careful.
+
+### Assets
+
+Assets are loaded asynchronously, but the handle is returned (and can be used) immediately.
+Asset changes are detected by Bevy, and hot-reloaded; this works fine for simple parts, but more complex ones (e.g. scene files) may require custom reloading logic (via `AssetEvent`).
+
+Load/access assets:
 
 ```rust
-use bevy::prelude::*;
+struct UiFont(Handle<Font>);
 
-struct Person;
-struct Name(String);
-
-fn add_people(mut commands: Commands) {
-  commands
-    .spawn()
-    .insert(Person)
-    .insert(Name("Foo".to_string()));
-  commands
-    .spawn()
-    .insert(Person)
-    .insert(Name("Bar".to_string()));
+struct SpriteSheets {
+  map_tiles: Handle<TextureAtlas>,
 }
 
-struct GreetTimer(Timer);
+struct ExtraAssets(Vec<HandleUntyped>);
 
-// Use a timed greeter; without a timer, this is executed continuously (see DefaultPlugins note).
-//
-fn greet_people_timed(time: Res<Time>, mut timer: ResMut<GreetTimer>, query: Query<&Name, With<Person>>) {
-  if timer.0.tick(time.delta()).just_finished() {
-    for name in query.iter() {
-      println!("Hello {}!", name.0);
+fn load_ui_font(mut commands: Commands, server: Res<AssetServer>) {
+  // Multiple `load`s of the same file return the same handle.
+  //
+  let handle: Handle<Font> = server.load("font.ttf");
+
+  // Store it - avoids collection and consequent unloading.
+  //
+  commands.insert_resource(UiFont(handle));
+}
+
+fn use_sprites(handles: Res<SpriteSheets>, atlases: Res<Assets<TextureAtlas>>, textures: Res<Assets<Texture>>) {
+  // The two getters can return None if the assets are not loaded yet.
+
+  if let Some(atlas) = atlases.get(&handles.map_tiles) { /* ... */ }
+  if let Some(map_tex) = textures.get("map.png") { /* ... */ }
+}
+
+fn paths_and_clones(mut commands: Commands, server: Res<AssetServer>) {
+  // Load with "Asset path".
+  //
+  let mesh: Handle<Mesh> = server.load("scene.gltf#Mesh0/Primitive0");
+
+  // Strong and weak clones (have standard strong/weak referencing behavior).
+  //
+  let strong_h_clone = mesh.clone();
+  let weak_h_clone = mesh.clone_weak();
+
+  // Untyped clones allow storing mixed-typed collections.
+  //
+  let untyped_clone = my_collection.clone_untyped();
+
+  // Untyped loading! Formats are detected by extension.
+  //
+  if let Ok(handles) = server.load_folder("extra") {
+    commands.insert_resource(ExtraAssets(handles));
+  }
+}
+```
+
+Manual assets generation (e.g. for procedural generation):
+
+```rust
+fn add_material(mut materials: ResMut<Assets<StandardMaterial>>) {
+  let new_mat = StandardMaterial { base_color: Color::rgba(0.25, 0.50, 0.75, 1.0), unlit: true, ..Default::default() };
+  materials.add(new_mat);
+}
+```
+
+#### Custom asset events/hooks
+
+See https://bevy-cheatbook.github.io/features/assets.html#assetevent.
+
+#### Textures/sprites
+
+For textures/images, Y points downwards. This is consistent with the majority of the image formats, but inconsistent with the rest of Bevy (and OpenGL).
+
+Use the sprite-flipping feature to invert this behavior:
+
+```rust
+commands.spawn_bundle(SpriteBundle {
+  sprite: Sprite { flip_y: true, flip_x: false, ..Default::default() }, ..Default::default()
+});
+```
+
+### Input handling
+
+Input handling can be managed via resources (higher level) and events (lower level).
+
+#### Keyboard
+
+```rust
+fn keyboard_input(keys: Res<Input<KeyCode>>) {
+  if keys.just_pressed(KeyCode::Space) { /* Space was pressed */ }
+  if keys.just_released(KeyCode::LControl) { /* Left Ctrl was released */ }
+  if keys.pressed(KeyCode::W) { /* W is being held down */ }
+}
+
+fn keyboard_events(mut key_evr: EventReader<KeyboardInput>) {
+  use bevy::input::ElementState;
+
+  // Scan codes are provided, but currently not usable.
+  //
+  for ev in key_evr.iter() {
+    match ev.state {
+      ElementState::Pressed => println!(ev.key_code),
+      ElementState::Released => println!(ev.key_code)
+    }
+  }
+}
+```
+
+#### Mouse
+
+Buttons/wheel:
+
+```rust
+fn mouse_button_input(buttons: Res<Input<MouseButton>>) {
+  if buttons.just_pressed(MouseButton::Left) { /* Left button was pressed */ }
+  if buttons.just_released(MouseButton::Left) { /* Left Button was released */ }
+  if buttons.pressed(MouseButton::Right) { /* Right Button is being held down */ }
+}
+
+fn mouse_button_events(mut mousebtn_evr: EventReader<MouseButtonInput>) {
+  use bevy::input::ElementState;
+
+  for ev in mousebtn_evr.iter() {
+    match ev.state {
+      ElementState::Pressed => println!(ev.button),
+      ElementState::Released => println!(ev.button),
     }
   }
 }
 
-pub struct HelloPlugin;
+fn scroll_events(mut scroll_evr: EventReader<MouseWheel>) {
+  use bevy::input::mouse::MouseScrollUnit;
 
-impl Plugin for HelloPlugin {
-  fn build(&self, app: &mut AppBuilder) {
-    app.insert_resource(GreetTimer(Timer::from_seconds(2.0, true)))
-      .add_startup_system(add_people.system())
-      .add_system(greet_people_timed.system());
+  for ev in scroll_evr.iter() {
+    match ev.unit {
+      MouseScrollUnit::Line => println!("Scroll (line units): vertical: {}, horizontal: {}", ev.y, ev.x),
+      MouseScrollUnit::Pixel => println!("Scroll (pixel units): vertical: {}, horizontal: {}", ev.y, ev.x),
+    }
+  }
+}
+```
+
+Relative motion:
+
+```rust
+fn mouse_motion(mut motion_evr: EventReader<MouseMotion>) {
+  for ev in motion_evr.iter() {
+    println!("Mouse moved: X: {} px, Y: {} px", ev.delta.x, ev.delta.y);
+  }
+}
+```
+
+Cursor:
+
+```rust
+fn cursor_position(windows: Res<Windows>) {
+  // Games typically only have one window (the primary window).
+  // For multi-window applications, you need to use a specific window ID here.
+  let window = windows.get_primary().unwrap();
+
+  if let Some(_position) = window.cursor_position() {
+    // cursor is inside the window, position given
+  } else {
+    // cursor is not inside the window
   }
 }
 
-App::build()
-  // WindowDescriptor stores the window properties.
-  //
-  .insert_resource(WindowDescriptor { title: "Hello W!".to_string(), width: 1280., height: 720., ..Default::default() })
-  // The DefaultPlugins group includes the basic features to run a game; it makes a window popup because
-  // it includes WindowPlugin and WinitPlugin. Since it also includes an event loop, the systems will
-  // run in an infinite loop.
-  //
-  .add_plugins(DefaultPlugins)
-  // In this plugin, we bundle the main setup.
-  //
-  .add_plugin(HelloPlugin)
-  .run();
+// To detect when the pointer is moved, use CursorMoved events to get the updated coordinates:
+
+fn cursor_events(mut cursor_evr: EventReader<CursorMoved>) {
+  for ev in cursor_evr.iter() {
+    println!("New cursor position: X: {}, Y: {}, in Window ID: {:?}", ev.position.x, ev.position.y, ev.id);
+  }
+}
 ```
+
+#### Gamepad
+
+Backed by the [gilrs library](https://gitlab.com/gilrs-project/gilrs).
+
+Connection:
+
+```rust
+// Simple resource to store the ID of the connected gamepad; we need to know which gamepad to use for player input.
+//
+struct MyGamepad(Gamepad);
+
+fn gamepad_connections(mut commands: Commands, my_gamepad: Option<Res<MyGamepad>>, mut gamepad_evr: EventReader<GamepadEvent>) {
+  for GamepadEvent(id, kind) in gamepad_evr.iter() {
+    match kind {
+      GamepadEventType::Connected => {
+        // If we don't have any gamepad yet, use this one
+        if my_gamepad.is_none() { commands.insert_resource(MyGamepad(*id)) }
+      }
+      GamepadEventType::Disconnected => {
+        // If it's the one we previously associated with the player, disassociate it:
+        if let Some(MyGamepad(old_id)) = my_gamepad.as_deref() {
+          if old_id == id { commands.remove_resource::<MyGamepad>() }
+        }
+      }
+      // other events are irrelevant
+      _ => {}
+    }
+  }
+}
+```
+
+Input:
+
+```rust
+fn gamepad_input(axes: Res<Axis<GamepadAxis>>, buttons: Res<Input<GamepadButton>>, my_gamepad: Option<Res<MyGamepad>>) {
+  let gamepad_id = if let Some(gp) = my_gamepad { gp.0 } else { return };
+
+  // The joysticks are represented using a separate axis for X and Y
+
+  let axis_lx = GamepadAxis(gamepad_id, GamepadAxisType::LeftStickX);
+  let axis_ly = GamepadAxis(gamepad_id, GamepadAxisType::LeftStickY);
+
+  if let (Some(x), Some(y)) = (axes.get(axis_lx), axes.get(axis_ly)) {
+    let left_stick_pos = Vec2::new(x, y); // for convenience
+
+    // implement a dead-zone to ignore small inputs
+    if left_stick_pos.length() > 0.1 { /* ... */ }
+  }
+
+  let jump_button = GamepadButton(gamepad_id, GamepadButtonType::South);
+  let heal_button = GamepadButton(gamepad_id, GamepadButtonType::East);
+
+  if buttons.just_pressed(jump_button) { /* button pressed: make the player jump */ }
+  if buttons.pressed(heal_button) { /* button being held down: heal the player */ }
+}
+```
+
+#### Touchscreen
+
+See https://bevy-cheatbook.github.io/features/input-handling.html#touchscreen.
+
+### Fixed timestep
+
+Use to run systems at fixed interval.
+
+```rust
+use bevy::core::FixedTimestep;
+
+App::build()
+  .add_system_set(
+    SystemSet::new()
+      .with_run_criteria(FixedTimestep::step(1.0)) // 1 Hz
+      .with_system(system_1.system())
+  )
+  .add_system_set(
+    SystemSet::new()
+      .with_run_criteria(FixedTimestep::step(0.5)) // 2 Hz
+      .with_system(system_2.system())
+  )
+```
+WATCH OUT!
+
+- events persist 2 frames, so if the fixed timestep is too slow, it will miss them;
+- timing is not exact, due to the inexact run criteria underlying nature;
+- etc.etc.!.
+
+See https://bevy-cheatbook.github.io/features/fixed-timestep.html (and referred examples) for more details.
+
+### Time
+
+Don't use `std::time::Instant::now()` to get the time - use `Res<Time>`: due to parallel execution, the former will be inconsistent/inaccurate (respect to the game time).
+
+### UI Layout
+
+Since the Y starts at the bottom, the UI flows from there; use `FlexDirection::ColumnReverse` to flow from the top.
 
 ## Math APIs
 

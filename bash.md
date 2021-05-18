@@ -31,7 +31,7 @@
   - [Associative arrays](#associative-arrays)
   - [Script operational concepts/Useful scripts](#script-operational-conceptsuseful-scripts)
     - [Ask for input (keypress)](#ask-for-input-keypress)
-    - [Trapping errors](#trapping-errors)
+    - [Trapping errors (hooks)](#trapping-errors-hooks)
     - [Log a script output/Enable debugging [log]](#log-a-script-outputenable-debugging-log)
     - [Switching to root user inside a script](#switching-to-root-user-inside-a-script)
     - [Check if there's data in stdin](#check-if-theres-data-in-stdin)
@@ -616,9 +616,12 @@ echo "  ab  " | xargs             # strip/trim leading and trailing whitespace
 
 ### Examples
 
+Substrings (0-based; -1=last):
+
 ```sh
-${str:1}                          # substring: remove the first charater
-${str::-1}                        # substring: remove the last character
+${str:1}                          # chars from i=1
+${str: -3}                        # last three chars; WATCH OUT! the space is required
+${str::-1}                        # chars until the last (not included)
 ```
 
 ## Paths
@@ -870,7 +873,7 @@ Input one char; if `variable_name` is specified, the input is stored in the vari
 read -rsn1 [<variable_name>]
 ```
 
-### Trapping errors
+### Trapping errors (hooks)
 
 Execute a (explicit) command on exit; generally convenient to trap `ERR` + `INT`, or `EXIT`.
 

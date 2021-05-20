@@ -105,27 +105,24 @@ See https://bevy-cheatbook.github.io/cookbook/mouse-grab.html.
 ## Track Assets Loading
 
 ```rust
+#[derive(Default)]
 struct AssetsLoading(Vec<HandleId>);
 
 fn setup(server: Res<AssetServer>, mut loading: ResMut<AssetsLoading>) {
-  let font: Handle<Font> = server.load("my_font.ttf");
-  let menu_bg: Handle<Texture> = server.load("menu.png");
-
-  loading.0.push(font.id);
-  loading.0.push(menu_bg.id);
+    let font: Handle<Font> = server.load("my_font.ttf");
+    let menu_bg: Handle<Texture> = server.load("menu.png");
+    loading.0.push(font.id);
+    loading.0.push(menu_bg.id);
 }
 
 fn check_assets_ready(server: Res<AssetServer>, loading: Res<AssetsLoading>) {
-  use bevy::asset::LoadState;
+    match server.get_group_load_state(loading.0.iter().copied()) {
+        LoadState::Failed => { /* one of our assets had an error */ }
+        LoadState::Loaded => {}
+        _                 => { return; /* NotLoaded/Loading: not fully ready yet */ }
+    }
 
-  // For per-asset testing, use the `get_load_state()` API.
-  match server.get_group_load_state(loading.0.clone()) {
-    LoadState::Failed => { /* one of our assets had an error */ }
-    LoadState::Loaded => {}
-    _ => return // not ready (states: NotLoaded/Loading)
-  }
-
-  // All assets are now ready
+    // all assets are now ready
 }
 ```
 

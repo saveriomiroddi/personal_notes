@@ -1,3 +1,16 @@
+## Thu 20/May/2021
+
+- Projects/Open source
+  - Bevy Cheatbook
+    - [x] Apply feedback: merge examples, and simplify logic
+  - Bevy
+    - [ ] PR: Improve Better Breakout assets loading
+      - [ ] Fight find synchronous strategy
+- Studies
+  - Rust/Gamedev
+    - [ ] Go through actual games
+      - [ ] Bevy examples: Better Breakout
+
 ## Wed 19/May/2021
 
 - Projects/Open source
@@ -5,6 +18,10 @@
     - [x] Discuss best format for example
   - Bevy
     - [x] Discuss Better Breakout systems dependency tree and assets loading
+- Studies
+  - Rust/Gamedev
+    - [ ] Go through actual games
+      - [ ] Bevy examples: Better Breakout
 
 ## Tue 18/May/2021
 

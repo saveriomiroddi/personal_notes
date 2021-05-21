@@ -1020,7 +1020,7 @@ eval set -- "$params"
 # Rigorously, one should add the '*' case (internal error), but it's not required.
 #
 while true; do
-  case "$1" in
+  case $1 in
     -h|--help)
       echo "$c_help"
       exit 0 ;;

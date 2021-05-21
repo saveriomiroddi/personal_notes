@@ -23,8 +23,11 @@
     - [Applications/examples](#applicationsexamples)
       - [Replace spaced coordinates with monotonically increasing values](#replace-spaced-coordinates-with-monotonically-increasing-values)
   - [Stored procedures](#stored-procedures)
+    - [Variables](#variables)
     - [Control flow syntax](#control-flow-syntax)
-    - [Cursors (with convenient example of looping)](#cursors-with-convenient-example-of-looping)
+    - [Statements output and SLEEP](#statements-output-and-sleep)
+    - [Exceptions handling](#exceptions-handling)
+    - [Cursors (with example procedure)](#cursors-with-example-procedure)
   - [Performance](#performance)
     - [Profiling](#profiling)
     - [Dynamic SQL](#dynamic-sql)
@@ -471,9 +474,20 @@ WHERE {parent_fk} = ?
 
 ## Stored procedures
 
+### Variables
+
+```sql
+-- The default is optional.
+DECLARE deletion_limit INT DEFAULT 50 * 1000;
+DECLARE max_table_id   INT DEFAULT (SELECT MAX(id) FROM mytable);
+
+-- Declared variables can be used in some places where standard variables can't.
+DELETE FROM mytable LIMIT deletion_limit;
+```
+
 ### Control flow syntax
 
-If/then/else:
+Control flow (there is no for loop!):
 
 ```sql
 IF @condition THEN
@@ -483,11 +497,10 @@ ELSEIF @condition THEN
 ELSE
   # block
 END IF;
-```
 
-Cycles (there is no for loop!):
+# Exit from a cycle.
+LEAVE label;
 
-```sql
 WHILE condition DO
   # block
 END WHILE;
@@ -505,27 +518,43 @@ END LOOP;
 Common properties:
 
 ```sql
+-- The label is optional if unused, and it can also be on a separate line from the cycle token, although
+-- the manual doesn't show it.
+--
 label_name: STATEMENT
   # Repeat the cycle
   ITERATE label_name;
-END STATEMENT;
+END STATEMENT label_name; -- The label name is optional.
 ```
 
-### Cursors (with convenient example of looping)
+### Statements output and SLEEP
+
+Only SELECTs print an output, and only if they're *not* assigned (see SLEEP below).
+
+Each SELECT (in the SP) will output a result in tabular format (except when no rows are found).
+If the client is run in very silent mode (-ss) only the result values will be shown, however, by using column naming, a clear output can be achieved.
+
+In order to sleep without output, just assign to a bogus variable:
 
 ```sql
-# Script for iterating a block of queries through all the tenants.
-#
-# Each SELECT (in the SP) will output a result in tabular format (except when no rows are found).
-# If the client is run in very silent mode (-ss) only the result values will be shown, however,
-# by using column naming, a clear output can be achieved.
-#
-# ROW_COUNT() can be useful for logging.
-#
-# The SUBSTR is a workaround to avoid printing a confusing `0`.
+SET v_null_output = (SELECT SLEEP(1.0));
+```
 
-SET @sleep_time = 5;
+### Exceptions handling
 
+```sql
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+  ROLLBACK;
+  SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated';
+END;
+```
+
+### Cursors (with example procedure)
+
+Script for iterating a block of queries through all the tenants:
+
+```sql
 ###################################################
 # Stored procedure definition
 ###################################################
@@ -537,19 +566,16 @@ DELIMITER $$
 CREATE PROCEDURE ALL_TENANTS_OPERATION()
 MODIFIES SQL DATA
 BEGIN
-  DECLARE v_tenant_id   INT;
+  DECLARE v_sleep_time = 5;
+
+  DECLARE v_tenant_id    INT;
   DECLARE v_cur_notfound BOOL;
+  DECLARE v_null_output  CHAR;
 
   # Cursors are closed automatically at the END of a SP, so there's no need to close them explicitly.
   #
   DECLARE cur_tenants CURSOR FOR SELECT id FROM tenants;
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_cur_notfound := TRUE;
-
-  DECLARE EXIT HANDLER FOR SQLEXCEPTION
-  BEGIN
-    ROLLBACK;
-    SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated';
-  END;
 
   OPEN cur_tenants;
   tenants_loop: LOOP
@@ -563,12 +589,13 @@ BEGIN
       LEAVE tenants_loop;
     END IF;
 
-    SELECT CONCAT(v_tenant_id, SUBSTR(SLEEP(@sleep_time), 0)) `Executing for tenant`,
-           COUNT(*) `Accounts remaining`
+    SELECT v_tenant_id `Executing for tenant`, COUNT(*) `Accounts remaining`
     FROM tenants WHERE id > v_tenant_id;
 
-    -- Insert the operation here, using v_tenant_id.
-    --
+    SET v_null_output = (SELECT SLEEP(v_sleep_time));
+
+    # Insert the operation here, using v_tenant_id.
+    #
     UPDATE ...;
 
     SELECT ROW_COUNT() `Updated rows`;

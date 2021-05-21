@@ -116,6 +116,8 @@ fn setup(server: Res<AssetServer>, mut loading: ResMut<AssetsLoading>) {
 }
 
 fn check_assets_ready(server: Res<AssetServer>, loading: Res<AssetsLoading>) {
+    use bevy::asset::LoadState;
+    
     match server.get_group_load_state(loading.0.iter().copied()) {
         LoadState::Failed => { /* one of our assets had an error */ }
         LoadState::Loaded => {}

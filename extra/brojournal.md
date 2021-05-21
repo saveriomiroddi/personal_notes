@@ -1,3 +1,14 @@
+## Fri 21/May/2021
+
+- Projects/Open source
+  - Bevy
+    - [ ] PR: Improve Better Breakout assets loading
+      - [x] Discuss on Discord/GitHub about the issue
+      - It seems it can't be currently accomplished
+- Studies
+  - Rust/Gamedev
+    - [x] Go through all engines again (Bevy is suitable only for very simple stuff)
+
 ## Thu 20/May/2021
 
 - Projects/Open source

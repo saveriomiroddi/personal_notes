@@ -1,3 +1,19 @@
+## Sat 22/May/2021
+
+- Projects/Open source
+  - Recipeek
+    - [x] Upgrade to Rails 4.2
+  - Bevy
+    - [x] Discuss on Discord manual but idiomatic state handling
+    - [x] Discuss on issue the proposed asset loading solution
+  - Intelleggere
+    - [ ] Prepare DDL Zan PR
+      - [x] Addition DL 9 luglio 2003, n. 215
+      - [ ] DL changes
+        - [x] Application Art.8 in differential form
+- Admin
+  - [x] Restructure home network
+
 ## Fri 21/May/2021
 
 - Projects/Open source

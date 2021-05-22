@@ -429,7 +429,8 @@ git filter-branch --force --tree-filter 'ag "def mymethod" -l | xargs -r perl -0
 ## Diffing/Patching/Status
 
 ```sh
-# --color applies to diff/show, and forces coloring (if `color.ui` != `always`); this may be undesirable for processing.
+# `--color` applies to diff/show, and forces coloring (if `color.ui` != `always`); this may be undesirable for processing.
+# `--ws-error-highlight=new,old` colors the removed trailing whitespace (which is not displayed by default (!!))
 
 show --name-[only|status] rev[:file]            # diff rev^..rev; show name only [--name-only] or status only [--name-status]
 show -m $merge                                  # show the full diff of the parents of a merge

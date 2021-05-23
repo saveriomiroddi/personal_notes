@@ -6,6 +6,8 @@
     - [Trigonometry](#trigonometry)
     - [Statistics](#statistics)
     - [Convenient stuff](#convenient-stuff)
+      - [Test if a positive number is a power of two](#test-if-a-positive-number-is-a-power-of-two)
+      - [Check if a number is close within the two ends of an interval](#check-if-a-number-is-close-within-the-two-ends-of-an-interval)
 
 ## Math
 
@@ -24,6 +26,38 @@
 
 Stddev: sqrt( Ε( (xᵢ-avg)² ) / n) )
 
+In words: root of the mean of the square of difference.
+
 ### Convenient stuff
 
-- `n & (n - 1) == 0`: test if a positive number is a power of two
+#### Test if a positive number is a power of two
+
+`n & (n - 1) == 0`
+
+#### Check if a number is close within the two ends of an interval
+
+Example: Check if on a field 10 units wide, an element is within (0, 1), or (9, 10).
+
+Intuitive explanation: x is far from the center more than (half width - interval).
+
+```sh
+$width - x < $interval ||
+         x < $interval
+
+# Subtract $width/2:
+
+$width/2 - x < $interval - $width/2 ||
+x - $width/2 < $interval - $width/2
+
+# We can't make absolute here, otherwise it's always false, as (interval - width/2) is negative, which
+# would make the equation always false.
+
+# Change the sign:
+
+x - $width/2 > $width/2 - $interval ||
+$width/2 - x > $width/2 - $interval
+
+# Make absolute!
+
+|x - $width/2| > $width/2 - $interval
+```

@@ -1,3 +1,66 @@
+## Sun 23/May/2021
+
+- Projects/Open source
+  - Intelleggere
+    - [x] Prepare DDL Zan PR
+      - [x] Addition DL 19 maggio 2020, n. 34, convertito, con modificazioni, dalla legge 17 luglio 2020, n. 77
+      - [x] DL changes
+        - [x] Application Art.9 in differential form
+    - [x] Final cleanup repository
+    - [x] Close project and add explanation
+- Admin
+  - [x] Plan cycle
+- Rust/Gamedev
+  - Prepare for porting Code the Classics: Readings
+    - [ ] Code the Classics book
+      - [ ] Boing
+
+### Cycle changes
+
+- Discarded
+  - The ZX Spectrum ULA - How to Design a Microcomputer
+  - AWS Scripts
+    - Implement 300k limit
+    - Final testing
+  - Intelleggere
+    - Create blog project
+    - Write post
+- Unscheduled
+  - Schedule manager
+    - Minor updates/improvements
+    - Refactor regex (tokens) handling
+    - Add basic test suite
+    - Add new format for work definition (`-MM -HH:MM`)
+    - Fix skip mode: Don't move the current day
+  - Hotplugger
+    - Add executable bit and open PR
+    - Test deprecated options format on 5.0, and open PR
+  - Admin
+    - Restructure home network
+  - QEMU script
+    - Make performance governor setting optional
+    - Make QEMU killer optional
+  - Code the Classics
+    - PR: Provide license
+  - Bevy Cheatbook
+    - PR: Fix `assets-ready.rs` example
+    - PR: Add group assets loading tracking example
+    - PR: `AssetServer#get_group_load_state`: Convert the iterator to borrowed version
+    - Discuss on Discord/Issue async assets loading
+    - Discuss on Discord manual but idiomatic state handling
+  - Awesome Bevy
+    - PR: Add Flappy Bevy game
+  - Rust/Gamedev
+    - Review simple 2D engines
+  - Recipeek
+    - Upgrade to Rails 4.2
+- Swapped
+  - Bevy beginner issues <> Convert Code the classics book games to Rust/Bevy
+  - Hands-On Data Structures and Algorithms in Rust: Chapter 4 <> 5
+  - Snake tutorial <> Better Breakout PR
+- Pushed
+  - Convert Code the classics book games to Rust/Bevy
+
 ## Sat 22/May/2021
 
 - Projects/Open source

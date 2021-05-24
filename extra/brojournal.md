@@ -1,3 +1,13 @@
+## Mon 24/May/2021
+
+- Rust/Gamedev
+  - Prepare for porting Code the Classics: Readings
+    - [x] Yet another round of research and discussion
+    - [ ] ggez examples
+  - Port Code the Classics
+    - [ ] Boing
+      - [x] Read/understand code
+
 ## Sun 23/May/2021
 
 - Projects/Open source

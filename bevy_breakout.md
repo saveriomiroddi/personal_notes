@@ -18,10 +18,11 @@
 
 ## Systems tree
 
-                       (C)
-  paddle_input +--------------+-> bound_paddle
-            (A)|              |(D)
-               +-> kinematics +
-            (B)|
-ball collision +
-
+```
+                      (->B)
+  paddle_input --+-----------------+--> bound_paddle
+            (->C)|                 |(D->)
+                 +--> kinematics --+
+            (->A)|
+ball collision --+
+```

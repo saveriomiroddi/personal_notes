@@ -37,6 +37,8 @@
   - [Client/server](#clientserver)
     - [Find configuration files used](#find-configuration-files-used)
   - [Metadata](#metadata)
+  - [Convenient operations](#convenient-operations)
+    - [Skip the indexes on mysqldump dumps](#skip-the-indexes-on-mysqldump-dumps)
 
 ## Privileges
 
@@ -768,4 +770,27 @@ Find the foreign keys for a table/column:
 SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
 FROM information_schema.KEY_COLUMN_USAGE
 WHERE (REFERENCED_TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME) = ('my_db', 'my_table', 'my_column');
+```
+
+## Convenient operations
+
+### Skip the indexes on mysqldump dumps
+
+Replace keys with null operations; valid alternatives:
+
+- on `ALTER TABLE`
+  - `ALGORITHM=DEFAULT`
+  - `LOCK=DEFAULT`
+  - `ENABLE KEYS`
+  - `ADD CHECK (TRUE)` : adds a check
+- on `CREATE TABLE`
+  - `CHECK (TRUE)` : adds a check
+
+`ALTER TABLE` key additions is produced by the Percona distro with `--innodb-optimize-keys`.
+
+We can't just remove the lines, because if they're at the end of the table def, they'll leave the previous statement with a terminating comma.  
+The leading comma could be deleted by using full-file matching, but this solution is simpler.
+
+```sh
+mysqldump $db | perl -pe 's/^  (UNIQUE |FULLTEXT )?KEY.+?(,)?$/  CHECK(TRUE)$2'
 ```

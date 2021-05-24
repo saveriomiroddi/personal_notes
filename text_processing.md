@@ -481,17 +481,17 @@ Basic support:
 
 - `[...]` (character sets)
 - `*`
+- capturing groups, but require escaping (`s|ab\(c\)|\1|`); `$<n>` reference is not supported
 
 Some supported by `-E`:
 
 - `\w`
 - `+`
+- capturing groups (`s|ab(c)|\1|`); `$<n>` reference is not supported
 
-Capturing groups are supported, but they require escaping the parentheses:
+Not supported (at all):
 
-```sh
-echo 'abc' | sed 's/a\(b\)c/\1/' # `b`
-```
+- `\d`
 
 ### Operators/variables
 

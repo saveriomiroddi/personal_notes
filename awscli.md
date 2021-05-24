@@ -7,6 +7,10 @@
     - [IAM](#iam)
     - [RDS](#rds)
     - [S3](#s3)
+      - [Upload objects](#upload-objects)
+      - [List keys/objects](#list-keysobjects)
+      - [More detailed objects information](#more-detailed-objects-information)
+      - [Objects manipulation](#objects-manipulation)
     - [Account-related](#account-related)
     - [Lightsail](#lightsail)
     - [Secrets Manager](#secrets-manager)
@@ -57,16 +61,32 @@ aws rds describe-reserved-db-instances \
 
 See `text_processing##jq` for JSON manipulation.
 
-Print objects summary:
+#### Upload objects
 
 ```sh
-# The prefix is optional
-$ aws s3 ls --summarize --human-readable "s3://$bucket/$prefix" --recursive | head -n 3
+# Optional: use more bandwidth, by increasing the max connections.
+#
+aws configure set default.s3.max_concurrent_requests 20
 
-2019-03-26 21:07:11   26.8 KiB /prefix1/key0
-2019-03-26 21:07:12   45.9 KiB /prefix1/key1
-2018-02-28 13:14:50    1.7 KiB prefix2/key0
+aws s3 cp [--quiet] $file s3://$bucket[$key]
+```
 
+#### List keys/objects
+
+List buckets/prefixes:
+
+```sh
+# What is displayed depends on what is specified.
+# The bucket can optionally be prefixed by `s3://`.
+
+aws s3 ls [--human-readable] [$bucket[$prefix]] [--recursive]
+```
+
+#### More detailed objects information
+
+List old object versions stats:
+
+```sh
 $ aws s3api list-object-versions --bucket $bucket --query \
   '
     {
@@ -149,6 +169,8 @@ $ aws s3api list-object-versions --max-items 1 --bucket $bucket
     "NextToken": "eyJLZXlNYXJrZXIiOiBudWxsLCAiVmVyc2lvbklkTWFya2VyIjogbnVsbCwgImJvdG9fdHJ1bmNhdGVfYW1vdW50IjogMX0="
 }
 ```
+
+#### Objects manipulation
 
 Delete object versions, from list file:
 

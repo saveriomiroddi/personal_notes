@@ -102,6 +102,8 @@ cargo clippy                         # linter
 cargo doc [--open]                   # builds and optionally opens docs for the installed crates
 ```
 
+When a project is run via Cargo, the env variable `CARGO_MANIFEST_DIR` is passed to the binary.
+
 Configuration file example:
 
 ```toml

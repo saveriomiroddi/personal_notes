@@ -1,3 +1,14 @@
+## Tue 25/May/2021
+
+- Projects/Open source
+  - Schedule manager
+    - [x] Fix non-replan skip event decoding
+- Rust/Gamedev
+  - Prepare for porting Code the Classics: Readings
+    - [ ] ggez examples
+      - [x] Fight `timer::check_update_time()`
+      - [x] Fight mistaken interpretation of unary sign
+
 ## Mon 24/May/2021
 
 - Rust/Gamedev

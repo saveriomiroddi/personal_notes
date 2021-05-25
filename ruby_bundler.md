@@ -27,6 +27,13 @@ group :test do
   gem "coveralls_reborn", "~> 0.22.0"
   gem "simplecov", "~> 0.21.2"
 end
+
+# Multi-group gem.
+# This specific case is a Rails default addition.
+#
+group :development, :test do
+  gem 'byebug'
+end
 ```
 
 ## Gem definition options

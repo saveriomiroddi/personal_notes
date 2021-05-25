@@ -478,6 +478,8 @@ impl Into<i32> for GamePiece {
 
 ### Basic operators/operations/arithmetic/math
 
+WATCH OUT!! `-1.operation(2)` is interpreted as `-(1.operation(2))`!!
+
 ```rust
 val += 1; val -= 1;             // increment/decrement value (no postfix)
 val <<= n; val >>= n;           // overflows are ignored
@@ -487,6 +489,7 @@ std::mem::size_of_val(v)        // memory occupation of a variable !!
 10_u64.pow(2);                  // exponentiation (power), int/int
 10_f64.powi(2);                 // exponentiation, float/int
 10_f64.sqrt();                  // square root
+(-1_f64).rem_euclid(20);        // 19 (nonnegative remainder); -1 % 20 == -1; see https://doc.rust-lang.org/std/primitive.i32.html#method.rem_euclid
 10_f64.sin();                   // sine (in rad)
 10_f64.cos();                   // cosine (in rad)
 10_f64.signum();                // sign. float: (>= +0.0 -> 1.0), (<= -0.0 -> -1.0), (NaN -> NaN); int: (0 -> 0), (< 0 -> -1), (> 0 -> 1)
@@ -1824,7 +1827,7 @@ Point(10) + &BigPoint(1)
 
 Some operators:
 
-- `std::ops::Add/Sub/Mul/Div`: `self.add`, etc -> `Output`
+- `std::ops::Add/Sub/Mul/Div/Rem`: `self.add`, etc -> `Output` (`Rem`=%)
 - `PartialEq`: `&self.eq`
 - `std::ops::Neg`: `self.neg` -> `Output` (unary negation)
 

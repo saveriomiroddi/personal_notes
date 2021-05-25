@@ -415,7 +415,7 @@ unsafe {
 }
 ```
 
-With crate:
+With standard crate `rand` (see other crates at https://sr.ht/~icefox/oorandom):
 
 ```rust
 // Shortcut API; invokes `thread_rng().gen()`.

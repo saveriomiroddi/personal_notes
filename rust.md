@@ -160,6 +160,8 @@ See more keys and their definitions at https://doc.rust-lang.org/cargo/reference
 
 At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
 
+The cargo configuration file (see custom configs below) `toml` extension is optional; it's search in many locations: https://doc.rust-lang.org/cargo/reference/config.html.
+
 ### Toolchain
 
 Set the specified toolchain for the current project:
@@ -184,7 +186,7 @@ Bevy hello world: 8.75" -> 1.25" (!!).
 # Requires lld. Source: git.io/JsfhD (includes other O/Ss).
 
 mkdir .cargo
-cat > .cargo/config << 'TOML'
+cat > .cargo/config.toml << 'TOML'
 [target.x86_64-unknown-linux-gnu]
 linker = "/usr/bin/clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld", "-Zshare-generics=y"]
@@ -3292,7 +3294,7 @@ impl std::fmt::Display for MyType {
 
 ### From (/Into)
 
-Implement when representing conversions from a type; used by the `Into` trait (`into()`).
+Implement when representing conversions from a type; the `Into` (`into()`) trait will be automatically handled.
 
 ```rust
 struct Number {

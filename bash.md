@@ -350,6 +350,7 @@ Metacharacters:
 - `[:xdigit:]`: hexadecimal!
 - `[^...]`: supported
 - `()` + `|`: supported
+- `{}`: supported, also for intervals (also with empty limits)
 
 References:
 

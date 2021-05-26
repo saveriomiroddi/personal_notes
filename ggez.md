@@ -2,12 +2,17 @@
 
 - [ggez](#ggez)
   - [Hello world](#hello-world)
+  - [General design](#general-design)
   - [Drawables](#drawables)
     - [Text](#text)
     - [Meshes (Geometric shapes)](#meshes-geometric-shapes)
     - [Images](#images)
+    - [Sprite batch](#sprite-batch)
+  - [Audio](#audio)
+  - [Timing](#timing)
+  - [Events Handling](#events-handling)
+    - [Input](#input)
   - [Misc](#misc)
-    - [Timing](#timing)
     - [System](#system)
 
 ## Hello world
@@ -77,12 +82,23 @@ impl event::EventHandler for MainState {
 
 pub fn main() -> GameResult {
     let (mut ctx, event_loop) = ggez::ContextBuilder::new("game_id", "author")
+        .window_setup(ggez::conf::WindowSetup::default().title("Snake!"))
+        .window_mode(ggez::conf::WindowMode::default().dimensions(800, 600))
         .add_resource_path("./resources")
         .build()?;
     let state = MainState::new(&mut ctx)?;
     event::run(ctx, event_loop, state)
 }
 ```
+
+## General design
+
+Generally speaking:
+
+- `MainState` is the world state
+  - it includes the entities
+- Both `MainState` and the entities include `update()` and `draw()`
+  - when the methods are called on `MainState`, it calls them on the entities
 
 ## Drawables
 
@@ -131,34 +147,64 @@ let stroked_rect = graphics::Mesh::new_rectangle(
 )?;
 ```
 
-Compose meshes:
+Compose meshes, via `MeshBuilder`:
 
 ```rust
-let builder = &mut graphics::MeshBuilder::new();
+// Meshes can also be added by calling the methods individually on the MeshBuilder instance.
 
-builder.line(
-    &[Vec2::new(200.0, 200.0), Vec2::new(400.0, 200.0), Vec2::new(400.0, 400.0)], // points
-    4.0, // width
-    Color::new(1.0, 0.0, 0.0, 1.0),
+let mesh = graphics::MeshBuilder::new()
+    .line(
+        &[Vec2::new(200.0, 200.0), Vec2::new(400.0, 200.0), Vec2::new(400.0, 400.0)], // points
+        4.0, // width
+        Color::new(1.0, 0.0, 0.0, 1.0),
+    )?
+    .circle(
+        DrawMode::fill(),
+        Vec2::new(600.0, 380.0),
+        40.0, 1.0, // radius, tolerance
+        Color::new(1.0, 0.0, 1.0, 1.0),
+    )?
+    .build(ctx)?;
+```
+
+Perform batch instantiation and modification, via `MeshBatch`:
+
+```rust
+// In new() ////////////////////////////////////////////////////////////////////
+
+let mesh = graphics::Mesh::new_rectangle(
+    ctx,
+    graphics::DrawMode::fill(),
+    graphics::Rect::new(450.0, 450.0, 50.0, 50.0),
+    Color::WHITE,
 )?;
 
-builder.ellipse(
-    DrawMode::fill(),
-    Vec2::new(600.0, 200.0),
-    50.0, 120.0, 1.0 // radius1, radius2, tolerance
-    Color::new(1.0, 1.0, 0.0, 1.0),
-)?;
+let mut mesh_batch = graphics::MeshBatch::new(mesh)?;
 
-builder.circle(
-    DrawMode::fill(),
-    Vec2::new(600.0, 380.0),
-    40.0, 1.0, // radius, tolerance
-    Color::new(1.0, 0.0, 1.0, 1.0),
-)?;
+for x in 0..100 {
+    mesh_batch.add(
+        graphics::DrawParam::new()
+            .dest(Vec2::new(x * 16.0, 100))
+            .rotation(x * PI),
+    );
+}
 
-// Creates a Mesh instance.
+// In update() /////////////////////////////////////////////////////////////////
+
+let instances: &mut[DrawParam] = self.mesh_batch.get_instance_params_mut();
+
+for instance in instances.iter_mut().take(50) {
+    if let graphics::Transform::Values { ref mut rotation, .. } = instance.trans {
+        *rotation += 0.001 * PI * delta_time;
+    }
+}
+
+// In draw() ///////////////////////////////////////////////////////////////////
+
+// Must flush before drawing! We modified 50, so we flush that number, starting from index 0.
 //
-builder.build(ctx)
+self.mesh_batch.flush_range(ctx, graphics::MeshIdx(0), 50)?;
+self.mesh_batch.draw(ctx, graphics::DrawParam::default())?;
 ```
 
 Textured triangle:
@@ -196,9 +242,33 @@ Coordinates: top left.
 
 See [Hello world](#hello-world).
 
-## Misc
+### Sprite batch
 
-### Timing
+Draw images in batch - for large amounts, it saves considerable time (bunnymark (1000 images) is ~8x as fast).
+
+```rust
+// In new() ////////////////////////////////////////////////////////////////////
+
+let bunnybatch = SpriteBatch::new(image);
+
+// In draw() ///////////////////////////////////////////////////////////////////
+
+self.bunnybatch.clear();
+
+for bunny in &self.bunnies {
+    self.bunnybatch.add((bunny.position,));
+}
+
+graphics::draw(ctx, &self.bunnybatch, (Vec2::new(0.0, 0.0),))?;
+```
+
+## Audio
+
+```rust
+let shot_sound = audio::Source::new(ctx, "/pew.ogg")?;
+```
+
+## Timing
 
 The internal timer is in the `TimeContext` type, which includes a `residual_update_dt`.
 
@@ -206,13 +276,62 @@ The internal timer is in the `TimeContext` type, which includes a `residual_upda
 // Returns true if the time elapsed since the last check is higher than the target FPS.
 // If more than a frame passed, is subtracts one frame time from `residual_update_dt`.
 //
-// This example is a bit confusing, but what it does is to perform one rotation change for each frame.
-// If the game is late, one cycle is performed for each frame of delay.
+// This pattern is used to run the intended number of updates per second: if the time is early, no cycles
+// are run, otherwise, one cycle is performed for each cycle fitting in the time since the last update.
 //
-while timer::check_update_time(ctx, DESIRED_FPS) {
+while timer::check_update_time(ctx, UPDATES_PER_SECOND) {
     self.rotation += 0.01;
 }
+
+// The game doesn't implement a frame limiter; it requires yielding (via framework, although it's just
+// forwarded to the O/S).
+//
+fn draw(&mut self, ctx: &mut Context) -> GameResult {
+  // blah
+  timer::yield_now();
+  Ok()
+}
 ```
+
+## Events Handling
+
+### Input
+
+Example for a game where keeping a key pressed is meaningful; in a game where this doesn't apply, `key_up_event()` can be ignored.
+
+```rust
+impl EventHandler for MainState {
+  fn key_down_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods, _repeat: bool) {
+      match keycode {
+          KeyCode::Up => { self.input.yaxis = 1.0; }
+          KeyCode::Left => { self.input.xaxis = -1.0; }
+          KeyCode::Right => { self.input.xaxis = 1.0; }
+          KeyCode::Space => { self.input.fire = true; }
+          KeyCode::Escape => event::quit(ctx),            // Exit API
+          _ => {}
+      }
+  }
+
+  fn key_up_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods) {
+      match keycode {
+          KeyCode::Up => { self.input.yaxis = 0.0; }
+          KeyCode::Left | KeyCode::Right => { self.input.xaxis = 0.0; }
+          KeyCode::Space => { self.input.fire = false; }
+          _ => {}
+      }
+  }
+}
+```
+
+Mouse:
+
+```rust
+fn mouse_button_down_event(&mut self,_ctx: &mut Context,button: input::mouse::MouseButton,_x: f32,_y: f32) {
+    if button == input::mouse::MouseButton::Left { /* .. */ }
+}
+```
+
+## Misc
 
 ### System
 
@@ -220,4 +339,8 @@ while timer::check_update_time(ctx, DESIRED_FPS) {
 // Graphics system info (drivers etc.).
 //
 let info: String = graphics::renderer_info(&ctx)?;
+
+// Canvas dimensions.
+//
+let (width, height) = graphics::drawable_size(ctx);
 ```

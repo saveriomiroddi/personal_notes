@@ -1,3 +1,24 @@
+## Wed 26/May/2021
+
+- Projects/Open source
+  - Geet
+  - Blog
+  - ggez
+    - [x] PR: Snake example: Simplify non-negative modulo computation, by using rem_euclid() API
+    - [x] Open discussion about improving code based on maintainer comment
+      - [x] Fight implementation
+      - [x] Write detailed explanation
+    - [ ] PR: Snake example: Use the library's timer rather than manual time tracking
+- Rust/Gamedev
+  - Prepare for porting Code the Classics: Readings
+    - [x] ggez game examples
+    - [ ] ggez API examples
+      - [x] `bunnymark.rs`
+      - [x] `spritebatch.rs`
+      - [x] `meshbatch.rs`
+      - [x] `imageview.rs`
+- Rust/CS
+
 ## Tue 25/May/2021
 
 - Projects/Open source
@@ -5,7 +26,7 @@
     - [x] Fix non-replan skip event decoding
 - Rust/Gamedev
   - Prepare for porting Code the Classics: Readings
-    - [ ] ggez examples
+    - [ ] ggez game examples
       - [x] Fight `timer::check_update_time()`
       - [x] Fight mistaken interpretation of unary sign
 
@@ -14,7 +35,7 @@
 - Rust/Gamedev
   - Prepare for porting Code the Classics: Readings
     - [x] Yet another round of research and discussion
-    - [ ] ggez examples
+    - [ ] ggez game examples
   - Port Code the Classics
     - [ ] Boing
       - [x] Read/understand code

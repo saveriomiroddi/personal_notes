@@ -1,14 +1,22 @@
-## Wed 26/May/2021
+## Thu 27/May/2021
 
 - Projects/Open source
   - Geet
-  - Blog
+    - [ ] Review `pr create -A`
+    - [ ] Review case sensitiveness
+- Studies
+  - Rust
+    - [ ] Investigate compiled ASM of different ggez function versions
+
+## Wed 26/May/2021
+
+- Projects/Open source
   - ggez
     - [x] PR: Snake example: Simplify non-negative modulo computation, by using rem_euclid() API
     - [x] Open discussion about improving code based on maintainer comment
       - [x] Fight implementation
       - [x] Write detailed explanation
-    - [ ] PR: Snake example: Use the library's timer rather than manual time tracking
+    - [x] PR: Snake example: Use the library's timer rather than manual time tracking
 - Rust/Gamedev
   - Prepare for porting Code the Classics: Readings
     - [x] ggez game examples
@@ -17,7 +25,6 @@
       - [x] `spritebatch.rs`
       - [x] `meshbatch.rs`
       - [x] `imageview.rs`
-- Rust/CS
 
 ## Tue 25/May/2021
 

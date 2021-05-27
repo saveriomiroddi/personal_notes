@@ -119,8 +119,8 @@ Snippets:
 
 ```sh
 chmod -R go-rx .ssh                         # setup SSH permissions
-chage -d $(date +%Y-%m-%d) myuser           # set the change date to today!
-chage -I 0 myuser                           # expire password
+chage -d $(date +%Y-%m-%d) $user            # set the change date to today!
+chage -I 0 $user                            # expire password
 ```
 
 User name/home/sudo:

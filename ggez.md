@@ -3,11 +3,13 @@
 - [ggez](#ggez)
   - [Hello world](#hello-world)
   - [General design](#general-design)
-  - [Drawables](#drawables)
-    - [Text](#text)
-    - [Meshes (Geometric shapes)](#meshes-geometric-shapes)
-    - [Images](#images)
-    - [Sprite batch](#sprite-batch)
+  - [Draw](#draw)
+    - [Viewport](#viewport)
+    - [Drawables](#drawables)
+      - [Text](#text)
+      - [Meshes (Geometric shapes)](#meshes-geometric-shapes)
+      - [Images](#images)
+      - [Sprite batch](#sprite-batch)
   - [Audio](#audio)
   - [Timing](#timing)
   - [Events Handling](#events-handling)
@@ -100,9 +102,22 @@ Generally speaking:
 - Both `MainState` and the entities include `update()` and `draw()`
   - when the methods are called on `MainState`, it calls them on the entities
 
-## Drawables
+## Draw
 
-### Text
+### Viewport
+
+When setting a reversed viewport, it seems that the reverse coordinates are relative:
+
+```rust
+// This is an upside-down 800x600 viewport; note the second Y value.
+//
+let viewport = graphics::Rect::new(0.0, 600.0, 800.0, -600.0);
+graphics::set_screen_coordinates(ctx, viewport).unwrap();
+```
+
+### Drawables
+
+#### Text
 
 ```rust
 // Coordinates: top left.
@@ -111,7 +126,7 @@ let font = graphics::Font::new(ctx, "/LiberationMono-Regular.ttf")?;
 let text = graphics::Text::new(("Hello world!", font, 48.0));
 ```
 
-### Meshes (Geometric shapes)
+#### Meshes (Geometric shapes)
 
 ```rust
 // The type is `Mesh` for all.
@@ -236,13 +251,13 @@ mb.raw(&triangle_verts, &triangle_indices, Some(image))?;
 mb.build(ctx)
 ```
 
-### Images
+#### Images
 
 Coordinates: top left.
 
 See [Hello world](#hello-world).
 
-### Sprite batch
+#### Sprite batch
 
 Draw images in batch - for large amounts, it saves considerable time (bunnymark (1000 images) is ~8x as fast).
 

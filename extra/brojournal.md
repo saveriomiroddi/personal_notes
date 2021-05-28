@@ -1,3 +1,18 @@
+## Fri 28/May/2021
+
+- Projects/Open source
+  - Geet
+    - [x] Workaround CLI array arguments causing an error
+  - Blog
+    - [x] `add_new_book.sh`: Use the cover filename as book name
+- Rust
+  - [ ] Investigate compiled ASM of different ggez function versions
+- Rust/Gamedev
+  - Prepare for porting Code the Classics: Readings
+    - [ ] ggez API examples
+      - [x] `transforms.rs`
+      - [ ] `graphics_settings.rs`
+
 ## Thu 27/May/2021
 
 - Projects/Open source

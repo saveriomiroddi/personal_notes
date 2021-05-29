@@ -1,3 +1,14 @@
+## Sat 29/May/2021
+
+- Rust/Gamedev
+  - Prepare for porting Code the Classics: Readings
+    - [ ] ggez API examples
+      - [x] `graphics_settings.rs`
+      - [x] `input_test.rs`
+- Admin
+  - Planning/Other
+    - [x] Review/buy books for next cycles
+
 ## Fri 28/May/2021
 
 - Projects/Open source
@@ -73,7 +84,8 @@
     - [x] Final cleanup repository
     - [x] Close project and add explanation
 - Admin
-  - [x] Plan cycle
+  - Planning/Other
+    - [x] Plan cycle
 - Rust/Gamedev
   - Prepare for porting Code the Classics: Readings
     - [ ] Code the Classics book

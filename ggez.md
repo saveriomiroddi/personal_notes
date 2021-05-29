@@ -4,16 +4,18 @@
   - [Hello world](#hello-world)
   - [General design](#general-design)
   - [Draw](#draw)
+    - [Text](#text)
+    - [Meshes (Geometric shapes)](#meshes-geometric-shapes)
+    - [Images](#images)
+    - [Sprite batch](#sprite-batch)
+  - [Screen](#screen)
+    - [Graphics configuration](#graphics-configuration)
     - [Viewport](#viewport)
-    - [Drawables](#drawables)
-      - [Text](#text)
-      - [Meshes (Geometric shapes)](#meshes-geometric-shapes)
-      - [Images](#images)
-      - [Sprite batch](#sprite-batch)
   - [Audio](#audio)
   - [Timing](#timing)
   - [Events Handling](#events-handling)
     - [Input](#input)
+    - [Window](#window)
   - [Misc](#misc)
     - [System](#system)
 
@@ -78,6 +80,8 @@ impl event::EventHandler for MainState {
         // end of draw().
         graphics::present(ctx)?;
 
+        timer::yield_now();
+
         Ok(())
     }
 }
@@ -104,20 +108,7 @@ Generally speaking:
 
 ## Draw
 
-### Viewport
-
-When setting a reversed viewport, it seems that the reverse coordinates are relative:
-
-```rust
-// This is an upside-down 800x600 viewport; note the second Y value.
-//
-let viewport = graphics::Rect::new(0.0, 600.0, 800.0, -600.0);
-graphics::set_screen_coordinates(ctx, viewport).unwrap();
-```
-
-### Drawables
-
-#### Text
+### Text
 
 ```rust
 // Coordinates: top left.
@@ -126,7 +117,7 @@ let font = graphics::Font::new(ctx, "/LiberationMono-Regular.ttf")?;
 let text = graphics::Text::new(("Hello world!", font, 48.0));
 ```
 
-#### Meshes (Geometric shapes)
+### Meshes (Geometric shapes)
 
 ```rust
 // The type is `Mesh` for all.
@@ -251,13 +242,13 @@ mb.raw(&triangle_verts, &triangle_indices, Some(image))?;
 mb.build(ctx)
 ```
 
-#### Images
+### Images
 
 Coordinates: top left.
 
 See [Hello world](#hello-world).
 
-#### Sprite batch
+### Sprite batch
 
 Draw images in batch - for large amounts, it saves considerable time (bunnymark (1000 images) is ~8x as fast).
 
@@ -275,6 +266,86 @@ for bunny in &self.bunnies {
 }
 
 graphics::draw(ctx, &self.bunnybatch, (Vec2::new(0.0, 0.0),))?;
+```
+
+## Screen
+
+
+### Graphics configuration
+
+Fullscreen/windowed, and resizability:
+
+```rust
+enum conf::FullscreenType {
+    Windowed,
+    True,     // also it allows us to set different resolutions.
+    Desktop,  // modern preference; plays nicer with multiple monitors.
+}
+
+ggez::graphics::set_fullscreen(ctx, fullscreen_type)?;
+
+context_builder
+    .window_mode(
+        conf::WindowMode::default()
+            .fullscreen_type(conf::FullscreenType::Windowed)
+            .resizable(true),
+    )
+```
+
+Antialiasing:
+
+```rust
+// Supported: 2⁰ to 2⁴
+//
+context_builder
+    .window_setup(
+        // or: `conf::NumSamples::Four`
+        conf::WindowSetup::default().samples(conf::NumSamples::try_from(4)?)
+    )
+```
+
+Backend:
+
+```rust
+enum Backend {
+    // Defaults to 3.2, which is supported by basically every machine since 2009 or so
+    OpenGL { major: u8, minor: u8 },
+    // Defaults to 3.0, used for mobile devices; older versions have limitations.
+    #[allow(clippy::upper_case_acronyms)]
+    OpenGLES { major: u8, minor: u8 },
+}
+
+let backend = conf::Backend::default(); // OpenGL
+let backend = conf::Backend::OpenGLES { major: 3, minor: 0 };
+
+context_builder
+    .backend(backend)
+```
+
+### Viewport
+
+The `set_screen_coordinates()` function sets the viewport; this implies that if the window size is the same, and the viewport size increases, the image drawn gets smaller!
+
+```rust
+println!("Viewport size: {:?}", graphics::screen_coordinates(ctx));
+```
+
+It's also possible to draw upside down:
+
+```rust
+// This is an upside-down 800x600 viewport; note the second Y value.
+//
+let viewport = graphics::Rect::new(0.0, 600.0, 800.0, -600.0);
+graphics::set_screen_coordinates(ctx, viewport).unwrap();
+```
+
+Since the event coordinates are absolute, if the coordinates system (viewport) is changed, the logical coordinates need to be computed:
+
+```rust
+let screen_rect = graphics::screen_coordinates(ctx);
+let size = graphics::window(ctx).inner_size(); // seems the same as graphics::drawable_size(ctx)
+logical_x = (x / (size.width  as f32)) * screen_rect.w + screen_rect.x;
+logical_y = (y / (size.height as f32)) * screen_rect.h + screen_rect.y;
 ```
 
 ## Audio
@@ -316,39 +387,71 @@ Example for a game where keeping a key pressed is meaningful; in a game where th
 
 ```rust
 impl EventHandler for MainState {
-  fn key_down_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods, _repeat: bool) {
-      match keycode {
-          KeyCode::Up => { self.input.yaxis = 1.0; }
-          KeyCode::Left => { self.input.xaxis = -1.0; }
-          KeyCode::Right => { self.input.xaxis = 1.0; }
-          KeyCode::Space => { self.input.fire = true; }
-          KeyCode::Escape => event::quit(ctx),            // Exit API
-          _ => {}
-      }
-  }
+    fn key_down_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods, _repeat: bool) {
+        match keycode {
+            KeyCode::Up => { self.input.yaxis = 1.0; }
+            KeyCode::Left => { self.input.xaxis = -1.0; }
+            KeyCode::Right => { self.input.xaxis = 1.0; }
+            KeyCode::Space => { self.input.fire = true; }
+            KeyCode::Escape => event::quit(ctx),            // Exit API
+            _ => {}
+        }
+    }
 
-  fn key_up_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods) {
-      match keycode {
-          KeyCode::Up => { self.input.yaxis = 0.0; }
-          KeyCode::Left | KeyCode::Right => { self.input.xaxis = 0.0; }
-          KeyCode::Space => { self.input.fire = false; }
-          _ => {}
-      }
-  }
+    fn key_up_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods) {
+        match keycode {
+            KeyCode::Up => { self.input.yaxis = 0.0; }
+            KeyCode::Left | KeyCode::Right => { self.input.xaxis = 0.0; }
+            KeyCode::Space => { self.input.fire = false; }
+            _ => {}
+        }
+    }
+
+    // Text input (simplified handling); called after (each) key_down event.
+    //
+    fn text_input_event(&mut self, _ctx: &mut Context, ch: char) { /* ... */ }
 }
+
+// Key status can be checked from the context:
+
+let a_key_pressed: bool = input::keyboard::is_key_pressed(ctx, KeyCode::A);
+let shift_key_pressed: bool =  input::keyboard::is_mod_active(ctx, input::keyboard::KeyMods::SHIFT)
+println!("Pressed keys: {:?}", input::keyboard::pressed_keys(ctx));
 ```
 
 Mouse:
 
 ```rust
-fn mouse_button_down_event(&mut self,_ctx: &mut Context,button: input::mouse::MouseButton,_x: f32,_y: f32) {
+fn mouse_button_down_event(&mut self, _ctx: &mut Context, button: input::mouse::MouseButton, x: f32, y: f32) {
     if button == input::mouse::MouseButton::Left { /* .. */ }
 }
+
+fn mouse_button_up_event(&mut self, _ctx: &mut Context, button: MouseButton, x: f32, y: f32) { /* ... */ }
+fn mouse_motion_event(&mut self, _ctx: &mut Context, x: f32, y: f32, xrel: f32, yrel: f32) { /* ... */ }
+fn mouse_wheel_event(&mut self, _ctx: &mut Context, x: f32, y: f32) { /* ... */ }
+```
+
+Pad:
+
+```rust
+fn gamepad_button_down_event(&mut self, _ctx: &mut Context, btn: Button, id: GamepadId) { /* .. */ }
+fn gamepad_button_up_event(&mut self, _ctx: &mut Context, btn: Button, id: GamepadId) { /* .. */ }
+fn gamepad_axis_event(&mut self, _ctx: &mut Context, axis: Axis, value: f32, id: GamepadId) { /* .. */ }
+```
+
+### Window
+
+```rust
+fn resize_event(&mut self, ctx: &mut Context, new_width: f32, new_height: f32) { /* ... */ }
+
+fn focus_event(&mut self, _ctx: &mut Context, gained: bool) { /* gained/lost */ }
 ```
 
 ## Misc
 
 ### System
+
+Window functions return zeros if the window doesn't exist.
 
 ```rust
 // Graphics system info (drivers etc.).
@@ -358,4 +461,8 @@ let info: String = graphics::renderer_info(&ctx)?;
 // Canvas dimensions.
 //
 let (width, height) = graphics::drawable_size(ctx);
+
+// Size of the window, including borders, titlebar, etc.
+//
+let (width, height) = graphics::size(ctx);
 ```

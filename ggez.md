@@ -11,13 +11,16 @@
   - [Screen](#screen)
     - [Graphics configuration](#graphics-configuration)
     - [Viewport](#viewport)
+    - [Canvas](#canvas)
   - [Audio](#audio)
   - [Timing](#timing)
   - [Events Handling](#events-handling)
     - [Input](#input)
     - [Window](#window)
   - [Misc](#misc)
-    - [System](#system)
+    - [Graphics(-related) info](#graphics-related-info)
+    - [Files](#files)
+    - [Logging](#logging)
 
 ## Hello world
 
@@ -270,6 +273,7 @@ graphics::draw(ctx, &self.bunnybatch, (Vec2::new(0.0, 0.0),))?;
 
 ## Screen
 
+It's possible to draw to an arbitrary destination; see `render_to_image.rs`.
 
 ### Graphics configuration
 
@@ -348,10 +352,34 @@ logical_x = (x / (size.width  as f32)) * screen_rect.w + screen_rect.x;
 logical_y = (y / (size.height as f32)) * screen_rect.h + screen_rect.y;
 ```
 
+### Canvas
+
+It's possible to draw to a canvas, and then to screen.
+
+The example (`hello_canvas.rs`) is confusing - it seems that the screen canvas needs to be set to `None` in order for the canvas to be written to the screen, but it's written even after.
+
+It is also [buggy](https://docs.rs/ggez/0.4.4/ggez/graphics/type.Canvas.html).
+
 ## Audio
 
 ```rust
-let shot_sound = audio::Source::new(ctx, "/pew.ogg")?;
+let sound = audio::Source::new(ctx, "/pew.ogg")?;
+sount.set_volume(0.5);
+
+// Playing asynchronously; doesn't wait if the sound is already playing
+sound.play_detached(ctx).unwrap();
+// Waits if the sound is already playing
+sound.play_later().unwrap();
+// Stop and play_later()
+sound.play(ctx).unwrap();
+
+// There are other actions available, like pause(), resume(), repeat(), etc.
+
+// There are other tests avilable, like stopped(), etc.
+while sound.playing() { println!("Elapsed time: {:?}", sound.elapsed()) }
+
+// There are effects available.
+sound.set_pitch(2.0);
 ```
 
 ## Timing
@@ -449,7 +477,7 @@ fn focus_event(&mut self, _ctx: &mut Context, gained: bool) { /* gained/lost */ 
 
 ## Misc
 
-### System
+### Graphics(-related) info
 
 Window functions return zeros if the window doesn't exist.
 
@@ -465,4 +493,56 @@ let (width, height) = graphics::drawable_size(ctx);
 // Size of the window, including borders, titlebar, etc.
 //
 let (width, height) = graphics::size(ctx);
+
+// Averaged from the last 200 frames.
+//
+let fps: f64 = ggez::timer::fps(ctx);
 ```
+
+### Files
+
+The filesystem library implements a VFS.
+
+```rust
+// Print context filesystem info
+filesystem::print_all(ctx);
+
+// Get files of a dir
+let files: Box<dyn Iterator<Item = path::PathBuf>> = filesystem::read_dir(ctx, "/")?;
+
+let test_file = path::Path::new("/path/to/file");
+
+// Write
+{
+    let mut file = filesystem::create(ctx, test_file)?;
+    file.write_all(b"foo")?;
+}
+
+// Append
+{
+    let options = filesystem::OpenOptions::new().append(true);
+    let mut file = filesystem::open_options(ctx, test_file, options)?;
+    file.write_all(b"foo")?;
+}
+
+// Read
+{
+    let mut buffer = Vec::new();
+    let mut file = filesystem::open(ctx, test_file)?;
+    file.read_to_end(&mut buffer)?;
+}
+
+// Delete
+filesystem::delete(ctx, "/path/to/file")?;
+
+// Write a configuration file `conf.toml` to the user dir.
+let config = conf::Conf::new();
+filesystem::write_config(ctx, &config)?;
+
+// Read a configuration file, named `conf.toml`, in any resource dir.
+let config = filesystem::read_config(ctx, )?;
+```
+
+### Logging
+
+See `logging.rs` example.

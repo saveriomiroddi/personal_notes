@@ -1,3 +1,16 @@
+## Sun 30/May/2021
+
+- Projects/Open source
+  - ruby-packer
+    - [x] Discussion maintenance
+- Rust/Gamedev
+  - Prepare for porting Code the Classics: Readings
+    - [x] ggez API examples
+      - [x] `sounds.rs`
+      - [x] `files.rs`
+      - [x] `canvas_subframe.rs`
+      - [x] `hello_canvas.rs`
+
 ## Sat 29/May/2021
 
 - Rust/Gamedev

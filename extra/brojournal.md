@@ -1,3 +1,12 @@
+## Mon 31/May/2021
+
+- Rust/Gamedev
+  - Port Code the Classics
+    - [x] Deeper review of the API requirements
+    - [ ] Boing
+      - [ ] Port
+  - [x] Deeper review of Macroquad
+
 ## Sun 30/May/2021
 
 - Projects/Open source

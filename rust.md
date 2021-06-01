@@ -483,6 +483,7 @@ impl Into<i32> for GamePiece {
 WATCH OUT!! `-1.operation(2)` is interpreted as `-(1.operation(2))`!!
 
 ```rust
+x / y                           // nearest int (-3 / 2 == -1) -> different from Ruby
 val += 1; val -= 1;             // increment/decrement value (no postfix)
 val <<= n; val >>= n;           // overflows are ignored
 std::mem::swap(&mut a, &mut b); // !! swap two variables !!
@@ -566,6 +567,8 @@ let (cycle_execute, x) = self.cycle_decode();
 cycle_execute(self, x);
 ```
 
+If the error `expected fn pointer, found fn item` is raised, explictly define the fn type (seems related to git.io/JGz2L).
+
 Because of the capturing, closures have overhead compared to functions.
 
 Closures can use function pointers, including initializer functions!!:
@@ -603,6 +606,8 @@ fn my_closure() -> Box<dyn Fn(i32) -> i32> {
   Box::new(|x| x + 1)
 }
 ```
+
+`const` closures [can't be defined](https://stackoverflow.com/questions/29191170/is-there-any-way-to-explicitly-write-the-type-of-a-closure).
 
 ### Ranges and `std::iter::Iterator` methods
 
@@ -785,7 +790,7 @@ if let Some(i) = vec.iter().position(|vec_item| *vec_item == remove_item) {
   vec.remove(i);
 }
 
-// Remove all matching elements
+// Remove all matching elements (Ruby delete_if(), but with opposite condition)
 //
 vec.retain(|vec_item| *vec_item != remove_item);
 ```
@@ -1288,7 +1293,7 @@ result.unwrap_or_else( |err | {
 let value = result.expect("it shouldn't be None!");
 let &mut value = result.as_mut().expect("it shouldn't be None!");
 
-// Converts to Option, and discards the error (use this if it's sure that there can't be an error)
+// Convert Result to Option, and discard the error (use this if it's sure that there can't be an error)
 //
 result.ok();
 
@@ -3100,7 +3105,7 @@ use macros::MyMacro;
 // or (must be at the crate root)
 
 #[macro_use]
-extern crate macros;
+extern crate macros; // name of the crate
 ```
 
 then use!

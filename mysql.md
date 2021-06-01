@@ -616,7 +616,7 @@ CALL ALL_TENANTS_OPERATION(); DROP PROCEDURE ALL_TENANTS_OPERATION;
 ## Performance
 
 ```sql
-# Join order
+# Query hints: Join order
 # Reference: https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimizer-hints-join-order.
 
 SELECT /*+ JOIN_ORDER(t2, t1) */ COUNT(*)

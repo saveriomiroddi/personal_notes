@@ -12,7 +12,7 @@
     - [Graphics configuration](#graphics-configuration)
     - [Viewport](#viewport)
     - [Canvas](#canvas)
-  - [Audio](#audio)
+  - [Audio/Sound](#audiosound)
   - [Timing](#timing)
   - [Events Handling](#events-handling)
     - [Input](#input)
@@ -21,6 +21,7 @@
     - [Graphics(-related) info](#graphics-related-info)
     - [Files](#files)
     - [Logging](#logging)
+    - [Algebra](#algebra)
 
 ## Hello world
 
@@ -28,7 +29,7 @@
 use ggez::event;
 use ggez::graphics;
 use ggez::{Context, GameResult};
-use glam::*;
+use glam::Vec2;                  // Add `glam = {version = "...", features = ["mint"]}` dependency to the manifest
 
 struct MainState {
     objects_x: f32,
@@ -360,7 +361,9 @@ The example (`hello_canvas.rs`) is confusing - it seems that the screen canvas n
 
 It is also [buggy](https://docs.rs/ggez/0.4.4/ggez/graphics/type.Canvas.html).
 
-## Audio
+## Audio/Sound
+
+Don't forget that the reference must be in scope, somewhere :)
 
 ```rust
 let sound = audio::Source::new(ctx, "/pew.ogg")?;
@@ -546,3 +549,15 @@ let config = filesystem::read_config(ctx, )?;
 ### Logging
 
 See `logging.rs` example.
+
+### Algebra
+
+ggez uses the `glam` crate:
+
+```rust
+// Related types: Mat2/3/4, Quat, Vec3/4; Vec3A is SIMD
+
+const X_AXIS: Vec2 = const_vec2!([1., 0.]);
+let vec2 = glam::Vec2::new(200., 100.);
+let normalize = vec2.normalize();
+```

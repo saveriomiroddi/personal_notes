@@ -1,3 +1,12 @@
+## Tue 01/Jun/2021
+
+- Rust/Gamedev
+  - Port Code the Classics
+    - [ ] Boing
+      - [ ] Port
+        - [x] Fight missing ggez dependency
+        - [x] Fight closure/function passing, item type issue
+
 ## Mon 31/May/2021
 
 - Rust/Gamedev

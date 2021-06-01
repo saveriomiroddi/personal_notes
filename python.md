@@ -97,10 +97,14 @@ a, b = myfunction()
 
 ### Operators
 
-```python
-# not/or have precedence as in other languages
-# and/or do short-circuit
-```
+Math:
+
+- `//`: floor of int division (like ruby, ie. `-3 // 2 == -2`)
+
+Booleans:
+
+- `not`/`or` have precedence as in other languages
+- `and`/`or` do short-circuit
 
 ### Time stuff
 

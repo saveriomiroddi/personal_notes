@@ -1,3 +1,11 @@
+## Wed 02/Jun/2021
+
+- Rust/Gamedev
+  - Port Code the Classics
+    - [ ] Boing
+      - [ ] Design
+        - [ ] Fight control functions
+
 ## Tue 01/Jun/2021
 
 - Rust/Gamedev

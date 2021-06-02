@@ -74,7 +74,7 @@ impl event::EventHandler for MainState {
         graphics::draw(
             ctx,
             &self.image,
-            graphics::DrawParam::new()
+            DrawParam::new()
                 .dest(Vec2::new(self.objects_x, 0.))
                 .rotation(0.5)
                 .scale(Vec2::new(10., 10.)),
@@ -193,7 +193,7 @@ let mut mesh_batch = graphics::MeshBatch::new(mesh)?;
 
 for x in 0..100 {
     mesh_batch.add(
-        graphics::DrawParam::new()
+        DrawParam::new()
             .dest(Vec2::new(x * 16.0, 100))
             .rotation(x * PI),
     );
@@ -214,7 +214,7 @@ for instance in instances.iter_mut().take(50) {
 // Must flush before drawing! We modified 50, so we flush that number, starting from index 0.
 //
 self.mesh_batch.flush_range(ctx, graphics::MeshIdx(0), 50)?;
-self.mesh_batch.draw(ctx, graphics::DrawParam::default())?;
+self.mesh_batch.draw(ctx, DrawParam::default())?;
 ```
 
 Textured triangle:
@@ -369,19 +369,25 @@ Don't forget that the reference must be in scope, somewhere :)
 let sound = audio::Source::new(ctx, "/pew.ogg")?;
 sount.set_volume(0.5);
 
-// Playing asynchronously; doesn't wait if the sound is already playing
-sound.play_detached(ctx).unwrap();
-// Waits if the sound is already playing
-sound.play_later().unwrap();
-// Stop and play_later()
-sound.play(ctx).unwrap();
+// Playback operations (it's correct that some methods require Context, while others don't)
 
-// There are other actions available, like pause(), resume(), repeat(), etc.
+sound.play_detached(ctx)?;     // Play asynchronously (even if dropped), without wait; can't be stopped
+sound.play_later()?;           // Queue playback, waiting each time for the sound to finish
+sound.play(ctx).unwrap();      // Shortcut for stop() + play_later()
+sound.set_repeat(true);
+sound.pause();
+sound.resume();
+sound.stop(ctx)?;
 
-// There are other tests avilable, like stopped(), etc.
+// Example queries
+
 while sound.playing() { println!("Elapsed time: {:?}", sound.elapsed()) }
+sound.stopped();
+sound.volume();
+sound.repeat();
 
-// There are effects available.
+// Example effects
+
 sound.set_pitch(2.0);
 ```
 
@@ -445,9 +451,12 @@ impl EventHandler for MainState {
 
 // Key status can be checked from the context:
 
-let a_key_pressed: bool = input::keyboard::is_key_pressed(ctx, KeyCode::A);
-let shift_key_pressed: bool =  input::keyboard::is_mod_active(ctx, input::keyboard::KeyMods::SHIFT)
-println!("Pressed keys: {:?}", input::keyboard::pressed_keys(ctx));
+let a_key_pressed: bool = keyboard::is_key_pressed(ctx, KeyCode::A);
+let shift_key_pressed: bool =  keyboard::is_mod_active(ctx, keyboard::KeyMods::SHIFT)
+println!("Pressed keys: {:?}", keyboard::pressed_keys(ctx));
+let key_pressed_repeatedly: bool = keyboard::is_key_repeated(ctx, KeyCode::A);
+
+let keys_pressed: &HashSet<KeyCode> = keyboard::pressed_keys(ctx);
 ```
 
 Mouse:

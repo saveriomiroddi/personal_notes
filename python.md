@@ -8,6 +8,7 @@
     - [Collections](#collections)
       - [Lists](#lists)
       - [Dicts](#dicts)
+    - [Iteration/Comprehension](#iterationcomprehension)
     - [Functions](#functions)
     - [Operators](#operators)
     - [Time stuff](#time-stuff)
@@ -62,11 +63,6 @@ len(list)                   # size/length/count of a list
 list.append(value)          # append an item
 list[-1] if list else None  # safe get
 not list                    # idiomatic check if a list is empty
-
-# Comprehension
-
-regions = [(r.a, r.b) for r in folded_regions]    # example
-[a*10 for a in [1, 2] if a == 2]                  # example with conditional; elements not passing the test won't be included
 ```
 
 #### Dicts
@@ -77,9 +73,25 @@ dict.setdefault(key, default)  # return a value, setting the given default if no
 key in dict               # check if dict contains key
 dict.get(key[, default])  # perform a lookup; if default is not provided and the key doesn't exist, an error is raised
 dict.pop(key[, default])  # delete a key; if default is not provided and the key doesn't exist, an error is raised
+```
+
+### Iteration/Comprehension
+
+```python
+for i in range(r)         # iterate in [0, 5)
+for i in range(l, r, s)   # iterate with given (l)eft limit and (s)tep; the step can be negative (if so, make l > s).
+
+for e in list             # iterate over a list
 
 for k, v in dict.items()  # iterate over a dict
 for k in dict             # iterate over a dict keys
+```
+
+Comprehension:
+
+```python
+regions = [(r.a, r.b) for r in folded_regions]    # example
+[a*10 for a in [1, 2] if a == 2]                  # example with conditional; elements not passing the test won't be included
 ```
 
 ### Functions

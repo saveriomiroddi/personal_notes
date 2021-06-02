@@ -16,7 +16,9 @@
     - [Blackbox (nightly)](#blackbox-nightly)
   - [Crates](#crates)
     - [Partial/more flexible defaults (`smart-default`)](#partialmore-flexible-defaults-smart-default)
-    - [Random (with and without `rand`)](#random-with-and-without-rand)
+    - [Random](#random)
+      - [`rand`](#rand)
+      - [Other crates](#other-crates)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
     - [Date/times (standard)](#datetimes-standard)
     - [Date/times (`chrono`)](#datetimes-chrono)
@@ -399,7 +401,7 @@ let mut sphere2 = Sphere {
 };
 ```
 
-### Random (with and without `rand`)
+### Random
 
 Poor man's random:
 
@@ -415,7 +417,9 @@ unsafe {
 }
 ```
 
-With standard crate `rand` (see other crates at https://sr.ht/~icefox/oorandom):
+#### `rand`
+
+`rand` is the most common crate, and it's a relatively large one.
 
 ```rust
 // Shortcut API; invokes `thread_rng().gen()`.
@@ -472,6 +476,23 @@ impl<'a> MyRng<'a> {
     MyRng { rng }
   }
 }
+```
+
+#### Other crates
+
+For other crates, see https://sr.ht/~icefox/oorandom.
+
+A convenient one for small projects is [`fastrand`](https://github.com/smol-rs/fastrand):
+
+```rust
+fastrand::bool();
+fastrand::u32(..);
+
+// Shuffle an array
+fastrand::shuffle(&mut vec);
+
+// Manual seed
+fastrand::seed(7);
 ```
 
 ### Regular expressions (`regex`)

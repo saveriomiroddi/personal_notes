@@ -6,6 +6,7 @@
   - [ActiveRecord](#activerecord)
     - [Querying](#querying)
     - [Migrations](#migrations)
+    - [Callbacks](#callbacks)
 
 ## Tooling
 
@@ -103,3 +104,12 @@ Irreversible migration error:
 ```ruby
 raise ActiveRecord::IrreversibleMigration
 ```
+
+### Callbacks
+
+In order to find the difference on save, use:
+
+- `before_save` -> `changes()`
+- `after_save` -> `saved_changes()`
+
+The format is `{"field" => [before, after]}`; unchanged fields are not included.

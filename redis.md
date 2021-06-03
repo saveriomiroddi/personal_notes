@@ -9,6 +9,7 @@
 | General | `KEYS <pattern>`                     | list keys                                                                         |
 | General | `GET <key>`                          | get a key's value                                                                 |
 | General | `DEL <key>`                          | delete a key; returns the number of keys deleted                                  |
+| General | `FLUSHALL`                           | clear/purge all the keys                                                          |
 | Hash    | `HGET`                               | get a key                                                                         |
 | Hash    | `HGETALL`                            | get all the fields/values                                                         |
 | Hash    | `HMSET`                              | set multiple fields/values      (ruby library: use mapped_hmset for hash sources) |

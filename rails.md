@@ -5,6 +5,7 @@
   - [Controllers](#controllers)
   - [ActiveRecord](#activerecord)
     - [Querying](#querying)
+    - [Updating](#updating)
     - [Migrations](#migrations)
     - [Callbacks](#callbacks)
 
@@ -32,6 +33,12 @@ Article.joins(:user).optimizer_hints("JOIN_ORDER(articles, users)").to_sql
 
 ```ruby
 query.ids                   # pluck the ids!
+```
+
+### Updating
+
+```ruby
+instance.update_columns({a: 'b'})   # skips all the logic, except serialization
 ```
 
 ### Migrations

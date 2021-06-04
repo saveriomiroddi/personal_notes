@@ -18,7 +18,7 @@
     - [Partial/more flexible defaults (`smart-default`)](#partialmore-flexible-defaults-smart-default)
     - [Random](#random)
       - [`rand`](#rand)
-      - [Other crates](#other-crates)
+      - [fastrand/Other crates](#fastrandother-crates)
     - [Regular expressions (`regex`)](#regular-expressions-regex)
     - [Date/times (standard)](#datetimes-standard)
     - [Date/times (`chrono`)](#datetimes-chrono)
@@ -228,7 +228,8 @@ Conversions:
 
 ```rust
 integer.to_string();                      // integer to string
-String::from_utf8(bytes).unwrap();        // string from (valid) utf-8 bytes
+String::from_utf8(bytes).unwrap();        // (valid) utf-8 bytes to string
+char.to_digit(RADIX).unwrap();            // (parse) char to numeric
 
 // parse string to numeric type; with any numeric implementing `FromString`
 // f64 will parse integer strings (e.g. `1`)
@@ -478,7 +479,7 @@ impl<'a> MyRng<'a> {
 }
 ```
 
-#### Other crates
+#### fastrand/Other crates
 
 For other crates, see https://sr.ht/~icefox/oorandom.
 
@@ -487,6 +488,10 @@ A convenient one for small projects is [`fastrand`](https://github.com/smol-rs/f
 ```rust
 fastrand::bool();
 fastrand::u32(..);
+
+// Random array element (Ruby sample())
+let vec_i = fastrand::shuffle(..vec.len());
+vec[vec_i];
 
 // Shuffle an array
 fastrand::shuffle(&mut vec);

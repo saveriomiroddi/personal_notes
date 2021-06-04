@@ -1,3 +1,11 @@
+## Fri 04/Jun/2021
+
+- Port Code the Classics
+  - [ ] Boing
+    - [x] Port
+    - [x] Fight send showcase
+    - [x] Unfork repo
+
 ## Thu 03/Jun/2021
 
 - Rust/Gamedev

@@ -1298,6 +1298,11 @@ let &mut value = result.as_mut().expect("it shouldn't be None!");
 //
 result.ok();
 
+// Convert Option to Result.
+//
+option.ok_or("error!");
+option.ok_or_else(|| slow_function() );
+
 // take(): extract a value and replace with None (no errors raised if invoked on None).
 // This is useful when we want to move out an instance that doesn't implement Copy.
 //

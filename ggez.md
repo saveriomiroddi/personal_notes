@@ -293,7 +293,8 @@ context_builder
     .window_mode(
         conf::WindowMode::default()
             .fullscreen_type(conf::FullscreenType::Windowed)
-            .resizable(true),
+            .vsync(true) // default: true
+            .resizable(true)
     )
 ```
 

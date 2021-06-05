@@ -508,7 +508,7 @@ General:
 Operations on numbered lines (1-based):
 
 - insert : `i<content>` (before match; includes newline)
-- insert : `a<content>` (after match; includes newline)
+- append : `a<content>` (after match; includes newline)
 - delete : `d`.
 - replace : `c<content>`.
 - search/replace: `s/<search>/<replace>/[g]`

@@ -473,7 +473,7 @@ The concept is simple - encapsulate the update behavior of entities, rather than
 
 ### 12. Subclass Sandbox
 
-If many parts of a system need to be coupled with a behavior that in turn has many implementation, a solution is to:
+If many parts of a system need to be coupled with a behavior that in turn has many implementations, a solution is to:
 
 - implement a base class, which is coupled with the systems, and provides protected functions to the subclasses, in order to make them work;
 - implement many subclasses, which use only the protected functions, and don't communicate with the systems.

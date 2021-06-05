@@ -1,10 +1,27 @@
+## Sat 05/Jun/2021
+
+- Rust/Gamedev
+  - Port Code the Classics
+    - [x] Boing
+      - [x] Think improvements to original design
+    - [x] Write script for adding and preparing new projects
+    - [ ] Cavern
+      - [ ] Read/understand code
+- Projects/Open source
+  - ZFS
+    - [x] Fix: [Openzfs Ppa crashes Ubuntu server 20.04 installer](https://github.com/saveriomiroddi/zfs-installer/issues/200)
+    - [x] Fix new issue introduced by 20.04.2
+    - [x] Disable the PPA on UbuntuServer
+    - [ ] Fix: [v0.4x breaks update-grub](https://github.com/saveriomiroddi/zfs-installer/issues/199)
+
 ## Fri 04/Jun/2021
 
-- Port Code the Classics
-  - [ ] Boing
-    - [x] Port
-    - [x] Fight send showcase
-    - [x] Unfork repo
+- Rust/Gamedev
+  - Port Code the Classics
+    - [ ] Boing
+      - [x] Port
+      - [x] Fight send showcase
+      - [x] Unfork repo
 
 ## Thu 03/Jun/2021
 

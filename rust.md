@@ -33,18 +33,18 @@
     - [Pattern matching](#pattern-matching)
       - [Error handling](#error-handling)
     - [Structs](#structs)
-    - [`self` in associated methods](#self-in-associated-methods)
+    - [`self` in methods](#self-in-methods)
     - [Generics](#generics)
     - [Traits](#traits)
       - [Basics (and Generics #2)](#basics-and-generics-2)
-      - [OO-approach and supertraits](#oo-approach-and-supertraits)
+      - [Approaches to collections and static/dynamic dispatching](#approaches-to-collections-and-staticdynamic-dispatching)
+      - [Supertraits and inheritance (object-orientation)](#supertraits-and-inheritance-object-orientation)
+        - [Inheritance: making overridden methods private](#inheritance-making-overridden-methods-private)
       - [Limitations of returning Self](#limitations-of-returning-self)
-      - [Disambiguation](#disambiguation)
       - [Downcasting/Upcasting](#downcastingupcasting)
     - [Operator overloading](#operator-overloading)
     - [Method overloading (workaround)](#method-overloading-workaround)
-    - [Static methods](#static-methods)
-    - [Inheritance emulation (private trait methods)](#inheritance-emulation-private-trait-methods)
+    - [Associated functions/methods](#associated-functionsmethods)
     - [Ownership](#ownership)
       - [Move](#move)
       - [Borrowing](#borrowing)
@@ -272,7 +272,6 @@ fn main() -> std::result::Result<(), Box<dyn Error>> {
 
   // `mut`: mutable.
   // the `new` function is not dictated by the language, but a common practice.
-  // static methods are called "associated functions".
   //
   let mut guess = String::new();
 
@@ -532,8 +531,7 @@ let is_0 = |x: i32| -> bool { x == 0; }     // with type annotations; they're no
 
 // Generic closure signature. The closure types passed don't need to be annotated.
 //
-struct Calculator<T: Fn(u32) -> u32>
-{
+struct Calculator<T: Fn(u32) -> u32> {
   calculation: T,
 }
 ```
@@ -1481,9 +1479,9 @@ let mut user2 = User {
 }
 ```
 
-### `self` in associated methods
+### `self` in methods
 
-In associated methods, the `self` reference can be also a smart pointer:
+In methods, the `self` reference can be also a smart pointer:
 
 ```rust
 struct MyStruct {
@@ -1629,48 +1627,43 @@ impl<T: Display + Ord, U> Point<T, U> {
 }
 ```
 
-#### OO-approach and supertraits
+#### Approaches to collections and static/dynamic dispatching
+
+Let's say we have the following trait + concrete types:
 
 ```rust
 pub trait Draw { fn draw(&self); }
 
-pub struct Screen<T: Draw> {
-  pub components: Vec<T>,
-}
-impl<T: Draw> Screen<T> { pub fn run(&self) {} }
+pub struct Square {}
+impl Draw for Square { fn draw(&self) {} }
 
-pub struct Pizza {}
-impl Draw for Pizza { fn draw(&self) {} }
-
-pub struct Tapparella {}
-impl Draw for Tapparella { fn draw(&self) {} }
-
-Screen {
-  components: vec![Pizza {}, Pizza {}],
-};
+pub struct Circle {}
+impl Draw for Circle { fn draw(&self) {} }
 ```
 
-Dynamic dispatch version. components needs to be declared as `Vec<Box<dyn Draw>>`, where `dyn` indicates dynamic dispatch.
+If we want a generic collection of instances of the same type, we use generics; this is faster, as it's static dispatching:
 
 ```rust
-pub trait Draw { fn draw(&self); }
+pub struct Screen<T: Draw> {
+    pub components: Vec<T>,
+}
 
+// Syntax for defining methods with generics.
+impl<T: Draw> Screen<T> { pub fn run(&self) {} }
+
+let screen = Screen { components: vec![Square {}, Square {}] };
+```
+
+If the instances can be of different types, we use dynamic dispatching:
+
+```rust
 pub struct Screen {
-  // Previously, this could be defined as `Vec<&Draw>`, which is now deprecated.
-  //
+  // In the past, this could be defined as `Vec<&Draw>`, which is now deprecated.
   pub components: Vec<Box<dyn Draw>>,
 }
 impl Screen { pub fn run(&self) {} }
 
-pub struct Pizza {}
-impl Draw for Pizza { fn draw(&self) {} }
-
-pub struct Tapparella {}
-impl Draw for Tapparella { fn draw(&self) {} }
-
-Screen {
-  components: vec![Pizza {}, Tapparella {}],
-};
+let screen = Screen { components: vec![Square {}, Circle {}] };
 ```
 
 `dyn <type>`s are called "trait objects". They require a pointer, like `Box<T>` or a reference (`&`); the methods in the thread must be "object safe":
@@ -1684,6 +1677,8 @@ In order to specify a dynamic type when boxing, must explicitly cast:
 Box::new(NullLogger {});                    // type = Box<NullLogger>
 Box::new(NullLogger {}) as Box<dyn Logger>; // type = Box<dyn Logger>
 ```
+
+#### Supertraits and inheritance (object-orientation)
 
 Supertraits are traits depending on other traits. `X` is a supertrait of `Y` means that `Y` must implement `X` (this "super" as higher in a tree).
 
@@ -1701,6 +1696,132 @@ trait BetterDisplay: fmt::Display {
 //
 trait Matrix: Sized + Mul<Self> { /* ... */ }
 ```
+
+We can use supertraits in order to implemented object-oriented inheritance; the essence is that the tree is based on traits, rather than types:
+
+```rust
+trait Root {
+    fn update(&self) {
+        println!("M:root");
+    }
+
+    fn type_() {
+        println!("AF:root");
+    }
+}
+
+trait Middle: Root {
+    fn update(&self) {
+        Root::update(self);
+        println!("M:middle");
+    }
+}
+
+trait Leaf: Middle {
+    fn update(&self) {
+        Middle::update(self);
+        println!("M:leaf");
+    }
+}
+
+struct Node {}
+
+// Note that we need to implement all the traits.
+impl Root for Node {
+    fn type_() {
+        println!("AF:node+root");
+    }
+}
+impl Middle for Node {}
+impl Leaf for Node {}
+
+impl Node {
+    pub fn update(&self) {
+        println!("M:node");
+    }
+
+    pub fn type_() {
+        println!("AF:node");
+    }
+}
+
+let node = Node {};
+
+// Note the so-called disambiguations (#1 and #4/5)
+
+Leaf::update(&node);      // M:root/M:middle/M:leaf
+node.update();            // M:node                 - if `impl` Node is not provided, this is invalid
+
+Node::type_();            // AF:node
+<Node as Root>::type_();  // AF:node+root           - if `impl` Node is provided
+<Node as Root>::type_();  // AF:root                - if `impl` Node is not provided
+Root::type_();            // Invalid!               - must invoke on an `Impl` type; traits alone are not objects!
+```
+
+##### Inheritance: making overridden methods private
+
+The simplest way to make overridden methods private is to use private trait methods:
+
+```rust
+// #![feature(get_mut_unchecked)]
+// #![feature(test)]
+//
+/////////////////////////////////////
+//
+// #![allow(unused_must_use)]
+// #![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+// #![allow(unused_assignments)]
+// #![allow(unused_macros)]
+// #![allow(unused_mut)]
+// #![allow(non_snake_case)]
+
+pub trait SuperClass: private::SubInterface {
+    fn virtual_(&self) {
+        println!("virtual_");
+        self.redefined()
+    }
+}
+
+pub(crate) mod private {
+    pub trait SubInterface {
+        fn redefined(&self);
+    }
+}
+
+struct SubClass {}
+
+impl private::SubInterface for SubClass {
+    fn redefined(&self) {
+        println!("redefined");
+    }
+}
+
+impl SuperClass for SubClass {
+    fn virtual_(&self) {
+        println!("ovr-virtual_");
+        private::SubInterface::redefined(self);
+    }
+}
+
+let instance = SubClass {};
+
+instance.virtual_(); // virtual_/redefined     - if virtual_() not overridden
+instance.virtual_(); // ovr-virtual_/redefined - if virtual_() is overridden
+```
+
+An ugly alternative is to pass a "sub interface" implementors a "base class" type:
+
+```rust
+impl BaseClass {
+    fn virtual_<T: SubInterface>(&self, redefiner: T) {
+        redefiner.redefined();
+    }
+}
+```
+
+The other strategy is embedding; in order to avoid forwarding boilerplate, there is the [`delegate` crate](#inheritance-emulation-via-delegate-crate), or the [`Deref\[Mut\]` antipattern](https://github.com/rust-unofficial/patterns/blob/master/anti_patterns/deref.md)).
 
 #### Limitations of returning Self
 
@@ -1720,46 +1841,6 @@ trait MyTrait {
     Self::new()
   }
 }
-```
-
-#### Disambiguation
-
-Specify which function to invoke, when there is overlapping with/between traits:
-
-```rust
-trait Flyer {
-  fn fly(&self);
-  fn mean() -> String;          // associated method
-}
-
-struct Human;
-
-impl Flyer for Human {
-  fn fly(&self) {
-    println!("Flying!");
-  }
-  fn mean() -> String {
-    "Plane".to_string()
-  }
-}
-
-impl Human {
-  fn fly(&self) {
-    println!("No way");
-  }
-  fn mean() -> String {
-    "Arms, hopefully".to_string()
-  }
-}
-
-let person = Human;
-
-person.fly();        // "No way"
-Flyer::fly(&person); // "Flying"
-
-println!("{}", Human::mean());            // "Arms, hopefully"
-println!("{}", <Human as Flyer>::mean()); // "Plan"
-println!("{}", Flyer::mean());            // error!
 ```
 
 #### Downcasting/Upcasting
@@ -1882,78 +1963,31 @@ impl Into<Monster> for Bar {
 }
 ```
 
-### Static methods
-
-Methods definition (essentially, struct functions)
+### Associated functions/methods
 
 ```rust
 struct Rectangle {
-  width: u32,
-  height: u32,
+    width: u32,
+    height: u32,
 }
 
 // Multiple methods can be defined in the same `impl` block (and multiple blocks can be defined).
 impl Rectangle {
-  // Methods can also borrow `self` mutably.
-  // Methods taking ownership of `self` are rare and specific.
-  fn area(&self) -> u32 {
-    self.width * self.height
-  }
+    // When there is `self`, it's called "method".
+    // `self` can also be borrowed mutably.
+    // Methods taking ownership of `self` are rare and specific.
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
 }
 
 impl Rectangle {
-  fn square(size: u32) -> Rectangle {
-    Rectangle { width: size, height: size }
-  }
+    // Where there isn't `self`, it's called "associated function" (static method, in other langs).
+    fn square(size: u32) -> Rectangle {
+        Rectangle { width: size, height: size }
+    }
 }
 ```
-
-### Inheritance emulation (private trait methods)
-
-The simplest way to (partially) emulate inheritance is to use private trait methods (implemented via modules privacy):
-
-```rust
-pub(crate) mod private {
-  pub trait SubInterface {
-    fn redefined(&self);
-  }
-}
-
-pub trait SuperClass: private::SubInterface {
-  fn virtuaz(&self) {
-    self.redefined()
-  }
-}
-
-struct SubClass {}
-
-impl private::SubInterface for SubClass {
-  fn redefined(&self) {}
-}
-
-// In order not to override the default `virtuaz()` method, just leave the impl block empty.
-//
-impl SuperClass for SubClass {
-  fn virtuaz(&self) {
-    // private::SubInterface::redefined(self);
-  }
-}
-
-let super_reference = SubClass {};
-super_reference.virtuaz();
-```
-
-An ugly alternative is to pass a "sub interface" implementors a "base class" type:
-
-```rust
-impl BaseClass {
-  fn virtuaz<T: SubInterface>(&self, redefiner: T) {
-    redefiner.redefined();
-  }
-}
-```
-
-The other strategy is embedding; in order to avoid forwarding boilerplate, there is the [`delegate` crate](#inheritance-emulation-via-delegate-crate), or the [`Deref\[Mut\]` antipattern](https://github.com/rust-unofficial/patterns/blob/master/anti_patterns/deref.md)).
 
 ### Ownership
 

@@ -1,3 +1,66 @@
+### Cycle changes
+
+- Discarded
+  - Bevy Cheat Book: Correct all examples
+  - geet
+    - Restructure `pr create -A`
+- Unscheduled
+  - Schedule Manager: Fix non-replan skip event decoding
+  - ggez
+    - PR: Snake example: Simplify non-negative modulo computation, by using rem_euclid() API
+    - Open discussion about improving code based on maintainer comment
+      - Fight implementation
+    - PR: Snake example: Use the library's timer rather than manual time tracking
+  - Rust/Gamedev
+    - Deeper review at Code the Classics API requirements, and Macroquad
+    - Yet another look at game engines (activity)
+    - Port Code the Classics
+      - Write script for adding and preparing new projects
+  - ZFS
+    - Fix reported issue: Openzfs ppa crashes Ubuntu server 20.04 installer
+    - Fix new issue introduced by 20.04.2
+    - Disable the PPA on UbuntuServer
+    - Complete reported issue v0.4x breaks update-grub
+  - Admin
+    - Tools
+      - Research and tweak plugin for printing code (to pdf)
+  - Rust
+    - Review supertraits and OO-related concepts
+  - Gamedev
+    - Talk: Exploring the Tech and Design of Noita
+- Not completed
+  - Rust/CS
+    - Hands-On Data Structures and Algorithms in Rust
+      - [ ] Section 6: Entity component systems
+        - [ ] 40. Creating Data Stores
+        - [ ] 41. Building ECS Systems
+
+## Sun 06/Jun/2021
+
+- Projects/Open source
+  - ZFS
+    - [x] Complete issue [v0.4x breaks update-grub](https://github.com/saveriomiroddi/zfs-installer/issues/199)
+- Rust
+  - [x] Review supertraits and OO-related concepts
+- Rust/Gamedev
+  - [x] Yet another look at game engines (activity)
+  - Port Code the Classics
+    - [ ] Cavern
+      - [ ] Read/understand code
+- Rust/CS
+  - Hands-On Data Structures and Algorithms in Rust
+    - [x] Section 5: Hash maps
+      - [x] 36. Testing and Improving Our HashMap
+      - [x] Quiz 5: Test your knowledge
+  - [ ] Section 6: Entity component systems
+    - [x] 38. Understand What an ECS Is and How It Differs from Traditional Structures
+    - [x] 39. Creating an ID Generator
+- Gamedev
+  - [x] Talk: [Exploring the Tech and Design of Noita](https://www.youtube.com/watch?v=prXuyMCgbTc)
+- Admin
+  - Tools
+    - [x] Research and tweak plugin for printing code (to pdf)
+
 ## Sat 05/Jun/2021
 
 - Rust/Gamedev

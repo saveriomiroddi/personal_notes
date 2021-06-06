@@ -113,6 +113,7 @@ myvar=$myvar2                       # $myvar2 doesn't require quotes
 unset myvar                         # delete myvar
 export myvar=value                  # makes available to subshells. `local export` is allowed, but doesn't work as intended; in order to export
                                     # local variables, do it separately from assignment (or use declare)
+local myvar1 myvar2                 # declare multiple local variables in one statement
 ((var+=1))                          # increment variable value
 ((var++)) || true                   # increment variable value. WATCH OUT!!! `|| true` is required if var=0 before the increment/decrement!!!!
 

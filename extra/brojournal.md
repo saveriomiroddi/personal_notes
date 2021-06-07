@@ -1,3 +1,29 @@
+## Mon 07/Jun/2021
+
+- Admin
+  - Planning/Other
+    - [x] Plan next cycle
+    - [x] Fight mistaken malware on blog
+  - Tools
+    - [x] Git aliases: Support non-master branch
+- Projects/Open source
+  - Openscripts
+    - purge_trash
+      - [x] Continue in case of removal error
+      - [x] Support GUI run for runtime errors notification
+  - Schedule manager
+    - [x] Move all the skip replans also in regular mode
+    - [x] Replace skip_only with nomove functionality
+    - [x] Refactoring: Create launcher class (Replan)
+    - [x] Add Reworker test suite
+    - [x] Reworker: Add HH:MM -H.MMh format (and reverse)
+  - Geet
+    - [x] De-hardcode the `master` string (constant was already existing)
+    - [ ] Add support for non-`master` development branch
+      - [x] Add internal support for non-`master` development branches
+- Writings
+  - [x] Article: Conveniently handling non-master development/default branches in Git(/Hub)
+
 ### Cycle changes
 
 - Discarded

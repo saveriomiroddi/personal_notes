@@ -9,9 +9,11 @@
       - [Character conversions](#character-conversions)
     - [Date functions](#date-functions)
     - [Numeric functions](#numeric-functions)
+    - [Aggregates](#aggregates)
     - [Other/generic functions](#othergeneric-functions)
   - [Regular expressions (regexes)](#regular-expressions-regexes)
     - [Strategies](#strategies)
+  - [JSON + MVI and array storage](#json--mvi-and-array-storage)
   - [XPath](#xpath)
   - [CSV Import/Export](#csv-importexport)
   - [Dates](#dates)
@@ -77,7 +79,7 @@ ORDER BY FIELD( field, @values...)
 ### String functions
 
 ```sql
-TRIM(<expr>)                                       # Strips only spaces by default!
+TRIM(<expr>)                                       # Strips only spaces by default! Defaults to `BOTH` sides
 TRIM([BOTH|LEADING|TRAILING] str FROM <expr>)      # Strip characters; usable for newlines
 
 SUBSTR(`field` (FROM|,) @start (FOR|,) @len)       # @start = 1-based; if start < 0, start from the end
@@ -86,6 +88,13 @@ INSTR(@str, @pattern)                              # 1-based; 0 if not found
 
 CONCAT_WS(@separator, @fields..)                   # concatenate using the separator; ignores nulls
 (L|U)CASE(@sstr)                                   # down/upcase
+```
+
+`SUBSTR` doesn't support end position (only length). If one wants to strip values around a string, can use `TRIM`:
+
+```sql
+SELECT TRIM('"' FROM '"aa"aa"');
+-- aa"aa
 ```
 
 #### Character conversions
@@ -133,6 +142,12 @@ RAND()                               # random number; has low entropy
 GET_BYTES(@number)                   # random number; has higher entropy. can use as `HEX(GET_BYTES)` in order to get a random hex string.
 ```
 
+### Aggregates
+
+```sql
+GROUP_CONCAT(@field[, @separator])   # ignores NULL fields, but returns NULL if there are no non-null values; @separator defaults to `,`
+```
+
 ### Other/generic functions
 
 ```sql
@@ -140,7 +155,7 @@ IFNULL(<expr>, @substitute)
 UUID()                               # generates a uuid
 SLEEP(@secs)
 LAST_INSERT_ID()                     # last inserted AUTO_INCREMENTed id
-ROW_COUNT()                          # number of rows affected by last operation
+ROW_COUNT()                          # number of rows affected by last operation (NOT rows changed!)
 GREATEST|LEAST(@values...)           # min/max on multiple values
 ```
 
@@ -235,6 +250,60 @@ SELECT
 -- +----------+
 -- | my_op    |
 -- +----------+
+```
+
+## JSON + MVI and array storage
+
+Add a JSON column with MVI, allowing for arrays storage:
+
+```sql
+CREATE TABLE clients (
+  id            INT PRIMARY KEY,
+  client_tags JSON,
+)
+SELECT 1 `id`, '["foo", "bar", "baz"]' `client_tags`;
+```
+
+JSON search functions:
+
+```sql
+-- `one`: return first match; `All`: return all
+-- the return type of `All` is inconsistent; it depends on the number of elements found.
+--
+SELECT JSON_SEARCH(client_tags, 'one', 'bar') FROM clients;
+-- "$[1]"
+SELECT JSON_SEARCH('["bar", "bar"]', 'All', 'bar');
+-- ["$[0]", "$[1]"]
+SELECT JSON_SEARCH(client_tags, 'All', 'bar') FROM clients;
+-- "$[1]"
+```
+
+JSON modification functions:
+
+```sql
+SELECT JSON_ARRAY_APPEND(client_tags, '$', 'qux') FROM clients;
+-- ["foo", "bar", "baz", "qux"]
+
+SELECT JSON_ARRAY_INSERT(client_tags, '$[1]', 'qux') FROM clients;
+-- ["foo", "qux", "bar", "baz"]
+
+SELECT JSON_REMOVE(client_tags, '$[1]') FROM clients;
+-- ["foo", "baz"]
+
+-- Removal by value can't be directly done; must search+remove (and trim)
+SELECT JSON_REMOVE(client_tags, TRIM(BOTH '"' FROM JSON_SEARCH(client_tags, 'one', 'bar'))) FROM clients;
+-- ["foo"]
+```
+
+MVIs:
+
+```sql
+ALTER TABLE clients ADD KEY client_tags ( (CAST(client_tags -> '$' AS CHAR(64) ARRAY)) );
+
+EXPLAIN FORMAT=TREE SELECT * FROM clients WHERE 'foo' MEMBER OF (client_tags -> '$')\G
+-- -> Filter: json'"foo"' member of (cast(json_extract(client_tags,_utf8mb4'$') as char(64) array))  (cost=0.35 rows=1)
+--     -> Index lookup on clients using client_tags (cast(json_extract(client_tags,_utf8mb4'$') as char(64) array)=json'"foo"')  (cost=0.35 rows=1)
+
 ```
 
 ## XPath

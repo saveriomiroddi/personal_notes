@@ -31,6 +31,7 @@
     - [Shell prompt](#shell-prompt)
     - [Correct whitespaces problems](#correct-whitespaces-problems)
     - [Revert common mistakes](#revert-common-mistakes)
+    - [Find the default branch](#find-the-default-branch)
 
 ## Document notes
 
@@ -55,9 +56,12 @@ Conventions:
 
 ## Configuration
 
+Arbitrary sections/keys can be created, not only the ones used by Git.
+
 ```sh
-config [--global]   # stores config in `.git/config`; [global] stores in `~/.gitconfig`
-help -c             # list all possible configuration keys
+config [--global] $section.$key $value # stores config in `.git/config`; [global] stores in `~/.gitconfig`
+config --remove-section $section       # delete a section, with all the keys
+help -c                                # list all possible configuration keys
 ```
 
 | Parameter                 |    Value    | Comment                                            |
@@ -510,3 +514,15 @@ rebase $base_commit --whitespace=fix
 ### Revert common mistakes
 
 See: https://sethrobertson.github.io/GitFixUm/fixup.html
+
+### Find the default branch
+
+```sh
+# Offline.
+#
+git rev-parse --abbrev-ref $remote/HEAD | awk -F/ '{print $NF}'
+
+# Online.
+#
+git remote show $remote | awk '/^  HEAD branch:/ {print $NF}'
+```

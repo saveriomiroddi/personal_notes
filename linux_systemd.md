@@ -41,6 +41,13 @@ The `--user` is for units belonging to the user (eg. transient timers).
 
 A static service can't be manually enabled or disabled; use mask for that.
 
+WATCH OUT! Even if a service is disabled, if other enabled services depend on it; in this case, find and disable them:
+
+```sh
+systemctl list-dependencies --reverse snapd.socket
+# ... now disable the dependencies ...
+```
+
 ## journalctl
 
 ```sh

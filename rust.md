@@ -798,6 +798,8 @@ Common methods:
 
 ```rust
 vec.swap(pos1, pos2);
+vec.resize(new_len, value: T);          // resize (extend/shrink) a vector; T must be Clone
+vec.resize_with(new_len, || expr);      // resize, via function (e.g. when T is not Clone)
 
 // Splitting
 (sl1, sl2) = coll.split_at(split_point);     // immutable

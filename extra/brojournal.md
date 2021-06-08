@@ -1,3 +1,16 @@
+## Tue 08/Jun/2021
+
+- Geet
+  - [x] Issue: Remove irrelevant `base` param
+  - [x] Merge PR: Switch to main branch (instead of master) after the merge
+  - [x] PR creation: Use main branch (as default) instead of hardcoded `master`
+- Rust/Assembler
+  - [x] Investigate compiled ASM of different ggez function versions, and report on ggez
+- Rust/CS
+  - Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 6: Entity component systems
+      - [ ] 40. Creating Data Stores
+
 ## Mon 07/Jun/2021
 
 - Admin

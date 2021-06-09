@@ -259,7 +259,7 @@ Add a JSON column with MVI, allowing for arrays storage:
 ```sql
 CREATE TABLE clients (
   id            INT PRIMARY KEY,
-  client_tags JSON,
+  client_tags JSON
 )
 SELECT 1 `id`, '["foo", "bar", "baz"]' `client_tags`;
 ```
@@ -278,7 +278,7 @@ SELECT JSON_SEARCH(client_tags, 'All', 'bar') FROM clients;
 -- "$[1]"
 ```
 
-JSON modification functions:
+JSON modification functions. WATCH OUT! Operating on a null node (/column) will return NULL.
 
 ```sql
 SELECT JSON_ARRAY_APPEND(client_tags, '$', 'qux') FROM clients;
@@ -293,6 +293,21 @@ SELECT JSON_REMOVE(client_tags, '$[1]') FROM clients;
 -- Removal by value can't be directly done; must search+remove (and trim)
 SELECT JSON_REMOVE(client_tags, TRIM(BOTH '"' FROM JSON_SEARCH(client_tags, 'one', 'bar'))) FROM clients;
 -- ["foo"]
+
+-- Set/replace. WATCH OUT! See result below for out-of-bounds cases.
+--
+SELECT JSON_SET(client_tags, '$[5]', 'qux') FROM clients;
+-- ["foo", "bar", "baz", "qux"]
+
+-- Insert only; never replace. Same considerations above about indexing.
+--
+SELECT JSON_INSERT(client_tags, '$[5]', 'qux') FROM clients;
+-- ["foo", "bar", "baz", "qux"]
+
+-- Replace only; never insert if not existing.
+--
+SELECT JSON_REPLACE(client_tags, '$[5]', 'qux') FROM clients;
+-- ["foo", "bar", "baz"]
 ```
 
 MVIs:

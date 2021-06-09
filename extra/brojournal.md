@@ -1,3 +1,22 @@
+## Wed 09/Jun/2021
+
+- Rust/CS
+  - Hands-On Data Structures and Algorithms in Rust
+    - [x] Section 6: Entity component systems
+      - [x] 40. Creating Data Stores
+      - [x] 41. Building ECS Systems
+      - [x] ~~42. Combining It All into a Simple CLI Game~~
+      - [x] ~~43. Introduction to Specs~~
+      - [x] Quiz 6: Test your knowledge
+    - [ ] Section 7: Storage
+      - [x] 44. Creating a Blob Data File
+      - [x] 45. Converting Any Data Size to Byte String
+- Admin/Systems
+  - [x] Fight investigate system slowdown (-> Firefox)
+- Admin/Blog
+  - [x] Disable Disqus
+    - [x] Second look at alternatives
+
 ## Tue 08/Jun/2021
 
 - Geet
@@ -16,7 +35,7 @@
 - Admin
   - Planning/Other
     - [x] Plan next cycle
-    - [x] Fight mistaken malware on blog
+    - [x] Fight mistaken malware on blog (-> Disqus)
   - Tools
     - [x] Git aliases: Support non-master branch
 - Projects/Open source

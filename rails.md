@@ -8,6 +8,7 @@
     - [Updating](#updating)
     - [Migrations](#migrations)
     - [Callbacks](#callbacks)
+    - [Metadata](#metadata)
 
 ## Tooling
 
@@ -97,7 +98,7 @@ Direct operations:
 ```ruby
 rename_table :old_table_name, :new_table_name
 drop_table :table_name
-change_column :table, :column, :type, **column_options # see options above
+change_column :table, :column, :type, **column_options # see options in :create_table
 change_column_default :table, :column, :default
 
 # Foreign keys
@@ -120,3 +121,12 @@ In order to find the difference on save, use:
 - `after_save` -> `saved_changes()`
 
 The format is `{"field" => [before, after]}`; unchanged fields are not included.
+
+### Metadata
+
+```ruby
+# Columns metadata. Watch out: they (obviously) depend on the DB existence; if, for example, Rake tasks
+# indirectly cause this code to load while the db doesn't exist (yet), they will fail.
+#
+MyModel.columns_hash['my_attribute'].limit
+```

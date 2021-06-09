@@ -23,6 +23,7 @@
     - [Date/times (standard)](#datetimes-standard)
     - [Date/times (`chrono`)](#datetimes-chrono)
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
+    - [Terminal interaction (`termion`)](#terminal-interaction-termion)
     - [Map literals (`maplit`)](#map-literals-maplit)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
     - [Unit testing](#unit-testing)
@@ -35,6 +36,8 @@
     - [Convenience macros for operator overloading (`auto_ops`)](#convenience-macros-for-operator-overloading-auto_ops)
     - [Indented Heredoc-like strings (`indoc`)](#indented-heredoc-like-strings-indoc)
     - [User directories (`directories`)](#user-directories-directories)
+    - [Convient Error types handling (`failure`)](#convient-error-types-handling-failure)
+    - [De/serialization (`bincode`)](#deserialization-bincode)
 
 ## Standard library
 
@@ -759,6 +762,37 @@ let matches = App::new("myapp")
     .get_matches();
 ```
 
+### Terminal interaction (`termion`)
+
+Operations are performed by writing to the buffer.
+
+```rust
+use std::io::Write;
+
+let (width, height) = terminal_size()?;
+
+let mut term: RawTerminal<Stdout> = std::io::stdout().into_raw_mode()?;
+
+// Clear screen
+write!(term, "{}", clear::All)?;
+
+// Print text at specific coordinates
+writeln!(term, "{}foo", Goto(x_u16, y_u16))?;
+
+// Change (current) color.
+//
+// Working with different colors is awkard. Color is a trait, and since Fg(col)/Bg(col) don't accept
+// a Boxed instance, and there are no From<> implementations, the easiest thing is to convert to
+// string.
+//
+let fmt_color = if true {
+    format!("{}", Fg(Black))
+} else {
+    format!("{}", Fg(White))
+};
+writeln!(term, "{}bar", fmt_color)?;
+```
+
 ### Map literals (`maplit`)
 
 ```rust
@@ -1138,4 +1172,54 @@ let tmpdir: PathBuf = std::env::temp_dir();
 //
 UserDirs::new().home_dir();
 UserDirs::new().desktop_dir();
+```
+
+### Convient Error types handling (`failure`)
+
+```rust
+use failure_derive::*;
+
+#[derive(Fail, Debug)]
+pub enum BlobError {
+    #[fail(display = "No Room")]
+    NoRoom,
+    #[fail(display = "Too Big {}", 0)]
+    TooBig(u64),
+    #[fail(display = "Bincode {}", 0)]
+    Bincode(bincode::Error),
+}
+
+// Add a variant, and implement From, for each new error type to convert.
+//
+impl From<bincode::Error> for BlobError {
+    fn from(e: bincode::Error) -> Self {
+        Self::Bincode(e)
+    }
+}
+```
+
+### De/serialization (`bincode`)
+
+Binary de/serialization (`serde` is used behind the scenes):
+
+```rust
+bincode::deserialize_from(read)?;      // deserialize from Read
+bincode::serialize_into(write, &val)?; // serialize to Write
+
+// Example of a blob, where the first 8 (usize) bytes are the length of the array, and the other
+// the array.
+//
+let val_len: usize = bincode::deserialize_from(r)?;
+let mut val_buffer = vec![0_u8; k_len];
+r.read_exact(&mut val_buffer)?;
+
+// Deserialization functions, showcasing the types involved (owned/borrowed)
+
+pub fn deserialize<V: DeserializeOwned>(bindata: &[u8]) -> Result<V, bincode::Error> {
+    bincode::deserialize(bindata)
+}
+
+pub fn deserialize_b<'d, V: Deserialize<'d>>(bindata: &'d [u8]) -> Result<V, bincode::Error> {
+    bincode::deserialize(bindata)
+}
 ```

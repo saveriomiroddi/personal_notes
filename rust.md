@@ -8,7 +8,7 @@
   - [Rustfmt](#rustfmt)
   - [Syntax/basics](#syntaxbasics)
     - [Basic structure/Printing/Input](#basic-structureprintinginput)
-      - [Printing/formatting](#printingformatting)
+      - [Printing/formatting/write!](#printingformattingwrite)
     - [Conditional build (ifdef-like)](#conditional-build-ifdef-like)
     - [Data types](#data-types)
     - [Casting](#casting)
@@ -299,7 +299,9 @@ fn cycle_forever() -> ! {
 }
 ```
 
-#### Printing/formatting
+#### Printing/formatting/write!
+
+WATCH OUT! Don't forget to bring `std::io::Write` into scope, when using write-related traits.
 
 ```rust
 println!("{:#?}", vec);                 // generic pretty printing

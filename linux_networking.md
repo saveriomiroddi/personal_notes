@@ -18,6 +18,7 @@
     - [Diagnose/measure traffic](#diagnosemeasure-traffic)
     - [Sniff network traffic](#sniff-network-traffic)
     - [Port scan (nmap)](#port-scan-nmap)
+    - [Disable ipv6](#disable-ipv6)
   - [Interfaces](#interfaces)
     - [Basic configuration](#basic-configuration)
     - [NetworkManager](#networkmanager)
@@ -402,6 +403,13 @@ tcpdump -vvv -nn -X -s256 'port 443 and (src host 82.195.158.81 or dst host 82.1
 ```sh
 nmap 192.168.0.0/24		                      # scan all open ports in a subnet
 nmap -oG - -p 22 192.168.0.0/24 | grep open	# scan a single port, with [o]output for [G]rep, filtering only machines where the [p]ort 22 is open
+```
+
+### Disable ipv6
+
+```sh
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sysctl -w net.ipv6.conf.default.disable_ipv6=1
 ```
 
 ## Interfaces

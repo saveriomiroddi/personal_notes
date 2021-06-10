@@ -254,14 +254,21 @@ SELECT
 
 ## JSON + MVI and array storage
 
-Add a JSON column with MVI, allowing for arrays storage:
+Add a JSON column and, separately, a MVI, allowing for arrays storage:
 
 ```sql
 CREATE TABLE clients (
-  id            INT PRIMARY KEY,
+  id          INT PRIMARY KEY,
   client_tags JSON
 )
 SELECT 1 `id`, '["foo", "bar", "baz"]' `client_tags`;
+
+-- Limited to 512!
+ALTER TABLE clients ADD KEY client_tags ( (CAST(client_tags -> '$' AS CHAR(512) ARRAY)) );
+
+EXPLAIN FORMAT=TREE SELECT * FROM clients WHERE 'foo' MEMBER OF (client_tags -> '$')\G
+-- -> Filter: json'"foo"' member of (cast(json_extract(client_tags,_utf8mb4'$') as char(64) array))  (cost=0.35 rows=1)
+--     -> Index lookup on clients using client_tags (cast(json_extract(client_tags,_utf8mb4'$') as char(64) array)=json'"foo"')  (cost=0.35 rows=1)
 ```
 
 JSON search functions:
@@ -308,17 +315,6 @@ SELECT JSON_INSERT(client_tags, '$[5]', 'qux') FROM clients;
 --
 SELECT JSON_REPLACE(client_tags, '$[5]', 'qux') FROM clients;
 -- ["foo", "bar", "baz"]
-```
-
-MVIs:
-
-```sql
-ALTER TABLE clients ADD KEY client_tags ( (CAST(client_tags -> '$' AS CHAR(64) ARRAY)) );
-
-EXPLAIN FORMAT=TREE SELECT * FROM clients WHERE 'foo' MEMBER OF (client_tags -> '$')\G
--- -> Filter: json'"foo"' member of (cast(json_extract(client_tags,_utf8mb4'$') as char(64) array))  (cost=0.35 rows=1)
---     -> Index lookup on clients using client_tags (cast(json_extract(client_tags,_utf8mb4'$') as char(64) array)=json'"foo"')  (cost=0.35 rows=1)
-
 ```
 
 ## XPath

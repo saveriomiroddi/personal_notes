@@ -1,3 +1,10 @@
+## Thu 10/Jun/2021
+
+- Rust/CS
+  - Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 7: Storage
+      - [ ] 46. Creating a Blob Store
+
 ## Wed 09/Jun/2021
 
 - Rust/CS

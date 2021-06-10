@@ -2,7 +2,8 @@
 
 - [Rust libraries](#rust-libraries)
   - [Standard library](#standard-library)
-    - [Files/streams](#filesstreams)
+    - [Files read/write/create](#files-readwritecreate)
+    - [File operations](#file-operations)
     - [Paths handling/Directories](#paths-handlingdirectories)
     - [Testing](#testing)
       - [Integration tests](#integration-tests)
@@ -41,20 +42,21 @@
 
 ## Standard library
 
-### Files/streams
+### Files read/write/create
 
 ```rust
 std::fs::read_to_string(filename) -> Result<String, Error>;    // content must be valid UTF-8; filename can be relative.
 std::fs::read(game_rom_filename) -> Result<Vec<u8>, Error>;    // read binary content
 writer.write_all(data: AsRef<[u8]>) -> Result<()>              // write to a writer (e.g. File)
 
+// Open in read mode (no write/create).
+//
+let f = File::open("log.txt")?;
+
+// Read line by line.
 // Buffered read/write require the import below
 //
 use std::io::prelude::*;
-//
-// Read line by line
-//
-let f = File::open("log.txt")?;
 let mut reader = BufReader::new(f);
 let mut line = String::new();
 let len = reader.read_line(&mut line)?;
@@ -62,6 +64,13 @@ let len = reader.read_line(&mut line)?;
 // Read whole lines (two ways: iteration, vector)
 for line in reader.lines() { println!("{}", line?); }
 let lines = reader.lines().collect::<Result<Vec<_>, _>>()?;
+
+// Open file R/W + create; quite odd:
+//
+let f: File = OpenOptions::new()
+                  .create(true)            // use create_new(true) to fail if the file exists
+                  .write(true).read(true)
+                  .open("log.txt");
 
 // Open file for writing; if existing, it's truncated.
 //
@@ -76,6 +85,16 @@ stream.write(&[666]).unwrap();
 // Per-line buffered write; convenient if each line must be immediately available.
 let mut writer = LineWriter::new(file);
 writer.write_all(b"I like pizza!\n")?;
+```
+
+Filesystem operations:
+
+```rust
+// Read/Writes (obviously) move the current position.
+
+file.set_len(len)?;               // truncate/extend; the cursor position stays the same (if was end, and the file was shrunk, it will be past the end!)
+file.seek(SeekFrom::Start(i64))?; // also: SeekFrom::{End,Current}
+file.seek(SeekFrom::Current(0))?; // get current position
 ```
 
 Abstract operation traits:
@@ -93,6 +112,12 @@ BufWriter::new(vec);
 ```
 
 for more complex operations (ie. involving seek), can use [io::Cursor](https://doc.rust-lang.org/std/io/struct.Cursor.html).
+
+### File operations
+
+```rust
+fs::remove_file(file)?;
+```
 
 ### Paths handling/Directories
 

@@ -449,7 +449,7 @@ let int_as_bool = 1 as bool;        // 1: true, 0: false, other: !!undefined!!
 
 For static variables, see [static section](#staticglobal-variables-lazy_static-once_cell-thread_local)
 
-Numeric casts:
+Numeric casts/operations:
 
 ```rust
 0xFF_u8 as u16;          // 0x00FF ("zero-extend")
@@ -457,6 +457,9 @@ Numeric casts:
 
 0xFF_u8 as i16;          // WATCH OUT!!: 0x00FF
 (0xFF_u8 as i8) as i16;  // 0xFFFF
+
+5_u64.wrapping_add(-4_i32 as u64);   // proper way to add signed to unsigned
+5_u64.checked_sub(-(-4_i32) as u64); // otherwise, branch positive/negative, and do checked op for both cases
 ```
 
 Automatic casting, for types supporting the `Deref` trait:

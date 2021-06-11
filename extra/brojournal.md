@@ -1,3 +1,15 @@
+## Fri 11/Jun/2021
+
+- Rust/CS
+  - [x] Hands-On Data Structures and Algorithms in Rust
+    - [ ] Section 7: Storage
+      - [x] 46. Creating a Blob Store
+      - [x] Quiz 7: Test your knowledge
+- Admin/Tools
+  - [x] Improvements to blog's `add_new_book.sh` script
+- Admin/System
+  - [x] Fight system not suspending
+
 ## Thu 10/Jun/2021
 
 - Rust/CS

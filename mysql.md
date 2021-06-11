@@ -317,6 +317,71 @@ SELECT JSON_REPLACE(client_tags, '$[5]', 'qux') FROM clients;
 -- ["foo", "bar", "baz"]
 ```
 
+Convert an array to a table:
+
+```sql
+-- Operation a single string
+--
+SELECT *
+FROM
+  JSON_TABLE(
+    '[5, 6, 70]', -- JSON doc
+    "$[*]"        -- JSON path
+    COLUMNS(
+      Value VARCHAR(16) PATH "$" -- Mapping; if the data type is CHAR, must specify the size, otherwise↵
+                                 -- CHAR(1) is used, and data is truncated!
+      ERROR ON ERROR
+    )
+  ) data;
+-- +-------+
+-- | Value |
+-- +-------+
+-- | 5     |
+-- | 6     |
+-- | 70    |
+-- +-------+
+
+-- Compute the per-tag count for a given tenant.
+--
+-- 2.6" - pretty good.
+-- total sources: 8.0M; tenant: 630k (index on tenant_id)
+--
+SELECT t.tag, COUNT(*)
+FROM
+  source s,
+  JSON_TABLE(s.tags, '$[*]' COLUMNS(tag VARCHAR(255) PATH '$' ERROR ON ERROR)) t
+WHERE s.tenant_id = 0
+GROUP BY t.tag;
+
+-- Selecting the unique tags for a given tenant
+-- A bit faster: 2.4"
+--
+SELECT DISTINCT t.tag
+FROM
+  source s,
+  JSON_TABLE(s.tags, '$[*]' COLUMNS(tag VARCHAR(255) PATH '$' ERROR ON ERROR)) t
+WHERE s.tenant_id = 0;
+
+-- Counting the unique tags for a given tenant: 2.6".
+-- It seems that there are no specific optimizations; there could be in the future.
+--
+EXPLAIN FORMAT=TREE
+SELECT COUNT(DISTINCT t.tag)
+FROM
+  source s,
+  JSON_TABLE(s.tags, '$[*]' COLUMNS(tag VARCHAR(255) PATH '$' ERROR ON ERROR)) t
+WHERE s.tenant_id = 0\G
+*************************** 1. row ***************************
+-> Aggregate: count(distinct t.tag)
+    -> Nested loop inner join
+        -> Index lookup on s using tenant_id (tenant_id=0)  (cost=229585.10 rows=1157816)
+        -> Materialize table function
+
+-- For reference, a scan of the filtered records takes 0.6":
+--
+SELECT COUNT(*) FROM source where tenant_id = 0 AND unindexed_column = 'xxx';
+```
+
 ## XPath
 
 Examples:
@@ -869,7 +934,7 @@ Replace keys with null operations; valid alternatives:
 `ALTER TABLE` key additions is produced by the Percona distro with `--innodb-optimize-keys`.
 
 We can't just remove the lines, because if they're at the end of the table def, they'll leave the previous statement with a terminating comma.  
-The leading comma could be deleted by using full-file matching, but this solution is simpler.
+The leading comma could be deleted with some text processing trickery, but this solution is simpler.
 
 ```sh
 mysqldump $db | perl -pe 's/^  (UNIQUE |FULLTEXT )?KEY.+?(,)?$/  CHECK(TRUE)$2'

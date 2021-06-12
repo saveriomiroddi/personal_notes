@@ -485,6 +485,7 @@ Dir.delete(dosPath)                             # not recursive
 FileUtils.remove_dir(path, true)                # recursive
 
 FileUtils.touch(filename)
+FileUtils.chmod(permissions, filename)          # change permissions; can be symbolic, e.g. `+x`
 FileUtils.chown(user[, group[, filename]])      # change owner - File.chown needs the group/user id!!
 
 FileUtils.cp(src, dest, **options)              # copy file

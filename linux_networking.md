@@ -110,11 +110,10 @@ rsync -av --relative "/target/run/./systemd/resolve" "/mnt/run"
 #
 rsync -av --remove-source-files $from $to
 
-# Resume partial files, but obviously must be 100% sure that the file content is the same.
-# `--progress` is similar, but it's confusing (see https://unix.stackexchange.com/a/203028).
+# Resume partial files (and after, checks that they're the same).
 # When syncing with a server, it must have rsync installed.
 #
-rsync --append myserver:clonezilla.iso clonezilla.iso
+rsync --append-verify myserver:clonezilla.iso clonezilla.iso
 
 # Exclude (glob)
 #

@@ -140,10 +140,10 @@ $SUDO_USER              # User who invoked sudo
 [[ $EUID -eq 0 ]]       # Shell (all) check for user being root
 ```
 
-Passwordless sudo:
+Passwordless sudo (run as regular user):
 
 ```sh
-echo "$(whoami) ALL=(ALL:ALL) NOPASSWD: ALL" > "/etc/sudoers.d/$(whoami)_no_sudo_pwd"
+echo "$(whoami) ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$(whoami)_no_sudo_pwd"
 sudo chmod 440 !$
 ```
 

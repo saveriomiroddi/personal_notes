@@ -63,8 +63,8 @@ ls --block-size=K   # human-readable; use K,M,G...
 
 -[i]name <pattern>                # use quotes when using wildcards in pattern; case [i]nsensitive
 -wholename <value>                # include the directory name (eg. `.git/config`)
--regextype awk -[i]regex <regex>  # same as name, but with regex; must match the whole name; !! specify the regextype (the default is minimal) !!
-                                  # !! uses crap metachars (eg. [[:digit:]]) !!
+-regextype egrep -[i]regex <regex>  # same as name, but with regex; must match the whole name
+                                    # WATCH OUT: must specify the regextype (the default is minimal); if there is a -not, it must be put before it
 
 -type (f|d)                       # [f]iles, [d]irectories
 -L <path> -xtype l                # find symlinks
@@ -92,12 +92,22 @@ ls --block-size=K   # human-readable; use K,M,G...
 -print -quit                      # print one entry and quit; useful to check if there is one or more files in a directory (or matching)
 -printf '%P\0'                    # print the relative path, and also append null-char
 
-# exec: in both, `{}` must be the last argument
+# exec: in both, `{}` must be the last argument; if not possible, use shell (see below)
 -exec $command {} \;              # execute command for every file found, passing the name as {}; multiple -exec can be passed
 -exec $command {} +               # execute command with as many files as possible (see https://unix.stackexchange.com/a/389706)
 ```
 
 ### Examples
+
+Simplest find files + execute command (with quoting):
+
+```sh
+# Without xargs
+find . -type f -exec bash -c 'mv "$@" /dest' - {} +
+
+# With xargs
+find . -type f -print0 | xargs -0 -I {} mv {} /dest
+```
 
 Execute a certain command for the found directories:
 
@@ -198,7 +208,7 @@ cat /proc/self/environ | xargs -0 -L 1        # print the env vars (null-termina
 ```sh
 tar -C /tmp xvz                                        # Extract to a different directory
 tar xvz --transform="s/^parsec-3.0/parsec-benchmark/"  # Rename destination files while extracting!!
-tar --exclude='parsec-benchmark/.git' parsec-benchmark # Exclude (glob pattern)
+tar --exclude='parsec-benchmark/.git' parsec-benchmark # Exclude (glob pattern); if `/` is not prefixed, matches at any level
 ```
 
 ## mkfifo

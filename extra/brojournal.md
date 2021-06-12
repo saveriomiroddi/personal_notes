@@ -1,3 +1,10 @@
+## Sat 12/Jun/2021
+
+- Admin/Other
+  - [ ] Reinstall desktop O/S
+    - [x] Update all the scripts
+    - [ ] Fight Linux boot desktop
+
 ## Fri 11/Jun/2021
 
 - Rust/CS

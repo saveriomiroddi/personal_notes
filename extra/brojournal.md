@@ -1,9 +1,25 @@
+## Sun 13/Jun/2021
+
+- Admin/Other
+  - [x] Reinstall desktop O/S
+    - [x] Update all the scripts
+      - [x] Multifunction: investigate current configuration and old one
+    - [x] Fight Linux boot desktop (-> nvidia drivers)
+    - [x] Fight ZFS/grub
+
+- Projects/Open source
+  - ZFS
+    - [x] Handle Ubiquity now emptying `/run`
+    - [x] Don't set the permissions on rpool directories
+    - [x] Backport the majority (but simpler) of commits to 0.3
+    - [x] Officially close project
+
 ## Sat 12/Jun/2021
 
 - Admin/Other
   - [ ] Reinstall desktop O/S
     - [x] Update all the scripts
-    - [ ] Fight Linux boot desktop
+    - [ ] Fight Linux boot desktop (nvidia drivers)
 
 ## Fri 11/Jun/2021
 

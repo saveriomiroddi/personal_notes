@@ -4,6 +4,7 @@
   - [Pools](#pools)
     - [Basic operations](#basic-operations)
     - [Features](#features)
+      - [Find current GRUB supported features](#find-current-grub-supported-features)
     - [Import/export](#importexport)
     - [Admin](#admin)
   - [Mirror/devices](#mirrordevices)
@@ -42,7 +43,13 @@ zpool destroy $pool
 
 ### Features
 
+WATCH OUT! Once a feature is enabled, it can't be disabled.
+
 ```sh
+# Get the pool features/values.
+#
+zpool get all $pool
+
 # Hackish way of getting the supported features.
 #
 man zpool-features | grep -E '^       \w+$'
@@ -51,6 +58,24 @@ man zpool-features | grep -E '^       \w+$'
 #
 zpool upgrade [$pool]
 ```
+
+#### Find current GRUB supported features
+
+```sh
+# First, enable the src repository
+
+apt source grub-pc
+cd grub2-*/
+perl -ne 'print if /\*spa_feature_names\[\]/ .. /^\};$/' grub-core/fs/zfs/zfs.c
+```
+
+As of 2.04:
+
+- `com.delphix:embedded_data`
+- `com.delphix:extensible_dataset`
+- `com.delphix:hole_birth`
+- `org.illumos:lz4_compress`
+- `org.open-zfs:large_blocks`
 
 ### Import/export
 

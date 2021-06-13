@@ -753,9 +753,10 @@ mount -fav
 ## Modules
 
 ```sh
-modprobe $name      # load module
-modprobe -r $name   # unload the module, with all the dependencies
-lsmod               # list loaded modules
+modprobe $name             # load module
+modprobe -r $name          # unload the module, with all the dependencies
+lsmod                      # list loaded modules
+insmod /path/to/$module.ko # load a module
 
 # Find if a module is loaded.
 #

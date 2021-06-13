@@ -24,6 +24,7 @@
     - [Commandline args](#commandline-args-1)
     - [Syntax](#syntax)
     - [Base commands](#base-commands)
+    - [Regex](#regex)
     - [APIs](#apis)
     - [Useful examples](#useful-examples-1)
   - [Sed](#sed)
@@ -399,7 +400,7 @@ RS                    # separator
 ~                     # regex comparison
 !~                    # negative regex comparison
 
-/regex/               # regular expression
+/regex/               # regular expression; can be prefixed with `!`
 
 expr { statement }    # execute `statement` if `expr` is true
 
@@ -421,6 +422,11 @@ print expr
 getline           # consume one line
 exit
 ```
+
+### Regex
+
+- capturing groups are not supported (see [APIs](#apis))
+- `\b` is not supported - use `\y`
 
 ### APIs
 

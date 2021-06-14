@@ -8,6 +8,7 @@
     - [Import/export](#importexport)
     - [Admin](#admin)
   - [Mirror/devices](#mirrordevices)
+  - [Datasets](#datasets)
   - [Mountpoints](#mountpoints)
   - [Settings](#settings)
     - [Compression](#compression)
@@ -153,7 +154,19 @@ zdb | grep ashift                                                # show the pool
 zpool attach -o ashift=9 $pool $device_in_mirror> <new_device  # force the optimal ashift for the attaching device
 ```
 
+## Datasets
+
+```sh
+# Rename a dataset. Can be performed on mounted datasets.
+# Since (presumably) child datasets refer to parents, renaming a parent will propagate to children.
+#
+#
+zfs rename $from $to
+```
+
 ## Mountpoints
+
+WATCH OUT!: The dataset mountpoints are inherited from children, unless `mountpoint` is specified.
 
 ```sh
 # Don't allow pool mounting.
@@ -162,7 +175,6 @@ zpool attach -o ashift=9 $pool $device_in_mirror> <new_device  # force the optim
 zpool create -O canmount=off
 
 # Create with a permanent mountpoint (-O mountpoint), but a different temporary one (-R).
-# WATCH OUT!: With `-R`, filesystem's mountpoint will be relative to it.
 # The mountpoints are created on pool creation, but not destroyed on pool destruction.
 #
 zpool create -O mountpoint=/ -R /media/disk_a

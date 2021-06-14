@@ -737,9 +737,11 @@ aa-logprof -f /etc/apparmor.d/opt.nginx_app_server.sbin.nginx
 Columns:
 
 - `options` (-3)
-  - `X-mount.mkdir[=mode]`: create the mountpoint (as `mkdir -p`) if not exists
-  - `nofail`: don't report error if the device is not present; best used with timeout (`x-systemd.device-timeout`)
-  - `x-systemd.device-timeout=<time>`: time can be specified with suffixes, eg. `1ms`; `0` is infinite; defaults to 90"
+  - `X-mount.mkdir[=mode]`                 : create the mountpoint (as `mkdir -p`) if not exists
+  - `nofail`                               : don't report error if the device is not present; best used with timeout (`x-systemd.device-timeout`)
+  - `x-systemd.device-timeout=<time>`      : time can be specified with suffixes, eg. `1ms`; `0` is infinite; defaults to 90"
+  - `x-systemd.requires-mounts-for=/path`  : require paths to exist (constrain ordering)
+  - `x-systemd.requires=zfs-mount.service` : require service to run
 - `dump` (-2): `1` if the partition is included when using dump tool
 - `pass` (-1): order when checking with fsck
 

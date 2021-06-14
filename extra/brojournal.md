@@ -1,3 +1,40 @@
+## Mon 14/Jun/2021
+
+- Projects/Open source
+  - ZFS
+    - [x] Replicate 0.5 issues on a VM
+      - [x] Create bpool dataset(s), in order to avoid GRUB warning
+    - [x] Backport non-procedural changes from master into `0.3_backports`
+    - [x] Backport: Update pool creation features to updated procedure
+    - [x] Backport: Fix /boot mounts mess (part 1: timeout)
+    - [x] Backport: Fix /boot mounts mess (part 2: /boot dependency)
+    - [x] Backport: Use UUID rather than PARTUUID for boot partitions in the fstab
+      - [x] Fix EFI mounts (from 1 onwards) filesystem UUID
+    - [x] Master+Backport: Refactoring: Move fstab preparation into separate step
+    - [x] Backport: Generalize fix filesystem mount ordering
+    - [x] Backport: Improve old update_zed_cache_Debian(), following the new procedure
+    - [x] Backport: Datasets support
+      - [x] 8f75a078aa Add support for datasets
+      - [x] 198afb8762 Allow dataset creation options customization via env variable
+      - [x] 4fd8ee1c8a Complete KUbuntu support
+      - [x] d7518ad12b Don't set the permissions on rpool directories
+      - [x] Test
+    - [x] All clean
+      - [x] Test Ubuntu Server on backport
+      - [x] Test Debian on backport
+      - [x] Test bpool dataset(s) on 0.3_backports
+      - [x] Test new procedure
+        - [x] Run and review errors (without bpool datasets)
+        - [x] Apply the backport fixes, where applicable
+        - [x] Try bpool datasets
+        - [x] Test if Ubuntu Server works
+        - [x] Test if Debian works
+    - [x] Merge backport, as separate file
+  - [x] Backport: Implement bpool datasets, with Debian required GRUB change
+  - [x] Backport: Set fstab dump `0`
+  - [x] Add Debian support for new procedure and drop backport
+  - [x] Fix build
+
 ## Sun 13/Jun/2021
 
 - Admin/Other

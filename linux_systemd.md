@@ -51,7 +51,7 @@ systemctl list-dependencies --reverse snapd.socket
 ## journalctl
 
 ```sh
-journalctl -b [-k]                                 # view log for current Boot; only [k]ernel messages
+journalctl -b -xp 3 [-k]                           # view log for current Boot; with e[x]tra information, only errors (`-p 3` = level); only [k]ernel messages
 journalctl --pager-end --unit=$service.service     # show unit log; `page-end`: go to end
 journalctl --vacuum-time=1d                        # clean systemd journal (/var/log/journal)
 ```

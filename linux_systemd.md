@@ -1,19 +1,22 @@
 # Linux Systemd
 
 - [Linux Systemd](#linux-systemd)
-  - [Generic commands](#generic-commands)
+  - [Generic commands and notes](#generic-commands-and-notes)
   - [Systemctl](#systemctl)
   - [journalctl](#journalctl)
-  - [Configuring a unit](#configuring-a-unit)
+  - [Configuring a service unit](#configuring-a-service-unit)
     - [Overrides](#overrides)
     - [Hooks](#hooks)
   - [Timers (scheduled events)](#timers-scheduled-events)
+    - [Systemd time format](#systemd-time-format)
     - [Once-off (transient)](#once-off-transient)
   - [Event triggers](#event-triggers)
 
-## Generic commands
+## Generic commands and notes
 
 List all the services, and their running status: `service --status-all`. Great for disabling unnecessary services!!
+
+Units are stored under `/etc/systemd/system`, however, it's best practice not to edit them directly, instead, use the `edit` command.
 
 ## Systemctl
 
@@ -24,7 +27,8 @@ systemctl reload $service             # reload; not always functional
 systemctl reload-or-restart $service  # if reload is not defined (or has no effect), restart; WATCH OUT! don't define `ExecReload`
 systemctl status $service
 systemctl cat $service                # print unit file
-systemctl edit --full $service        # edit unit file (--full: edit the service, instead of creating an override)
+systemctl edit --full $service        # create/edit unit file (--full: edit the service, instead of creating an override)
+                                      # in order to programmatically edit, workaround by setting `SYSTEMD_EDITOR=tee [-a]` and piping the content.
 systemctl mask $service               # "mask": disable a service, by symlinking it to /dev/null; WATCH OUT! doesn't fail if the service doesn't exis
 
 systemctl daemon-reload               # invoke this after updating a unit
@@ -36,6 +40,8 @@ systemctl list-unit-files [$pattern]  # all units, with their states; glob patte
 systemctl [--user] list-timers        # list timers
 systemctl --failed                    # show units that failed to start
 ```
+
+If a unit is stored with ill-formed content, it won't be found by commands, which print instead a confusing `No files found` message.
 
 The `--user` is for units belonging to the user (eg. transient timers).
 
@@ -72,7 +78,7 @@ systemctl kill --kill-who=main --signal=SIGUSR2 systemd-journald
 journalctl --vacuum-size=128M
 ```
 
-## Configuring a unit
+## Configuring a service unit
 
 See:
 
@@ -88,7 +94,7 @@ Almost all the entries are optional. Escaping is not standard; in order to escap
 # for example, a space is escaped with a slash, both the slash and the space will be part of the string
 # (!).
 #
-cat > /etc/systemd/system/myservice.service <<UNIT
+SYSTEMD_EDITOR=tee systemctl edit --full myservice.service << UNIT
 [Unit]
 Description=My Service
 
@@ -139,7 +145,7 @@ KillMode=control-group
 Restart=always
 
 [Install]
-# Generally, this is the setting.
+# General-purpose setting.
 #
 WantedBy=multi-user.target
 UNIT
@@ -159,9 +165,78 @@ If the `Type=oneshot`, `ExecPostStart` can be used to specify a command to execu
 
 ## Timers (scheduled events)
 
+Reference: https://www.freedesktop.org/software/systemd/man/systemd.timer.html.
+
 Timers are represented by `.timer` files accompanying the main service (a service is required).
 
 See [overrides](#overrides) for overriding notes.
+
+Example:
+
+```sh
+SYSTEMD_EDITOR=tee systemctl edit --full myservice.timer << UNIT
+[Unit]
+Description=myservice timer
+
+[Timer]
+OnCalendar=*-*-* 0/5:*:*
+
+# Other options/configurations:
+#
+# AccuracySec=1s          # defaults to 1m
+# OnCalendar=*-*-* 6:00
+# RandomizedDelaySec=30m  # defaults o 0
+# Persistent=true         # stores the last run on disk, so jobs are not missed; requires OnCalendar
+
+[Install]
+WantedBy=timers.target
+UNIT
+
+systemctl enable myservice.timer
+systemctl start myservice.timer
+```
+
+### Systemd time format
+
+Reference: https://www.freedesktop.org/software/systemd/man/systemd.time.html.
+
+Examples:
+
+```
+  Sat,Thu,Mon..Wed,Sat..Sun → Mon..Thu,Sat,Sun *-*-* 00:00:00
+      Mon,Sun 12-*-* 2,1:23 → Mon,Sun 2012-*-* 01,02:23:00
+                    Wed *-1 → Wed *-*-01 00:00:00
+           Wed..Wed,Wed *-1 → Wed *-*-01 00:00:00
+                 Wed, 17:48 → Wed *-*-* 17:48:00
+Wed..Sat,Tue 12-10-15 1:2:3 → Tue..Sat 2012-10-15 01:02:03
+                *-*-7 0:0:0 → *-*-07 00:00:00
+                      10-15 → *-10-15 00:00:00
+        monday *-12-* 17:00 → Mon *-12-* 17:00:00
+  Mon,Fri *-*-3,1,2 *:30:45 → Mon,Fri *-*-01,02,03 *:30:45
+       12,14,13,12:20,10,30 → *-*-* 12,13,14:10,20,30:00
+            12..14:10,20,30 → *-*-* 12..14:10,20,30:00
+  mon,fri *-1/2-1,3 *:30:45 → Mon,Fri *-01/2-01,03 *:30:45
+             03-05 08:05:40 → *-03-05 08:05:40
+                   08:05:40 → *-*-* 08:05:40
+                      05:40 → *-*-* 05:40:00
+     Sat,Sun 12-05 08:05:40 → Sat,Sun *-12-05 08:05:40
+           Sat,Sun 08:05:40 → Sat,Sun *-*-* 08:05:40
+           2003-03-05 05:40 → 2003-03-05 05:40:00
+ 05:40:23.4200004/3.1700005 → *-*-* 05:40:23.420000/3.170001
+             2003-02..04-05 → 2003-02..04-05 00:00:00
+       2003-03-05 05:40 UTC → 2003-03-05 05:40:00 UTC
+                 2003-03-05 → 2003-03-05 00:00:00
+                      03-05 → *-03-05 00:00:00
+                     hourly → *-*-* *:00:00
+                      daily → *-*-* 00:00:00
+                  daily UTC → *-*-* 00:00:00 UTC
+                    monthly → *-*-01 00:00:00
+                     weekly → Mon *-*-* 00:00:00
+    weekly Pacific/Auckland → Mon *-*-* 00:00:00 Pacific/Auckland
+                     yearly → *-01-01 00:00:00
+                   annually → *-01-01 00:00:00
+                      *:2/3 → *-*-* *:02/3:00
+```
 
 ### Once-off (transient)
 

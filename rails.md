@@ -5,6 +5,7 @@
   - [Controllers](#controllers)
   - [ActiveRecord](#activerecord)
     - [Querying](#querying)
+      - [Scopes](#scopes)
     - [Updating](#updating)
     - [Migrations](#migrations)
     - [Callbacks](#callbacks)
@@ -30,10 +31,19 @@ Query hints (6.0+):
 Article.joins(:user).optimizer_hints("JOIN_ORDER(articles, users)").to_sql
 # => SELECT /*+ JOIN_ORDER(articles, users) */ `articles`.* FROM `articles` INNER JOIN `users` ON `users`.`id` = `articles`.`user_id`
 ```
+
 ### Querying
 
 ```ruby
 query.ids                   # pluck the ids!
+```
+
+#### Scopes
+
+```ruby
+scope :with_tag, ->(name) do
+  where(tag: name)
+end
 ```
 
 ### Updating
@@ -86,7 +96,7 @@ change_table :table, bulk: true do |t|
   t.belongs_to
 
   t.remove :column_name                # remove a column
-  t.remove_index :column_name{, column_name_N}, name: index_name
+  t.remove_index :column_name{, column_name_N}  # replace :column_name with `name: index_name` if non-rails naming
   t.remove_references
   t.remove_belongs_to
   t.remove_timestamps
@@ -98,8 +108,9 @@ Direct operations:
 ```ruby
 rename_table :old_table_name, :new_table_name
 drop_table :table_name
-change_column :table, :column, :type, **column_options # see options in :create_table
+change_column :table, ... # see options in :create_table
 change_column_default :table, :column, :default
+remove_index :table, ...  # see options in :change_table
 
 # Foreign keys
 #

@@ -7,7 +7,7 @@
     - [Text](#text)
     - [Meshes (Geometric shapes)](#meshes-geometric-shapes)
     - [Images](#images)
-    - [Sprite batch](#sprite-batch)
+    - [Sprites batching](#sprites-batching)
   - [Screen](#screen)
     - [Graphics configuration](#graphics-configuration)
     - [Viewport](#viewport)
@@ -252,7 +252,7 @@ Coordinates: top left.
 
 See [Hello world](#hello-world).
 
-### Sprite batch
+### Sprites batching
 
 Draw images in batch - for large amounts, it saves considerable time (bunnymark (1000 images) is ~8x as fast).
 

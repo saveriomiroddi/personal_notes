@@ -1,3 +1,12 @@
+## Tue 15/Jun/2021
+
+- Rust/Gamedev
+  - Study Macroquad
+    - [x] Investigate low responsiveness (-> Linux)
+    - [x] Fight Linux OpenGL drivers
+    - [x] Compare performance with other machine
+      - [x] Research and buy new card
+
 ## Mon 14/Jun/2021
 
 - Projects/Open source

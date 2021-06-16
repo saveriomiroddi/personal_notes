@@ -1,8 +1,19 @@
+## Wed 16/Jun/2021
+
+- Rust/Gamedev
+  - [x] Investigate and discuss low responsiveness issue (-> framerate; game loop design)
+  - [ ] Article: https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
+    - [ ] Check out similar articles
+- MySQL
+  - [x] FT indexes administration deep dive (theory and first tests)
+
 ## Tue 15/Jun/2021
 
 - Rust/Gamedev
   - Study Macroquad
+    - [ ] [Making an online multiplayer game in Rust with Nakama](https://heroiclabs.com/blog/tutorials/rust-fishgame)
     - [x] Investigate low responsiveness (-> Linux)
+- Admin/Other
     - [x] Fight Linux OpenGL drivers
     - [x] Compare performance with other machine
       - [x] Research and buy new card

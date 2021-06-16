@@ -202,6 +202,8 @@ For a softer isolation (that is, with the kernel still being scheduled on the de
 
 ## Setting the CPU frequency
 
+EDIT: Read the [kernel guide](https://www.kernel.org/doc/html/v5.8/admin-guide/pm/cpufreq.html) to see if something applies.
+
 It seems that there isn't a stable software way to do that; on a Ryzen 3950x, the strategies:
 
 - setting `userspace` governor

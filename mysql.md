@@ -11,6 +11,7 @@
     - [Numeric functions](#numeric-functions)
     - [Aggregates](#aggregates)
     - [Other/generic functions](#othergeneric-functions)
+  - [(Status) Variables](#status-variables)
   - [Regular expressions (regexes)](#regular-expressions-regexes)
     - [Strategies](#strategies)
   - [JSON + MVI and array storage](#json--mvi-and-array-storage)
@@ -151,12 +152,22 @@ GROUP_CONCAT(@field[, @separator])   # ignores NULL fields, but returns NULL if 
 ### Other/generic functions
 
 ```sql
+FORMAT(@number, @decimal_places)     # format (pretty print) a number
 IFNULL(<expr>, @substitute)
 UUID()                               # generates a uuid
 SLEEP(@secs)
 LAST_INSERT_ID()                     # last inserted AUTO_INCREMENTed id
 ROW_COUNT()                          # number of rows affected by last operation (NOT rows changed!)
 GREATEST|LEAST(@values...)           # min/max on multiple values
+```
+
+## (Status) Variables
+
+```sql
+SHOW GLOBAL VARIABLES [LIKE 'pattern'| WHERE expr];
+SELECT @@variable_name;                             -- alternate form for selecting a global var
+
+SHOW GLOBAL STATUS [LIKE 'pattern' | WHERE expr];
 ```
 
 ## Regular expressions (regexes)
@@ -620,6 +631,16 @@ WHERE {parent_fk} = ?
 ```
 
 ## Stored procedures
+
+List stored procedures (via information schema):
+
+```sql
+SELECT routine_name
+FROM information_schema.routines
+WHERE routine_type = 'PROCEDURE'
+      -- AND routine_schema = @database_name
+      AND routine_name LIKE 'rds\_%';
+```
 
 ### Variables
 

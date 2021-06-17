@@ -1,3 +1,11 @@
+## Thu 17/Jun/2021
+
+- Admin/System
+  - [x] Fight system not suspending (-> new ethernet driver version)
+- Projects/Open source
+  - [x] QEMU research paper
+    - [x] Address remaning review issues
+
 ## Wed 16/Jun/2021
 
 - Rust/Gamedev

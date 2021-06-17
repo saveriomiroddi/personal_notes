@@ -358,7 +358,7 @@ apt-cache search '^linux-image-unsigned-5.4.[[:digit:]-]+-generic'
 #
 aptitude why -v $package
 
-# Display the sources of given package
+# Display the repositories with a given package
 #
 apt-cache policy $package
 
@@ -403,9 +403,14 @@ dpkg-deb -c $package.deb
 ar -vx $package.deb
 tar xvf data.tar.gz
 
-# Find which package a file belongs to
+# Find which package a file in the filesystem belongs to
 #
 dpkg -S $file
+
+# Find which packages include a file with the given name (no need for path). This is not a preinstalled tool.
+# Require its case to be refreshed `apt-file cache`. 
+#
+apt-file search $filename
 ```
 
 Useful generic snippets:

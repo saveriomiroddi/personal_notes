@@ -298,6 +298,12 @@ Differently from GNU Parallel, the command can't be quoted.
 - `-P <processes>`: use 0 for unlimited; based on the manpage, `-n` or `-L` should be used, but they weren't required with the personal use cases.
 
 ```sh
+# WATCH OUT! When sending params via echo on a single line, must not send the newline (which is always considere a separator):
+#
+echo -n t1 t2 t3 | xargs -d ' ' -P 0 -I {} echo mysql -e 'SELECT * FROM {}'
+
+# Execute a command from `ls` output.
+#
 ls -1 *.txt | perl -pe 's/\.txt//' | xargs -P 4 -I {} mysql -e 'LOAD DATA INFILE "{}.txt" INTO TABLE "{}"'
 
 # Prints the files, surrounded by double quotes.

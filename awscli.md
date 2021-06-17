@@ -48,13 +48,24 @@ aws iam get-user --user-name=$username
 
 ### RDS
 
+Find RDS reservations expiry:
+
 ```sh
-# Find RDS reservations expiry:
-#
 aws rds describe-reserved-db-instances \
   --region eu-west-1 \
   --reserved-db-instance-id my-reservation-id \
   --query 'ReservedDBInstances[*].[StartTime,Duration]'
+```
+
+Modify a parameter group:
+
+```sh
+# The output is annoying. In case of error, it will be printed on stderr.
+#
+aws rds modify-db-parameter-group \
+  --db-parameter-group-name mydbparametergroup \
+  --parameters "ParameterName=max_connections,ParameterValue=250,ApplyMethod=immediate" \
+               "ParameterName=max_allowed_packet,ParameterValue=1024,ApplyMethod=immediate" > /dev/null
 ```
 
 ### S3

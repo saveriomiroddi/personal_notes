@@ -30,6 +30,7 @@
     - [At](#at)
   - [Apparmor](#apparmor)
   - [fstab](#fstab)
+  - [sysctl](#sysctl)
   - [Modules](#modules)
   - [Install grub from live cd (or perform chrooted operations)](#install-grub-from-live-cd-or-perform-chrooted-operations)
   - [Logging/syslog/tools](#loggingsyslogtools)
@@ -302,8 +303,8 @@ cat /proc/<uid>/limits
 # check the limit for a user
 sudo -u mysql bash -c "ulimit -n"
 
-# extend the limit at global level; add to /etc/sysctl.conf
-echo fs.file-max = 65536 >> /etc/sysctl.conf
+# extend the limit at global level; may still be overridden by /etc/sysctl.conf
+echo fs.file-max = 65536 >> /etc/sysctl.d/99-file-max.conf
 
 # check the result
 sysctl -p
@@ -408,7 +409,7 @@ tar xvf data.tar.gz
 dpkg -S $file
 
 # Find which packages include a file with the given name (no need for path). This is not a preinstalled tool.
-# Require its case to be refreshed `apt-file cache`. 
+# Require its case to be refreshed `apt-file cache`.
 #
 apt-file search $filename
 ```
@@ -755,6 +756,14 @@ Test the content of fstab (not reliable for actual mounting; for example, doesn'
 ```sh
 # [f]ake, [a]ll, [v]erbose
 mount -fav
+```
+
+## sysctl
+
+```sh
+sudo sysctl -a                                                                   # list all values
+sysctl -w kernel.perf_event_paranoid=1                                           # set a value
+echo "kernel.perf_event_paranoid = 1" > /etc/sysctl.d/50-allow-perf-nonroot.conf # make a value permanent
 ```
 
 ## Modules

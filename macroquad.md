@@ -6,6 +6,8 @@
     - [Text](#text)
     - [Images/Sprites](#imagessprites)
     - [Tiles](#tiles)
+  - [Resources handling/ECS](#resources-handlingecs)
+  - [Sound](#sound)
   - [Physics](#physics)
       - [Manually checking sprite <> tile bottom collision](#manually-checking-sprite--tile-bottom-collision)
   - [Input](#input)
@@ -19,6 +21,19 @@
 // All the functions/constants are in the prelude.
 //
 use macroquad::prelude::*;
+
+fn window_conf() -> Conf {
+    // Defaults
+    Conf {
+        window_title: "".into(),
+        window_width: 800,
+        window_height: 600,
+        window_resizable: true,
+        sample_count: 1,          // MSAA
+        high_dpi: false,
+        ..Default::default()
+    }
+}
 
 #[macroquad::main("BasicShapes")]
 async fn main() -> Result<(), Box<dyn error::Error>> {
@@ -47,10 +62,12 @@ draw_text("IT WORKS!", 20.0, 20.0, 30.0, DARKGRAY);
 
 ### Images/Sprites
 
+See the [resources handling](#resources-handlingecs) section for storage/load.
+
 ```rs
 let sprite: Texture2D = load_texture("assets/Whale/Whale(76x66)(Orange).png").await?;
 
-// The `draw_texture()` function has no params.
+// The `draw_texture()` function has no texture params.
 draw_texture_ex(
     sprite,                                          // texture
     0., 0.,                                          // x, y
@@ -86,6 +103,50 @@ tiled_map.draw_tiles(
 let tile: &Option<Tile> = tiled_map.get_tile(LAYER, x_u32, y_u32);
 
 let tiles: TilesIterator = tiled_map.tiles();
+```
+
+## Resources handling/ECS
+
+Resources are typically stored and loaded in the global storage; this is also because they're async, so they can't be loaded in a standard initializer or so.
+
+```rs
+pub struct Resources {
+    pub title_texture: Texture2D,
+}
+
+impl Resources {
+    pub async fn new() -> Result<Resources, Box<dyn error::Error>> {
+        Ok(Resources { title_texture: load_texture("resources/cavern/title.png").await? })
+    }
+}
+
+async fn main() -> Result<(), Box<dyn error::Error>> {
+    let resources_loading = start_coroutine(async move {
+        let resources = Resources::new().await.unwrap();
+        storage::store(resources);
+    });
+
+    while !resources_loading.is_done() {
+        clear_background(BLACK);
+        let text = format!("Loading resources {}", ".".repeat(((get_time() * 2.) as usize) % 4));
+        draw_text(text, screen_width() / 2. - 160., screen_height() / 2., 40., WHITE);
+        next_frame().await;
+    }
+}
+
+let resources = storage::get::<Resources>(); // get_mut() also availale
+let title_texture = resources.title_texture;
+```
+
+## Sound
+
+```rust
+let sound1 = audio::load_sound("sound.wav").await?;
+audio::play_sound_once(sound1);
+
+audio::set_sound_volume(sound, volume_f32);
+audio::play_sound(sound, PlaySoundParams { looped: true, volume: 0.3});
+audio::stop_sound(sound);
 ```
 
 ## Physics

@@ -323,6 +323,7 @@ seq 4 | xargs -I {} -P 0 sh -c 'aws ec2 delete-snapshot --snapshot-id {} || true
 ```sh
 sudo mkdir /usr/share/doc/perf-tip
 curl https://raw.githubusercontent.com/torvalds/linux/master/tools/perf/Documentation/tips.txt | sudo tee /usr/share/doc/perf-tip/tips.txt
+sysctl -w kernel.perf_event_paranoid=1 # allow to non-root users
 
 # Display stats (to stderr!!)
 #

@@ -43,6 +43,7 @@
   - [jq](#jq)
     - [Hash](#hash)
     - [Arrays](#arrays-1)
+      - [More complex filtering](#more-complex-filtering)
     - [Functions](#functions)
   - [Silver searcher (ag)](#silver-searcher-ag)
   - [Generic snippets](#generic-snippets)
@@ -720,6 +721,19 @@ JSON
 #   "Key": "key1",
 #   "VersionId": "key2"
 # }
+```
+
+#### More complex filtering
+
+More complex filters, with string operations:
+
+```sh
+aws rds describe-db-instances | jq '
+  .DBInstances[] |                                     # Get `DBInstance` key from root hash, and iterate the array values
+  {DBInstanceIdentifier,DBInstanceStatus} |            # For convenience, filter those two keys only, from each array entry
+  select(.DBInstanceIdentifier | contains("00")) |     # Select only the entries whose `DBInstanceIdentifier` value includes "00"
+  select(.DBInstanceStatus != "available")             # Select only the entries whose `DBInstanceStatus` value != "available"
+'
 ```
 
 ### Functions

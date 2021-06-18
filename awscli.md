@@ -68,6 +68,13 @@ aws rds modify-db-parameter-group \
                "ParameterName=max_allowed_packet,ParameterValue=1024,ApplyMethod=immediate" > /dev/null
 ```
 
+Find RDS instance informations:
+
+```sh
+aws rds describe-db-instances --db-instance-identifier $id                   # can specify only one; no wildcards
+aws rds describe-db-instances --filters Name=db-instance-id,Values=$id1,$id2 # wildcards are not supported
+```
+
 ### S3
 
 See `text_processing##jq` for JSON manipulation.

@@ -1,3 +1,17 @@
+## Fri 18/Jun/2021
+
+- Admin/System
+  - [x] Profile and investigate slow Nvidia Linux games performance
+- Rust/Gamedev
+  - [x] Port Code the Classics
+    - [x] Review Macroquad APIs
+    - [x] Yet Another Resarch on Rust game engines
+    - [x] Scripting updates
+    - [ ] Cavern
+      - [ ] Port
+  - [x] Test port
+  - [x] Follow up issue with bevy cheatbook
+
 ## Thu 17/Jun/2021
 
 - Admin/System

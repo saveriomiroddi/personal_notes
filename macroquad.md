@@ -7,13 +7,14 @@
     - [Images/Sprites](#imagessprites)
     - [Tiles](#tiles)
   - [Resources handling/ECS](#resources-handlingecs)
-  - [Sound](#sound)
+  - [Audio/Sound](#audiosound)
   - [Physics](#physics)
       - [Manually checking sprite <> tile bottom collision](#manually-checking-sprite--tile-bottom-collision)
   - [Input](#input)
   - [Scene management/ECS](#scene-managementecs)
   - [Misc](#misc)
     - [I/O](#io)
+    - [Random](#random)
 
 ## Hello world
 
@@ -116,7 +117,7 @@ pub struct Resources {
 
 impl Resources {
     pub async fn new() -> Result<Resources, Box<dyn error::Error>> {
-        Ok(Resources { title_texture: load_texture("resources/cavern/title.png").await? })
+        Ok(Resources { title_texture: load_texture("title.png").await? })
     }
 }
 
@@ -134,11 +135,16 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     }
 }
 
+// In order to have a consistent assets/resource location across O/Ss, use:
+set_pc_assets_folder("assets");
+
 let resources = storage::get::<Resources>(); // get_mut() also availale
 let title_texture = resources.title_texture;
 ```
 
-## Sound
+## Audio/Sound
+
+Formats supported out of the box: `wav`, `ogg`.
 
 ```rust
 let sound1 = audio::load_sound("sound.wav").await?;
@@ -306,4 +312,13 @@ impl Node for Player {
 let file = load_file("path/to/file").await?
 // Lossily load a string
 let tiled_map_json = load_string("assets/map.json").await?;
+```
+
+### Random
+
+```rs
+// Shuffle an array!
+//
+use macroquad::rand::ChooseRandom;
+my_vec.shuffle();
 ```

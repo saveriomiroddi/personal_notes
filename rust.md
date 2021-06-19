@@ -449,7 +449,7 @@ let int_as_bool = 1 as bool;        // 1: true, 0: false, other: !!undefined!!
 
 For static variables, see [static section](#staticglobal-variables-lazy_static-once_cell-thread_local)
 
-Numeric casts/operations:
+Number-related casts/operations:
 
 ```rust
 0xFF_u8 as u16;          // 0x00FF ("zero-extend")
@@ -457,6 +457,8 @@ Numeric casts/operations:
 
 0xFF_u8 as i16;          // WATCH OUT!!: 0x00FF
 (0xFF_u8 as i8) as i16;  // 0xFFFF
+
+1.to_string();           // numeric to string
 
 5_u64.wrapping_add(-4_i32 as u64);   // proper way to add signed to unsigned
 5_u64.checked_sub(-(-4_i32) as u64); // otherwise, branch positive/negative, and do checked op for both cases
@@ -917,7 +919,7 @@ for (row, source_row) in values.iter_mut().zip(source_values.chunks($order)) {
 
 ### Hash maps
 
-The default hashing function is cryptographically secure!!. For faster versions, must use a crate (common one: `fxhash`).
+The default hashing function is cryptographically secure!!. For faster versions, must use a crate (common one: `fxhash`). For a version that can be used as `const`, see [`phf`](rust_ruby_libraries.md#)
 
 WATCH OUT! In order to avoid BCK headaches when getting and setting in the same scope/function, use the [Entry API](https://stackoverflow.com/a/28512504/210029) (see below).
 
@@ -993,14 +995,18 @@ let vec = score_table
   .map(|(_k, v)| v)
   .collect::<Vec<_>>();
 
-// Create a map from multiple arrays.
+// Create a map from two arrays.
 //
 let scores = teams
   .iter()
   .zip(initial_scores.iter())
   .collect::<HashMap<_, _>>();
 
-// Transform a map into another one (and pass ownership)
+// Create a map from a vector of tuples (a, b)
+//
+let haxx: HashMap<_, _> = vec![("foo", 1), ("barry", 2)]
+    .into_iter()
+    .collect();
 ```
 
 In order to use enums as keys, annotate them with `#[derive(Eq, PartialEq, Hash)]`.
@@ -1157,6 +1163,12 @@ if let Coin::Quarter(state) = coin {
 //
 while let Some(Some(value)) = optional_values_vec.pop() {
   println!("current value: {}", value);
+}
+
+// In order to compose an expression with let, use `matches!`
+//
+if matches!(coin, Coin::Quarter(_)) && random_event() {
+  // can't use the Quarter value here!
 }
 ```
 

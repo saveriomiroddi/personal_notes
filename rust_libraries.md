@@ -26,6 +26,7 @@
     - [Commandline parsing (`clap`)](#commandline-parsing-clap)
     - [Terminal interaction (`termion`)](#terminal-interaction-termion)
     - [Map literals (`maplit`)](#map-literals-maplit)
+    - [Perfect hashing maps (usable as const) (`phf`)](#perfect-hashing-maps-usable-as-const-phf)
     - [Channels: Single Producer Multiple Consumers (`bus`)](#channels-single-producer-multiple-consumers-bus)
     - [Unit testing](#unit-testing)
       - [RSpec-style testing (`demonstrate`)](#rspec-style-testing-demonstrate)
@@ -826,6 +827,17 @@ writeln!(term, "{}bar", fmt_color)?;
 let map = hashmap!{
     "a" => 1,
     "b" => 2,
+};
+```
+
+### Perfect hashing maps (usable as const) (`phf`)
+
+```rust
+// Requires `macro` feature
+
+const HAZZ: phf::Map<&'static str, i32> = phf_map! {
+    "loop" => 4,
+    "continue" => 2,
 };
 ```
 

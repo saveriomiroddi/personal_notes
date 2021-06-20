@@ -117,7 +117,7 @@ pub struct Resources {
 
 impl Resources {
     pub async fn new() -> Result<Resources, Box<dyn error::Error>> {
-        Ok(Resources { title_texture: load_texture("title.png").await? })
+        Ok(Resources { title_texture: load_texture("rsources/cavern/title.png").await? })
     }
 }
 
@@ -317,8 +317,20 @@ let tiled_map_json = load_string("assets/map.json").await?;
 ### Random
 
 ```rs
-// Shuffle an array!
+let r: u32 = rand();           // only for u32 ...
+let r: f32 = gen_range(0., 1.) // ... for the other types, use gen_range()
+
+
+// Vector functionalities
 //
 use macroquad::rand::ChooseRandom;
-my_vec.shuffle();
+vec.shuffle();                          // shuffle a vec
+vec.choose()?;                          // random element
+vec.choose_mut()?;                      // random element (immutable)
+vec.choose_mut()?;                      // random element (mutable)
+let iter = vec.choose_multiple(amount); // multiple random elements
+
+// Generate a value in the interval [min, max).
+//
+let randnum = gen_range(min, max);
 ```

@@ -1167,8 +1167,8 @@ while let Some(Some(value)) = optional_values_vec.pop() {
 
 // In order to compose an expression with let, use `matches!`
 //
-if matches!(coin, Coin::Quarter(_)) && random_event() {
-  // can't use the Quarter value here!
+if matches!(coin, Coin::Quarter(x) if x > 2) && random_event() {
+  // Can use a guard (above), but can't use the value here (makes sense)!
 }
 ```
 
@@ -1276,8 +1276,10 @@ Enums can't be iterated. See `strum` crate for this purpose.
 
 Foundation of Rust. In order to use the contained value, we must extract (and test) it.
 
+Many of the methods are common between `Option` and `Result`.
+
 WATCH OUT! unwrap() moves the value out, so trying to do `&mut opt.unwrap()` doesn't work, because it's a reference to the result, rather than the content.  
-In order to solve this case, use `if let`.
+In order to solve this case, use `if let` or `as_ref()`/`as_mut()`.
 
 ```rust
 enum Option<T> {
@@ -1290,8 +1292,7 @@ enum Option<T> {
 let some_number = Some(5);
 let absent_number: Option<i32> = None;
 
-// Question mark ('?') operator: convenient syntax for decoding a Result and returning the Err, if any.
-// It also works with functions returning `Option<T>`.
+// Question mark ('?') operator: convenient syntax for returning None/Err from the function, if it's the value of an Option/Result.
 //
 let value = method()?;
 
@@ -1300,16 +1301,20 @@ let value = method()?;
 // - `unwrap_or`:         eagerly evaluated
 // - `unwrap_or_default`: invokes the `default()` (!!)
 //
-result.unwrap_or_else( |err | {
+opt.unwrap_or_else( |err | {
   println!("Problem parsing arguments: {}", err);
   std::process::exit(1);
 });
 
+// Chain operations, stopping at None.
+//
+opt.and(value).and_then(|| slow_function());
+
 // Extract a value, raising an error if None. Since `expect()` consumes the value, use `as_ref()`/
 // `as_mut()` in order to borrow.
 //
-let value = result.expect("it shouldn't be None!");
-let &mut value = result.as_mut().expect("it shouldn't be None!");
+let value = opt.expect("it shouldn't be None!");
+let &mut value = opt.as_mut().expect("it shouldn't be None!");
 
 // Convert Result to Option, and discard the error (use this if it's sure that there can't be an error)
 //
@@ -1345,7 +1350,7 @@ Some(12).as_ref()
 Some(&12).cloned()
 ```
 
-See next section for pattern matching.
+See [pattern matching](#pattern-matching).
 
 ### Pattern matching
 
@@ -1796,16 +1801,16 @@ The simplest way to make overridden methods private is to use private trait meth
 // #![allow(unused_mut)]
 // #![allow(non_snake_case)]
 
+pub(crate) mod private {
+    pub trait SubInterface {
+        fn redefined(&self);
+    }
+}
+
 pub trait SuperClass: private::SubInterface {
     fn virtual_(&self) {
         println!("virtual_");
         self.redefined()
-    }
-}
-
-pub(crate) mod private {
-    pub trait SubInterface {
-        fn redefined(&self);
     }
 }
 

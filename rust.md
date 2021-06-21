@@ -1165,7 +1165,7 @@ while let Some(Some(value)) = optional_values_vec.pop() {
   println!("current value: {}", value);
 }
 
-// In order to compose an expression with let, use `matches!`
+// In order to compose a complex expression with pattern matching, use `matches!`
 //
 if matches!(coin, Coin::Quarter(x) if x > 2) && random_event() {
   // Can use a guard (above), but can't use the value here (makes sense)!

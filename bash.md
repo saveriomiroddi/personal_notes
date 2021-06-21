@@ -29,6 +29,7 @@
   - [Arrays](#arrays)
     - [Snippets](#snippets)
   - [Associative arrays](#associative-arrays)
+  - [Shellcheck](#shellcheck)
   - [Script operational concepts/Useful scripts](#script-operational-conceptsuseful-scripts)
     - [Ask for input (keypress)](#ask-for-input-keypress)
     - [Trapping errors (hooks)](#trapping-errors-hooks)
@@ -864,6 +865,20 @@ function myfx {
 myfx MYHASH
 echo ${#MYHASH[@]} # 2
 ```
+
+## Shellcheck
+
+In order to generically solve the `SC1091` issue:
+
+```
+source "$(dirname "$0")/included_file.sh"
+       ^-- SC1091: Not following: ./included_file.sh: openBinaryFile: does not exist (No such file or directory)
+```
+
+run shellcheck with the options:
+
+- `-x`           : allow `source` outside of files
+- `-P SCRIPTDIR` : use to script path to look for sourced files
 
 ## Script operational concepts/Useful scripts
 

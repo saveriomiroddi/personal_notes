@@ -117,7 +117,7 @@ pub struct Resources {
 
 impl Resources {
     pub async fn new() -> Result<Resources, Box<dyn error::Error>> {
-        Ok(Resources { title_texture: load_texture("rsources/cavern/title.png").await? })
+        Ok(Resources { title_texture: load_texture("resources/cavern/title.png").await? })
     }
 }
 
@@ -241,8 +241,14 @@ if let None = tiled_map.get_tile(LAYER, tile_below.x as u32, tile_below.y as u32
 
 ## Input
 
+State concepts:
+
+- `down`    : pressed, unconditionally
+- `pressed` : pressed, if it was not pressed on the previous frame
+
 ```rs
 if is_key_down(KeyCode::Right) { /* ... */ }
+if is_key_pressed(KeyCode::Right) { /* ... */ }
 ```
 
 ## Scene management/ECS
@@ -332,5 +338,5 @@ let iter = vec.choose_multiple(amount); // multiple random elements
 
 // Generate a value in the interval [min, max).
 //
-let randnum = gen_range(min, max);
+let rand = gen_range(min, max);
 ```

@@ -1,3 +1,61 @@
+## Mon 21/Jun/2021
+
+- Admin/Planning+Other
+  - [x] Plan next cycle
+    - [x] Basic research SWE books/courses
+  - [x] Split brogramming3 into bad/discarded
+- Admin/Tools
+  - [x] Network connection script: Don't connect if already connected to the given network
+  - [x] Music playback script: Add support for multiple album locations
+- Projects/Open source
+  - OpenScripts
+    - [x] Create Bash script templating script
+- Admin/Blog
+  - [x] Remove `small` tag (retag articles to `quick`)
+- Studies/Rust
+  - [ ] Investigate From trait implementation for boxed serde `ErrorKind` type
+- Studies/Systems programming
+  - [ ] Programming from the ground up
+    - [x] 1. Introduction
+    - [x] 2. Computer Architecture
+- Rust/Gamedev
+  - Port Code the Classics
+    - [ ] Cavern
+      - [ ] Port
+
+### Cycle changes
+
+- Discarded
+  - Hands-On Data Structures and Algorithms in Rust
+    - 6.42. Combining It All into a Simple CLI Game
+    - 6.43. Introduction to Specs
+- Unscheduled
+  - Schedule manager
+    - Refactoring: Create launcher class (Replan)
+    - Add Reworker test suite
+  - Geet
+    - De-hardcode the `master` string (constant was already existing)
+  - Blog
+    - Disable Disqus + looks at alternatives
+  - Admin/Tools
+    - Improvements to blog's `add_new_book.sh` script
+  - Admin/Systems
+    - Fight mistaken malware on blog (-> Disqus)
+    - Fight investigate system slowdown (-> Firefox)
+    - Reinstall desktop O/S
+      - Fight ZFS
+      - Updates to installation script
+    - Fight investigate suspend/resume (-> Ethernet driver bug)
+    - Profile and investigate slow Nvidia Linux games performance
+  - ZFS
+    - Massive work
+  - Rust/Gamedev
+    - Investigate and discuss low responsiveness issue (-> framerate; game loop design)
+    - Article: https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
+    - Port Code the Classics
+      - Yet Another Research on Rust game engines
+      - Scripting updates
+
 ## Sun 20/Jun/2021
 
 - Rust/Gamedev
@@ -20,7 +78,7 @@
 - Rust/Gamedev
   - [ ] Port Code the Classics
     - [x] Review Macroquad APIs
-    - [x] Yet Another Resarch on Rust game engines
+    - [x] Yet Another Research on Rust game engines
     - [x] Scripting updates
     - [ ] Cavern
       - [ ] Port

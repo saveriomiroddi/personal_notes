@@ -4,6 +4,7 @@
   - [Math](#math)
     - [Number theory](#number-theory)
     - [Trigonometry](#trigonometry)
+    - [Geometry](#geometry)
     - [Statistics](#statistics)
     - [Convenient stuff](#convenient-stuff)
       - [Test if a positive number is a power of two](#test-if-a-positive-number-is-a-power-of-two)
@@ -21,6 +22,14 @@
 
 - tan(θ) = opposite/adjacent
 - θ = arctan(opposite/adjacent)
+
+### Geometry
+
+Collision test between rectangles aligned with the axes:
+
+```
+r2.left > r1.right && r2.right < r1.left && r2.top > r1.bottom && r2.bottom < r1.top
+```
 
 ### Statistics
 

@@ -495,7 +495,7 @@ val <<= n; val >>= n;           // overflows are ignored
 std::mem::swap(&mut a, &mut b); // !! swap two variables !!
 std::mem::size_of_val(v)        // memory occupation of a variable !!
 
-10_f64.clamp(-100., 100.)       // clamp a number (limit value within interval)
+10_f64.clamp(-100., 100.)       // clamp a number (limit value within interval); floats only
 10_u64.pow(2);                  // exponentiation (power), int/int
 10_f64.powi(2);                 // exponentiation, float/int
 10_f64.sqrt();                  // square root
@@ -1293,8 +1293,21 @@ let some_number = Some(5);
 let absent_number: Option<i32> = None;
 
 // Question mark ('?') operator: convenient syntax for returning None/Err from the function, if it's the value of an Option/Result.
+// If the Error type is different and From<T> exists, it's invoked.
 //
-let value = method()?;
+fn mine() -> Result<String, io::Error> {
+  let value = errorable_operation()?;
+  result = process(value);
+  Ok(result)
+}
+//
+// Desugared version.
+//
+let result = match Try::into_result(f.read_to_string(&mut s)) {
+    Ok(v) => v,
+    Err(e) => return Try::from_error(From::from(e)),
+};
+
 
 // Convenient pattern. Companion APIs:
 //

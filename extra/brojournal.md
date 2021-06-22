@@ -1,3 +1,14 @@
+## Tue 22/Jun/2021
+
+- Rust/Gamedev
+  - Port Code the Classics
+    - [ ] Cavern
+      - [x] Port to Macroquad (naive)
+  - [x] Investigate and report ggez issue with key repetition test
+  - [x] Review Bevy Game Jam
+- Studies/Rust
+  - [x] Investigate From trait implementation for boxed serde `ErrorKind` type
+
 ## Mon 21/Jun/2021
 
 - Admin/Planning+Other
@@ -21,7 +32,7 @@
 - Rust/Gamedev
   - Port Code the Classics
     - [ ] Cavern
-      - [ ] Port
+      - [ ] Port to Macroquad (naive)
 
 ### Cycle changes
 
@@ -62,14 +73,14 @@
   - [ ] Port Code the Classics
     - [ ] Cavern
       - [x] Design
-      - [ ] Port
+      - [ ] Port to Macroquad (naive)
 
 ## Sat 19/Jun/2021
 
 - Rust/Gamedev
   - [ ] Port Code the Classics
     - [ ] Cavern
-      - [ ] Port
+      - [ ] Port to Macroquad (naive)
 
 ## Fri 18/Jun/2021
 
@@ -81,7 +92,7 @@
     - [x] Yet Another Research on Rust game engines
     - [x] Scripting updates
     - [ ] Cavern
-      - [ ] Port
+      - [ ] Port to Macroquad (naive)
   - [x] Test port
   - [x] Follow up issue with bevy cheatbook
 

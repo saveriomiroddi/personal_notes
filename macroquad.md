@@ -244,7 +244,7 @@ if let None = tiled_map.get_tile(LAYER, tile_below.x as u32, tile_below.y as u32
 State concepts:
 
 - `down`    : pressed, unconditionally
-- `pressed` : pressed, if it was not pressed on the previous frame
+- `pressed` : state changed not_pressed -> pressed
 
 ```rs
 if is_key_down(KeyCode::Right) { /* ... */ }

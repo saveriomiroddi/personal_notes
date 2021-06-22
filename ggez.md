@@ -455,9 +455,14 @@ impl EventHandler for MainState {
 let a_key_pressed: bool = keyboard::is_key_pressed(ctx, KeyCode::A);
 let shift_key_pressed: bool =  keyboard::is_mod_active(ctx, keyboard::KeyMods::SHIFT)
 println!("Pressed keys: {:?}", keyboard::pressed_keys(ctx));
-let key_pressed_repeatedly: bool = keyboard::is_key_repeated(ctx, KeyCode::A);
 
-let keys_pressed: &HashSet<KeyCode> = keyboard::pressed_keys(ctx);
+ let keys_pressed: &HashSet<KeyCode> = keyboard::pressed_keys(ctx);
+
+// Repetition test; returns true as long as the key is pressed.
+// Seems not to work correctly; on a test loop with is_key_pressed + is_key_repeated, it took around
+// 20 loops for the latter to start returning true.
+let key_kept_pressed: bool = keyboard::is_key_repeated(ctx);
+
 ```
 
 Mouse:

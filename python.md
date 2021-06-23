@@ -78,8 +78,8 @@ dict.pop(key[, default])  # delete a key; if default is not provided and the key
 ### Iteration/Comprehension
 
 ```python
-for i in range(r)         # iterate in [0, 5)
-for i in range(l, r, s)   # iterate with given (l)eft limit and (s)tep; the step can be negative (if so, make l > s).
+for i in range(r)         # iterate in [0, r)
+for i in range(l, r, s)   # iterate in [l, r) with (s)tep; the step can be negative (if so, make l > s).
 
 for e in list             # iterate over a list
 

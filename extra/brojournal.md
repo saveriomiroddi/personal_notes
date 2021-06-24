@@ -1,3 +1,14 @@
+## Thu 24/Jun/2021
+
+- Rust/Gamedev
+  - [x] Review [Godot Wild Jam](https://itch.io/jam/godot-wild-jam-33)
+  - [ ] Think jam participation
+  - Port Code the Classics
+    - [ ] Cavern
+      - [ ] Redesign with Macroquad APIs
+        - [ ] Review Fish Game source code/APIs
+          - `main.rs`, `player.rs`
+
 ## Wed 23/Jun/2021
 
 - Studies/SWE

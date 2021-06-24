@@ -805,7 +805,16 @@ SET foreign_key_checks=0;
 
 ### Profiling
 
-General profiler:
+Query optimizer trace; includes in-depth details about the query execution (plan):
+
+```sql
+SET optimizer_trace = "enabled=on";
+/* ... now execute the query ... */
+SET optimizer_trace = "enabled=off";
+SELECT * FROM information_schema.optimizer_trace\G
+```
+
+General profiler (deprecated; see https://dev.mysql.com/doc/refman/8.0/en/performance-schema-query-profiling.html and http://www.unofficialmysqlguide.com/profiling.html):
 
 ```sql
 SET PROFILING=1;
@@ -830,14 +839,6 @@ FROM INFORMATION_SCHEMA.PROFILING
 WHERE QUERY_ID = @query_id
 GROUP BY STATE
 ORDER BY Total_R DESC;
-```
-
-Query optimizer trace:
-
-```sql
-SET optimizer_trace = "enabled=on";
-SELECT * FROM information_schema.optimizer_trace\G
-SET optimizer_trace = "enabled=off";
 ```
 
 Digest slow query log, using Maatkit:

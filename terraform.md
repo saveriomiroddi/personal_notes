@@ -163,7 +163,11 @@ mymap = {
   "k2" = "v2"
 }
 
-mymap["k2"] #                # "v2"
+map["k2"]                     # map lookup; raises an error if the key is not in the map!
+keys(map)                     # extract the map keys into a list
+lookup(map, key, default)     # lookup with default; by testing the result against `default`, it can be used to test if the map contains the key
+
+contains(keys(map), key)      # clean way to test if a map contains a key
 ```
 
 ### Functions/Other syntax

@@ -80,17 +80,22 @@ help -c                                # list all possible configuration keys
 General notes:
 
 - always surround complex aliases with double quotes; internal double quotes must be escaped
-- the default shells is dash (sh)
+- the default shell is dash (sh)
 - the current path is the project dir; see the `GIT_PREFIX` workaround below
 - see `man git-config` for other infos
 
+If an alias starts with `!`, it's a shell commmand. Use bash when:
+
+- there are parameters involved;
+- and/or dash is not sufficient.
+
 ```
-# Use bash and a complex command; note that without `sh` at the end, the positional parameters don't behave as expected
+# Note that without `sh` as first parameter, the positional parameters don't behave as expected.
 # IMPORTANT: doesn't work with filenames with spaces.
 #
 cs = "!bash -c 'cd \"${GIT_PREFIX:-.}\"; git checkout --$1 \"${@:2}\" && git add \"${@:2}\"' sh"
 
-# Alternative form for complex commands (uses dash)
+# Alternative form for complex commands (via function).
 #
 stsh = "!f() { git stash show -p stash@{${1-0}}; }; f"
 ```

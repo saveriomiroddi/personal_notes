@@ -1,3 +1,13 @@
+## Fri 25/Jun/2021
+
+- Studies/SWE
+  - Competitive Programmer's Core Skills
+    - [ ] Week 1
+      - [x] Programming assignment
+        - Fight misinterpreted problem
+    - [ ] Week 2
+      - [ ] Videos/readings
+
 ## Thu 24/Jun/2021
 
 - Rust/Gamedev

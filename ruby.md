@@ -31,6 +31,7 @@
       - [Useful operations](#useful-operations)
     - [Hash](#hash)
     - [Enumerable](#enumerable)
+  - [Basic I/O](#basic-io)
   - [Gem](#gem)
   - [Handling processes](#handling-processes)
     - [Basic handling, via `IO.popen`](#basic-handling-via-iopopen)
@@ -566,6 +567,9 @@ arr = [0, 1, 2]
 
 arr.fill(nil, arr.size...5)             # resize/extend (destructive) in arguably expressive form; returns the array; !!! watch out the `...` syntax !!!
 arr[5] ||= nil                          # other resize/extend, in arguably less expressive form
+
+arr.delete(obj)                         # delete an object matching via `==`; returns self
+arr.delete_at(i)                        # delete an object at index `i`; returns the value deleted, or nil if no deletion
 ```
 
 #### Useful operations
@@ -608,8 +612,18 @@ ActiveSupport additions:
 
 ### Enumerable
 
+```rb
 enu.each_cons(n)                        # each overlapping subarray of `n` items; last non-exact subarrays are not included
 enu.each_slice(n)                       # each non overlapping subarray of `n` items; last non-exact subarray is included
+```
+
+## Basic I/O
+
+Files:
+
+```rb
+io_obj.readchar                         # reads one char; raises EOFError at the EOF
+```
 
 ## Gem
 

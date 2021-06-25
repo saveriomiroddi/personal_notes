@@ -1,6 +1,7 @@
 # MySQL
 
 - [MySQL](#mysql)
+  - [General database SQL concepts](#general-database-sql-concepts)
   - [Privileges](#privileges)
   - [Control flow](#control-flow)
   - [General statements](#general-statements)
@@ -31,7 +32,9 @@
     - [Statements output and SLEEP](#statements-output-and-sleep)
     - [Exceptions handling](#exceptions-handling)
     - [Cursors (with example procedure)](#cursors-with-example-procedure)
-  - [Performance](#performance)
+  - [Performance/Optimization](#performanceoptimization)
+    - [General optimization topics](#general-optimization-topics)
+    - [Query hints](#query-hints)
     - [Profiling](#profiling)
     - [Dynamic SQL](#dynamic-sql)
   - [Administration](#administration)
@@ -42,6 +45,25 @@
   - [Metadata](#metadata)
   - [Convenient operations](#convenient-operations)
     - [Skip the indexes on mysqldump dumps](#skip-the-indexes-on-mysqldump-dumps)
+
+## General database SQL concepts
+
+Noncorrelated subquery: query that is independent from the outer query.
+Semijoin - "almost" join that only checks for existince in another set.
+
+```sql
+SELECT *
+FROM t1
+WHERE t2_id IN (SELECT id FROM t2)
+```
+
+Derived table:
+
+```sql
+SELECT *
+FROM t1
+     JOIN (SELECT id FROM t2) USING (id)
+```
 
 ## Privileges
 
@@ -779,15 +801,9 @@ DELIMITER ;
 CALL ALL_TENANTS_OPERATION(); DROP PROCEDURE ALL_TENANTS_OPERATION;
 ```
 
-## Performance
+## Performance/Optimization
 
 ```sql
-# Query hints: Join order
-# Reference: https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimizer-hints-join-order.
-
-SELECT /*+ JOIN_ORDER(t2, t1) */ COUNT(*)
-FROM table_1 t1 JOIN table_2 t2
-
 # Disable optimizer switches:
 #
 SET GLOBAL optimizer_switch = "duplicateweedout=off";
@@ -801,6 +817,37 @@ ALTER TABLE seat_assignments STATS_SAMPLE_PAGES=50, STATS_AUTO_RECALC=0;
 #
 SET unique_checks=0;
 SET foreign_key_checks=0;
+```
+
+### General optimization topics
+
+Merging: merging a derived table in the outer query, by inlining the DT tables (as JOINs) and conditions to the outer query.
+
+Docs:
+
+- [Subquery materialization](https://dev.mysql.com/doc/refman/8.0/en/subquery-materialization.html)
+- [Derived tables/Views/CTEs materialization](https://dev.mysql.com/doc/refman/8.0/en/derived-table-optimization.html)
+
+### Query hints
+
+```sql
+# Join order; reference: https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimizer-hints-join-order.
+
+SELECT /*+ JOIN_ORDER(t2, t1) */ COUNT(*)
+FROM t1 JOIN t2
+
+# Force CTE materialization; reference: https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimizer-hints-table-level
+
+WITH cte AS (SELECT id FROM t2 WHERE TRUE)
+SELECT /*+ NO_MERGE(cte) */ COUNT(*)
+FROM t1 JOIN cte USING (id)
+
+# Force Semijoin materialization.
+# This is the simple form; there is an alternative via hints SEMIJOIN+QB_NAME.
+
+SELECT t1.*
+FROM t1
+WHERE t2_id IN (SELECT /*+ SUBQUERY(MATERIALIZATION) */ id FROM t2)
 ```
 
 ### Profiling

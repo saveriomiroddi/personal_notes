@@ -11,6 +11,7 @@
       - [Printing/formatting/write!](#printingformattingwrite)
     - [Conditional build (ifdef-like)](#conditional-build-ifdef-like)
     - [Data types](#data-types)
+      - [Numeric operations](#numeric-operations)
     - [Casting](#casting)
       - [Into<T>](#intot)
     - [Basic operators/operations/arithmetic/math](#basic-operatorsoperationsarithmeticmath)
@@ -23,13 +24,14 @@
       - [Bidimensional array struct, uninitialized and macro'ed](#bidimensional-array-struct-uninitialized-and-macroed)
     - [Hash maps](#hash-maps)
     - [Strings](#strings)
+      - [String/char-related APIs/conversions](#stringchar-related-apisconversions)
       - [Internal representation (bytes/chars/graphemes)](#internal-representation-bytescharsgraphemes)
     - [For/while (/loop) loops](#forwhile-loop-loops)
     - [If (let)/then/else](#if-letthenelse)
     - [Sorting](#sorting)
       - [Sorting floats](#sorting-floats)
     - [Enums](#enums)
-    - [Option<T>/Result<T, Error>](#optiontresultt-error)
+    - [Option<T>/Result<T, E>](#optiontresultt-e)
     - [Pattern matching](#pattern-matching)
       - [Error handling](#error-handling)
     - [Structs](#structs)
@@ -266,20 +268,18 @@ fn testing(n: u32) -> String {
 
 // The return value is optional. This specific one is convenient [for testing].
 //
-fn main() -> std::result::Result<(), Box<dyn Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
   print!("Enter guess: ");
   io::stdout().flush().unwrap(); // makes sure that the output is flushed, since O/S generally do it per-line.
 
   // `mut`: mutable.
   // the `new` function is not dictated by the language, but a common practice.
   //
-  let mut guess = String::new();
+  let mut buffer = String::new();
 
-  // `&`: reference
-  // `&mut` is necessary, if expected, even if the variable is mutable.
-  // `read_line()` returns the enum `io::Result`; the "variants" are `Ok` and `Err`.
+  // Appends to the buffer.
   //
-  io::stdin().read_line(&mut guess).expect("Failed to read guess!");
+  let bytes_read = io::stdin().read_line(&mut buffer)?;
 
   // Placeholder: `{}`
   //
@@ -431,6 +431,13 @@ multiply(&(2, 3));
 
 For strings, see the [Strings chapter](#strings).
 
+#### Numeric operations
+
+```rs
+5_u64.wrapping_add(-4_i32 as u64);   // proper way to add signed to unsigned
+5_u64.checked_sub(-(-4_i32) as u64); // otherwise, branch positive/negative, and do checked op for both cases
+```
+
 ### Casting
 
 ```rust
@@ -458,10 +465,16 @@ Number-related casts/operations:
 0xFF_u8 as i16;          // WATCH OUT!!: 0x00FF
 (0xFF_u8 as i8) as i16;  // 0xFFFF
 
-1.to_string();           // numeric to string
+1.to_string();             // numeric to string
 
-5_u64.wrapping_add(-4_i32 as u64);   // proper way to add signed to unsigned
-5_u64.checked_sub(-(-4_i32) as u64); // otherwise, branch positive/negative, and do checked op for both cases
+integer.to_string();                      // integer to string
+String::from_utf8(bytes).unwrap();        // (valid) utf-8 bytes to string
+char.to_digit(RADIX).unwrap();            // (parse) char to numeric
+
+// parse string to numeric type; with any numeric implementing `FromString`
+// f64 will parse integer strings (e.g. `1`)
+//
+let guess: u32 = string.parse().unwrap();
 ```
 
 Automatic casting, for types supporting the `Deref` trait:
@@ -1060,6 +1073,60 @@ str_method(&literal[..]);
 str_method(literal);
 ```
 
+#### String/char-related APIs/conversions
+
+String APIs:
+
+```rust
+s.eq(&str)                              // test equality (compare)
+s.len();
+s.is_empty();                           // must be 0 chars long
+s.contains("pattern");
+s.start_with("pref");
+
+s += &s2;                               // concatenate via overloaded operator; can take &str or &String
+s.push_str(&str);                       // concatenate (append) strings
+s.push('c');
+s.insert(pos, 'c');                     // insert; use also as Ruby unshift()
+s.replace_range(range, "s");            // replace a string range (!)
+s.to_lowercase(); s.to_uppercase();
+s.replace("a", "b");                    // gsub
+s.clear();                              // blank a string
+s.repeat(8);                            // string repeat (multiplication)
+
+s.trim(); s.trim_end(); s.trim_start(); // trim/strip
+s.trim_end_matches("suffix");           // chomp suffix (but repeated)! also accepts a closure
+
+s.as_bytes();                           // byte slice (&[u8]) of the string contents
+s.into_bytes();                         // convert to Vec[u8]
+
+// splits; there is a `rsplit*` version for each
+// in order to use the slice methods, do `collect()`
+//
+s.split("sep")
+s.split(char::is_numeric);
+s.split(|c: char| c.is_numeric()).collect();
+s.splitn(max_splits, "sep").collect::Vec<T>(); // splits from left by separator to Vec, long `max_splits` maximum
+
+s.lines();                              // the newline char is not included in the output!
+s.split_whitespace();
+
+format!("{}/{}/{}"), s1, s2, s3);       // preferred format for more complex concatenations
+```
+
+Char APIs:
+
+```rust
+c.is_alphabetic();
+c.is_numeric();
+
+c.to_lowercase(); c.to_uppercase();       // returns an iterator (AAARGH!!!)
+
+use std::char;
+
+let c = char::from_digit(4, 10);          // (number, radix)
+```
+
 #### Internal representation (bytes/chars/graphemes)
 
 A `String` is a wrapper over a `Vec<u8>`.
@@ -1272,7 +1339,7 @@ fn route(ip_kind: IpAddrKind) { }
 
 Enums can't be iterated. See `strum` crate for this purpose.
 
-### Option<T>/Result<T, Error>
+### Option<T>/Result<T, E>
 
 Foundation of Rust. In order to use the contained value, we must extract (and test) it.
 
@@ -1292,6 +1359,9 @@ enum Option<T> {
 let some_number = Some(5);
 let absent_number: Option<i32> = None;
 
+
+// !!!!!! WATCH OUT! The Result error enum is `Err`, not `Error` !!!!!!
+
 // Question mark ('?') operator: convenient syntax for returning None/Err from the function, if it's the value of an Option/Result.
 // If the Error type is different and From<T> exists, it's invoked.
 //
@@ -1303,7 +1373,7 @@ fn mine() -> Result<String, io::Error> {
 //
 // Desugared version.
 //
-let result = match Try::into_result(f.read_to_string(&mut s)) {
+let result = match Try::into_result(expression) {
     Ok(v) => v,
     Err(e) => return Try::from_error(From::from(e)),
 };

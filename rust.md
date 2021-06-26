@@ -1363,7 +1363,7 @@ let absent_number: Option<i32> = None;
 // !!!!!! WATCH OUT! The Result error enum is `Err`, not `Error` !!!!!!
 
 // Question mark ('?') operator: convenient syntax for returning None/Err from the function, if it's the value of an Option/Result.
-// If the Error type is different and From<T> exists, it's invoked.
+// If the Error type is different and From<T> is implemented, it's invoked.
 //
 fn mine() -> Result<String, io::Error> {
   let value = errorable_operation()?;

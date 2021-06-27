@@ -1,3 +1,13 @@
+## Sun 27/Jun/2021
+
+- Studies/SWE
+  - Competitive Programmer's Core Skills
+    - [ ] Week 2
+      - [x] Videos/readings
+      - [x] Practice quiz
+      - [ ] Assignment
+        - [x] Problem 1
+
 ## Sat 26/Jun/2021
 
 - Studies/SWE

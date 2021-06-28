@@ -36,6 +36,7 @@
     - [General optimization topics](#general-optimization-topics)
     - [Query hints](#query-hints)
     - [Profiling](#profiling)
+    - [Dirty pages](#dirty-pages)
     - [Dynamic SQL](#dynamic-sql)
   - [Administration](#administration)
     - [Non-blocking schema changes](#non-blocking-schema-changes)
@@ -892,6 +893,23 @@ Digest slow query log, using Maatkit:
 
 ```sh
 mk-query-digest /path/to/*-slow.log
+```
+
+### Dirty pages
+
+Dirty pages percentage query:
+
+```sql
+SELECT
+  ROUND(
+    100 * (SELECT VARIABLE_VALUE FROM performance_schema.global_status WHERE VARIABLE_NAME = "Innodb_buffer_pool_pages_dirty") /
+    (
+      1 +
+      (SELECT VARIABLE_VALUE FROM performance_schema.global_status WHERE VARIABLE_NAME = "Innodb_buffer_pool_pages_data") +
+      (SELECT VARIABLE_VALUE FROM performance_schema.global_status WHERE VARIABLE_NAME = "Innodb_buffer_pool_pages_free")
+    )
+  , 2) `dirty_pct`
+;
 ```
 
 ### Dynamic SQL

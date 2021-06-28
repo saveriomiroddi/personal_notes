@@ -2,11 +2,10 @@
 
 - Studies/SWE
   - Competitive Programmer's Core Skills
-    - [ ] Week 2
+    - [x] Week 2
       - [x] Videos/readings
       - [x] Practice quiz
-      - [ ] Assignment
-        - [x] Problem 1
+      - [x] Assignment
 
 ## Sat 26/Jun/2021
 

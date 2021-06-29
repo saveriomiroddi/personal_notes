@@ -95,7 +95,7 @@ The VIM section requires some cleanup.
 
 ### bindings
 
-`Ctrl+Shift+D`              duplicate line or selection
+`Ctrl+K, Ctrl+P`            duplicate line or selection
 `Ctrl[+K]+D`                when a word is selected, goes to the next instance and selects the current; if [+K], skips the current
 `Ctrl+Alt+(select)`         start rectangular selection
 `Ctrl+Shift+(Up/Down)`   		move a line

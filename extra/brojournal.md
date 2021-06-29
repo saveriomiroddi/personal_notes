@@ -1,11 +1,30 @@
-## Sun 27/Jun/2021
+## Tue 29/Jun/2021
+
+- Studies/SWE
+  - Competitive Programmer's Core Skills
+    - [ ] Week 3
+      - [x] Videos/quizzes
+      - [x] Assignment
+        - Fight binary knapsack problem
+  - Codewars
+    - [x] A few katas
+
+## Mon 28/Jun/2021
 
 - Studies/SWE
   - Competitive Programmer's Core Skills
     - [x] Week 2
+      - [x] Assignment
+
+## Sun 27/Jun/2021
+
+- Studies/SWE
+  - Competitive Programmer's Core Skills
+    - [ ] Week 2
       - [x] Videos/readings
       - [x] Practice quiz
-      - [x] Assignment
+      - [ ] Assignment
+        - [x] Problem 1
 
 ## Sat 26/Jun/2021
 

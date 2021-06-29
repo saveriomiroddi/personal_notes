@@ -614,7 +614,8 @@ Fun tricks:
 
 ```sh
 printf '<SAV>%.0s' {1..10}        # repeat a string
-echo "  ab  " | xargs             # strip/trim leading and trailing whitespace
+echo "  ab  " | xargs             # strip/trim leading and trailing whitespace (but not newline!)
+echo $'a \n'  | perl -pe chomp    # (`a `) strip one trailing whitespace
 ```
 
 ### Examples
@@ -757,7 +758,7 @@ mapfile -td. coordinates < <(echo -n "$1")
 mapfile -t coordinates < <(printf "a a\nb b")
 mapfile -t coordinates <<< "$myvar"
 mapfile -t coordinates </path/to/file
-mapfile -t coordinates < <(perl -pe 'chomp if eof' /path/to/file) # strip end newline
+mapfile -t coordinates < <(perl -pe 'chomp if eof' /path/to/file) # strip (file-)end newline
 
 IFS=, read -ra coordinates <<< $1    # create via `read`; note how `echo -n` is not required
 

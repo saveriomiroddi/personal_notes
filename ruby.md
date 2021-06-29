@@ -622,6 +622,7 @@ enu.each_slice(n)                       # each non overlapping subarray of `n` i
 Files:
 
 ```rb
+io_obj.readline                         # includes the newline!
 io_obj.readchar                         # reads one char; raises EOFError at the EOF
 ```
 

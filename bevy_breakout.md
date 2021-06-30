@@ -1,8 +1,14 @@
 # Bevy breakout
 
 - [Bevy breakout](#bevy-breakout)
+  - [General info](#general-info)
   - [Parts](#parts)
   - [Systems tree](#systems-tree)
+
+## General info
+
+- Repo/branch: https://github.com/alice-i-cecile/bevy/tree/better-breakout
+- PR: https://github.com/bevyengine/bevy/pull/2094
 
 ## Parts
 

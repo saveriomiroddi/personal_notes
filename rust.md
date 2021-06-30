@@ -359,8 +359,9 @@ impl Debug for SortableFloat {
 The `cfg` attribute performs a conditional build:
 
 ```rust
-#[cfg(test)]        // Compile only in test builds.
-#[cfg(not(test))]   // Compile only in nont-test builds.
+#[cfg(test)]                 // Compile only in test builds
+#[cfg(not(test))]            // ... in non-test builds
+#[cfg(target_os = "linux")]  // ... on linux
 ```
 
 The attribute can be applied to methods, statements, etc.

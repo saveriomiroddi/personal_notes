@@ -1,3 +1,25 @@
+## Wed 30/Jun/2021
+
+- Projects/Open source
+  - Complete madness on open source issues
+    - [x] Investigate fonts issue, and open issue on fonts project
+      - [x] Further investigation and report
+    - Rust-analyzer
+      - [x] Fight/open two issues with files exclusion
+        - [x] Further investigation and report
+- Studies/SWE
+  - Codewars
+    - [x] One kata
+- Studies/Comparch
+  - Architecture of consoles project
+    - [x] Review/open issue about presumed error in the PS1 article
+- Admin/tools
+  - Personal repositories sync script
+    - [x] Add personal notes overwrite functionality
+- Rust/Gamedev
+  - Port Code the Classics
+    - [x] Refactoring/extension of `add_new_project.sh`
+
 ## Tue 29/Jun/2021
 
 - Studies/SWE

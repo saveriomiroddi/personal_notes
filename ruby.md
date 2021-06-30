@@ -16,7 +16,8 @@
     - [Regular expression exceptions](#regular-expression-exceptions)
     - [Weak references](#weak-references)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
-  - [Strings substitution](#strings-substitution)
+  - [Strings](#strings)
+    - [Substitution](#substitution)
   - [Classes/Metaprogramming](#classesmetaprogramming)
     - [Dynamic class instantiation](#dynamic-class-instantiation)
     - [Reflection](#reflection)
@@ -382,7 +383,13 @@ RUBY_VERSION                        # e.g. "2.7.0"
 __dir__                             # directory of current file
 ```
 
-## Strings substitution
+## Strings
+
+```rb
+str.slice!(interval)                # removes and return the sliced substring, so it can be used in expressions
+```
+
+### Substitution
 
 ```ruby
 # Using a non-capturing group (`?:`) will not capture it, but replace it;

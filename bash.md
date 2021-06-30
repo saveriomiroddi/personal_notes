@@ -40,6 +40,7 @@
     - [Sudo-related tasks](#sudo-related-tasks)
     - [Time-related functionalities](#time-related-functionalities)
     - [Parse commandline options (`getopt`)](#parse-commandline-options-getopt)
+    - [Poor man's configfile parser](#poor-mans-configfile-parser)
     - [`bash` command options](#bash-command-options)
     - [Variables printing function](#variables-printing-function)
   - [Shell colors](#shell-colors)
@@ -1058,6 +1059,7 @@ if [[ $# -ne 0 ]]; then
   echo "$c_help"
   exit 1
 fi
+```
 
 Non-option params are available, after the `while` block, from `$1`.
 

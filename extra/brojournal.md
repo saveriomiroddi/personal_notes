@@ -1,3 +1,20 @@
+## Thu 01/Jul/2021
+
+- Projects/Open source
+  - tw-emoji-color-font
+    - [x] Test on stock install, and follow up discussion
+  - Rust-analyzer
+    - [x] Provide test case
+- Studies/SWE
+  - Competitive Programmer's Core Skills
+    - [x] Week 3
+      - [x] Assignment
+        - [ ] Review binary knapsack problem solution
+    - [ ] Week 4
+      - [ ] Videos/quizzes
+      - [ ] Assignment
+        - [x] Problem 1
+
 ## Wed 30/Jun/2021
 
 - Projects/Open source

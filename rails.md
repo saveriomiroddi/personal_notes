@@ -1,6 +1,7 @@
 # Rails
 
 - [Rails](#rails)
+  - [Metadata](#metadata)
   - [Tooling](#tooling)
   - [Controllers](#controllers)
   - [ActiveRecord](#activerecord)
@@ -9,7 +10,14 @@
     - [Updating](#updating)
     - [Migrations](#migrations)
     - [Callbacks](#callbacks)
-    - [Metadata](#metadata)
+    - [Metadata](#metadata-1)
+
+## Metadata
+
+```rb
+Rails.gem_version                 # Rails version in Gem::Version format
+Rails.root                        # Rails root path (as Pathname; can also be used like `Pathname.new(__FILE__).relative_path_from(Rails.root)`
+```
 
 ## Tooling
 
@@ -96,7 +104,7 @@ change_table :table, bulk: true do |t|
   t.belongs_to
 
   t.remove :column_name                # remove a column
-  t.remove_index :column_name{, column_name_N}  # replace :column_name with `name: index_name` if non-rails naming
+  t.remove_index :column_name{, column_name_N}  # replace also be used like `Pathname.new(__FILE__).relative_path_from(Rails.root)``name: index_name` if non-rails naming
   t.remove_references
   t.remove_belongs_to
   t.remove_timestamps

@@ -759,6 +759,12 @@ Current user run dir, on Linux:
 ENV.fetch('XDG_RUNTIME_DIR')
 ```
 
+Check if I/O is terminal:
+
+```rb
+STDIN.istty
+```
+
 ### Poor man's deep_dup (deep duplicate objects)
 
 ```ruby

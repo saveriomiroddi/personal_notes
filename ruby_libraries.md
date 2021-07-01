@@ -7,7 +7,7 @@
       - [Encoding](#encoding)
     - [Date/time](#datetime)
       - [Date/time templated parsing](#datetime-templated-parsing)
-    - [Rational](#rational)
+    - [Maths/Rational](#mathsrational)
     - [CSV](#csv)
     - [JSON](#json)
     - [XML](#xml)
@@ -240,11 +240,13 @@ Examples:
 '%YT%T%:z'          # 2014T14:20:54+00:00 (json format)
 ```
 
-### Rational
+### Maths/Rational
 
 ```rb
 r = Rational(8, 9)      # no new()!!
 (r * 9).to_i == 8       # arithmetic yiels other Rational instances
+
+x = Math.log2(y)
 ```
 
 ### CSV

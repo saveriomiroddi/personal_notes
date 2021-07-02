@@ -1,3 +1,10 @@
+## Fri 02/Jul/2021
+
+- Studies/SWE
+  - Competitive Programmer's Core Skills
+    - [ ] Week 5
+      - [ ] Videos/quizzes
+
 ## Thu 01/Jul/2021
 
 - Projects/Open source

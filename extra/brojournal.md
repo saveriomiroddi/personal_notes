@@ -1,12 +1,22 @@
+## Sun 04/Jul/2021
+
+- Studies/SWE
+  - Competitive Programmer's Core Skills
+    - [ ] Week 4
+      - [ ] Assignment
+        - [ ] Problem 5
+  - Codewars
+    - [x] Several katas
+
 ## Sat 03/Jul/2021
 
 - Studies/SWE
   - Competitive Programmer's Core Skills
     - [ ] Week 4
       - [ ] Assignment
-      - [x] Problem 2
-      - [ ] Fight Problem 3
-      - [x] Problem 4
+        - [x] Problem 2
+        - [ ] Fight Problem 3
+        - [x] Problem 4
 
 ## Fri 02/Jul/2021
 

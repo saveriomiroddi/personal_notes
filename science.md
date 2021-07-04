@@ -6,6 +6,7 @@
     - [Trigonometry](#trigonometry)
     - [Geometry](#geometry)
     - [Statistics](#statistics)
+    - [Algebra](#algebra)
     - [Convenient stuff](#convenient-stuff)
       - [Test if a positive number is a power of two](#test-if-a-positive-number-is-a-power-of-two)
       - [Check if a number is close within the two ends of an interval](#check-if-a-number-is-close-within-the-two-ends-of-an-interval)
@@ -36,6 +37,16 @@ r2.left > r1.right && r2.right < r1.left && r2.top > r1.bottom && r2.bottom < r1
 Stddev: sqrt( Ε( (xᵢ-avg)² ) / n) )
 
 In words: root of the mean of the square of difference.
+
+### Algebra
+
+Solve a quadratic equation:
+
+```
+ax² + bx + c = 0
+
+x = (-b ± √(b² - 4ac)) / 2a
+```
 
 ### Convenient stuff
 

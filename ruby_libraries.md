@@ -78,7 +78,7 @@ Useful methods:
 - `strip`, `lstrip`, `rstrip`
 - `index(substr)`, `rindex(substr)`
 - `slice(start[, end])`, `slice!`
-- `split(separator[, limit])`
+- `split(separator[, limit])`                    # the default split is multiple spaces, which is convenient, but not intuitive
 - `start_with?`
 - `lcomp`: doesn't exist; use `str.gsub(/^(Regexp.escape(expr))+/)`
 - `% *values`: equal to `sprintf(str, *values)`
@@ -247,6 +247,10 @@ r = Rational(8, 9)      # no new()!!
 (r * 9).to_i == 8       # arithmetic yiels other Rational instances
 
 x = Math.log2(y)
+x = Math.sqrt(y)        # square root; DO NOT USE `y ** 0.5`!!!
+x = Math.sin(y_rad)     # remember that rad = deg / 180 * Pi
+x = Math.cos(y_rad)
+Math::PI
 ```
 
 ### CSV

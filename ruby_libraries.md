@@ -250,6 +250,7 @@ x = Math.log2(y)
 x = Math.sqrt(y)        # square root; DO NOT USE `y ** 0.5`!!!
 x = Math.sin(y_rad)     # remember that rad = deg / 180 * Pi
 x = Math.cos(y_rad)
+x = Math.pow(y[, m])    # if m is specified, it's performed `x^y % m`, without huge intermediate numbers
 Math::PI
 ```
 

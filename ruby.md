@@ -13,7 +13,7 @@
     - [Collections destructuring in blocks](#collections-destructuring-in-blocks)
     - [Modules](#modules)
     - [Refinements](#refinements)
-    - [Regular expression exceptions](#regular-expression-exceptions)
+    - [Regular expression APIs/notes](#regular-expression-apisnotes)
     - [Weak references](#weak-references)
   - [Special variables/Built-in constants](#special-variablesbuilt-in-constants)
   - [Strings](#strings)
@@ -304,9 +304,13 @@ describe NilEmptyHelper do
 end
 ```
 
-### Regular expression exceptions
+### Regular expression APIs/notes
 
 - the `/s` flag is not needed; additionally, it has a different meaning (just don't use it).
+
+```ruby
+Regexp.union(*strings_or_regexes)         # Generates a `/a|b|.../` Regexp instance; String expressions are escaped
+```
 
 ### Weak references
 

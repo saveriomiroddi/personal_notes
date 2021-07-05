@@ -1,3 +1,32 @@
+## Mon 05/Jul/2021
+
+- Studies/SWE
+  - Competitive Programmer's Core Skills
+    - [ ] Week 5
+      - [ ] Videos/quizzes
+  - Codewars
+    - [x] 3 katas
+- Open source/ZFS
+  - [x] Close issue: Improve the description (device reference) in the Subiquity launch dialog
+    - Fight find out where the prefixes come from
+
+### Cycle changes
+
+- Swapped
+  - Programming from the ground up <> Competitive Programmer's Core Skills
+- Unscheduled
+  - Review Bevy Game Jam
+  - Review Godot Wild Jam
+  - Think jam participation
+  - Codewars: katas
+  - Personal repositories sync script: Add personal notes overwrite functionality
+  - Architecture of consoles project: Review/open issue about presumed error in the PS1 article
+  - Complete madness on open source issues
+    - Investigate fonts issue, and open issue on fonts project
+    - Rust-analyzer: Fight/open two issues with files exclusion
+- Not completed
+  - Port Code the Classics
+
 ## Sun 04/Jul/2021
 
 - Studies/SWE

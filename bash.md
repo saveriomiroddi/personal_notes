@@ -776,7 +776,11 @@ coordinates[1]=b                     # set an indexed value
 echo "${coordinates[@]:2}"           # array slicing! ([2..-1]) (see https://stackoverflow.com/a/1336245)
 echo "${@:2}"                        # slice the `$@` variable
 echo ${#coordinates[@]}              # size (length)
-printf '%s\n' "${pizza[@]}"          # print the entries (one per line); `echo` prints all in one line
+printf '%s\n' "${array[@]}"          # print the entries (one per line); `echo` prints all in one line
+
+# Simple inclusion test (there is no direct way); ensure $value doesn't include metachars.
+#
+printf '%s\0' "${array[@]}" | grep -qz "^$value$"
 
 # Joining arrays.
 #
@@ -834,6 +838,10 @@ declare -A MYHASH=([foo]=1 [bar]=2)  # explicit creation with multiple values (i
 MYHASH[foo]=bar                      # implicit creation
 unset MYHASH                         # destruction
 
+# explicit creation from a string; escaping is not required, but shellcheck complains otherwise
+content="[foo]=1"
+eval declare -A MYHASH=\("$content"\)
+
 echo ${MYHASH[foo]}                  # access an entry
 unset MYHASH[foo]                    # remove an entry
 [[ -v MYHASH[foo] ]]                 # test if a key exists
@@ -841,6 +849,7 @@ unset MYHASH[foo]                    # remove an entry
 echo ${MYHASH[@]}                    # values (!!!)
 echo ${!MYHASH[@]}                   # keys
 echo ${#MYHASH[@]}                   # size
+declare -p MYHASH                    # print the AA (in declaration form)
 
 # Iterate.
 # in order to iterate the sorted keys, use `mapfile` as in the Arrays section

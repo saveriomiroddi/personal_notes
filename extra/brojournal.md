@@ -1,3 +1,13 @@
+## Tue 06/Jul/2021
+
+- Admin/Tools
+  - [x] Test Win 10 to go + Clonezilla backup/restore from Ubuntu
+  - [x] Scripting: `create_vsc_project`
+- Open source
+  - ZFS
+    - [x] Further improvement to disk name displayed in the pre-Subiquity dialog
+    - [ ] Add custom disk group configurations (e.g. multiple mirrors)
+
 ## Mon 05/Jul/2021
 
 - Studies/SWE
@@ -9,6 +19,8 @@
 - Open source/ZFS
   - [x] Close issue: Improve the description (device reference) in the Subiquity launch dialog
     - Fight find out where the prefixes come from
+- Admin/Planning+Other
+  - [ ] Plan next cycle
 
 ### Cycle changes
 

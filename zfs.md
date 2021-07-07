@@ -151,7 +151,7 @@ zpool detach $pool $device
 #
 fdisk -l                                                         # show the SS for the disks
 zdb | grep ashift                                                # show the pool current ashift
-zpool attach -o ashift=9 $pool $device_in_mirror> <new_device  # force the optimal ashift for the attaching device
+zpool attach -o ashift=9 $pool $device_in_mirror $new_device     # force the optimal ashift for the attaching device
 ```
 
 ## Datasets

@@ -1,3 +1,16 @@
+## Wed 07/Jul/2021
+
+- Open source/ZFS
+  - [x] Support complex custom vdev configurations (e.g. multiple mirrors) #223
+- Studies/Bash
+  - [x] Review different splitting patterns using `IFS`
+- Admin/Planning
+  - [x] Plan next cycle
+- Studies/Rust+Sytems programming
+  - [ ] Rust in Action
+    - [x] Peek at chapters 1 to 3
+    - [ ] Chapter 4
+
 ## Tue 06/Jul/2021
 
 - Admin/Tools
@@ -6,7 +19,7 @@
 - Open source
   - ZFS
     - [x] Further improvement to disk name displayed in the pre-Subiquity dialog
-    - [ ] Add custom disk group configurations (e.g. multiple mirrors)
+    - [ ] Support complex custom vdev configurations (e.g. multiple mirrors) #223
 
 ## Mon 05/Jul/2021
 

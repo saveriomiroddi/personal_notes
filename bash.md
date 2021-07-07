@@ -17,7 +17,6 @@
   - [Functions](#functions)
   - [Grouping commands](#grouping-commands)
   - [Background processes/jobs management](#background-processesjobs-management)
-  - [Cycle a string tokens based on separator (IFS)](#cycle-a-string-tokens-based-on-separator-ifs)
   - [String functions](#string-functions)
     - [Examples](#examples)
   - [Paths](#paths)
@@ -31,6 +30,7 @@
   - [Associative arrays](#associative-arrays)
   - [Shellcheck](#shellcheck)
   - [Script operational concepts/Useful scripts](#script-operational-conceptsuseful-scripts)
+    - [Split a string (via IFS) and cycle the tokens](#split-a-string-via-ifs-and-cycle-the-tokens)
     - [Ask for input (keypress)](#ask-for-input-keypress)
     - [Trapping errors (hooks)](#trapping-errors-hooks)
     - [Log a script output/Enable debugging [log]](#log-a-script-outputenable-debugging-log)
@@ -554,30 +554,6 @@ function bkg_function {
 result=$(bkg_function)
 ```
 
-## Cycle a string tokens based on separator (IFS)
-
-Use IFS to tokenize a string with alternative characters (they're considered a set of **single** chars); **must** unset after:
-
-```sh
-input="a,b c;d"
-
-IFS=",;"
-for token in $input; do echo "<$token>"; done
-# <a>
-# <b c>
-# <d>
-
-unset IFS
-```
-
-While the `while` loop has scoping:
-
-```sh
-while IFS= read -r token; do : done <<< $input
-```
-
-it doesn't work as intended for this purpose.
-
 ## String functions
 
 Substitutions generally have the single (single operator) or global (double operator) version; where this is the case, the global version is presented.
@@ -615,8 +591,8 @@ Fun tricks:
 
 ```sh
 printf '<SAV>%.0s' {1..10}        # repeat a string
-echo "  ab  " | xargs             # strip/trim leading and trailing whitespace (but not newline!)
-echo $'a \n'  | perl -pe chomp    # (`a `) strip one trailing whitespace
+echo "  ab  " | xargs             # strip/trim leading and trailing whitespace; compresses spaces; !! adds a newline !!
+echo $'a \n'  | perl -pe chomp    # (`a `) strip one trailing whitespace,
 ```
 
 ### Examples
@@ -749,7 +725,7 @@ coordinates=(${1//./ })             # split by `.` (bash) !!! use only for unspa
 # More solid way of creating an array from a string.
 # `mapfile` is synonym of `readarray`.
 #
-# `-t`: remove trailing delimiter
+# `-t`: remove trailing delimiter; without, each entry will include it
 #
 # in order to make the variable local, declare it as local before executing `mapfile`
 # When using this pattern, **WATCH OUT!! Don't forget `-n` on the echo!!**
@@ -837,6 +813,7 @@ declare -A MYHASH                    # explicit creation
 declare -A MYHASH=([foo]=1 [bar]=2)  # explicit creation with multiple values (it's possible to quote both keys and values)
 MYHASH[foo]=bar                      # implicit creation
 unset MYHASH                         # destruction
+MYHASH=()                            # empty the hash
 
 # explicit creation from a string; escaping is not required, but shellcheck complains otherwise
 content="[foo]=1"
@@ -892,6 +869,29 @@ run shellcheck with the options:
 - `-P SCRIPTDIR` : use to script path to look for sourced files
 
 ## Script operational concepts/Useful scripts
+
+### Split a string (via IFS) and cycle the tokens
+
+Use IFS to tokenize a string with alternative characters (they're considered a set of **single** chars); **must** unset after:
+
+```sh
+IFS=",;"
+for token in $'a,b c;d\ne'; do echo "<$token>"; done
+# <a>
+# <b c>
+# <d
+# e>
+
+unset IFS
+```
+
+The `while/IFS/read` pattern has different semantics:
+
+```sh
+while IFS=",;" read -r t0 t1 t2; do echo "<$t0><$t1><$t2>"; done <<< $'a,b c;d\ne'
+# <a><b c><d>
+# <e><><>
+```
 
 ### Ask for input (keypress)
 

@@ -1,3 +1,13 @@
+## Thu 08/Jul/2021
+
+- Studies/Rust+Systems programming
+  - [ ] Rust in Action
+    - [x] Chapter 4 (peek)
+    - [x] Chapter 5
+    - [x] Chapter 6
+    - [x] Chapter 7
+    - [x] Chapter 8
+
 ## Wed 07/Jul/2021
 
 - Open source/ZFS

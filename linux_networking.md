@@ -24,7 +24,9 @@
     - [NetworkManager](#networkmanager)
       - [Changing Network manager DNS (18.04+)](#changing-network-manager-dns-1804)
     - [Netplan](#netplan)
-    - [iproute2 (`ip` tool)](#iproute2-ip-tool)
+    - [`ip` tool](#ip-tool)
+      - [iproute2](#iproute2)
+      - [Create a TUN/TAP device](#create-a-tuntap-device)
     - [Wi-Fi](#wi-fi)
 
 ## High-level services
@@ -468,7 +470,9 @@ YAML
 netplay apply
 ```
 
-### iproute2 (`ip` tool)
+### `ip` tool
+
+#### iproute2
 
 Show all the interfaces, even if unconfigured:
 
@@ -486,6 +490,21 @@ echo 'nameserver 8.8.8.8' > /etc/resolv.conf
 ```
 
 For a permanent configuration, use Netplan.
+
+#### Create a TUN/TAP device
+
+```sh
+# $devname: mytap, $ip_mask: 192.168.0.1/24
+
+ip tuntap add mod etap name $devname user $USER          # create a TT device, in tunneling mode
+ip link set $devname up                                  # activate it
+ip addr add $ip_mask dev $devname                        # set the IP address
+iptables -t nat -a POSTROUTING -a $ip_mask -j MASQUERADE # enable internet packets to reach the ip mask by mapping IP addresses to the device
+sysctl -w net.ipv4.ip_forward = 1
+
+ip tuntap [list]                                         # list TT devices
+ip tuntap del mode tap name $devname                     # delete the device
+```
 
 ### Wi-Fi
 

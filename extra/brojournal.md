@@ -1,3 +1,17 @@
+## Fri 09/Jul/2021
+
+- Projects
+  - Geet
+    - [x] Add support for draft PRs creation
+  - Schedule manager
+    - [x] Add support for `work -HH:MM -Nh` (hours in integer format)
+    - [x] Rescue errors, and print message, then exit (+convert one instance)
+- Studies/Rust+Systems programming
+  - [ ] Rust in Action
+    - [x] Copy notes/investigate topics
+    - [x] Chapter 9
+    - [ ] Chapter 10
+
 ## Thu 08/Jul/2021
 
 - Studies/Rust+Systems programming

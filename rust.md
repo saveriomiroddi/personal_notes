@@ -20,8 +20,6 @@
       - [Method chaining](#method-chaining)
       - [Iterator trait/Associated types](#iterator-traitassociated-types)
     - [Arrays/Vectors/Slices](#arraysvectorsslices)
-      - [Uninitialized memory (`std::mem`)](#uninitialized-memory-stdmem)
-      - [Bidimensional array struct, uninitialized and macro'ed](#bidimensional-array-struct-uninitialized-and-macroed)
     - [Hash maps](#hash-maps)
     - [Strings](#strings)
       - [String/char-related APIs/conversions](#stringchar-related-apisconversions)
@@ -320,7 +318,8 @@ Formatting (see https://doc.rust-lang.org/std/fmt):
 ```rust
 "{:.2}"             // round float
 "{:x}/{:X}"         // lower/upper hex
-"{:b}"              // binary
+"{:b}"              // binary (via trait std::fmt::Binary)
+"{:p}"              // pointer
 
 "{:5}"              // padding (right align)
 "{:05}"             // padding with char (zero)
@@ -397,9 +396,14 @@ All number literals support the type as suffix (e.g. `32u8`), and the (cosmetic)
 Extra string literals:
 
 ```rust
-b"hello"                // byte (ASCII) string
-r"hello"; r#"hello"#    // raw string (doesn't process escapes)
-br"hello"; br#"hello"#  // byte raw string
+let bytestr: &[u8] = b"hello";      // byte string
+let rawstr: &str = r"hello";        // raw string (doesn't process escapes)
+let byterawstr: &[u8] = br"hello";  // byte raw string
+
+// Any number of hashes can be added to the raw string delimiters, to disambiguate the ending one:
+
+let zzz = br#"foo"bar"#;
+let zzz = br##"foo"#bar"##;         // with a single delimiting hash, the first `"#` is considered terminating
 ```
 
 Char literals:
@@ -507,6 +511,7 @@ x / y                           // nearest int (-3 / 2 == -1) -> different from 
 val += 1; val -= 1;             // increment/decrement value (no postfix)
 val <<= n; val >>= n;           // overflows are ignored
 std::mem::swap(&mut a, &mut b); // !! swap two variables !!
+std::mem::size_of::(Type)       // memory occupation of a type
 std::mem::size_of_val(v)        // memory occupation of a variable !!
 
 10_f64.clamp(-100., 100.)       // clamp a number (limit value within interval); floats only
@@ -863,73 +868,6 @@ let slice = &array[..];         // type is `&[u32]`
 ```
 
 See the [ownership chapter](#ownership), for the related properties.
-
-#### Uninitialized memory (`std::mem`)
-
-Safe(r) version of initialization with uninitialized values of Array and i32; the simpler but unsafe(r) versions are below.
-
-```rust
-let mut result: [MaybeUninit<crate::Color>; pixels_count] = unsafe { MaybeUninit::uninit().assume_init() };
-result[0] = MaybeUninit::new(crate::Color { r: 0.0, g: 0.0, b: 0.0 });
-let result = unsafe { mem::transmute::<_, [crate::Color; pixels_count]>(result) };
-
-let mut x = MaybeUninit::<&i32>::uninit();
-unsafe { x.as_mut_ptr().write(&0); }
-let x = unsafe { x.assume_init() };
-```
-
-For a more sophisticated application to bidimensional arrays, see the [subsection below](#bidimensional-array-struct-uninitialized-and-macroed).
-
-Other uninitialized forms:
-
-```rust
-let mut result: [[f64; $order]; $order] = usafe { mem::zeroed() };
-let mut result: [[f64; $order]; $order] = usafe { MaybeUninit::zeroed().assume_init( }) // same as previous
-
-let mut result: [[f64; $order]; $order] = usafe { mem::uninitialized() };
-let mut result: [[f64; $order]; $order] = usafe { MaybeUninit::uninit().assume_init( }) // same as previous
-```
-
-There are also more sophisticated uses, e.g. partially initialized arrays.
-
-#### Bidimensional array struct, uninitialized and macro'ed
-
-For the lulz; in such cases, avoiding the MaybeUninit intermediate value is simpler.
-
-```rust
-macro_rules! matrix {
-  ($name:ident, $order: literal) => {
-    #[derive(Debug)]
-    pub struct $name {
-      pub values: [[f64; $order]; $order],
-    }
-
-    impl $name {
-      pub fn new(source_values: &[f64]) -> Self {
-        let mut dest_values: [MaybeUninit<[f64; $order]>; $order] = unsafe { MaybeUninit::uninit().assume_init() };
-
-        for (dest_row, source_row) in dest_values.iter_mut().zip(source_values.chunks($order)) {
-          *dest_row = MaybeUninit::new(source_row.try_into().unwrap());
-        }
-
-        let dest_values = unsafe { mem::transmute::<_, [[f64; $order]; $order]>(dest_values) };
-
-        $name { values: dest_values }
-      }
-    }
-  };
-}
-```
-
-Simpler/unsafer logic:
-
-```rust
-let mut values: [[f64; $order]; $order] = unsafe { MaybeUninit::uninit().assume_init() };
-
-for (row, source_row) in values.iter_mut().zip(source_values.chunks($order)) {
-  row.copy_from_slice(source_row);
-}
-```
 
 ### Hash maps
 

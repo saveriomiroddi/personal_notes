@@ -3,7 +3,7 @@
 - [Rust libraries](#rust-libraries)
   - [Standard library](#standard-library)
     - [Files read/write/create](#files-readwritecreate)
-    - [File operations](#file-operations)
+      - [Read/Write traits](#readwrite-traits)
     - [Paths handling/Directories](#paths-handlingdirectories)
     - [Testing](#testing)
       - [Integration tests](#integration-tests)
@@ -38,16 +38,19 @@
     - [Indented Heredoc-like strings (`indoc`)](#indented-heredoc-like-strings-indoc)
     - [User directories (`directories`)](#user-directories-directories)
     - [Convient Error types handling (`failure`)](#convient-error-types-handling-failure)
-    - [De/serialization (`bincode`)](#deserialization-bincode)
+    - [De/serialization](#deserialization)
+      - [`serde`/`bincode`](#serdebincode)
+      - [Guaranteed endiannes storage (`byteorder`)](#guaranteed-endiannes-storage-byteorder)
 
 ## Standard library
 
 ### Files read/write/create
 
 ```rust
-std::fs::read_to_string(filename) -> Result<String, Error>;    // content must be valid UTF-8; filename can be relative.
-std::fs::read(game_rom_filename) -> Result<Vec<u8>, Error>;    // read binary content
-writer.write_all(data: AsRef<[u8]>) -> Result<()>              // write to a writer (e.g. File)
+let str: String = std::fs::read_to_string(filename)?     // content must be valid UTF-8; filename can be relative.
+let buf: Vec<u8> = std::fs::read(game_rom_filename)      // read binary content
+writer.write_all(data: &[u8])?                           // write the whole buffer to a writer (e.g. File)
+let bytes_copied = std::io::copy(&reader, &mut writer)?  // copy a reader into a writer until EOF is reached
 
 // Open in read mode (no write/create).
 //
@@ -97,12 +100,6 @@ file.seek(SeekFrom::Start(i64))?; // also: SeekFrom::{End,Current}
 file.seek(SeekFrom::Current(0))?; // get current position
 ```
 
-Abstract operation traits:
-
-- `std::io::Read`
-- `std::io::Write`: `write_all(buf: &[u8])`, `write(buf: &[u8])`
-  - prefer `write_all()` to `write()`, since the latter doesn't guarantee that the whole buffer is written!
-
 `Vec` can be trivially used as `StringIO` equivalent:
 
 ```rust
@@ -112,6 +109,23 @@ BufWriter::new(vec);
 ```
 
 for more complex operations (ie. involving seek), can use [io::Cursor](https://doc.rust-lang.org/std/io/struct.Cursor.html).
+
+#### Read/Write traits
+
+`std::io::Read`:
+
+```rs
+take(n)                      // create an adapter reading at most n bytes
+read_to_end(&mut buffer)     // read until the EOF
+```
+
+`std::io::Write`:
+
+```rs
+write_all(buf: &[u8])
+write(buf: &[u8])            // prefer `write_all()` to `write()`, since the latter doesn't guarantee that the whole buffer is written!
+``
+
 
 ### File operations
 
@@ -136,6 +150,10 @@ let p: PathBuf = Path::new('/path').to_owned();
 //
 let p: Option<&OsStr> = path.file_name(); // Ruby basename(); for the poor man's version, use String#split
 let p: Option<&OsStr> = path.file_stem(); // Filename without extension/path. Must do the (very)
+
+// Convenient APIs
+//
+pb.pop()                                  // Remove the last child
 
 // Conversions (methods available to both Path/PathBuf):
 //
@@ -1167,9 +1185,24 @@ impl From<bincode::Error> for BlobError {
 }
 ```
 
-### De/serialization (`bincode`)
+### De/serialization
 
-Binary de/serialization (`serde` is used behind the scenes):
+#### `serde`/`bincode`
+
+Serde basics:
+
+```rs
+// serde = {version = "1.0", features = ["derive"]}
+// serde_json = "1.0"
+
+#[derive(Serialize, Deserialize, Debug)]
+struct MyStruct {}
+
+let serialized = serde_json::to_string(&MyStruct {})?;
+let deserialized: MyStruct = serde_json::from_str(&serialized)?; // must specify the type
+```
+
+Bincode (uses `serde` as backend):
 
 ```rust
 bincode::deserialize_from(read)?;      // deserialize from Read
@@ -1191,4 +1224,10 @@ pub fn deserialize<V: DeserializeOwned>(bindata: &[u8]) -> Result<V, bincode::Er
 pub fn deserialize_b<'d, V: Deserialize<'d>>(bindata: &'d [u8]) -> Result<V, bincode::Error> {
     bincode::deserialize(bindata)
 }
+```
+
+#### Guaranteed endiannes storage (`byteorder`)
+
+```rs
+f.read_u32::<LittleEndian>()?           // read an u32 stored in little endian format
 ```

@@ -1,3 +1,10 @@
+## Sat 10/Jul/2021
+
+- Studies/Rust+Systems programming
+  - [ ] Rust in Action
+    - [x] Chapter 10
+    - [x] Chapter 11
+
 ## Fri 09/Jul/2021
 
 - Projects

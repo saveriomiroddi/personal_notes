@@ -1,7 +1,14 @@
 # Compute architecture
 
 - [Compute architecture](#compute-architecture)
+  - [Data types](#data-types)
   - [IEEE754](#ieee754)
+
+## Data types
+
+The `word` size depends on the architecture!!
+
+Assuming a 16-bit arch, the 128-bit size is `long word`.
 
 ## IEEE754
 

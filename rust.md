@@ -1260,6 +1260,15 @@ enum IpAddr {
   V6(String),
 }
 
+// Enums can be associated to values.
+// `repr(u8)` forces the compiler to use 8-bits for each variant.
+//
+#[repr(u8)]
+enum Color {
+    WHITE = 0x00,
+    BLACK = 0x01,
+}
+
 // Methods can even be defined on enums!
 //
 impl IpAddr {
@@ -2622,7 +2631,8 @@ use std::time::Duration;
 
 let message = "Hello";
 
-// `move` is required to access variable in the context, with move semantics.
+// `move` is required to access variable in the context, with move semantics, because, the closure may
+// outlive the referenced variable!
 //
 let handle = thread::spawn(move || {
   // Thread-safe way of printing.

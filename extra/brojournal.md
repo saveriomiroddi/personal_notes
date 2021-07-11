@@ -1,3 +1,21 @@
+## Sun 11/Jul/2021
+
+- Studies/Rust+Systems programming
+  - [x] Rust in Action
+    - [x] Chapter 12
+    - [x] Copy notes/investigate topics
+- Projects
+  - Schedule manager
+    - [x] Minor refactorings
+    - [x] Add time section separators when adding a new date section
+    - [x] Add templating
+- Studies/SWE
+  - Codewars
+    - [x] 3 katas
+- Studies/Low-level programming
+  - [ ] Write Great Code, Volume 1: Understanding the Machine
+    - [x] Chapter 2
+
 ## Sat 10/Jul/2021
 
 - Studies/Rust+Systems programming

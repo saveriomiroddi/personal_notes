@@ -7,7 +7,10 @@
     - [Uninitialized memory (`std::mem::MaybeUninit`)](#uninitialized-memory-stdmemmaybeuninit)
       - [Bidimensional array struct, uninitialized and macro'ed](#bidimensional-array-struct-uninitialized-and-macroed)
     - [std::num::NonZero*](#stdnumnonzero)
+    - [(LLVM) Intrinsics/ASM APIs](#llvm-intrinsicsasm-apis)
+    - [Embedded/OS development](#embeddedos-development)
   - [Internal](#internal)
+    - [Memory layout](#memory-layout)
     - [References](#references)
     - [Null pointer optimization](#null-pointer-optimization)
 
@@ -16,9 +19,9 @@
 ### std::mem APIs
 
 ```rs
-size_of::(Type)         // memory occupation of a type
-size_of_val(v)          // memory occupation of a variable
-unsfe { zeroed::<T>() } // return zeroed memory for type; it's unsafe because zero(s) may not be a valid value
+size_of::<Type>()         // memory occupation of a type
+size_of_val(&v)           // memory occupation of a variable
+unsafe { zeroed::<T>() }  // return zeroed memory for type; it's unsafe because zero(s) may not be a valid value
 ```
 
 ### Unsafe
@@ -82,7 +85,7 @@ let (slice1, slice2) = unsafe {
 Referencing raw memory (undefined behavior):
 
 ```rust
-let address = 0x012345usize;
+let address = 0x012345_usize;
 let r = address as *mut i32;
 
 let slice: &[i32] = unsafe {
@@ -161,7 +164,82 @@ for (row, source_row) in values.iter_mut().zip(source_values.chunks($order)) {
 
 If an integer variable is guaranteed never to be 0, one can use `NonZero*` data types, which allow some optimizations.
 
+### (LLVM) Intrinsics/ASM APIs
+
+Intrinsic/ASM APIs are unstable.
+
+```rs
+#![feature(core_intrinsics)]  // Enable the (unstable) intrinsics APIs
+#![feature(link_llvm_intrinsics)]
+#![feature(asm)]              // Enable the (unstable) ASM APIs
+
+use core::intrinsics;
+
+unsafe { intrinsics::abort(); }
+
+extern "C" {
+    // Provides specific instructions to the linker about where it should look to find the function
+    // definitions
+    #[link_name = "llvm.eh.sjlj.setjmp"]
+    pub fn setjmp(_: *mut i8) -> i32;
+}
+
+loop {
+    unsafe { asm!("hlt"); }
+}
+```
+
+### Embedded/OS development
+
+Basic structure for an O/S program:
+
+```rs
+#![no_std]                    // Don't include the stdlib.
+#![no_main]                   // Program doesn't have main()
+#![feature(core_intrinsics)]
+#![feature(asm)]
+
+use core::intrinsics;
+use core::panic::PanicInfo;
+
+#[panic_handler]
+#[no_mangle]
+pub fn panic(_info: &PanicInfo) -> ! {
+    unsafe { intrinsics::abort(); }
+}
+
+// [lang]uage items are elements of Rust implemented as libraries outside of the compiler itself; in
+// this context, we don't include the stdlib.
+// [E]xception [H]andler. "Personality" routines are executed at each step of the call stack unwinding.
+//
+#[lang = "eh_personality"]
+#[no_mangle]
+pub extern "C" fn eh_personality() {}
+
+#[no_mangle]
+pub extern "C" fn _start() -> ! {
+    let mut framebuffer = 0xb8000 as *mut u8;
+
+    unsafe {
+        // Using write_volatile() prevents the compiler from performing certain optimizations, e.g.
+        // presetting the memory before execution rather than writing during execution.
+        framebuffer.offset(1).write_volatile(0x30);
+        // Alternate write form.
+        *(framebuffer + 1) = 0x30;
+    }
+
+    // Never return, as there's nowhere to return to.
+    loop {
+        unsafe { asm!("hlt"); }
+    }
+}
+```
+
 ## Internal
+
+### Memory layout
+
+Structs without fields are "Zero-sized types" (ZST), and don't take any space in the resulting program.
 
 ### References
 

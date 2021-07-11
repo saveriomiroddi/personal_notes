@@ -78,7 +78,6 @@ Useful methods:
 - `strip`, `lstrip`, `rstrip`
 - `index(substr)`, `rindex(substr)`
 - `slice(start[, end])`, `slice!`
-- `split(separator[, limit])`                    # the default split is multiple spaces, which is convenient, but not intuitive
 - `start_with?`
 - `lcomp`: doesn't exist; use `str.gsub(/^(Regexp.escape(expr))+/)`
 - `% *values`: equal to `sprintf(str, *values)`
@@ -86,6 +85,12 @@ Useful methods:
 Splitting:
 
 ```ruby
+# WATCH OUT!!!:
+# - the default separator is /\s+/, which is convenient, but not intuitive
+# - by default (`limit: nil`), empty fields are not included in the result; in order to include them,
+#   specify `limit: -1`
+split(separator[, limit])
+
 split(/(separator)/)                  # retain the separator as separate token
 split(/(?<=\+)\n(?=\+)/)              # retain the separator in the splitted fields via LB/LA (complex case: `\n` is discarded)
 

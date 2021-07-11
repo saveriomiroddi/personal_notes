@@ -14,6 +14,8 @@
     - [Commandline arguments (basic)](#commandline-arguments-basic)
     - [O/S, Processes](#os-processes)
     - [Blackbox (nightly)](#blackbox-nightly)
+  - [Rust utilities (`cargo install`)](#rust-utilities-cargo-install)
+    - [Cargo crates handling (`cargo-edit`)](#cargo-crates-handling-cargo-edit)
   - [Crates](#crates)
     - [Partial/more flexible defaults (`smart-default`)](#partialmore-flexible-defaults-smart-default)
     - [Random](#random)
@@ -40,7 +42,7 @@
     - [Convient Error types handling (`failure`)](#convient-error-types-handling-failure)
     - [De/serialization](#deserialization)
       - [`serde`/`bincode`](#serdebincode)
-      - [Guaranteed endiannes storage (`byteorder`)](#guaranteed-endiannes-storage-byteorder)
+      - [Guaranteed endianness storage (`byteorder`)](#guaranteed-endianness-storage-byteorder)
 
 ## Standard library
 
@@ -353,6 +355,17 @@ Be pessimistic about the side effects of this function. Can't make any absolute 
 use test::bench::black_box;
 
 pub fn black_box<T>(dummy: T) -> T
+```
+
+## Rust utilities (`cargo install`)
+
+### Cargo crates handling (`cargo-edit`)
+
+```sh
+# The crate location (name/repo/path) is detected automatically.
+#
+cargo add [--features=a,b] $crate_ref            # by default, the version specifier is the latest `^M.m.p` (with minor upgrade strategy)
+--vers=$version --branch=$branch                 # version modifiers
 ```
 
 ## Crates
@@ -1226,7 +1239,7 @@ pub fn deserialize_b<'d, V: Deserialize<'d>>(bindata: &'d [u8]) -> Result<V, bin
 }
 ```
 
-#### Guaranteed endiannes storage (`byteorder`)
+#### Guaranteed endianness storage (`byteorder`)
 
 ```rs
 f.read_u32::<LittleEndian>()?           // read an u32 stored in little endian format

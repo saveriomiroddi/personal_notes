@@ -16,8 +16,9 @@
 ### Number theory
 
 - positive numbers: integers > 0
-- natura numbers: positive numbers, plus, sometimes, 0
+- natural numbers: positive numbers, plus, sometimes, 0
   - use `nonnegative integer` to avoid ambiguities
+- rational numbers; result of a fraction
 
 ### Trigonometry
 

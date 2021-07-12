@@ -250,6 +250,7 @@ Examples:
 ```rb
 r = Rational(8, 9)      # no new()!!
 (r * 9).to_i == 8       # arithmetic yiels other Rational instances
+x.gcd(y)                # Greatest commond divisor (Massimo Comun Divisore, MCD)
 
 x = Math.log2(y)
 x = Math.sqrt(y)        # square root; DO NOT USE `y ** 0.5`!!!

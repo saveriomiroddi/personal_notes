@@ -1,3 +1,17 @@
+## Mon 12/Jul/2021
+
+- Studies/Low-level programming
+  - [ ] Write Great Code, Volume 1: Understanding the Machine
+    - [x] Chapter 3
+- Studies/SWE
+  - Codewars
+    - [x] Review a few katas
+- Rust/Gamedev
+  - [ ] Experiment with Better Breakout code
+    - [x] Study the codebase
+    - [x] Restructure it
+    - [x] Try remove FixedTimeStep, and use variable timestep
+
 ## Sun 11/Jul/2021
 
 - Studies/Rust+Systems programming

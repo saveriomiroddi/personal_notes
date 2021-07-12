@@ -27,8 +27,8 @@
       - [Mouse](#mouse)
       - [Gamepad](#gamepad)
       - [Touchscreen](#touchscreen)
-    - [Fixed timestep](#fixed-timestep)
-    - [Time](#time)
+    - [Time/Timestep](#timetimestep)
+      - [Fixed timestep](#fixed-timestep)
     - [UI Layout](#ui-layout)
   - [Math APIs](#math-apis)
 
@@ -904,7 +904,23 @@ fn gamepad_input(axes: Res<Axis<GamepadAxis>>, buttons: Res<Input<GamepadButton>
 
 See https://bevy-cheatbook.github.io/features/input-handling.html#touchscreen.
 
-### Fixed timestep
+### Time/Timestep
+
+Don't use `std::time::Instant::now()` to get the time - use `Res<Time>`: due to parallel execution, the former will be inconsistent/inaccurate (respect to the game time).
+
+In order to run with variable timestep:
+
+```rs
+pub fn paddle_input(mut last_time: Local<f64>, time: Res<Time>, ...) {
+    let last_time_diff = time.seconds_since_startup() - *last_time;
+
+    velocity.x = direction * speed * last_time_diff;
+
+    *last_time = time.seconds_since_startup();
+}
+```
+
+#### Fixed timestep
 
 Use to run systems at fixed interval.
 
@@ -930,10 +946,6 @@ WATCH OUT!
 - etc.etc.!.
 
 See https://bevy-cheatbook.github.io/features/fixed-timestep.html (and referred examples) for more details.
-
-### Time
-
-Don't use `std::time::Instant::now()` to get the time - use `Res<Time>`: due to parallel execution, the former will be inconsistent/inaccurate (respect to the game time).
 
 ### UI Layout
 

@@ -3309,7 +3309,7 @@ pub fn eat_at_restaurant() {
 Modifiers (prefixes):
 
 - `crate`: absolute path
-- `super`: parent module
+- `super`: parent module (like current directory)
 - `self`
 
 Multiple files/directories structure:

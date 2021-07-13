@@ -1,3 +1,24 @@
+## Tue 13/Jul/2021
+
+- Admin/tools
+  - [x] Write PDF manager support; buy pro version
+- Studies/Low-level programming
+  - [ ] Write Great Code, Volume 1: Understanding the Machine
+    - [x] Chapter 4
+    - [x] Chapter 5
+    - [ ] Chapter 6
+- Rust/Gamedev
+  - [x] Merge Bevy book + cookbook notes
+  - [ ] Experiment with Better Breakout code
+    - [ ] Add states: Intro/Game Over
+      - [x] Epic general fight, including bug
+      - [ ] Diagnose excessively slow state change
+- Open source
+  - Bevy Cheatbook
+    - [x] Open issue about mistake in background color page
+  - Bevy
+    - [x] Discuss, created minimal test case, and report Bevy segfault bug
+
 ## Mon 12/Jul/2021
 
 - Studies/Low-level programming

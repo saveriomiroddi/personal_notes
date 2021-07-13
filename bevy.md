@@ -3,7 +3,7 @@
 - [Bevy](#bevy)
   - [Setup](#setup)
   - [Hello world](#hello-world)
-  - [Architecture parts](#architecture-parts)
+  - [Architecture concepts](#architecture-concepts)
     - [Components/bundles](#componentsbundles)
     - [Resources](#resources)
     - [Systems](#systems)
@@ -17,20 +17,31 @@
     - [States](#states)
     - [Stages](#stages)
     - [Run criteria](#run-criteria)
-  - [Features](#features)
+  - [Rendering](#rendering)
     - [Transforms](#transforms)
+    - [Background](#background)
     - [Assets](#assets)
       - [Custom asset events/hooks](#custom-asset-eventshooks)
       - [Textures/sprites](#texturessprites)
-    - [Input handling](#input-handling)
-      - [Keyboard](#keyboard)
-      - [Mouse](#mouse)
-      - [Gamepad](#gamepad)
-      - [Touchscreen](#touchscreen)
+    - [UI Layout](#ui-layout)
+    - [Text](#text)
+  - [Input handling](#input-handling)
+    - [Keyboard](#keyboard)
+    - [Mouse](#mouse)
+    - [Gamepad](#gamepad)
+    - [Touchscreen](#touchscreen)
+  - [Other APIs](#other-apis)
     - [Time/Timestep](#timetimestep)
       - [Fixed timestep](#fixed-timestep)
-    - [UI Layout](#ui-layout)
-  - [Math APIs](#math-apis)
+    - [Math](#math)
+  - [Utils](#utils)
+    - [Track Assets Loading](#track-assets-loading)
+    - [List All Resource Types](#list-all-resource-types)
+    - [Display the framerate](#display-the-framerate)
+    - [Exit the application](#exit-the-application)
+    - [Transformations](#transformations)
+
+This is a merge of the Bevy book and the Bevy Cookbook.
 
 ## Setup
 
@@ -50,9 +61,62 @@ bevy = {
 
 ## Hello world
 
-See the [cookbook](bevy_cookbook.md).
+```rust
+// The system() trait is `prelude::IntoSystem`
+use bevy::prelude::*;
 
-## Architecture parts
+struct Person;
+struct Name(String);
+
+fn add_people(mut commands: Commands) {
+  commands
+    .spawn()
+    .insert(Person)
+    .insert(Name("Foo".to_string()));
+  commands
+    .spawn()
+    .insert(Person)
+    .insert(Name("Bar".to_string()));
+}
+
+struct GreetTimer(Timer);
+
+// Use a timed greeter; without a timer, this is executed continuously (see DefaultPlugins note).
+//
+fn greet_people_timed(time: Res<Time>, mut timer: ResMut<GreetTimer>, query: Query<&Name, With<Person>>) {
+  if timer.0.tick(time.delta()).just_finished() {
+    for name in query.iter() {
+      println!("Hello {}!", name.0);
+    }
+  }
+}
+
+pub struct HelloPlugin;
+
+impl Plugin for HelloPlugin {
+  fn build(&self, app: &mut AppBuilder) {
+    app.insert_resource(GreetTimer(Timer::from_seconds(2.0, true)))
+      .add_startup_system(add_people.system())
+      .add_system(greet_people_timed.system());
+  }
+}
+
+App::build()
+  // WindowDescriptor stores the window properties.
+  //
+  .insert_resource(WindowDescriptor { title: "Hello W!".to_string(), width: 1280., height: 720., ..Default::default() })
+  // The DefaultPlugins group includes the basic features to run a game; it makes a window popup because
+  // it includes WindowPlugin and WinitPlugin. Since it also includes an event loop, the systems will
+  // run in an infinite loop.
+  //
+  .add_plugins(DefaultPlugins)
+  // In this plugin, we bundle the main setup.
+  //
+  .add_plugin(HelloPlugin)
+  .run();
+```
+
+## Architecture concepts
 
 ### Components/bundles
 
@@ -298,7 +362,7 @@ Used to access entity components. WATCH OUT! Bundles must be queried via compone
 fn check_zero_health(
   // Find entities that have (`Health` & `Transform`) components, and are optionally a `Player`.
   // Entity is the entity id (not required).
-  // With/out are (optional) filters: the entities must include an Ally, but not an Enemy.
+  // With/out<T> are (optional) filters: the entities must include an Ally, but not an Enemy.
   // For an Or filter example, see [Change detection](#change-detection).
   mut query: Query<
     (Entity, &Health, &mut Transform, Option<&Player>),
@@ -491,6 +555,8 @@ impl Plugin for HelloPlugin {
       .add_system(greet_people_timed.system());
   }
 }
+
+app.add_plugin(Plugin)
 ```
 
 Plugins can be grouped:
@@ -521,7 +587,7 @@ App::build()
 States are the global app states.  
 It's convenient to use plugins to group systems to use with states.
 
-WATCH OUT! Since states aren internally implemented via run criteria, they will conflict with other run criteria uses, e.g. fixed timestep.
+WATCH OUT! Since states are internally implemented via run criteria, they will conflict with other run criteria uses, e.g. fixed timestep.
 
 Setup:
 
@@ -530,28 +596,47 @@ Setup:
 enum AppState { MainMenu, InGame, Paused }
 
 App::build()
-  // add the app state type
+  // add the first app state to the stack
   .add_state(AppState::MainMenu)
 
-  // add systems to run regardless of state, as usual
+  // systems outside of system sets will run regardless of the state
   .add_system(play_music.system())
 
-  // systems to run only in the main menu
+  // Different state callbacks /////////////////////////////////////////////////
+
+  // when entering the state (equivalent of startup systems)
   .add_system_set(
-    SystemSet::on_update(AppState::MainMenu)
-      .with_system(handle_ui_buttons.system())
+    SystemSet::on_enter(AppState::MainMenu).with_system(setup_menu.system())
   )
 
-  // setup when entering the state
+  // on state active
   .add_system_set(
-    SystemSet::on_enter(AppState::MainMenu)
-      .with_system(setup_menu.system())
+    SystemSet::on_update(AppState::MainMenu).with_system(handle_ui_buttons.system())
   )
 
-  // cleanup when exiting the state
+  // on pause, e.g. things to do when becoming inactive
   .add_system_set(
-    SystemSet::on_exit(AppState::MainMenu)
-      .with_system(close_menu.system())
+    SystemSet::on_pause(AppState::InGame).with_system(hide_enemies.system())
+  )
+
+  // player idle animation while paused
+  .add_system_set(
+    SystemSet::on_inactive_update(AppState::InGame).with_system(player_idle.system())
+  )
+
+  // on state both active and paused
+  .add_system_set(
+    SystemSet::on_in_stack_update(AppState::InGame).with_system(animate_water.system())
+  )
+
+  // when resuming from pause
+  .add_system_set(
+    SystemSet::on_resume(AppState::InGame).with_system(reset_player.system())
+  )
+
+  // on exit (e.g. cleanup)
+  .add_system_set(
+    SystemSet::on_exit(AppState::MainMenu).with_system(close_menu.system())
   )
 ```
 
@@ -567,50 +652,6 @@ fn play_music(app_state: Res<State<AppState>>) {
 }
 ```
 
-Stack:
-
-```rust
-App::build()
-  // player movement only when actively playing
-  .add_system_set(
-    SystemSet::on_update(AppState::InGame)
-      .with_system(player_movement.system())
-  )
-  // player idle animation while paused
-  .add_system_set(
-    SystemSet::on_inactive_update(AppState::InGame)
-      .with_system(player_idle.system())
-  )
-  // animations both while paused and while active
-  .add_system_set(
-    SystemSet::on_in_stack_update(AppState::InGame)
-      .with_system(animate_trees.system())
-      .with_system(animate_water.system())
-  )
-  // things to do when becoming inactive
-  .add_system_set(
-    SystemSet::on_pause(AppState::InGame)
-      .with_system(hide_enemies.system())
-  )
-  // things to do when becoming active again
-  .add_system_set(
-    SystemSet::on_resume(AppState::InGame)
-      .with_system(reset_player.system())
-  )
-  // setup when first entering the game
-  .add_system_set(
-    SystemSet::on_enter(AppState::InGame)
-      .with_system(setup_player.system())
-      .with_system(setup_map.system())
-  )
-  // cleanup when finally exiting the game
-  .add_system_set(
-    SystemSet::on_exit(AppState::InGame)
-      .with_system(despawn_player.system())
-      .with_system(despawn_map.system())
-  )
-```
-
 Change; all the current state's systems complete before moving to the next system (there's no limit to the number of state changes within a frame):
 
 ```rust
@@ -623,13 +664,12 @@ app_state.pop().unwrap();
 // Direct set.
 //
 fn enter_game(mut app_state: ResMut<State<AppState>>) {
+  // Can fail if we are already in the target state or if another state change is already queued
   app_state.set(AppState::InGame).unwrap();
-  // ^ this can fail if we are already in the target state
-  // or if another state change is already queued
 }
 ```
 
-WATCH OUT!! Key-initiated state changes require Input to be reset:
+(Double check; may not be necessary anymore) WATCH OUT!! Key-initiated state changes require Input to be reset:
 
 ```rust
 fn esc_to_menu(mut keys: ResMut<Input<KeyCode>>, mut app_state: ResMut<State<AppState>>) {
@@ -652,7 +692,7 @@ See https://bevy-cheatbook.github.io/programming/stages.html.
 
 Run criteria allow low-level systems running specification. See: https://bevy-cheatbook.github.io/programming/run-criteria.html.
 
-## Features
+## Rendering
 
 ### Transforms
 
@@ -667,6 +707,19 @@ In 2D:
 There are two transforms: `Transform` (relative to parent) and `GlobalTransform` (best to use read-only; if a component has no parent, T = GT)
 
 WATCH OUT! GT is synced with T in the `PostUpdate` stage, so be careful.
+
+### Background
+
+Set the background color:
+
+```rs
+App::build().insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)))
+
+// In system form
+pub fn set_background(mut commands: Commands) {
+    commands.insert_resource(BACKGROUND_COLOR); // ClearColor can be set as const
+}
+```
 
 ### Assets
 
@@ -748,11 +801,63 @@ commands.spawn_bundle(SpriteBundle {
 });
 ```
 
-### Input handling
+### UI Layout
+
+Since the Y starts at the bottom, the UI flows from there; use `FlexDirection::ColumnReverse` to flow from the top.
+
+### Text
+
+Creating text:
+
+```rs
+let text = Text {
+    sections: vec![
+        TextSection {
+            value: "Score: ".to_string(), // "\n" can be used as newline
+            style: TextStyle {
+                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                font_size: 40.0,
+                color: Color::rgb(0.5, 0.5, 1.0),
+            },
+        },
+        TextSection {
+            value: "".to_string(),
+            style: TextStyle {
+                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                font_size: 40.0,
+                color: Color::rgb(1.0, 0.5, 0.5),
+            },
+        },
+    ],
+    ..Default::default()
+};
+let style = Style {
+    position_type: PositionType::Absolute,
+    position: Rect {
+        top: SCORE_PADDING,
+        left: SCORE_PADDING,
+        ..Default::default()
+    },
+    ..Default::default()
+};
+
+let text_bundle = TextBundle { text, style, ..Default::default() };
+```
+
+Update it:
+
+```rs
+pub fn update_scoreboard(score: Res<Score>, mut query: Query<&mut Text, With<Scoreboard>>) {
+    let mut scoreboard_text = query.single_mut().unwrap();
+    scoreboard_text.sections[1].value = format!("{}", score.0);
+}
+```
+
+## Input handling
 
 Input handling can be managed via resources (higher level) and events (lower level).
 
-#### Keyboard
+### Keyboard
 
 ```rust
 fn keyboard_input(keys: Res<Input<KeyCode>>) {
@@ -775,7 +880,9 @@ fn keyboard_events(mut key_evr: EventReader<KeyboardInput>) {
 }
 ```
 
-#### Mouse
+### Mouse
+
+Grab the mouse: see https://bevy-cheatbook.github.io/cookbook/mouse-grab.html.
 
 Buttons/wheel:
 
@@ -843,7 +950,7 @@ fn cursor_events(mut cursor_evr: EventReader<CursorMoved>) {
 }
 ```
 
-#### Gamepad
+### Gamepad
 
 Backed by the [gilrs library](https://gitlab.com/gilrs-project/gilrs).
 
@@ -900,9 +1007,11 @@ fn gamepad_input(axes: Res<Axis<GamepadAxis>>, buttons: Res<Input<GamepadButton>
 }
 ```
 
-#### Touchscreen
+### Touchscreen
 
 See https://bevy-cheatbook.github.io/features/input-handling.html#touchscreen.
+
+## Other APIs
 
 ### Time/Timestep
 
@@ -947,12 +1056,86 @@ WATCH OUT!
 
 See https://bevy-cheatbook.github.io/features/fixed-timestep.html (and referred examples) for more details.
 
-### UI Layout
-
-Since the Y starts at the bottom, the UI flows from there; use `FlexDirection::ColumnReverse` to flow from the top.
-
-## Math APIs
+### Math
 
 ```rust
 const_vec2!   // create a const Vec2; also for: Mat2/3/4, Quat, Vec3/3a/4
 ```
+
+## Utils
+
+### Track Assets Loading
+
+```rust
+#[derive(Default)]
+struct AssetsLoading(Vec<HandleId>);
+
+fn setup(server: Res<AssetServer>, mut loading: ResMut<AssetsLoading>) {
+    let font: Handle<Font> = server.load("my_font.ttf");
+    let menu_bg: Handle<Texture> = server.load("menu.png");
+    loading.0.push(font.id);
+    loading.0.push(menu_bg.id);
+}
+
+fn check_assets_ready(server: Res<AssetServer>, loading: Res<AssetsLoading>) {
+    use bevy::asset::LoadState;
+
+    match server.get_group_load_state(loading.0.iter().copied()) {
+        LoadState::Failed => { /* one of our assets had an error */ }
+        LoadState::Loaded => {}
+        _                 => { return; /* NotLoaded/Loading: not fully ready yet */ }
+    }
+
+    // all assets are now ready
+}
+```
+
+### List All Resource Types
+
+List all the types that have been added (by the dev, not by Bevy) as resources:
+
+```rust
+fn print_resources(archetypes: &Archetypes, components: &Components) {
+  // `get_short_name()` removes the path information, e.g `bevy_audio::audio::Audio` -> `Audio`;
+  // in order to see the path, just use `info.name()`.
+  let mut resources = archetypes
+    .resource()
+    .components()
+    .map(|id| components.get_info(id).unwrap())
+    .map(|info| TypeRegistration::get_short_name(info.name()))
+    .collect::<Vec<_>>();
+
+  resources.sort();
+  resources.iter().for_each(|name| println!("{}", name));
+}
+```
+
+### Display the framerate
+
+```rust
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+
+App::build()
+  .add_plugin(LogDiagnosticsPlugin::default())
+  .add_plugin(FrameTimeDiagnosticsPlugin::default())
+```
+
+### Exit the application
+
+```rust
+use bevy::app::AppExit;
+
+fn exit_system(mut exit: EventWriter<AppExit>) {
+  exit.send(AppExit);
+}
+
+// For prototyping, Bevy provides a system, to exit on pressing the Esc key:
+//
+App::build().add_system(bevy::input::system::exit_on_esc_system.system())
+```
+
+### Transformations
+
+- Convert cursor to world coordinates: see https://bevy-cheatbook.github.io/cookbook/cursor2world.html#convert-cursor-to-world-coordinates.
+- Custom camera projection: see https://bevy-cheatbook.github.io/cookbook/custom-projection.html.
+- Pan+Orbit camera: see https://bevy-cheatbook.github.io/cookbook/pan-orbit-camera.html.

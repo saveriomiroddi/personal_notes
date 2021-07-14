@@ -1,3 +1,25 @@
+## Wed 14/Jul/2021
+
+- Admin/tools
+  - [x] Discord email notification madness
+  - [x] Follow up discussion Fish Game beta testing
+- Rust/Gamedev
+  - [ ] Experiment with Better Breakout code
+    - [ ] Add states: Intro/Game Over
+      - [x] Discuss/workaround timing issue with better breakout (known problem)
+    - [x] Create separate repository
+    - [x] Setup Windows Rust env
+- Studies/SWE
+  - Codewars
+    - [x] 1 kata
+- Studies/Low-level programming
+  - [ ] Write Great Code, Volume 1: Understanding the Machine
+    - [x] Chapter 6
+- Projects
+  - Fish Game
+    - [x] Preliminary source code review
+    - [x] Fix bug with error/stack trace printed when a joystick is not connected
+
 ## Tue 13/Jul/2021
 
 - Admin/tools

@@ -1,3 +1,23 @@
+## Thu 15/Jul/2021
+
+- Writings
+  - [x] Article: Compiling the CVE-2021-22555 exploit Proof of concept
+- Projects
+  - Fish Game
+    - [x] Test animation program(s)
+    - [x] Preliminary discussions about the game
+    - [x] Study jump code
+    - [x] Investigate descend bug
+    - [x] Review and remove redundant file
+  - Geet
+    - [x] Relax GitClient::UPSTREAM_BRANCH_REGEX
+  - Bevy
+    - [x] Follow up with reported bug
+- Admin/Tools
+  - Programming journal headers copy script
+    - [x] Try multiple pattern match
+    - [x] Add escaping
+
 ## Wed 14/Jul/2021
 
 - Admin/tools

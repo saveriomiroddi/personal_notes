@@ -32,6 +32,7 @@
     - [Correct whitespaces problems](#correct-whitespaces-problems)
     - [Revert common mistakes](#revert-common-mistakes)
     - [Find the default branch](#find-the-default-branch)
+    - [Checkout a GitHub PR (of a private repository)](#checkout-a-github-pr-of-a-private-repository)
 
 ## Document notes
 
@@ -530,4 +531,14 @@ git rev-parse --abbrev-ref $remote/HEAD | awk -F/ '{print $NF}'
 # Online.
 #
 git remote show $remote | awk '/^  HEAD branch:/ {print $NF}'
+```
+
+### Checkout a GitHub PR (of a private repository)
+
+A PR request can be checked out locally (even if the source repo is private):
+
+```sh
+# This creates a standard branch, linked to the PR.
+#
+git fetch origin pull/$number/head:$local_branch
 ```

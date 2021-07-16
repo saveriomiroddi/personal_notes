@@ -8,6 +8,7 @@
   - [Mocks](#mocks)
     - [Matchers](#matchers)
     - [Matching arguments](#matching-arguments)
+    - [Receive counts](#receive-counts)
     - [Responses](#responses)
   - [Testing modules](#testing-modules)
   - [Custom matcher](#custom-matcher)
@@ -102,7 +103,7 @@ end
 
 ### Matchers
 
-See [reference](https://relishapp.com/rspec/rspec-expectations/docs/built-in-matchers/type-matchers).
+See [reference](https://relishapp.com/rspec/rspec-expectations/v/3-10/docs/built-in-matchers).
 
  | Target       | Methods                                              | Notes                |
  | ------------ | ---------------------------------------------------- | -------------------- |
@@ -117,15 +118,24 @@ See [reference](https://relishapp.com/rspec/rspec-expectations/docs/built-in-mat
  |              | `match_array(array)`                                 |                      |
  |              | `be_false`, `be_true`, `be_falsey`, `be_truthy`      |                      |
  |              | `be_empty`                                           |                      |
+ | Include      | `include`                                            |                      |
 
 ### Matching arguments
 
 See [reference](https://relishapp.com/rspec/rspec-mocks/docs/setting-constraints/matching-arguments).
 
-| Argument                   | Methods            | Notes                                     |
-| -------------------------- | ------------------ | ----------------------------------------- |
-| Regexp/===                 | with(/expr/)       | Anything supporting case equality (`===`) |
-| Instance of specific class | instance_of(klazz) |                                           |
+| Argument                   | Methods              | Notes                                     |
+| -------------------------- | -------------------- | ----------------------------------------- |
+| Regexp/===                 | `with(/expr/)`       | Anything supporting case equality (`===`) |
+| Instance of specific class | `instance_of(klazz)` |                                           |
+
+### Receive counts
+
+See [reference](https://relishapp.com/rspec/rspec-mocks/v/3-10/docs/setting-constraints/receive-counts).
+
+- `once`, `twice`, `exactly(n).times`
+- `at_least(:once)`, `at_least(:twice)`, `at_least(n).times`
+- `at_most(:once)`, `at_most(:twice)`, `at_most(n).times`
 
 ### Responses
 

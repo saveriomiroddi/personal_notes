@@ -1,3 +1,20 @@
+## Fri 16/Jul/2021
+
+- Rust/Gamedev
+  - Bevy
+    - [x] Follow up with reported bug
+      - [x] Prepare a Windows 10 USB installation
+- Studies/Rust
+  - [x] Review RefMut BCK issue
+- Studies/Git
+  - [x] Fetching GitHub PRs; write an alias
+- Projects
+  - Fish Game
+    - [x] Review PR
+    - [x] Investigate/discuss Macroquad CPU occupation
+    - [ ] Study grenade code
+    - [ ] Think working bomb
+
 ## Thu 15/Jul/2021
 
 - Writings
@@ -17,6 +34,9 @@
   - Programming journal headers copy script
     - [x] Try multiple pattern match
     - [x] Add escaping
+- Studies/Low-level programming
+  - [ ] Write Great Code, Volume 1: Understanding the Machine
+    - [ ] Chapter 7
 
 ## Wed 14/Jul/2021
 

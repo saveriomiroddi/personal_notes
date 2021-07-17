@@ -1,3 +1,10 @@
+## Sat 17/Jul/2021
+
+- Studies/Low-level programming
+    - [x] Chapter 7
+    - [x] Chapter 8
+    - [ ] Chapter 9
+
 ## Fri 16/Jul/2021
 
 - Rust/Gamedev

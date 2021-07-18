@@ -2,6 +2,7 @@
 
 - [Rust](#rust)
   - [Cargo/Rustup](#cargorustup)
+    - [Features](#features)
     - [Toolchain](#toolchain)
     - [Fast builds](#fast-builds)
     - [Cross-compilation](#cross-compilation)
@@ -100,6 +101,10 @@ cargo test [-- --nocapture]          # pass nocapture in order to output print s
 cargo fmt
 cargo clippy                         # linter
 cargo doc [--open]                   # builds and optionally opens docs for the installed crates
+
+# Build/run options
+
+--features draw_hitboxes
 ```
 
 When a project is run via Cargo, the env variable `CARGO_MANIFEST_DIR` is passed to the binary.
@@ -161,6 +166,16 @@ See more keys and their definitions at https://doc.rust-lang.org/cargo/reference
 At the root, `Cargo.lock`, managed by Cargo, manages the dependency versions.
 
 The cargo configuration file (see custom configs below) `toml` extension is optional; it's search in many locations: https://doc.rust-lang.org/cargo/reference/config.html.
+
+### Features
+
+Define the features of a project.
+
+```toml
+[features]
+default = ["draw_hitboxes"] // features enabled by default
+draw_hitboxes = []          // `[]` is the dependencies
+```
 
 ### Toolchain
 
@@ -361,6 +376,7 @@ The `cfg` attribute performs a conditional build:
 #[cfg(test)]                 // Compile only in test builds
 #[cfg(not(test))]            // ... in non-test builds
 #[cfg(target_os = "linux")]  // ... on linux
+#[cfg(feature = "draw_hitboxes")] // ... with feature enabled
 ```
 
 The attribute can be applied to methods, statements, etc.

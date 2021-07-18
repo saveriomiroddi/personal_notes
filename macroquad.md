@@ -6,6 +6,7 @@
   - [Draw](#draw)
     - [Text](#text)
     - [Images/Sprites](#imagessprites)
+    - [Animations](#animations)
     - [Tiles](#tiles)
   - [Resources handling/ECS](#resources-handlingecs)
   - [Audio/Sound](#audiosound)
@@ -84,6 +85,7 @@ clear_background(RED);
 
 draw_line(40.0, 40.0, 100.0, 200.0, 15.0, BLUE);
 draw_rectangle(screen_width() / 2.0 - 60.0, 100.0, 120.0, 60.0, GREEN);
+draw_rectangle_lines(screen_width() / 2.0 - 60.0, 100.0, 120.0, 60.0, 5., RED);
 draw_circle(screen_width() - 30.0, screen_height() - 30.0, 15.0, YELLOW);
 ```
 
@@ -107,6 +109,37 @@ draw_texture_ex(
     WHITE,                                           // color
     DrawTextureParams {                              // params
         source: Some(Rect::new(0.0, 0.0, 76., 66.)), // source (eg. from a sprite sheet)
+        ..Default::default()
+    },
+);
+```
+
+### Animations
+
+AnimationSprite doesn't have a notion of texture; it's simply has the logic to generate the coordinates inside the sprite sheet at a given point in time.
+
+```rs
+let cannon_sprite = AnimatedSprite::new(
+    CANNON_WIDTH, CANNON_HEIGHT, // set the dimension of a single frame
+    &[Animation { name: "idle", row: 0, frames: 1, fps: 1 }],
+    &[Animation { name: "firing", row: 1, frames: 4, fps: 8 }],
+    true, // `playing`: set true to start animating directly, or set separately
+);
+
+cannon_sprite.set_animation(1);
+cannon_sprite.set_frame(0); // not required; 0 is default
+
+// Put both inside draw().
+//
+cannon_sprite.update();
+draw_texture_ex(
+    cannonball_texture, // texture is separate!
+    // ...
+    DrawTextureParams {
+        source: Some(cannonball_sprite.frame().source_rect),
+        dest_size: Some(cannonball_sprite.frame().dest_size),
+        flip_x: false,
+        rotation: 0.0,
         ..Default::default()
     },
 );

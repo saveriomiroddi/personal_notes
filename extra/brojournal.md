@@ -1,3 +1,21 @@
+## Sun 18/Jul/2021
+
+- Admin/tools
+  - [x] Report in depth issues with PDF tool
+- Projects
+  - Fish Game
+    - [x] Draw artwork
+      - [x] Experiment and buy software
+        - [x] Fight registration
+        - [x] Report bug
+    - [ ] Implement weapon
+      - [ ] Big bomb
+        - [x] Draw assets
+        - [x] Implement base
+        - [x] Implement grace time
+        - [x] Add feature to debug hitboxes
+        - [x] Fight animations
+
 ## Sat 17/Jul/2021
 
 - Studies/Low-level programming

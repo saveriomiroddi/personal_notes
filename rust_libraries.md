@@ -5,6 +5,7 @@
     - [Files read/write/create](#files-readwritecreate)
       - [Read/Write traits](#readwrite-traits)
     - [Paths handling/Directories](#paths-handlingdirectories)
+    - [File/directory operations](#filedirectory-operations)
     - [Testing](#testing)
       - [Integration tests](#integration-tests)
     - [Collections](#collections)
@@ -126,13 +127,6 @@ read_to_end(&mut buffer)     // read until the EOF
 ```rs
 write_all(buf: &[u8])
 write(buf: &[u8])            // prefer `write_all()` to `write()`, since the latter doesn't guarantee that the whole buffer is written!
-``
-
-
-### File operations
-
-```rust
-fs::remove_file(file)?;
 ```
 
 ### Paths handling/Directories
@@ -189,14 +183,49 @@ path
   .to_str()         // Option<&str>
   .unwrap()         // &str
   .into_string();   // String
+
+// If tests need to be performed (e.g. on file_name()), then the most convenient thing is to go through
+// &str:
+//
+if pathbuf.file_name().unwrap().to_str().unwrap().start_with("js0") { /* */ }
 ```
 
-Directories:
+### File/directory operations
 
 ```rust
+fs::remove_file(file)?;
+
 path.exists()                    // test if file/dir exists
 std::fs::create_dir(&path)?;     // create a directory (mkdir)
 std::fs::create_dir_all(&path)?; // create a directory (mkdir -p)
+
+// Read a directory's file basenames (stdlib doesn't have glob APIs).
+// WATCH OUT! The result is not sorted!
+//
+let block_devices: ReadDir = std::fs::read_dir("/dev").unwrap();
+block_devices
+    .map(|entry| {
+      entry.unwrap()             // DirEntry
+        .file_name()             // base filename, OsString
+        .into_string().unwrap()  // String
+    })
+    .collect::<Vec<String>>()
+
+// Rigorous way of filtering + mapping a directory's filenames
+// This also shows how to work with full path names.
+//
+block_devices
+    .filter_map(|entry| {
+        let path = entry.unwrap().path();
+        let file_name = path.file_name().unwrap().to_str().unwrap();
+
+        if file_name.starts_with(JOYSTICK_BLOCK_DEVICE_FILENAME_PREFIX) {
+            Some(path.into_os_string().into_string().unwrap())
+        } else {
+            None
+        }
+    })
+    .collect::<Vec<String>>()
 ```
 
 ### Testing

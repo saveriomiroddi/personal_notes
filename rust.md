@@ -676,6 +676,7 @@ flat_map(|x| x)              // Ruby :flat_map. WATCH OUT! flattens only one lev
 fold(a, |a, x| a + x)        // Ruby :inject
 fold_first(|a, x| a + x)     // Like fold(), using the first element as initial value
 filter(|x| x % 2 == 0)       // Ruby :select
+filter_map(|x| Some(x * 2))  // AWESOME!!! Combines filter and map; None values are discarded
 find(|x| x % 2 == 0)         // Ruby :find/:detect
 flatten()                    // Quasi-Ruby :flatten. WATCH OUT! flattens only one level.
 dedup()                      // Ruby :uniq

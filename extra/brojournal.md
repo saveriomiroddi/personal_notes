@@ -1,3 +1,11 @@
+## Mon 19/Jul/2021
+
+- Projects
+  - Fish Game
+    - [x] Complete cannon
+    - [x] Improve Linux controllers detection
+      - [x] Fight find simplest path handling patterns
+
 ## Sun 18/Jul/2021
 
 - Admin/tools

@@ -1,3 +1,13 @@
+## Tue 20/Jul/2021
+
+- Projects
+  - Fish Game
+    - [x] Fix master gamepad compilation error
+    - [x] Apply review notes Cannon
+      - [x] Cannon: Allow self-pwning
+      - [x] Add blowback
+    - [x] Implement Parrot
+
 ## Mon 19/Jul/2021
 
 - Projects

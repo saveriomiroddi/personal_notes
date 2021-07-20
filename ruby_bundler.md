@@ -3,6 +3,7 @@
 - [Bundler](#bundler)
   - [Generic structure](#generic-structure)
   - [Gem definition options](#gem-definition-options)
+  - [Commands](#commands)
 
 ## Generic structure
 
@@ -47,3 +48,7 @@ gem 'sshkit-sudo', '~> 0.2.0', path: '/path/to/sshkit-sudo'
 #
 gem 'sshkit-sudo', git: 'https://github.com/ticketsolve/sshkit-sudo', branch: 'mytest'
 ```
+
+## Commands
+
+- `bundler package`: download gems into `vendor/cache`

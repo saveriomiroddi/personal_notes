@@ -1,3 +1,14 @@
+## Wed 21/Jul/2021
+
+- Projects
+  - Geet
+    - [x] PR creation: Rename `upstream` branchs references/APIs to `remote`
+    - [x] Other minor refactorings
+    - [ ] Add upstream support to `pr open`
+      - [x] Fight misbehaving/ignored `head` in GitHub PR API
+  - Fish game
+    - [x] Review new weapon specs
+
 ## Tue 20/Jul/2021
 
 - Projects

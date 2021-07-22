@@ -1,3 +1,10 @@
+## Thu 22/Jul/2021
+
+- Projects
+  - Fish game
+    - [x] Implement Curse weapon
+      - [x] Fight issue with throw (-> extra logic in unexpected location)
+
 ## Wed 21/Jul/2021
 
 - Projects
